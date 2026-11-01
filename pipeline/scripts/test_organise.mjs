@@ -1,7 +1,7 @@
 // Tests "Fill the fridge" (organise.js) on every product whose 3D file carries stock items.
 // For each: the fridge starts empty; Fill puts every item exactly where it was built (no drift in position or scale),
 // Empty hides them all again, a second Fill and a fill with the doors closed and reopened give the same result,
-// and the page logs no errors.
+// the doors Fill opens are drawn fully open, and the page logs no errors.
 // usage: node test_organise.mjs <base url> <out dir> [product ids...]
 import fs from "node:fs";
 import { launch, sleep } from "./cdp.mjs";
@@ -27,6 +27,13 @@ const snap = `(() => {
   const top = found.filter((n) => { for (let p = n.parent; p; p = p.parent) if (set.has(p)) return false; return true; });
   return top.map((n) => [n.visible ? 1 : 0, n.position.x, n.position.y, n.position.z, n.scale.x, n.scale.y, n.scale.z]);
 })()`;
+// every part drawn the way the page says: an open part has moved its whole travel, a shut one sits at rest
+const restAt = `(() => { const mv = document.querySelector('model-viewer'), s = mv[Object.getOwnPropertySymbols(mv).find((x) => x.description === 'scene')];
+  window.__rest = Object.fromEntries(window.__demo.product.parts.map((p) => { const n = s.getObjectByName(p.node); return [p.key, n && [n.position.clone(), n.quaternion.clone()]]; })); })()`;
+const drawn = `JSON.stringify((() => { const mv = document.querySelector('model-viewer'), s = mv[Object.getOwnPropertySymbols(mv).find((x) => x.description === 'scene')], st = window.__demo.state;
+  return window.__demo.product.parts.filter((p) => window.__rest[p.key] && (p.axis || p.slide)).map((p) => { const n = s.getObjectByName(p.node), [p0, q0] = window.__rest[p.key];
+    const moved = p.axis ? 2 * Math.acos(Math.min(1, Math.abs(n.quaternion.dot(q0)))) * 180 / Math.PI / Math.abs(p.angle) : n.position.distanceTo(p0) / Math.hypot(...p.slide);
+    return [p.key, +moved.toFixed(2), st[p.key] ? moved > 0.98 : moved < 0.02]; }); })())`;
 const maxDiff = (a, c) => a.reduce((m, r, i) => Math.max(m, ...[1, 2, 3, 4, 5, 6].map((k) => Math.abs(r[k] - c[i][k]))), 0);
 
 for (const id of targets) {
@@ -37,6 +44,7 @@ for (const id of targets) {
   const ready = await b.evalJS("!!window.__organise?.ready?.()");
   check(ready, "the model has stock items and the Fill button is ready");
   if (!ready) continue;
+  await b.evalJS(restAt);
   const empty = JSON.parse(await b.evalJS(`JSON.stringify(${snap})`));
   check(empty.length > 60, `${empty.length} stock items found`);
   check(empty.every((r) => r[0] === 0), "starts empty: every item hidden");
@@ -50,6 +58,8 @@ for (const id of targets) {
   check(await b.evalJS("window.__organise.isFull() && document.getElementById('part-organise').textContent.includes('Empty')"), "the button now says Empty the fridge");
   const open = await b.evalJS("Object.values(window.__demo.state).filter(Boolean).length");
   check(open >= 2, `Fill opened the doors (${open} parts open)`);
+  const d = JSON.parse(await b.evalJS(drawn));
+  check(d.every((x) => x[2]), `after Fill: every part drawn as the page says (${d.map((x) => `${x[0]} ${Math.round(x[1] * 100)}%`).join(", ")})`);
 
   await b.evalJS("document.getElementById('part-organise').click()");
   await sleep(9000);

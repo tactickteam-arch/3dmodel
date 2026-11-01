@@ -94,12 +94,13 @@ for (const p of catalogue.products.filter((p) => !p.hidden)) {
     ok((await b.evalJS(`document.querySelector('[data-part="${part.key}"]').getAttribute('aria-pressed')`)) === "true", `${part.label} opens`);
   }
   await b.evalJS(`document.getElementById('roomFine').open = true;1`);
-  await b.evalJS(`(()=>{const i=document.getElementById('hcIn');i.value=1.0;i.dispatchEvent(new Event('input',{bubbles:true}));return 1})()`); await sleep(300);
-  const d3 = await dataset();
-  ok(+d3.hc === 1, "the phone-height slider changes the camera height");
+  await b.evalJS(`(()=>{const i=document.getElementById('hcIn');i.value=1.0;i.dispatchEvent(new Event('input',{bubbles:true}));return 1})()`);
+  // it redraws on the next frame, which can be slow while a clip plays
+  ok(await b.waitFor("+document.querySelector('.room').dataset.hc === 1", 3000), "the phone-height slider changes the camera height");
   // save
   await b.evalJS(`window.__dl=null;const o=HTMLAnchorElement.prototype.click;if(!window.__patched){HTMLAnchorElement.prototype.click=function(){if(this.download){window.__dl={name:this.download,href:this.href}}else o.call(this)};window.__patched=1}navigator.canShare=undefined;1`);
-  await click("#roomSave"); await sleep(2500);
+  await click("#roomSave");
+  await b.waitFor("!!window.__dl", 10000); // a 1600 x 1000 JPEG can take a few seconds to encode
   const size = await b.evalJS(`(async()=>{if(!window.__dl)return 0;const r=await fetch(window.__dl.href);return (await r.blob()).size})()`);
   ok(size > 20000, `Save picture gives a JPEG (${size} bytes)`);
   await b.shot(`${out}/${p.id}.png`);

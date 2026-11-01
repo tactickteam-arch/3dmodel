@@ -617,6 +617,11 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
     if (outer || inner) { await togglePart(outer || inner); await new Promise((r) => setTimeout(r, 950)); if (!S || S.busy) return; }
     S.busy = true;
     const mv = S.mv;
+    // let the running clip end first: model-viewer cross-fades from it, and currentTime = 0 rewinds
+    // that fade, leaving the new door drawn shut
+    if (!mv.paused) await new Promise((r) => { mv.addEventListener("finished", r, { once: true }); setTimeout(r, 1200); });
+    if (!S) return;
+    mv.pause();
     const sk = () => parts.map((p) => (S.open[p.key] ? 1 : 0)).join("");
     const from = sk();
     S.open[key] = !S.open[key];

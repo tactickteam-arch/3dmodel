@@ -778,6 +778,10 @@ const stateKey = () => parts.map((p) => (state[p.key] ? 1 : 0)).join("");
 // outline, so the camera steps back while it is open
 const swingsWide = parts.some((p) => p.axis && Math.abs(p.angle) >= 90);
 let busy = false;
+// model-viewer cross-fades from a clip still running, and setting currentTime rewinds that fade too: the new
+// clip stays hidden behind the old one and a door the state calls open is drawn shut or half-open. So a clip
+// starts from a paused element, once the last one has ended (or cut short, for a jump to the end).
+const clipEnded = () => (mv.paused ? null : new Promise((r) => { mv.addEventListener("finished", r, { once: true }); setTimeout(r, 1200); }));
 async function togglePart(key, { instant = false } = {}) {
   if (busy || !(key in state)) return;
   // a part inside another (the ice tray lives behind the freezer door): open the outer one first, and close the inner one before the outer
@@ -786,6 +790,8 @@ async function togglePart(key, { instant = false } = {}) {
   const inner = state[key] ? parts.find((x) => x.needs === key && state[x.key])?.key : null;
   if (outer || inner) { await togglePart(outer || inner, { instant }); await sleep(instant ? 80 : 950); if (busy) return; }
   busy = true;
+  if (!instant) await clipEnded();
+  mv.pause();
   const from = stateKey();
   const anyBefore = Object.values(state).some(Boolean);
   state[key] = !state[key];

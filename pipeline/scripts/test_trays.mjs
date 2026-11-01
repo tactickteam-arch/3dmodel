@@ -1,7 +1,8 @@
 // Tests the fridge trays that lift out (BENCHMARK.md section 13). One button and a tap take the shelves, the Fresh 0
 // tray and the vegetable drawer out with their food, and put them back. Taking them out with the door shut opens the
 // door first; shutting the door puts them back first. The model has a clip for every one-part move, Fill still puts
-// every item exactly in its place with the trays out, and the page logs no errors.
+// every item exactly in its place with the trays out, every door is drawn the way the page says (also when a second
+// button is pressed while the first door is still moving), and the page logs no errors.
 // usage: node test_trays.mjs <base url> <out dir> [product id]
 import fs from "node:fs";
 import { launch, sleep } from "./cdp.mjs";
@@ -28,6 +29,17 @@ const slide = (await b.evalJS("JSON.stringify(window.__demo.product.parts.find((
 check(slide !== "null", `the product has a trays part (slide ${slide})`);
 const dz = JSON.parse(slide)?.[2] ?? 0;
 
+// every part drawn the way the page says: an open part has moved its whole travel, a shut one sits at rest.
+// The rest poses are read now, with everything shut.
+await b.evalJS(`(() => { const s = ${scene}; window.__rest = Object.fromEntries(window.__demo.product.parts.map((p) => { const n = s.getObjectByName(p.node); return [p.key, [n.position.clone(), n.quaternion.clone()]]; })); })()`);
+const drawn = async (when) => {
+  const d = JSON.parse(await b.evalJS(`JSON.stringify((() => { const s = ${scene}, st = window.__demo.state;
+    return window.__demo.product.parts.map((p) => { const n = s.getObjectByName(p.node), [p0, q0] = window.__rest[p.key];
+      const moved = p.axis ? 2 * Math.acos(Math.min(1, Math.abs(n.quaternion.dot(q0)))) * 180 / Math.PI / Math.abs(p.angle) : n.position.distanceTo(p0) / Math.hypot(...p.slide);
+      return [p.key, +moved.toFixed(2), st[p.key] ? moved > 0.98 : moved < 0.02]; }); })())`));
+  check(d.every((x) => x[2]), `${when}: every part drawn as the page says (${d.map((x) => `${x[0]} ${Math.round(x[1] * 100)}%`).join(", ")})`);
+};
+
 // clips: Rest plus one per single-part move
 const names = JSON.parse(await b.evalJS("JSON.stringify(document.querySelector('model-viewer').availableAnimations)"));
 const n = (await b.evalJS("window.__demo.product.parts.length"));
@@ -46,6 +58,7 @@ check(st.fridge && st.trays, `from a shut door: the door opened, then the trays 
 check(Math.abs(t1 - t0 - dz) < 0.003 && Math.abs(s1 - s0 - dz) < 0.003 && Math.abs(v1 - v0 - dz) < 0.003,
   `the trays and their food moved out ${((t1 - t0) * 100).toFixed(1)} cm (shelf food ${((s1 - s0) * 100).toFixed(1)}, drawer ${((v1 - v0) * 100).toFixed(1)})`);
 check(await label() === "Put trays back", `the button now reads "${await label()}"`);
+await drawn("door and trays out");
 await b.shot(`${out}/${id}-trays-out.png`);
 
 // a tap on the trays puts them back, and another takes them out
@@ -67,6 +80,7 @@ for (const [want, words] of [[false, "puts the trays back"], [true, "takes them 
   st = await state();
   check(st.trays === want && st.fridge, `a tap on the trays ${words} (${JSON.stringify(st)})`);
 }
+await drawn("after the taps");
 
 // Fill and Empty with the trays out: every item lands exactly where it was built, in the moved trays
 await press("organise");
@@ -91,7 +105,15 @@ await sleep(3200);
 st = await state();
 const t2 = await z("FridgeTrays");
 check(!st.trays && !st.fridge && Math.abs(t2 - t0) < 0.003, `shutting the door put the trays back first, then shut it (${JSON.stringify(st)}, trays at ${((t2 - t0) * 100).toFixed(1)} cm)`);
+await drawn("door shut");
 await b.shot(`${out}/${id}-shut.png`);
+
+// a second press while the first door is still moving (the page lets one through after 900 ms; a clip lasts 1 s)
+await press("freezer");
+await sleep(930);
+await press("fridge");
+await sleep(3000);
+await drawn("freezer, then fridge 930 ms later");
 
 const errs = b.logs.filter((l) => /EXCEPTION|\[error\]|Uncaught/.test(l));
 check(errs.length === 0, errs.length ? `console errors: ${errs.slice(0, 2).join(" | ")}` : "no console errors");
