@@ -105,8 +105,10 @@ export function stateClips(root, parts, seconds = 1) {
     return new T(`${p.node}.${prop}`, [0, seconds], [...a, ...a]);
   });
   const clips = [new THREE.AnimationClip("Rest", seconds, rest)];
+  // the pages move one part at a time (a part inside another waits for it), so only states one part apart
+  // need a clip: 2^n x n clips instead of 2^n x (2^n - 1), which keeps a four-part model small
   for (const from of states) for (const to of states) {
-    if (from === to) continue;
+    if ([...from].filter((c, i) => c !== to[i]).length !== 1) continue;
     const tracks = parts.map((p, i) => {
       const [prop, a] = pose(p, nodes[i], from[i] === "1");
       const [, b] = pose(p, nodes[i], to[i] === "1");

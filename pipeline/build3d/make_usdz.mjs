@@ -292,9 +292,17 @@ for (const finish of finishes) {
         ]) },
       ]),
     });
+    // a part inside this one (the trays behind the fridge door, the ice tray behind the freezer's) goes back in at
+    // once before this one closes; both moves are absolute, so nothing happens if it is already in
+    const inner = [...partInfo.values()].filter((i) => i.part.needs === info.part.key);
+    const putBack = inner.length ? [{ name: "PutBack", write: () => group("PutBack", "parallel", inner.flatMap((i, k) => [
+      { name: `In${k}Place`, write: () => transform(`In${k}Place`, i.closedPath, i.poseClosed, 0) },
+      { name: `In${k}Park`, write: () => transform(`In${k}Park`, i.openPath, i.poseParked, 0) },
+    ])) }] : [];
     behavior(`Close_${n}`, tap(info.openTargets), {
       name: "Close",
       write: () => group("Close", "serial", [
+        ...putBack,
         { name: "Swing", write: () => transform("Swing", info.openPath, info.poseClosed, SWING) },
         { name: "Swap", write: () => group("Swap", "parallel", [
           { name: "PlaceClosed", write: () => transform("PlaceClosed", info.closedPath, info.poseClosed, 0) },

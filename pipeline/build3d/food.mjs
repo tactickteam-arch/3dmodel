@@ -67,7 +67,7 @@ export function Food({ brandDir = null } = {}) {
     }
     for (let i = 0; i < n - 1; i++) for (let k = 0; k < sides; k++) {
       const a = i * (sides + 1) + k, b2 = a + 1, c = a + sides + 1, d = c + 1;
-      idx.push(a, c, b2, b2, c, d);
+      idx.push(a, b2, c, b2, d, c); // faces point outward
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
@@ -161,11 +161,11 @@ export function Food({ brandDir = null } = {}) {
   function carrot(name, x, y, z, seed = 1) {
     const g = group(name);
     const L = 0.15;
-    // lying along z, the tip toward +z
+    // lying along z, the crown (where the fronds grow) toward +z and the tip toward -z
     const m = mesh("Root", lathe([[0.0001, 0], [0.004, 0.006], [0.01, 0.04], [0.0145, 0.09], [0.0165, 0.13], [0.0155, 0.15], [0.0001, 0.152]], 12), C("carrot", 0xffffff, { rough: 0.55 }, "carrot.jpg"), 0, 0, 0);
     m.rotation.x = Math.PI / 2; m.position.set(0, 0.016, -L / 2 + 0.0);
     g.add(m);
-    for (let i = 0; i < 4; i++) { const s = mesh("Frond", new THREE.CylinderGeometry(0.0012, 0.0018, 0.05, 4), C("carrottop", 0x4f8a2e, { rough: 0.6 }), 0, 0.016 + (i - 1.5) * 0.004, -L / 2 - 0.02); s.rotation.x = Math.PI / 2 + (i - 1.5) * 0.14; g.add(s); }
+    for (let i = 0; i < 4; i++) { const s = mesh("Frond", new THREE.CylinderGeometry(0.0012, 0.0018, 0.05, 4), C("carrottop", 0x4f8a2e, { rough: 0.6 }), 0, 0.016 + (i - 1.5) * 0.004, L / 2 + 0.02); s.rotation.x = Math.PI / 2 + (i - 1.5) * 0.14; g.add(s); }
     return tag(at(g, x, y, z, ((seed % 3) - 1) * 0.1));
   }
   function brinjal(name, x, y, z, seed = 1) {
@@ -318,13 +318,15 @@ export function Food({ brandDir = null } = {}) {
     const g = group(name);
     const m = C("sachet_" + texFile, 0xffffff, { rough: 0.3 }, texFile);
     const back = C("sachetback", 0xe8f0f8, { rough: 0.3 });
+    // lying down, the pack settles: its underside goes almost flat and the milk bulges the top
+    const up1 = upright ? 1 : 1.4, down1 = upright ? 1 : 0.3;
     const mk = (up) => {
       const geo = flipV(new THREE.PlaneGeometry(W, D, 14, 8));
       const p = geo.attributes.position;
       for (let i = 0; i < p.count; i++) {
         const u = p.getX(i) / (W / 2), v = p.getY(i) / (D / 2);
         const h = T * Math.pow(Math.max(0, 1 - u * u), 0.55) * Math.pow(Math.max(0, 1 - v * v), 0.45);
-        p.setZ(i, up ? h : -h);
+        p.setZ(i, up ? h * up1 : -h * down1);
       }
       geo.computeVertexNormals();
       return geo;
@@ -332,7 +334,7 @@ export function Food({ brandDir = null } = {}) {
     const top = mesh("Top", mk(true), m, 0, 0, 0);
     const bot = mesh("Bottom", flipFaces(mk(false)), back, 0, 0, 0);
     if (upright) { top.position.y = bot.position.y = D / 2; }
-    else { top.position.y = bot.position.y = T * 0.55; top.rotation.x = bot.rotation.x = -Math.PI / 2; }
+    else { top.position.y = bot.position.y = T * down1; top.rotation.x = bot.rotation.x = -Math.PI / 2; } // underside on the shelf
     g.add(top, bot);
     return tag(at(g, x, y, z, seed * 0.3));
   }

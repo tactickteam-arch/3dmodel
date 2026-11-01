@@ -3,7 +3,9 @@
 // photos of this model (front, side, open, stocked, rear): freezer on top (81 L) with a brushed-steel Convertible plate, one glass
 // shelf and a manual ice maker (lever and two trays); fridge below (262 L) with a pull-out Fresh 0 Zone tray, a round temperature
 // plate, three tempered-glass shelves and a large Fresh Zone drawer; 2 baskets in the freezer door and 4 in the fridge door; both
-// doors hinged on the right; a black pocket grip across the top of the fridge door instead of handles.
+// doors hinged on the right; a black pocket grip across the top of the fridge door instead of handles. LG's manual says the
+// shelves, the Fresh 0 Zone tray and the vegetable drawer lift out, so they are one part (FridgeTrays) that slides out with
+// its food when the fridge door is open.
 // Stocked for a south Indian kitchen. usage: node make_lg_glt3426.mjs <products.json> <tex dir> <out.glb>
 import fs from "node:fs";
 import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
@@ -25,6 +27,12 @@ const gy0 = 0.106, gy1 = 1.132;               // fridge cavity floor and ceiling
 const fzBot = 1.185;                         // freezer door bottom edge
 const frTop = 1.178, frLow = 0.028;          // fridge door top (with its lip) and bottom
 const bandTop = 1.169, bandBot = 1.141;      // the black pocket grip
+// With the door shut its baskets reach 105 mm into the cabinet (the bottle basket), so the shelves end
+// 1 cm short of them, and the drawer and the freezer shelf short of the baskets in front of them.
+const shelfFront = zFront - 0.115, drawerFront = zFront - 0.105, fzShelfFront = zFront - 0.09;
+// the glass shelves' heights, measured on LG's open-fridge photo of this model (scaled by the drawer cover; the control
+// plate on the back wall checks the scale, 0.912 m measured against 0.905 m here)
+const s1 = 0.834, s2 = 0.711, s3 = 0.587;
 
 // ── materials ──
 const steelDoorF = mat("DoorFreezer", 0xd6d6d6, { metal: 0.38, rough: 0.5 });
@@ -130,8 +138,9 @@ function sachet(name, m, labelName, x, y, z, rotY = 0) {
   return g;
 }
 function egg(name, x, y, z) { const e = sph(name, 0.0215, F.egg, x, y, z, 1, 1.28, 1); return e; }
-function basket(name, w, dep, h, y, front = true) { // a clear door basket, open at the top; origin at its floor
-  const g = group(name, 0, y, 0);
+// a clear door basket, open at the top; origin at its floor, its back on the face of the door's liner (10 mm in)
+function basket(name, w, dep, h, y, front = true) {
+  const g = group(name, 0, y, -0.01);
   g.add(box(name + "Floor", w, 0.004, dep, clear, 0, 0.002, -dep / 2));
   g.add(box(name + "Back", w, h, 0.004, clear, 0, h / 2, -0.002));
   if (front) g.add(box(name + "Lip", w, h * 0.85, 0.004, clear, 0, h * 0.425, -dep + 0.002));
@@ -195,9 +204,9 @@ for (let i = 0; i < 5; i++) cab.add(box("FreezerVent", 0.09, 0.004, 0.008, plint
 cab.add(plane("PlateConvertible", 0.166, 0.077, plateConv, -0.06, 1.485, zIn1 + 0.0125));
 // freezer glass shelf across the cavity, with a metal front rail
 {
-  const y = 1.392, g = group("FreezerShelf", 0, y, 0), bd = inD - 0.06;
+  const y = 1.392, g = group("FreezerShelf", 0, y, 0), bd = fzShelfFront - 0.005 - zIn1 - 0.02;
   g.add(box("FzShelfGlass", inW - 0.012, 0.005, bd, glass, 0, 0, zIn1 + bd / 2 + 0.02));
-  g.add(box("FzShelfRimF", inW - 0.008, 0.012, 0.01, glassRim, 0, 0.004, zFront - 0.04));
+  g.add(box("FzShelfRimF", inW - 0.008, 0.012, 0.01, glassRim, 0, 0.004, fzShelfFront - 0.005));
   g.add(box("FzShelfRimB", inW - 0.008, 0.01, 0.008, glassRim, 0, 0.003, zIn1 + 0.03));
   g.add(box("FzShelfRailL", 0.008, 0.012, bd, glassRim, xL + 0.01, 0.003, zIn1 + bd / 2 + 0.02));
   g.add(box("FzShelfRailR", 0.008, 0.012, bd, glassRim, xR - 0.01, 0.003, zIn1 + bd / 2 + 0.02));
@@ -210,6 +219,9 @@ cab.add(box("IceHousingSideL", 0.005, 0.14, 0.2, white, icX - icW / 2 - 0.0025, 
 cab.add(box("IceHousingSideR", 0.005, 0.14, 0.2, white, icX + icW / 2 + 0.0025, 1.247 + icDY, icZ - 0.1));
 
 // ── fridge inside ──
+// the trays that lift out (LG's manual): Fresh 0 Zone, the three shelves and the vegetable drawer, with their food
+const trays = group("FridgeTrays");
+cab.add(trays);
 cab.add(box("FridgeLed", 0.2, 0.006, 0.016, lightM, 0, gy1 - 0.006, zFront - 0.15));
 // Fresh 0 Zone: a pull-out tray at the top, a clear box on side rails with LG's printed words on its lip
 {
@@ -224,30 +236,36 @@ cab.add(box("FridgeLed", 0.2, 0.006, 0.016, lightM, 0, gy1 - 0.006, zFront - 0.1
   g.add(box("F0Handle", 0.18, 0.012, 0.014, clearRib, 0, 0.05, zc + bd / 2 + 0.006));
   g.add(plane("PrintFresh0", 0.17, 0.0378, printF0, 0, 0.1, zc + bd / 2 - 0.0015));
   g.add(plane("PrintPullout", 0.17, 0.0227, printPull, 0, 0.025, zc + bd / 2 + 0.0023));
-  cab.add(g);
+  trays.add(g);
   // butter, paneer, curd cups and a cheese block on its floor
-  stock.fresh0(cab, { y: 1.007, z: zc + 0.03 });
+  stock.fresh0(trays, { y: 1.005, z: zc + 0.03 });
 }
 // the round temperature plate on the back wall
 cab.add(plane("PlateControl", 0.162, 0.072, plateCtrl, -0.04, 0.905, zIn1 + 0.0125));
 // three tempered-glass shelves with white rims, and the Fresh Zone drawer
 function shelf(name, y) {
-  const g = group(name, 0, y, 0), bd = inD - 0.05;
+  const g = group(name, 0, y, 0), bd = shelfFront - 0.0085 - zIn1 - 0.014;
   g.add(box(name + "Glass", inW - 0.01, 0.006, bd, glass, 0, 0, zIn1 + bd / 2 + 0.014));
-  g.add(box(name + "Rim", inW - 0.01, 0.014, 0.012, glassRim, 0, 0.004, zFront - 0.036));
-  g.add(box(name + "Edge", inW - 0.01, 0.004, 0.003, edgeGreen, 0, -0.002, zFront - 0.029));
+  g.add(box(name + "Rim", inW - 0.01, 0.014, 0.012, glassRim, 0, 0.004, shelfFront - 0.0085));
+  g.add(box(name + "Edge", inW - 0.01, 0.004, 0.003, edgeGreen, 0, -0.002, shelfFront - 0.0015));
   g.add(box(name + "RimBack", inW - 0.01, 0.01, 0.01, glassRim, 0, 0.002, zIn1 + 0.02));
   g.add(box(name + "RailL", 0.01, 0.014, bd, glassRim, xL + 0.012, 0, zIn1 + bd / 2 + 0.014));
   g.add(box(name + "RailR", 0.01, 0.014, bd, glassRim, xR - 0.012, 0, zIn1 + bd / 2 + 0.014));
+  trays.add(g);
+}
+shelf("Shelf1", s1);
+shelf("Shelf2", s2);
+shelf("Shelf3", s3);
+// Fresh Zone: a glass cover (fixed) over a big clear drawer (it lifts out) with LG's printed words on its front
+const fzD = drawerFront - zIn1 - 0.016, fzW = inW - 0.02, fzC = zIn1 + fzD / 2 + 0.016;
+{
+  const g = group("FreshZoneCover", 0, 0, 0), bd = fzD;
+  g.add(box("FzGlassCover", inW - 0.01, 0.006, bd, glass, 0, 0.438, fzC));
+  g.add(box("FzCoverRim", inW - 0.01, 0.012, 0.012, glassRim, 0, 0.441, drawerFront - 0.002));
   cab.add(g);
 }
-shelf("Shelf1", 0.785);
-shelf("Shelf2", 0.690);
-shelf("Shelf3", 0.585);
-{ // Fresh Zone: a glass cover over a big clear drawer with LG's printed words on its front
-  const g = group("FreshZone", 0, 0, 0), bd = inD - 0.08, bw = inW - 0.02, zc = zIn1 + bd / 2 + 0.016;
-  g.add(box("FzGlassCover", inW - 0.01, 0.006, bd, glass, 0, 0.438, zc));
-  g.add(box("FzCoverRim", inW - 0.01, 0.012, 0.012, glassRim, 0, 0.441, zFront - 0.05));
+{
+  const g = group("FreshZone", 0, 0, 0), bd = fzD, bw = fzW, zc = fzC;
   g.add(box("FzBoxFloor", bw, 0.004, bd, clear, 0, 0.19, zc));
   g.add(box("FzBoxBack", bw, 0.23, 0.004, clear, 0, 0.305, zIn1 + 0.018));
   g.add(box("FzBoxL", 0.004, 0.23, bd, clear, -bw / 2, 0.305, zc));
@@ -256,12 +274,17 @@ shelf("Shelf3", 0.585);
   g.add(box("FzBoxRim", bw, 0.008, 0.008, clearRib, 0, 0.42, zc + bd / 2));
   g.add(box("FzBoxFootRim", bw, 0.008, 0.008, clearRib, 0, 0.193, zc + bd / 2));
   g.add(plane("PrintFreshZone", 0.17, 0.0442, printFz, 0, 0.3, zc + bd / 2 + 0.0023));
-  cab.add(g);
+  trays.add(g);
 }
 
 // ── stock: vegetarian South Indian food, eggs, juices, water and soft drinks (stock_lg.mjs, food.mjs) ──
-stock.shelves(cab, { zIn1, inW, inD, s1: 0.785, s2: 0.690, s3: 0.585, fz: 0.194 });
-stock.freezer(cab, { zIn1, floor: fy0 + 0.002, top: 1.397 });
+stock.shelves(trays, {
+  zIn1, inW, inD, s1, s2, s3, fz: 0.192, fit: true, vk: 0.8,
+  shelfB: { hw: inW / 2 - 0.03, z0: zIn1 + 0.034, z1: shelfFront - 0.015 },
+  drawerB: { hw: fzW / 2 - 0.014, z0: zIn1 + 0.04, z1: drawerFront - 0.006, y0: 0.192 },
+  drawerCeil: 0.435 - 0.01 - 0.192, // the heap stays 1 cm under the drawer's glass cover
+});
+stock.freezer(cab, { fit: true, zIn1, floor: fy0, top: 1.3945, box: { hw: inW / 2 - 0.03, z0: zIn1 + 0.03, z1: icZ - 0.21 } });
 
 // ── ice maker: the tray unit and the bucket slide out together (a real part) ──
 const ic = group("IceMaker", icX, 0, icZ);
@@ -287,6 +310,8 @@ ic.position.y = icDY;     // the ice maker hangs under the freezer shelf
 
 // ── doors: hinged on the right, no handles, black pocket grip on the fridge door ──
 const pw = W - 0.004;
+// the inside of a door basket of width w: its x range between the end walls, and the middle of a depth dep
+const inside = (w) => (dep) => [-pw / 2 - w / 2 + 0.004, -pw / 2 + w / 2 - 0.004, -(0.01 + dep / 2)];
 function doorShell(name, y0, h, parts) { const g = group(name, W / 2, y0, zFront); parts(g); return g; }
 const freezerDoor = doorShell("FreezerDoor", fzBot, H - fzBot, (g) => {
   const h = H - fzBot;
@@ -301,8 +326,8 @@ const freezerDoor = doorShell("FreezerDoor", fzBot, H - fzBot, (g) => {
   g.add(box("FzLiner", pw - 0.05, h - 0.05, 0.012, liner, -pw / 2, h / 2, -0.004));
   const b1 = basket("FzBasket1", pw - 0.1, 0.07, 0.065, 0.31, true); b1.position.x = -pw / 2; g.add(b1);
   const b2 = basket("FzBasket2", pw - 0.1, 0.07, 0.065, 0.175, true); b2.position.x = -pw / 2; g.add(b2);
-  // frozen grated coconut and parotta in the baskets (small packs)
-  stock.doorFreezer(g, { n: 4, gap: 0.13, b1: 0.31, b2: 0.175 });
+  // frozen peas, parotta and paneer in the baskets (small packs)
+  stock.doorFreezer(g, { fit: true, b1: 0.31, b2: 0.175, dep: 0.07, inside: inside(pw - 0.1) });
 });
 const fridgeDoor = doorShell("FridgeDoor", frLow, frTop - frLow, (g) => {
   const h = frTop - frLow, lowH = bandBot - frLow, bandH = bandTop - bandBot, lipH = frTop - bandTop;
@@ -320,10 +345,10 @@ const fridgeDoor = doorShell("FridgeDoor", frLow, frTop - frLow, (g) => {
   const bE = basket("EggBasket", pw - 0.12, 0.075, 0.062, eggY, true); bE.position.x = -pw / 2; g.add(bE);
   const bJ = basket("JarBasket", pw - 0.12, 0.085, 0.085, jarY, true); bJ.position.x = -pw / 2; g.add(bJ);
   const bB = basket("BottleBasket", pw - 0.12, 0.095, 0.17, botY, true); bB.position.x = -pw / 2; g.add(bB);
-  const bC = basket("CanBasket", pw - 0.12, 0.075, 0.115, canY, true); bC.position.x = -pw / 2; g.add(bC);
+  const bC = basket("CanBasket", pw - 0.12, 0.08, 0.115, canY, true); bC.position.x = -pw / 2; g.add(bC);
   // eggs in the egg basket's cups, then jars, bottles and cans (stock_lg.mjs)
-  g.add(box("EggCupsRib", pw - 0.14, 0.006, 0.05, clearRib, -pw / 2, eggY + 0.006, -0.037));
-  stock.doorFridge(g, { eggY, jarY, botY, canY });
+  g.add(box("EggCupsRib", pw - 0.14, 0.006, 0.05, clearRib, -pw / 2, eggY + 0.006, -0.047));
+  stock.doorFridge(g, { fit: true, eggY, jarY, botY, canY, deps: { egg: 0.075, jar: 0.085, bottle: 0.095, can: 0.08 }, inside: inside(pw - 0.12) });
 });
 root.add(freezerDoor, fridgeDoor);
 

@@ -548,7 +548,7 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
   }
   function buildBar() {
     const bar = q("roomBar");
-    const partBtns = parts.map((p) => `<button class="room-chip" type="button" data-part="${p.key}" aria-pressed="false">${ICON.door}<span>Open ${p.label}</span></button>`).join("");
+    const partBtns = parts.map((p) => `<button class="room-chip" type="button" data-part="${p.key}" aria-pressed="false">${ICON.door}<span>${partText(p, false)}</span></button>`).join("");
     bar.innerHTML = `
       <div class="room-row">
         <button class="room-chip solid" type="button" id="roomAgain">${ICON.spot}Another spot</button>
@@ -606,8 +606,15 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
     if (onWall) q("wdOut") && (q("wdOut").textContent = `${S.wallDist.toFixed(1)} m`), q("wdIn") && (q("wdIn").value = S.wallDist);
   }
 
+  // "Open <label>" and "Close <label>", or the part's own two words (text: [to open, to close])
+  function partText(p, open) { return p.text ? p.text[open ? 1 : 0] : `${open ? "Close" : "Open"} ${p.label}`; }
   async function togglePart(key) {
     if (S.busy) return;
+    // a part inside another (the trays behind the fridge door): open the outer one first, and close the inner one before the outer
+    const self = parts.find((x) => x.key === key);
+    const outer = self?.needs && !S.open[key] && !S.open[self.needs] ? self.needs : null;
+    const inner = S.open[key] ? parts.find((x) => x.needs === key && S.open[x.key])?.key : null;
+    if (outer || inner) { await togglePart(outer || inner); await new Promise((r) => setTimeout(r, 950)); if (!S || S.busy) return; }
     S.busy = true;
     const mv = S.mv;
     const sk = () => parts.map((p) => (S.open[p.key] ? 1 : 0)).join("");
@@ -620,7 +627,7 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
     root?.querySelectorAll("[data-part]").forEach((b) => {
       const p = parts.find((x) => x.key === b.dataset.part);
       b.setAttribute("aria-pressed", String(S.open[p.key]));
-      b.querySelector("span").textContent = `${S.open[p.key] ? "Close" : "Open"} ${p.label}`;
+      b.querySelector("span").textContent = partText(p, S.open[p.key]);
     });
     setTimeout(() => { if (S) S.busy = false; }, 900);
   }

@@ -19,6 +19,9 @@ const SWING_MS = 900;
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const AXES = { x: new THREE.Vector3(1, 0, 0), y: new THREE.Vector3(0, 1, 0), z: new THREE.Vector3(0, 0, 1) };
 
+// "Open <label>" and "Close <label>", or the part's own two words (text: [to open, to close])
+function partText(p, open) { return p.text ? p.text[open ? 1 : 0] : `${open ? "Close" : "Open"} ${p.label}`; }
+
 export async function runXR(session, { mode, product, finishIndex = 0, parts = {}, onEnd }) {
   const ar = mode === "ar";
   const cm = (s) => parseFloat(s) / 100;
@@ -194,7 +197,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     const swinging = [...moving.values()].some((s) => s.t !== s.to);
     for (const s of spots) s.dot.visible = hotspotShown(s.h, st) && !swinging;
   }
-  const partLabel = (key) => { const s = moving.get(key); return s ? `${s.isOpen ? "Close" : "Open"} ${s.part.label}` : ""; };
+  const partLabel = (key) => { const s = moving.get(key); return s ? partText(s.part, s.isOpen) : ""; };
 
   // ── placement ──
   const head = new THREE.Vector3();
@@ -667,7 +670,7 @@ function makePanel(ctx) {
         const col = parts.length === 1 ? 0 : i % 2;
         const bw = parts.length === 1 ? W - 128 : colW;
         if (i > 0 && col === 0) y += bh + gap;
-        button(64 + col * (colW + gap), y, bw, bh, `${s.isOpen ? "Close" : "Open"} ${s.part.label}`, { type: "part", key: s.part.key }, { pressed: s.isOpen });
+        button(64 + col * (colW + gap), y, bw, bh, partText(s.part, s.isOpen), { type: "part", key: s.part.key }, { pressed: s.isOpen });
       });
       y += bh + 56;
     }
@@ -690,7 +693,7 @@ function makePanel(ctx) {
     g.fillStyle = SLATE;
     g.font = `400 32px ${FONT}`;
     g.textBaseline = "alphabetic";
-    const names = parts.map((s) => `the ${s.part.label}`).join(" or ");
+    const names = parts.filter((s) => !s.part.text).map((s) => `the ${s.part.label}`).join(" or ");
     const hint = `To open ${names}, point at it and press the trigger, or look at it and pinch. ` +
       (p.placement === "wall" ? "Point at a wall to hang it there." : "Point at the floor to move it. Hold grip and sweep to turn it.");
     for (const line of wrapText(g, hint, W - 128)) { g.fillText(line, 64, y + 10); y += 44; }

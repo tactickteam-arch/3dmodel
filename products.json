@@ -504,7 +504,7 @@
       "model": "GLT3426SNPZ",
       "name": "LG 343 L double-door refrigerator with Smart Inverter Compressor",
       "shortName": "343 L double-door refrigerator",
-      "summary": "Open the freezer, slide the ice tray out and open the fridge, look inside, then stand it in your kitchen at its real size.",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
       "arTip": "Tap a door to open it",
       "glb": "/models/lg-glt3426snpz.glb",
       "thumb": "/photos/lg-glt3426snpz/0.jpg",
@@ -536,7 +536,7 @@
               [
                 -0.296,
                 1.185,
-                0.24
+                0.23
               ],
               [
                 0.3,
@@ -546,14 +546,14 @@
             ],
             "open": [
               [
-                0.286,
+                0.279,
                 1.185,
                 0.278
               ],
               [
                 0.753,
                 1.72,
-                0.746
+                0.753
               ]
             ]
           }
@@ -607,7 +607,7 @@
               [
                 -0.296,
                 0.028,
-                0.213
+                0.205
               ],
               [
                 0.3,
@@ -617,14 +617,55 @@
             ],
             "open": [
               [
-                0.27,
+                0.268,
                 0.028,
                 0.278
               ],
               [
                 0.753,
                 1.178,
-                0.756
+                0.763
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.62
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.26,
+                0.188,
+                -0.283
+              ],
+              [
+                0.26,
+                1.129,
+                0.209
+              ]
+            ],
+            "open": [
+              [
+                -0.26,
+                0.188,
+                0.337
+              ],
+              [
+                0.26,
+                1.129,
+                0.829
               ]
             ]
           }

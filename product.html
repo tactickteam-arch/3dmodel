@@ -323,6 +323,11 @@
     .parts { bottom: 16px; }
     .fcard { left: 12px; right: 12px; width: auto; bottom: 74px; }
     .parts { flex-wrap: wrap; justify-content: center; border-radius: 24px; width: max-content; }
+    /* the part buttons sit under the model, not over it: the fridge's four parts and Fill wrap to three rows,
+       which hid its drawer and the trays */
+    .stage { display: flex; flex-direction: column; }
+    .stage > model-viewer { flex: 1 1 0; min-height: 0; height: auto; }
+    .parts { position: relative; left: auto; bottom: auto; transform: none; flex: none; margin: 6px auto 12px; }
     .parts button { padding: 10px 14px 10px 12px; font-size: 13.5px; }
     aside { border-left: 0; padding: 24px 16px 120px; gap: 24px; overflow: visible; }
     h1 { font-size: 28px; }
@@ -591,9 +596,9 @@ const shareUrl = (() => {
 })();
 // Phones kept model files for an hour before 24 Oct 2026; this query string made them fetch
 // the files with the fixed doors. The files now revalidate on every load (vercel.json); v=3 (29 Oct)
-// made sure Quick Look's own copy was replaced by the files with the panel grain, and v=4 (30 Oct)
-// by the files with the iPhone colour fixes.
-const model = (url) => `${url}?v=4`;
+// made sure Quick Look's own copy was replaced by the files with the panel grain, v=4 (30 Oct)
+// by the files with the iPhone colour fixes, and v=5 (30 Oct) by the fridge with removable trays.
+const model = (url) => `${url}?v=5`;
 
 // ── what this device can do ──
 const ua = navigator.userAgent;
@@ -736,8 +741,9 @@ function applyFinish(i) {
 renderSwatches();
 
 // ── moving parts: chips on the 3D view, and buttons inside phone AR ──
-const iconFor = (p) => (p.key === "louvre" ? I.louvre : p.key === "panel" ? I.panel : p.key === "drawer" ? I.drawer : product.category === "Washing machine" ? I.round : I.door);
-const partLabel = (p) => `${state[p.key] ? "Close" : "Open"} ${p.label}`;
+const iconFor = (p) => (p.key === "louvre" ? I.louvre : p.key === "panel" ? I.panel : p.key === "drawer" || p.key === "trays" ? I.drawer : product.category === "Washing machine" ? I.round : I.door);
+// a part reads "Open <label>" and "Close <label>", or its own two words (text: [to open, to close])
+const partLabel = (p) => (p.text ? p.text[state[p.key] ? 1 : 0] : `${state[p.key] ? "Close" : "Open"} ${p.label}`);
 for (const p of parts) {
   const b = document.createElement("button");
   b.id = `part-${p.key}`;
@@ -1260,7 +1266,7 @@ function renderFit() {
     verdict = `${I.yes}<span>It fits${tight.margin < 3 ? `, just: ${cmText(tight.margin)} to spare in ${tight.label.toLowerCase()}` : ""}</span>`;
   } else verdict = `${I.info}<span>So far it fits. Add the ${r.rows.filter((x) => !x.given).map((x) => x.label.toLowerCase()).join(" and ")}.</span>`;
   out.className = `fit-out ${short.length ? "no" : r.given ? "yes" : ""}`;
-  const front = r.front && !onWall ? `<p class="front">Keep about ${r.front} cm free in front so the ${(product.parts || []).map((p) => p.label).join(" and ")} can open fully.</p>` : "";
+  const front = r.front && !onWall ? `<p class="front">Keep about ${r.front} cm free in front so the ${(product.parts || []).filter((p) => !p.text).map((p) => p.label).join(" and ")} can open fully.</p>` : "";
   const src = r.note || (r.gaps ? "" : `${product.brand} doesn’t publish installation gaps for it, so this checks its size alone. Leave a little room for air.`);
   out.innerHTML = `<div class="verdict">${verdict}</div>
     <ul>${rows.map((x) => `<li><span>${x.label}: needs ${cmText(x.need)}${x.gap ? ` (${esc(x.gapText)})` : ""}</span><b class="${x.ok ? "" : "short"}">${x.ok ? `${cmText(x.margin)} spare` : `${cmText(-x.margin)} short`}</b></li>`).join("")}</ul>
@@ -1377,10 +1383,11 @@ async function openHeadset(mode) {
     session = s;
     await xr.runXR(session, {
       mode, product, finishIndex, parts: { ...state },
-      onEnd: ({ parts: after, finishIndex: fi }) => {
-        // carry the headset's door and finish state back to the page
+      onEnd: async ({ parts: after, finishIndex: fi }) => {
+        // carry the headset's door and finish state back to the page, one part at a time as on the page
+        // (a part inside another waits for it, and the model has a clip only for one part moving)
         if (fi !== finishIndex) applyFinish(fi);
-        for (const p of parts) if (after[p.key] !== state[p.key]) { busy = false; togglePart(p.key, { instant: true }); }
+        for (const p of parts) if (after[p.key] !== state[p.key]) { busy = false; await togglePart(p.key, { instant: true }); }
       },
     });
   } catch (err) {
@@ -1528,7 +1535,7 @@ const GUIDE_KEY = "ar-guide-skip";
 const skipGuide = () => { try { return localStorage.getItem(GUIDE_KEY) === "1"; } catch { return false; } };
 const step = (n, title, text) => `<div class="g-row step"><div class="ic">${n}</div><div><b>${esc(title)}</b><span>${esc(text)}</span></div></div>`;
 const row = (icon, title, text, key = false) => `<div class="g-row${key ? " key" : ""}"><div class="ic">${icon}</div><div><b>${esc(title)}</b><span>${esc(text)}</span></div></div>`;
-const openTitle = parts.length ? `Open the ${parts.map((p) => p.label).join(" or ")}` : "";
+const openTitle = parts.length ? `Open the ${parts.filter((p) => !p.text).map((p) => p.label).join(" or ")}` : "";
 function qrSvg(size = 4) {
   if (!/^https?:$/.test(location.protocol) || !window.qrcode) return "";
   const q = qrcode(0, "M");
