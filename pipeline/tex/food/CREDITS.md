@@ -1,11 +1,12 @@
 # Photo credits for the produce skins
 
-Every produce texture (tomato, onion, potato, carrot, brinjal, capsicums, apple, orange, lemon, banana, grape, cabbage, cauliflower, coconut, watermelon, okra, drumstick, chilli, coriander and curry leaf, egg) is a cropped, evenly re-lit and colour-balanced piece of a freely licensed photo from Wikimedia Commons, made by `pipeline/scripts/tex_food_photos.py`. The textures are derivative works and carry the licences below (CC BY / CC BY-SA need this credit).
+Every produce texture (tomato, potato, carrot, brinjal, capsicums, apple, orange, lemon, banana, grape, cabbage, cauliflower, coconut, watermelon, okra, drumstick, chilli, coriander and curry leaf, egg) is a cropped, evenly re-lit and colour-balanced piece of a freely licensed photo from Wikimedia Commons, made by `pipeline/scripts/tex_food_photos.py`. The textures are derivative works and carry the licences below (CC BY / CC BY-SA need this credit).
+
+The onion's skin is not from a photo: `pipeline/scripts/tex_onion.py` draws it.
 
 | Used for | Photo | Author | Licence |
 | --- | --- | --- | --- |
 | tomato | [Red tomatoes. img 16.jpg](https://commons.wikimedia.org/wiki/File:Red_tomatoes._img_16.jpg) | Dmitry Makeev | CC BY-SA 4.0 |
-| onion | [Onion bulbs.jpg](https://commons.wikimedia.org/wiki/File:Onion_bulbs.jpg) | Obuezie | CC BY-SA 4.0 |
 | potato | [Ingredients New Potatoes, Washed (4748996147).jpg](https://commons.wikimedia.org/wiki/File:Ingredients_New_Potatoes,_Washed_(4748996147).jpg) | Miia Ranta from Finland | CC BY-SA 2.0 |
 | carrot | [Carrot.1.jpg](https://commons.wikimedia.org/wiki/File:Carrot.1.jpg) | Laisha np | CC BY-SA 4.0 |
 | brinjal | [Segmented aubergine Thailand.jpg](https://commons.wikimedia.org/wiki/File:Segmented_aubergine_Thailand.jpg) | Takeaway | CC BY-SA 3.0 |

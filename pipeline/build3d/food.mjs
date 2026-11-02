@@ -106,10 +106,32 @@ export function Food({ brandDir = null } = {}) {
     g.add(cal);
     return tag(at(g, x, y, z, seed * 1.3));
   }
+  // A red onion as sold in India: a slightly flattened globe about 6 cm across and 5.4 cm high, a short dry neck
+  // and a flat root plate, never quite round, its neck leaning a little. In a heap it lies tipped over.
+  // The profile points are spaced evenly round the bulb so the skin's veins (tex_onion.py) keep an even width.
   function onion(name, x, y, z, seed = 1) {
     const g = group(name);
-    g.add(mesh("Bulb", lathe([[0.0001, 0], [0.012, 0.001], [0.03, 0.007], [0.038, 0.022], [0.036, 0.04], [0.026, 0.056], [0.012, 0.066], [0.003, 0.076], [0.0001, 0.078]], 14), C("onion", 0xffffff, { rough: 0.55 }, "onion.jpg"), 0, 0, 0));
-    g.add(mesh("Root", new THREE.CylinderGeometry(0.008, 0.002, 0.008, 6), C("root", 0xd8c9a8, { rough: 0.8 }), 0, 0.002, 0));
+    const R = 0.031, Hb = 0.054, r = rnd(seed * 53 + 7);
+    const prof = [[0.0001, 0.0005]];
+    for (let k = 0; k < 12; k++) { const a = Math.PI * (0.1 + 0.85 * k / 11); prof.push([R * Math.sin(a) * (1 + 0.05 * Math.sin(a)), Hb * (1 - Math.cos(a)) / 2]); }
+    prof.push([0.0042, Hb + 0.004], [0.0036, Hb + 0.008], [0.0026, Hb + 0.011], [0.0001, Hb + 0.012]);
+    const geo = lathe(prof, 18); // under 0.5 mm off round at this size; the iPhone file stores the drawer twice
+    // lumpy, a little oval, and the neck leaning one way
+    const p = geo.attributes.position, o = seed * 7.3, lean = (r() - 0.5) * 0.5, sx = 1 + (r() - 0.5) * 0.1;
+    for (let i = 0; i < p.count; i++) {
+      const px = p.getX(i), py = p.getY(i), pz = p.getZ(i);
+      const k = 1 + 0.035 * (vnoise(px * 60 + o, py * 60, pz * 60 + o) - 0.5) * 2;
+      p.setXYZ(i, px * k * sx + Math.max(0, py - Hb * 0.7) * lean, py, pz * k / sx);
+    }
+    geo.computeVertexNormals();
+    // tipped over about the bulb's middle, baked into the geometry so its box stays tight (qa_fit, the heap)
+    const tip = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler((r() - 0.5) * 0.9, 0, (r() - 0.5) * 1.1)).multiply(new THREE.Matrix4().makeTranslation(0, -Hb / 2, 0));
+    const root = new THREE.CylinderGeometry(0.0075, 0.0085, 0.0025, 10).translate(0, 0.001, 0).applyMatrix4(tip);
+    geo.applyMatrix4(tip);
+    geo.computeBoundingBox(); root.computeBoundingBox();
+    const lift = -Math.min(geo.boundingBox.min.y, root.boundingBox.min.y); // wider than tall, so on its side it sits lower
+    g.add(mesh("Bulb", geo, C(seed % 2 ? "onion" : "onion2", seed % 2 ? 0xffffff : 0xeadcd6, { rough: 0.48 }, "onion.jpg"), 0, lift, 0));
+    g.add(mesh("Root", root, C("onionroot", 0x7d6a4e, { rough: 0.9 }), 0, lift, 0));
     return tag(at(g, x, y, z, seed * 1.9));
   }
   function potato(name, x, y, z, seed = 1) {

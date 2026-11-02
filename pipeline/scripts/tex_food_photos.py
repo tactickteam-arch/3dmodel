@@ -1,5 +1,6 @@
 """Photographic skins for the fridge produce, cut from freely licensed Wikimedia Commons photos.
 Run after tex_food.py: it overwrites the noise textures of the same names in <out dir>/food/ and adds leaf_curry.jpg.
+The onion is drawn, not cut from a photo: tex_onion.py (the crop came out as a pink smear).
 The originals are downloaded (1600 px wide) into pipeline/sources/photos/produce/ the first time and kept there.
 Every texture is: a crop of the fruit's skin, lit evenly (the photo's own shading and highlights divided out),
 colour-balanced towards the fruit's natural colour, and blended so its left and right edges meet (u wraps round the fruit).
@@ -24,7 +25,6 @@ os.makedirs(OUT, exist_ok=True)
 # name: (Commons file, crop box as fractions x0 y0 x1 y1, output size, target mean colour, rotate degrees, flatten strength)
 S = {
     "tomato": ("Red tomatoes. img 16.jpg", (0.10, 0.28, 0.32, 0.52), (384, 192), (186, 40, 30), 0, 0.9),
-    "onion": ("Onion bulbs.jpg", (0.62, 0.10, 0.82, 0.28), (384, 192), (128, 56, 92), 0, 0.7),
     "potato": ("Ingredients New Potatoes, Washed (4748996147).jpg", (0.58, 0.27, 0.70, 0.36), (384, 192), (198, 164, 112), 0, 0.8),
     "carrot": ("Carrot.1.jpg", (0.42, 0.64, 0.58, 0.72), (192, 384), (232, 120, 30), 90, 0.7),
     "brinjal": ("Segmented aubergine Thailand.jpg", (0.42, 0.62, 0.72, 0.82), (192, 384), (62, 24, 84), 0, 0.6),
@@ -97,7 +97,7 @@ def seamless(a, frac=0.22):
 
 
 DETAIL = {"cabbage": 1.6, "cauliflower": 0.6, "tomato": 0.5, "potato": 0.5, "grape": 0.5, "banana": 0.3, "orange": 0.4, "egg": 0.4}
-SAT = {"banana": 1.25, "carrot": 1.1, "onion": 1.1}
+SAT = {"banana": 1.25, "carrot": 1.1}
 
 
 def make(name):

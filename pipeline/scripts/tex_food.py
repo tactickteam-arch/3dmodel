@@ -115,12 +115,7 @@ for ridge in range(0, w, 32):
     a[:, ridge:ridge + 2] *= 0.86
 tofile(a, "banana.jpg")
 
-# onion: purple-red papery skin, fine lines from root to tip
-w, h = 256, 128
-base = mix(colour((h, w), (110, 40, 70)), colour((h, w), (176, 82, 108)), fbm(w, h, 40, 3, 24))
-lines = np.repeat(noise(w, 1, 2.4, 25), h, 0)
-base *= (0.8 + 0.3 * lines)[..., None]
-tofile(base, "onion.jpg")
+# onion: drawn by tex_onion.py
 
 # cabbage: pale green with curved veins
 img = Image.new("RGB", (256, 128), (150, 190, 110))
