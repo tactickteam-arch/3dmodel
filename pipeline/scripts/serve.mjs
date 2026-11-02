@@ -1,4 +1,5 @@
-// Static server for the demo site with the same /p/:id rewrite as vercel.json.
+// Static server for the demo site with the same /p/:id rewrite as vercel.json: /p/<id> is p/<id>.html when
+// make_pages.mjs has written one (Vercel serves a file before it rewrites), otherwise product.html.
 // usage: node serve.mjs <siteDir> <port> [extraDir mounted at /__test]
 import http from "node:http";
 import fs from "node:fs";
@@ -12,7 +13,7 @@ http.createServer((req, res) => {
   // PRODUCTS=<file> serves another catalogue in place of /products.json (to test a new product alone)
   if (p === "/products.json" && process.env.PRODUCTS) { res.writeHead(200, { "Content-Type": TYPES[".json"] }); fs.createReadStream(process.env.PRODUCTS).pipe(res); return; }
   if (extra && p.startsWith("/__test/")) { base = extra; p = p.slice(7); }
-  else if (/^\/p\/[^/]+\/?$/.test(p)) p = "/product.html";
+  else if (/^\/p\/[^/]+\/?$/.test(p)) { const own = `/p/${p.split("/")[2]}.html`; p = fs.existsSync(path.join(root, own)) ? own : "/product.html"; }
   else if (p === "/") p = "/index.html";
   else if (!path.extname(p) && fs.existsSync(path.join(root, p + ".html"))) p += ".html";
   const file = path.join(base, path.normalize(p));

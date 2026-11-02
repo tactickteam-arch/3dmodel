@@ -96,6 +96,14 @@
   .parts svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
   .parts button[aria-pressed="true"] svg { color: var(--copper); }
 
+  /* when the part buttons don't fit across the 3D view (the fridge's five on a small laptop) they sit under it, as on phones */
+  .stage.parts-below { display: flex; flex-direction: column; }
+  .stage.parts-below > model-viewer { flex: 1 1 0; min-height: 0; height: auto; }
+  .stage.parts-below .parts { position: relative; left: auto; bottom: auto; transform: none; flex: none; margin: 6px auto 12px; flex-wrap: wrap; justify-content: center; border-radius: 24px; width: max-content; }
+  .stage.parts-below .fcard { bottom: calc(var(--bar, 60px) + 26px); }
+  .all-btn { position: absolute; left: 20px; top: 20px; z-index: 6; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 10px 16px 10px 12px; font: 600 14px var(--sans); color: var(--navy); }
+  .all-btn svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
+
   .progress { position: absolute; left: 50%; bottom: 96px; width: 180px; height: 3px; margin-left: -90px; background: rgba(18,34,58,.12); border-radius: 3px; overflow: hidden; transition: opacity .3s; z-index: 4; }
   .progress i { display: block; height: 100%; width: 0; background: var(--copper-dk); transition: width .2s; }
   .progress.done { opacity: 0; }
@@ -122,8 +130,8 @@
   .flab span { overflow: hidden; }
   .flab em { display: block; margin-top: 2px; font: 500 11.5px/1.2 var(--sans); font-style: normal; color: var(--copper-dk); }
   .flab em:empty { display: none; }
-  .flab.dim { background: rgba(253,252,249,.88); color: var(--slate); }
-  .flab.dim b { background: #E6E6E9; color: var(--slate); }
+  .flab.away { background: rgba(253,252,249,.88); color: var(--slate); }
+  .flab.away b { background: #E6E6E9; color: var(--slate); }
   .flab.num { padding: 5px; }
   .flab.num span { display: none; }
   .feat-btn { position: absolute; right: 20px; top: 20px; z-index: 6; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 18px 11px 14px; font: 600 14px var(--sans); color: var(--navy); }
@@ -257,6 +265,7 @@
   .link-btn svg { width: 16px; height: 16px; flex: none; }
   .link-btn.wa svg { color: #1FA855; }
   .share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .share-top { margin-top: 14px; }
 
   h1 { font-weight: 600 !important; letter-spacing: -0.3px; }
   .credit { margin-top: auto; font-size: 12.5px; line-height: 1.55; color: var(--slate); border-top: 1px solid var(--hair); padding-top: 18px; }
@@ -340,6 +349,18 @@
     .sheet::before { content: ""; position: absolute; left: 50%; top: 8px; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: var(--hair); }
     .sheet-body { padding: 26px 20px 8px; }
     .sheet-foot { padding: 12px 20px calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .toast { bottom: calc(118px + env(safe-area-inset-bottom, 0px)); } /* above the AR bar, not over it */
+    .all-btn { left: 12px; top: 12px; font-size: 13px; }
+    .fit-in label, .size small { font-size: 12px; }
+  }
+  /* a phone on its side: the 3D view and its buttons fill the screen, and the AR bar scrolls with the page
+     instead of covering the product */
+  @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+    .stage { height: calc(100svh - 56px); min-height: 0; }
+    .ar-box { position: static; padding: 0; background: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    aside { padding-bottom: 32px; }
+    .toast { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .hint { max-width: 40%; } /* in the corner, clear of the product */
   }
 
   /* /p/<id>?embed: the viewer alone, filling the frame a retailer's page puts it in */
@@ -408,6 +429,7 @@
     <a class="feat-btn embed-open" id="embedOpen" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg><span>View in your room</span></a>
 
     <div class="hint glass" id="hint"></div>
+    <button class="all-btn glass hide" id="btnAll" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>See all of it</span></button>
 
     <div class="controls glass" role="toolbar" aria-label="View controls">
       <button id="btnZoomIn" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -425,10 +447,10 @@
 
     <div class="parts glass hide" id="parts" role="group" aria-label="Open and close"></div>
 
-    <div class="fcard glass gone" id="fcard" role="dialog" aria-labelledby="fcTitle" aria-hidden="true">
+    <div class="fcard glass gone" id="fcard" role="dialog" aria-labelledby="fcTitle" aria-hidden="true" inert>
       <div class="top"><div><small id="fcCount"></small><h3 id="fcTitle"></h3></div><button class="x" id="fcClose" aria-label="Close"></button></div>
       <p id="fcText"></p>
-      <div class="nav"><button id="fcPrev">Previous</button><button id="fcNext">Next feature</button></div>
+      <div class="nav"><button id="fcPrev">Previous feature</button><button id="fcNext">Next feature</button></div>
     </div>
   </section>
 
@@ -440,6 +462,7 @@
       <span class="model-no" id="modelNo"></span>
       <p class="blurb" id="productBlurb"></p>
       <a class="buy hide" id="buyLink" target="_blank" rel="noopener">See price and offers on sangeetha.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <div><button class="link-btn share-top" id="btnShare" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>
     </div>
 
     <div id="finishBox">
@@ -511,7 +534,7 @@
     <div class="share" id="share">
       <div class="code" id="qrCode"></div>
       <div>
-        <p id="shareText"><b>Open on another device</b><br>Scan with a phone, or open the link on a Meta Quest or Vision Pro.</p>
+        <p id="shareText"><b>Share it, or open it on another device</b><br>Scan with a phone, or open the link on a Meta Quest or Vision Pro.</p>
         <div class="share-btns">
           <button class="link-btn" id="btnCopy">Copy link</button>
           <a class="link-btn wa" id="btnWhatsApp" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a>
@@ -578,12 +601,13 @@ const I = {
 };
 
 // ── which product: /p/<id>, or ?id=<id> ──
-const id = decodeURIComponent((location.pathname.match(/\/p\/([^/]+)/) || [])[1] || new URLSearchParams(location.search).get("id") || "");
+const id = decodeURIComponent((location.pathname.match(/\/p\/([^/]+)/) || [])[1] || new URLSearchParams(location.search).get("id") || "").toLowerCase();
 const catalogue = await fetch("/products.json").then((r) => r.json());
 const product = catalogue.products.find((p) => p.id === id && !p.hidden); // hidden products are not shown (see products.json)
 if (!product) {
   $("main").outerHTML = `<div class="missing"><h1>We couldn’t find that product</h1><p class="blurb">The link may be old, or the model isn’t in the catalogue yet.</p><a href="/">See all products</a></div>`;
-  throw new Error("unknown product " + id);
+  document.title = "Product not found";
+  await new Promise(() => {}); // nothing below applies to a missing product
 }
 // Vercel's other addresses for this site (per deployment and per branch) ask for a Vercel
 // login, so the links people scan and share always point at the public address
@@ -654,6 +678,8 @@ const orbit = () => {
 };
 mv.cameraOrbit = orbit();
 mv.arPlacement = onWall ? "wall" : "floor";
+// a unit on the wall turns as far as its sides, not round to its flat back, which looked broken to a shopper
+if (onWall) { mv.maxCameraOrbit = "100deg 157.5deg 300%"; document.querySelector('.controls .view[data-view="back"]').classList.add("hide"); }
 mv.src = model(product.glb);
 $("specs").innerHTML = product.specs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
 $("credit").innerHTML = `3D model made for Sangeetha from ${esc(product.brand)}’s official photos and published size (${esc(product.size.w)} W × ${esc(product.size.h)} H × ${esc(product.size.d)} D). <a href="${esc(product.source)}" target="_blank" rel="noopener">${esc(product.brand)} product page</a> · Demo by Tanmay Agarwal`;
@@ -662,9 +688,9 @@ $("brandLogo").alt = product.brand;
 if (product.sangeethaUrl) { $("buyLink").href = product.sangeethaUrl; $("buyLink").classList.remove("hide"); }
 
 // real product photos, opening larger on a tap
-for (const src of product.photos || []) {
+for (const [i, src] of (product.photos || []).entries()) {
   const b = document.createElement("button");
-  b.setAttribute("aria-label", "Open photo");
+  b.setAttribute("aria-label", `Open photo ${i + 1} of ${product.photos.length}`);
   b.innerHTML = `<img src="${src}" alt="${esc(product.brand)} ${esc(product.model)} photo" loading="lazy">`;
   b.addEventListener("click", () => openPhoto(src));
   $("gallery").appendChild(b);
@@ -706,7 +732,8 @@ if (product.sizeNote) { $("sizeNote").textContent = `${product.sizeNote}. Placed
   $("needNote").textContent = f.note || `${product.brand} doesn’t publish installation gaps for this ${onWall ? "unit" : "model"}, so only its size is checked. Leave a little room for air.`;
 }
 const turnHint = platform === "desktop" ? "Drag or swipe to turn · Pinch or scroll to zoom · Double-click to look closer" : "Drag to turn · Double-tap to look closer";
-$("hint").innerHTML = `${I.tap}<span>${parts.length ? `${turnHint} · ${product.arTip}` : turnHint}</span>`;
+const tip = platform === "desktop" ? product.arTip.replace(/^Tap\b/, "Click") : product.arTip;
+$("hint").innerHTML = `${I.tap}<span>${parts.length ? `${turnHint} · ${tip}` : turnHint}</span>`;
 if (headsetVR) $("btnVR").classList.remove("hide");
 if (platform === "desktop") $("arNote").querySelector("span").textContent = "Real size · On a phone or headset · No app";
 
@@ -749,12 +776,12 @@ for (const p of parts) {
   b.id = `part-${p.key}`;
   b.setAttribute("aria-pressed", "false");
   b.innerHTML = `${iconFor(p)}<span></span>`;
-  b.addEventListener("click", () => togglePart(p.key));
+  b.addEventListener("click", () => pressPart(p.key));
   $("parts").appendChild(b);
   const a = document.createElement("button");
   a.type = "button";
   a.id = `ar-${p.key}`;
-  a.addEventListener("click", () => togglePart(p.key));
+  a.addEventListener("click", () => pressPart(p.key));
   $("arParts").appendChild(a);
 }
 $("parts").classList.toggle("hide", !parts.length);
@@ -765,12 +792,26 @@ function renderParts() {
     $(`ar-${p.key}`).setAttribute("aria-pressed", String(state[p.key]));
     $(`ar-${p.key}`).textContent = partLabel(p);
   }
+  fitParts();
 }
+// the buttons sit under the model on phones, and wherever they don't fit across it in one row
+function fitParts() {
+  const stage = $("stage"), bar = $("parts");
+  const buttons = [...bar.children], gap = 8, pad = 12;
+  const need = buttons.reduce((w, b) => w + b.offsetWidth, 0) + gap * Math.max(0, buttons.length - 1) + pad;
+  stage.classList.toggle("parts-below", innerWidth <= 900 || need > stage.clientWidth - 32);
+  stage.style.setProperty("--bar", `${bar.offsetHeight}px`);
+}
+new ResizeObserver(() => fitParts()).observe($("stage"));
+new MutationObserver(() => fitParts()).observe($("parts"), { childList: true, subtree: true, characterData: true }); // Fill joins once the model loads
+document.fonts?.ready.then(fitParts);
 renderParts();
 
 // a fridge starts empty; "Fill the fridge" flies the items into their places (organise.js)
 window.__organise = null;
-queueMicrotask(() => { window.__organise = initOrganise({ mv, product, state, togglePart, bar: $("parts"), toast }); });
+// Fill opens the doors itself; a door still moving from a press finishes first, so none is skipped
+const doorWhenIdle = async (key) => { while (busy || chaining) await sleep(50); return togglePart(key); };
+queueMicrotask(() => { window.__organise = initOrganise({ mv, product, state, togglePart: doorWhenIdle, bar: $("parts"), toast }); fitParts(); });
 
 // the model carries one clip per change of state, named S<bits>_<bits>
 const stateKey = () => parts.map((p) => (state[p.key] ? 1 : 0)).join("");
@@ -782,13 +823,27 @@ let busy = false;
 // clip stays hidden behind the old one and a door the state calls open is drawn shut or half-open. So a clip
 // starts from a paused element, once the last one has ended (or cut short, for a jump to the end).
 const clipEnded = () => (mv.paused ? null : new Promise((r) => { mv.addEventListener("finished", r, { once: true }); setTimeout(r, 1200); }));
+// A press while a part is moving waits its turn instead of being lost. A second press on a part that is
+// already moving or waiting does nothing, so a double tap doesn't open it and shut it again.
+let chaining = 0, pressChain = Promise.resolve();
+const pressing = new Set();
+function pressPart(key) {
+  if (pressing.has(key)) return;
+  pressing.add(key);
+  const idle = async () => { while (busy || chaining || window.__organise?.openingDoors?.()) await sleep(50); };
+  pressChain = pressChain.then(async () => { await idle(); await togglePart(key); await idle(); }).catch(() => {}).finally(() => pressing.delete(key));
+}
 async function togglePart(key, { instant = false } = {}) {
   if (busy || !(key in state)) return;
   // a part inside another (the ice tray lives behind the freezer door): open the outer one first, and close the inner one before the outer
   const self = parts.find((x) => x.key === key);
   const outer = self?.needs && !state[key] && !state[self.needs] ? self.needs : null;
   const inner = state[key] ? parts.find((x) => x.needs === key && state[x.key])?.key : null;
-  if (outer || inner) { await togglePart(outer || inner, { instant }); await sleep(instant ? 80 : 950); if (busy) return; }
+  if (outer || inner) {
+    chaining++;
+    try { await togglePart(outer || inner, { instant }); await sleep(instant ? 80 : 950); } finally { chaining--; }
+    if (busy) return;
+  }
   busy = true;
   if (!instant) await clipEnded();
   mv.pause();
@@ -827,21 +882,25 @@ mv.addEventListener("pointerup", (e) => {
   if (!arActive && lastTap && now - lastTap.t < DOUBLE_MS && Math.hypot(x - lastTap.x, y - lastTap.y) < 30) {
     clearTimeout(lastTap.timer);
     lastTap = null;
-    return closeUp(x, y);
+    return closedUp ? $("btnReset").click() : closeUp(x, y);
   }
   const hit = mv.positionAndNormalFromPoint(x, y);
   const key = hit && parts.length ? partAt(product, state, hit.position) : null;
-  if (arActive) { if (pin.mode === "aim") placeHere(); else if (key && now - pin.placedAt > 600) togglePart(key); return; } // not the second tap of a double-tap that placed it
-  lastTap = { x, y, t: now, timer: setTimeout(() => { lastTap = null; if (key) togglePart(key); }, DOUBLE_MS) };
+  if (arActive) { if (pin.mode === "aim") placeHere(); else if (key && now - pin.placedAt > 600) pressPart(key); return; } // not the second tap of a double-tap that placed it
+  lastTap = { x, y, t: now, timer: setTimeout(() => { lastTap = null; if (key) pressPart(key); }, DOUBLE_MS) };
 });
 
 // ── camera ──
 // A click no longer moves the pivot or zooms out (disable-tap): a click opens a door and nothing else.
+let closedUp = false;
+const setClosedUp = (on) => { closedUp = on; $("btnAll").classList.toggle("hide", !on); };
 $("btnReset").addEventListener("click", () => {
   mv.cameraOrbit = orbit();
   mv.cameraTarget = "auto";
   mv.fieldOfView = "auto";
+  setClosedUp(false);
 });
+$("btnAll").addEventListener("click", () => $("btnReset").click());
 // front, side, back and top, at the product's own height and distance
 const VIEWS = { front: [0, null], side: [-90, null], back: [180, null], top: [0, 20] };
 for (const b of document.querySelectorAll(".controls .view")) b.addEventListener("click", () => {
@@ -850,6 +909,7 @@ for (const b of document.querySelectorAll(".controls .view")) b.addEventListener
   mv.cameraTarget = "auto";
   mv.fieldOfView = "auto";
   mv.cameraOrbit = `${theta}deg ${phi === null ? phi0 : `${phi}deg`} ${radius0}`;
+  setClosedUp(false);
 });
 
 // Zoom and turn from code, toward a point under the pointer. The camera never comes closer than
@@ -862,7 +922,7 @@ mv.addEventListener("load", () => {
   // the same limits model-viewer itself uses: 2.2 x the bounding sphere, up to 300% of the start distance
   const d = mv.getDimensions();
   minRadius = 2.2 * Math.hypot(d.x, d.y, d.z) / 2;
-  mv.minCameraOrbit = `auto 0deg ${minRadius}m`;   // 0deg: a close-up can look straight down on a top panel
+  mv.minCameraOrbit = `${onWall ? "-100deg" : "auto"} 0deg ${minRadius}m`;   // 0deg: a close-up can look straight down on a top panel
   requestAnimationFrame(() => {
     const o = mv.getCameraOrbit(), t = mv.getCameraTarget();
     baseFov = mv.getFieldOfView();
@@ -910,8 +970,10 @@ function zoomBy(f, x, y) {
 // customer sees a panel straight from the front without zooming and tilting. On the outside of the
 // product it faces the nearest side (front, side, back or top), so a curved or angled panel is still
 // seen square; inside (a shelf, the drum) it keeps its direction, because another way in could be blocked
-// by a wall. About 20 cm of the panel fills the view. A double-click on the background shows the whole product.
-const CLOSE_SPAN = 0.2;
+// by a wall. About 30 cm of the panel fills the view: close enough for the grain and the print, with an edge or a
+// handle still in sight (at 20 cm a plain front filled the screen with white). A double-click on the background,
+// a second double-click, or "See all of it" shows the whole product again.
+const CLOSE_SPAN = 0.3;
 function closeUp(x, y) {
   const hit = mv.positionAndNormalFromPoint(x, y);
   if (!hit) return $("btnReset").click();
@@ -932,6 +994,7 @@ function closeUp(x, y) {
   g.fov = Math.min(baseFov, Math.max(MIN_FOV, deg(2 * Math.atan(CLOSE_SPAN / 2 / minRadius))));
   applyGoal(g);
   $("hint").classList.add("gone");
+  setClosedUp(true);
 }
 $("btnZoomIn").addEventListener("click", () => zoomBy(0.75));
 $("btnZoomOut").addEventListener("click", () => zoomBy(1 / 0.75));
@@ -983,6 +1046,13 @@ if (!document.fullscreenEnabled) $("btnFullscreen").classList.add("hide");
 $("btnFullscreen").addEventListener("click", () => {
   if (document.fullscreenElement) document.exitFullscreen();
   else $("stage").requestFullscreen?.();
+});
+const FS_ICON = $("btnFullscreen").innerHTML;
+document.addEventListener("fullscreenchange", () => {
+  const on = !!document.fullscreenElement, b = $("btnFullscreen");
+  b.title = on ? "Leave full screen" : "Full screen";
+  b.setAttribute("aria-label", b.title);
+  b.innerHTML = on ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>' : FS_ICON;
 });
 
 // ── dimensions ──
@@ -1048,6 +1118,7 @@ const svgNS = "http://www.w3.org/2000/svg";
 const hsEls = hotspots.map((h, i) => {
   const b = document.createElement("button");
   b.className = "hs off";
+  b.tabIndex = -1;
   b.slot = `hotspot-f${i}`;
   b.dataset.position = h.pos.map((n) => `${n}m`).join(" ");
   b.dataset.normal = h.normal.join(" ");
@@ -1115,7 +1186,7 @@ function layoutFeatures() {
     const hidden = !featVisible(i) || !q || !q.facingCamera || !inView;
     const note = hidden ? need(h, featVisible(i) && q && q.facingCamera) || "Turn to see" : "";
     labEls[i].classList.toggle("num", narrow);
-    labEls[i].classList.toggle("dim", hidden);
+    labEls[i].classList.toggle("away", hidden);
     const sub = labEls[i].querySelector("em");
     if (sub.textContent !== note) sub.textContent = note;
     rows.push({ i, hidden, x: hidden ? NaN : q.canvasPosition.x, y: hidden ? NaN : q.canvasPosition.y });
@@ -1208,6 +1279,7 @@ async function showFeature(i, { tour = false } = {}) {
   $("fcNext").textContent = hotspots.length < 2 ? "Close" : "Next feature";
   $("fcard").classList.remove("gone");
   $("fcard").setAttribute("aria-hidden", "false");
+  $("fcard").inert = false;
   $("hint").classList.add("gone");
   if (tour && baseRadius) {
     touring = true;
@@ -1225,6 +1297,7 @@ function closeFeature() {
   labEls.forEach((b) => b.setAttribute("aria-pressed", "false"));
   $("fcard").classList.add("gone");
   $("fcard").setAttribute("aria-hidden", "true");
+  $("fcard").inert = true;
   if (touring) { touring = false; mv.cameraTarget = "auto"; mv.cameraOrbit = orbit(); }
 }
 const stepFeature = (d) => (hotspots.length < 2 ? closeFeature() : showFeature((featureIndex + d + hotspots.length) % hotspots.length, { tour: true }));
@@ -1570,8 +1643,8 @@ function guide() {
         step(2, "It stands on that spot at real size", size),
         step(3, "Walk around it", parts.length ? product.arTip : "Look at it from every side"),
       ],
-      note: `Stay on AR at the top of the screen: Object shrinks it to fit. On a ${onWall ? "plain wall" : "shiny or plain floor"}, move the phone slowly from side to side until it settles. To nudge it, drag it with one finger.`,
-      go: "Open AR",
+      note: `If “AR” and “Object” show at the top of the screen, keep “AR” chosen: “Object” shrinks it to fit the screen. On a ${onWall ? "plain wall" : "shiny or plain floor"}, move the phone slowly from side to side until it settles. To nudge it, drag it with one finger.`,
+      go: onWall ? "Open on your wall" : "Open in your room",
     };
     case "visionos": return {
       title: "How to use it on Vision Pro", sub: `${name}, in your room at real size.`,
@@ -1598,7 +1671,7 @@ function guide() {
         step(3, "Walk around it", parts.length ? product.arTip : "Look at it from every side"),
       ],
       note: onWall ? null : "To put it somewhere else, tap Move to another spot.",
-      go: "Open AR",
+      go: onWall ? "Open on your wall" : "Open in your room",
     } : {
       title: "AR isn’t available here", sub: "This browser or phone can’t open the camera view.",
       groups: [], note: "Open this page in Chrome on an Android phone with Google Play Services for AR, or in Safari on an iPhone.",
@@ -1672,6 +1745,14 @@ if (framed) {
   $("qrCode").classList.add("hide");
 } else $("qrCode").innerHTML = qrSvg();
 $("btnCopy").addEventListener("click", copyLink);
+// Share by the title: a phone's own share sheet (WhatsApp and the rest); on a laptop, the QR code and links below
+$("btnShare").addEventListener("click", async () => {
+  if (navigator.share && platform !== "desktop") {
+    try { await navigator.share({ title: document.title, text: `${product.brand} ${product.shortName}: open it in 3D and see it at real size in your room.`, url: shareUrl }); } catch {}
+    return;
+  }
+  $("share").scrollIntoView({ behavior: "smooth", block: "center" });
+});
 $("btnWhatsApp").href = `https://wa.me/?text=${encodeURIComponent(`${product.brand} ${product.shortName}: open it in 3D and see it at real size in your room. ${shareUrl}`)}`;
 
 // test hook for automated checks

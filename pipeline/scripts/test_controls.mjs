@@ -65,12 +65,22 @@ for (const id of ids) {
 
   await reset();
   const views = {};
+  // a unit on the wall has no Back button, and turns only as far as its sides
+  const wall = await b.evalJS("window.__demo.product.placement === 'wall'");
   for (const v of ["front", "side", "back", "top"]) {
+    if (wall && v === "back") continue;
     await b.evalJS(`document.querySelector('.controls .view[data-view=${v}]').click()`);
     views[v] = await cam();
   }
-  check(near(views.front.theta, 0, 1) && near(views.side.theta, -90, 1) && near(Math.abs(views.back.theta), 180, 1) && near(views.top.phi, 20, 1),
-    "Front, Side, Back and Top buttons turn the view");
+  check(near(views.front.theta, 0, 1) && near(views.side.theta, -90, 1) && (wall || near(Math.abs(views.back.theta), 180, 1)) && near(views.top.phi, 20, 1),
+    wall ? "Front, Side and Top buttons turn the view" : "Front, Side, Back and Top buttons turn the view");
+  if (wall) {
+    const hidden = await b.evalJS("document.querySelector('.controls .view[data-view=back]').offsetParent === null");
+    for (let i = 0; i < 14; i++) await key("ArrowRight", "ArrowRight", 39); // 140 degrees asked for
+    await sleep(900);
+    const t = (await cam()).theta;
+    check(hidden && Math.abs(t) <= 101, `a unit on the wall has no Back button and turns no further than its side (${t.toFixed(0)} degrees)`);
+  }
 
   await reset();
   await key("ArrowRight", "ArrowRight", 39);
@@ -125,8 +135,9 @@ for (const id of ids) {
     await sleep(1800);
     c = await cam();
     const same = parts0 === await b.evalJS("JSON.stringify(window.__demo.state)");
-    check(near(c.theta, theta, 1) && near(c.phi, 90, 1) && c.fov < home.fov / 2 && same,
-      `a double-click on the ${k} faces it head-on, close up (turn ${c.theta.toFixed(0)}, tilt ${c.phi.toFixed(0)}, lens ${c.fov.toFixed(1)} degrees), nothing opens`);
+    const span = 2 * c.r * Math.tan((c.fov * Math.PI) / 360); // what fills the view, in metres (product.html: about 30 cm)
+    check(near(c.theta, theta, 1) && near(c.phi, 90, 1) && Math.abs(span - 0.3) < 0.05 && same,
+      `a double-click on the ${k} faces it head-on, close up (turn ${c.theta.toFixed(0)}, tilt ${c.phi.toFixed(0)}, ${Math.round(span * 100)} cm across), nothing opens`);
     await b.shot(`${out}/${id}-closeup-${k}.png`);
   }
   // a single click on a part still opens it: test_features.mjs taps every part with real clicks

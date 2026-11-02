@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sangeetha 3D and AR</title>
 <meta name="description" content="Search a model number, open it in 3D, then see it at real size in your home on a phone or headset. No app needed.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sangeetha 3D and AR">
+<meta property="og:title" content="Sangeetha 3D and AR">
+<meta property="og:description" content="Search a model number, open it in 3D, then see it at real size in your home on a phone or headset. No app needed.">
+<meta property="og:url" content="https://3dmodelssangeetha.vercel.app/">
 <meta name="theme-color" content="#0E0E0F">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -151,7 +156,7 @@
   <div class="bar">
     <label class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="Search by model number or name" aria-label="Search by model number or name" autocomplete="off">
+      <input id="q" type="search" placeholder="Search model number or name" aria-label="Search by model number or name" autocomplete="off">
     </label>
     <div class="chips" id="chips"></div>
   </div>
@@ -175,6 +180,14 @@ const CATS = [["All", null], ...CATEGORIES.map(([value, label]) => [label, value
 let cat = null;
 const $ = (id) => document.getElementById(id);
 const q = $("q");
+// Back from a product: the same search and filter, scrolled to the card that was opened. The cards are built
+// after products.json loads, too late for the browser's own scroll restore, which put the list back at the top.
+history.scrollRestoration = "manual";
+const saved = history.state?.catalogue;
+if (saved) { q.value = saved.q || ""; cat = saved.cat ?? null; }
+const remember = () => history.replaceState({ ...history.state, catalogue: { y: scrollY, q: q.value, cat } }, "");
+addEventListener("pagehide", remember);
+document.addEventListener("click", (e) => { if (e.target.closest?.("a.card")) remember(); }, true);
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const AR = svg('<path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>');
@@ -253,7 +266,7 @@ function render() {
     return;
   }
   grid.innerHTML = list.map((p) => {
-    const tags = [p.size.w + " × " + p.size.h, p.parts?.length ? "Opens: " + p.parts.map((x) => x.label).join(", ") : null].filter(Boolean);
+    const tags = [`W ${parseFloat(p.size.w)} × H ${parseFloat(p.size.h)} × D ${parseFloat(p.size.d)} cm`, p.parts?.length ? "Opens: " + p.parts.map((x) => x.label).join(", ") : null].filter(Boolean);
     return `<div class="cell"><a class="card" href="/p/${p.id}">
       <div class="pic"><img src="${p.thumb}" alt="${esc(p.name)}" loading="lazy" width="900" height="900"><span class="badge">${AR}3D and AR</span></div>
       <div class="body">
@@ -275,6 +288,7 @@ q.addEventListener("keydown", (e) => {
   if (first) location.href = first.getAttribute("href");
 });
 render();
+if (saved) requestAnimationFrame(() => scrollTo(0, saved.y));
 </script>
 </body>
 </html>

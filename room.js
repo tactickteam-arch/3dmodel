@@ -112,6 +112,8 @@ const ICON = {
 };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+// an iPad tells the shopper to hold the iPad, not a phone (iPadOS Safari says it is a Mac, with touch)
+const DEVICE = /iPad/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ? "iPad" : "phone";
 const cm = (s) => parseFloat(s) / 100; // "63 cm" -> 0.63 m
 
 // ── EXIF: the 35 mm-equivalent focal length, if the photo says it ──
@@ -248,8 +250,8 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
           <h2>See it in your room</h2>
           <p>Give us a photo of the spot. The ${onWall ? "unit" : product.category.toLowerCase()} appears there at its real size, and you can drag it anywhere.</p>
           <ul class="room-tips">
-            <li>${ICON.landscape}<div><b>Hold your phone sideways.</b><br>Take a wide, landscape photo.</div></li>
-            <li>${ICON.level}<div><b>Hold it straight, at eye level.</b><br>Keep the phone level, not tilted up or down, and stand 2 to 3 metres back.</div></li>
+            <li>${ICON.landscape}<div><b>Hold your ${DEVICE} sideways.</b><br>Take a wide, landscape photo.</div></li>
+            <li>${ICON.level}<div><b>Hold it straight, at eye level.</b><br>Keep the ${DEVICE} level, not tilted up or down, and stand 2 to 3 metres back.</div></li>
             <li>${ICON.wall}<div><b>Show the wall and the floor.</b><br>${onWall ? "Take it straight at the wall where it will hang, with the floor at the bottom." : "Take it straight at the spot where it would stand, with the floor at the bottom. A wide-angle photo is fine, as long as it is level."}</div></li>
           </ul>
           <p class="room-error hide" id="roomError" role="alert"></p>
@@ -586,7 +588,7 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
     $("roomSmaller").addEventListener("click", () => { S.userSize = clamp(S.userSize / 1.06, 0.5, 2); sizeOut(); render(); });
     $("roomBigger").addEventListener("click", () => { S.userSize = clamp(S.userSize * 1.06, 0.5, 2); sizeOut(); render(); });
     $("roomSizeOut").addEventListener("click", () => { S.userSize = 1; sizeOut(); render(); });
-    bar.querySelectorAll("[data-part]").forEach((b) => b.addEventListener("click", () => togglePart(b.dataset.part)));
+    bar.querySelectorAll("[data-part]").forEach((b) => b.addEventListener("click", () => press(b.dataset.part)));
     const eye = q("roomEye");
     const hide = () => eye.classList.add("hide");
     $("hcIn").addEventListener("input", (e) => { S.hc = +e.target.value; $("hcOut").textContent = `${S.hc.toFixed(2).replace(/0$/, "")} m`; render(); });
@@ -608,13 +610,26 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
 
   // "Open <label>" and "Close <label>", or the part's own two words (text: [to open, to close])
   function partText(p, open) { return p.text ? p.text[open ? 1 : 0] : `${open ? "Close" : "Open"} ${p.label}`; }
+  // a press while a part moves waits its turn instead of being lost; a second press on the same part meanwhile does nothing
+  let pressChain = Promise.resolve();
+  const pressing = new Set();
+  function press(key) {
+    if (pressing.has(key)) return;
+    pressing.add(key);
+    const idle = async () => { while (S && (S.busy || S.chaining)) await new Promise((r) => setTimeout(r, 50)); };
+    pressChain = pressChain.then(async () => { await idle(); if (S) await togglePart(key); await idle(); }).catch(() => {}).finally(() => pressing.delete(key));
+  }
   async function togglePart(key) {
     if (S.busy) return;
     // a part inside another (the trays behind the fridge door): open the outer one first, and close the inner one before the outer
     const self = parts.find((x) => x.key === key);
     const outer = self?.needs && !S.open[key] && !S.open[self.needs] ? self.needs : null;
     const inner = S.open[key] ? parts.find((x) => x.needs === key && S.open[x.key])?.key : null;
-    if (outer || inner) { await togglePart(outer || inner); await new Promise((r) => setTimeout(r, 950)); if (!S || S.busy) return; }
+    if (outer || inner) {
+      S.chaining = true;
+      try { await togglePart(outer || inner); await new Promise((r) => setTimeout(r, 950)); } finally { if (S) S.chaining = false; }
+      if (!S || S.busy) return;
+    }
     S.busy = true;
     const mv = S.mv;
     // let the running clip end first: model-viewer cross-fades from it, and currentTime = 0 rewinds

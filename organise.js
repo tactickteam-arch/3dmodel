@@ -7,7 +7,7 @@ const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export function initOrganise({ mv, product, state, togglePart, bar, toast }) {
   const sceneSym = () => Object.getOwnPropertySymbols(mv).find((s) => s.description === "scene");
-  let items = null, full = true, running = false, btn = null;
+  let items = null, full = true, running = false, doors = false, btn = null;
 
   function setup() {
     const scene = mv[sceneSym()];
@@ -67,7 +67,9 @@ export function initOrganise({ mv, product, state, togglePart, bar, toast }) {
     if (running || !items || toFull === full) return;
     running = true;
     if (toFull) {
-      for (const p of product.parts) if (/door|freezer|fridge/i.test(p.label + p.key) && !/ice|tray/i.test(p.label) && !state[p.key]) { await togglePart(p.key); await sleep(1000); }
+      doors = true; // presses on the page wait while the doors open
+      try { for (const p of product.parts) if (/door|freezer|fridge/i.test(p.label + p.key) && !/ice|tray/i.test(p.label) && !state[p.key]) { await togglePart(p.key); await sleep(1000); } }
+      finally { doors = false; }
     }
     const scene = mv[sceneSym()];
     const box = items.box;
@@ -127,5 +129,5 @@ export function initOrganise({ mv, product, state, togglePart, bar, toast }) {
   // in AR the fridge is shown full
   mv.addEventListener("ar-status", (e) => { if (items && e.detail?.status === "session-started" && !full) setFull(true); });
   if (mv.loaded) setup(); else mv.addEventListener("load", setup, { once: true });
-  return { fill: () => run(true), empty: () => run(false), isFull: () => full, ready: () => !!items };
+  return { fill: () => run(true), empty: () => run(false), isFull: () => full, ready: () => !!items, openingDoors: () => doors };
 }

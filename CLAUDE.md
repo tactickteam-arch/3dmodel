@@ -13,6 +13,7 @@ A static site that shows Sangeetha's appliances in 3D and AR:
 ## Layout
 - **Site (repo root):**
   - `index.html` (catalogue), `product.html` (one product, `/p/<id>`), `xr.js` (headsets)
+  - `p/<id>.html`: product.html with each product's own title and link preview, made by `pipeline/scripts/make_pages.mjs`. Edit product.html, never these; run it after changing product.html or a product's name, summary, photo or `hidden` flag.
   - `products.json`
   - `models/` (GLB, plus USDZ in `models/usdz/`), `photos/`, `logos/`, `banners/` (the Quick Look banners)
 - **`pipeline/`** (not deployed):
