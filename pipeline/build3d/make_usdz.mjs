@@ -14,6 +14,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
+import * as THREE from "three";
 
 const [glbPath, productsPath, productId, outDir, mode] = process.argv.slice(2);
 const free = mode === "free";
@@ -127,8 +128,16 @@ for (const finish of finishes) {
     if (s.some((v) => v !== 1)) { w.line(`double3 xformOp:scale = ${tuple(s)}`); ops.push('"xformOp:scale"'); }
     if (ops.length) w.line(`uniform token[] xformOpOrder = [${ops.join(", ")}]`);
 
-    const mesh = node.getMesh();
-    if (mesh) {
+    // a part moves as one, and so does a group with no part inside: all of it is written here, merged
+    // otherwise its own mesh and every child with no part in it are joined here, and the children holding parts written below
+    const merge = opts.inPart || !hasPart(node);
+    const pieces = [], inv = new THREE.Matrix4().copy(world(node)).invert();
+    if (merge) collect(node, inv, pieces);
+    else {
+      node.getMesh()?.listPrimitives().forEach((prim) => pieces.push({ prim, M: new THREE.Matrix4(), node }));
+      for (const c of node.listChildren()) if (!partByNode.has(c.getName()) && !hasPart(c)) collect(c, inv, pieces);
+    }
+    if (pieces.length) {
       tapTargets.push(p);
       if (opts.tappable) {
         // lets Vision Pro accept both direct touch and look-and-pinch on this object
@@ -138,12 +147,13 @@ for (const finish of finishes) {
         w.line('uniform token info:id = "RealityKit.InputTarget"');
         w.close();
       }
-      mesh.listPrimitives().forEach((prim, i) => writeMesh(prim, `Geom_${i}`));
+      writeMeshes(pieces);
     }
+    if (merge) { w.close(); return tapTargets; }
     const childNames = new Set(["InputTarget"]);
     for (const child of node.listChildren()) {
-      if (opts.inPart || !partByNode.has(child.getName())) {
-        tapTargets.push(...writeNode(child, p, childNames, { tappable: opts.tappable, inPart: opts.inPart }));
+      if (!partByNode.has(child.getName())) {
+        if (hasPart(child)) tapTargets.push(...writeNode(child, p, childNames, { tappable: opts.tappable }));
         continue;
       }
       // a moving part: closed copy, open copy (parked at first), and four empty poses to
@@ -176,39 +186,69 @@ for (const finish of finishes) {
     return tapTargets;
   }
 
-  function writeMesh(prim, name) {
-    const pos = prim.getAttribute("POSITION"), nor = prim.getAttribute("NORMAL"), uv = prim.getAttribute("TEXCOORD_0");
-    const idx = prim.getIndices();
-    const count = pos.getCount();
-    let indices = idx ? Array.from(idx.getArray()) : [...Array(count).keys()];
-    // Quick Look draws one side only: a double-sided material gets its faces written twice
-    const m0 = materialFor(prim);
-    if (m0?.getDoubleSided()) {
-      const back = [];
-      for (let i = 0; i < indices.length; i += 3) back.push(indices[i], indices[i + 2], indices[i + 1]);
-      indices = indices.concat(back);
+  // Quick Look draws every mesh on its own, and again for its shadow. The LG 343 L's stock alone was
+  // 1,262 meshes, and an iPhone stuttered in AR. So the pieces that move together are joined, one mesh
+  // per material, each piece placed where it was. See-through pieces stay one mesh each: the renderer draws
+  // them in order of distance, mesh by mesh, and a joined basket (floor, back, sides and front) has its middle
+  // further back, so it was drawn before the bottles in it and hid them; the ice cubes vanished the same way.
+  const world = (node) => new THREE.Matrix4().fromArray(node.getWorldMatrix());
+  const hasPart = (node) => node.listChildren().some((c) => partByNode.has(c.getName()) || hasPart(c));
+  function collect(node, rootInv, out) {
+    const mesh = node.getMesh();
+    if (mesh) { const M = new THREE.Matrix4().multiplyMatrices(rootInv, world(node)); mesh.listPrimitives().forEach((prim) => out.push({ prim, M, node })); }
+    for (const c of node.listChildren()) collect(c, rootInv, out);
+  }
+  function writeMeshes(pieces) {
+    const groups = new Map();
+    pieces.forEach(({ prim, M, node }, i) => {
+      const m = materialFor(prim);
+      const key = m?.getAlphaMode() === "BLEND" ? `blend${i}` : [m ? matName(m) : "-", ...["NORMAL", "TEXCOORD_0", "TEXCOORD_1"].map((a) => !!prim.getAttribute(a))].join("|");
+      if (!groups.has(key)) groups.set(key, { m, list: [] });
+      groups.get(key).list.push({ prim, M });
+    });
+    [...groups.values()].forEach((g, i) => writeMesh(g.list, g.m, `Geom_${i}`));
+  }
+
+  function writeMesh(list, m, name) {
+    const points = [], normals = [], sts = [[], []], faces = [], el = [], v = new THREE.Vector3();
+    const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+    let hasN = false;
+    for (const { prim, M } of list) {
+      const pos = prim.getAttribute("POSITION"), nor = prim.getAttribute("NORMAL"), idx = prim.getIndices();
+      let indices = idx ? Array.from(idx.getArray()) : [...Array(pos.getCount()).keys()];
+      // a mirrored piece (negative scale) turns its faces inside out unless they are turned back
+      if (M.determinant() < 0) for (let i = 0; i < indices.length; i += 3) [indices[i + 1], indices[i + 2]] = [indices[i + 2], indices[i + 1]];
+      // Quick Look draws one side only: a double-sided material gets its faces written twice
+      if (m?.getDoubleSided()) {
+        const back = [];
+        for (let i = 0; i < indices.length; i += 3) back.push(indices[i], indices[i + 2], indices[i + 1]);
+        indices = indices.concat(back);
+      }
+      // primitives of one multi-material mesh share a vertex list; keep only the vertices this one uses
+      const used = [...new Set(indices)].sort((x, y) => x - y);
+      const remap = new Map(used.map((u, i) => [u, points.length + i]));
+      faces.push(...indices.map((u) => remap.get(u)));
+      const N = new THREE.Matrix3().getNormalMatrix(M);
+      for (const i of used) {
+        pos.getElement(i, el); v.set(el[0], el[1], el[2]).applyMatrix4(M);
+        points.push(P5([v.x, v.y, v.z]));
+        [v.x, v.y, v.z].forEach((c, k) => { min[k] = Math.min(min[k], c); max[k] = Math.max(max[k], c); });
+        if (nor) { hasN = true; nor.getElement(i, el); v.set(el[0], el[1], el[2]).applyMatrix3(N).normalize(); normals.push(N3([v.x, v.y, v.z])); }
+      }
+      // st carries the photo textures; st1, when present, the fine grain (lib.mjs GRAIN), in tiles
+      ["TEXCOORD_0", "TEXCOORD_1"].forEach((a, k) => { const set = prim.getAttribute(a); if (set) for (const i of used) { set.getElement(i, el); sts[k].push(U4([el[0], 1 - el[1]])); } });
     }
-    // primitives of one multi-material mesh share a vertex list; keep only the vertices this one uses
-    const used = [...new Set(indices)].sort((x, y) => x - y);
-    const remap = new Map(used.map((v, i) => [v, i]));
-    indices = indices.map((v) => remap.get(v));
-    const vec = (acc, n, fmt) => { const out = [], el = []; for (const i of used) { acc.getElement(i, el); out.push(fmt(el.slice(0, n))); } return out.join(", "); };
-    const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity], el = [];
-    for (const i of used) { pos.getElement(i, el); for (let k = 0; k < 3; k++) { min[k] = Math.min(min[k], el[k]); max[k] = Math.max(max[k], el[k]); } }
     w.open(`def Mesh "${name}"`, ['prepend apiSchemas = ["MaterialBindingAPI"]']);
     w.line(`float3[] extent = [${tuple(min)}, ${tuple(max)}]`);
-    w.line(`int[] faceVertexCounts = [${Array(indices.length / 3).fill(3).join(",")}]`);
-    w.line(`int[] faceVertexIndices = [${indices.join(",")}]`);
-    w.line(`point3f[] points = [${vec(pos, 3, P5)}]`);
-    if (nor) { w.line(`normal3f[] normals = [${vec(nor, 3, N3)}] (`); w.line('    interpolation = "vertex"'); w.line(")"); }
-    // st carries the photo textures; st1, when present, the fine grain (lib.mjs GRAIN), in tiles
-    for (const [set, name] of [[uv, "st"], [prim.getAttribute("TEXCOORD_1"), "st1"]]) {
-      if (!set) continue;
-      const st = []; for (const i of used) { set.getElement(i, el); st.push(U4([el[0], 1 - el[1]])); }
-      w.line(`texCoord2f[] primvars:${name} = [${st.join(", ")}] (`); w.line('    interpolation = "vertex"'); w.line(")");
-    }
+    w.line(`int[] faceVertexCounts = [${Array(faces.length / 3).fill(3).join(",")}]`);
+    w.line(`int[] faceVertexIndices = [${faces.join(",")}]`);
+    w.line(`point3f[] points = [${points.join(", ")}]`);
+    if (hasN) { w.line(`normal3f[] normals = [${normals.join(", ")}] (`); w.line('    interpolation = "vertex"'); w.line(")"); }
+    sts.forEach((st, k) => {
+      if (!st.length) return;
+      w.line(`texCoord2f[] primvars:${k ? "st1" : "st"} = [${st.join(", ")}] (`); w.line('    interpolation = "vertex"'); w.line(")");
+    });
     w.line('uniform token subdivisionScheme = "none"');
-    const m = materialFor(prim);
     if (m) w.line(`rel material:binding = </Root/Materials/${matName(m)}>`);
     w.close();
   }
