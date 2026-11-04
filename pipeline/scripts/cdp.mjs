@@ -7,6 +7,10 @@ export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export async function launch({ port = 9444, profile, flags = [] } = {}) {
   const proc = spawn(BIN, [`--remote-debugging-port=${port}`, "--enable-unsafe-swiftshader", "--use-angle=swiftshader", "--hide-scrollbars", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=${profile}`, ...flags, "about:blank"], { stdio: "ignore" });
+  // a test stopped by its time limit, the gate's timeout or a crash must take its browser with it: left running,
+  // they piled up for days and slowed every later run
+  process.on("exit", () => proc.kill());
+  for (const sig of ["SIGTERM", "SIGINT", "SIGHUP", "SIGALRM"]) process.once(sig, () => process.exit(1));
   let page;
   for (let i = 0; i < 40 && !page; i++) {
     await sleep(250);

@@ -32,6 +32,8 @@ const STAND = `(() => {
     phone: window.__phone.state.pos });
 })()`;
 const stand = async (ms = 900) => { await sleep(ms); return JSON.parse(await b.evalJS(STAND)); };
+// polls until ok(s) or the time is up: AR frames come slowly on a busy machine
+const standUntil = async (ok, ms = 5000) => { const end = Date.now() + ms; let s; do { s = await stand(150); } while (!ok(s) && Date.now() < end); return s; };
 const dist = (a, c) => Math.hypot(a[0] - c[0], a[1] - c[1], a[2] - c[2]);
 const fmt = (p) => `(${p.map((v) => v.toFixed(3)).join(", ")})`;
 const aim = (from, to) => b.evalJS(`window.__phone.aim(${JSON.stringify(from)}, ${JSON.stringify(to)})`);
@@ -74,8 +76,9 @@ for (const id of ids) {
 
     await b.evalJS("window.__phone.state.floorFound = true");
     const A = await b.evalJS("window.__phone.centreHit()");
-    s = await stand(1200);
-    check(s.place === "enabled" && !s.shown && dist(s.goal, A) < 0.002 && /real size on the floor/.test(s.status),
+    const found = (s) => s.place === "enabled" && !s.shown && dist(s.goal, A) < 0.002 && /real size on the floor/.test(s.status);
+    s = await standUntil(found);
+    check(found(s),
       `the floor is found: its footprint goes where the dot points ${fmt(A)}, Place here lights up`);
 
     // walk a little and point somewhere else; the footprint follows the dot
@@ -116,10 +119,12 @@ for (const id of ids) {
     check(/aiming/.test(s.ui) && !s.shown, "Move to another spot: back to the dot and the footprint");
     await aim([1.1, 0.1, -0.9], [1.4, F, -2.6]);
     const C = await b.evalJS("window.__phone.centreHit()");
-    await sleep(1200);
+    // a tap places it where the footprint is, so tap once the footprint has reached the new spot
+    await standUntil((s) => s.place === "enabled" && dist(s.goal, C) < 0.002, 8000);
     await b.click(206, 430);
-    s = await stand(400);
-    check(s.shown && dist(s.at, C) < 0.001 && facing(s) < 1, `a tap on the camera view places it on the new spot (${(dist(s.at, C) * 1000).toFixed(1)} mm off, facing the phone)`);
+    const placedC = (s) => s.shown && dist(s.at, C) < 0.001 && facing(s) < 1;
+    s = await standUntil(placedC);
+    check(placedC(s), `a tap on the camera view places it on the new spot (${(dist(s.at, C) * 1000).toFixed(1)} mm off, facing the phone)`);
 
     await b.evalJS("document.querySelector('model-viewer').shadowRoot.querySelector('.slot.exit-webxr-ar-button').click()");
     const left = await b.waitFor("document.querySelector('model-viewer').getAttribute('ar-status') === 'not-presenting'", 5000);

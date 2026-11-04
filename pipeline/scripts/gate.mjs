@@ -197,6 +197,21 @@ for (const u of usdzFiles) {
 // ── 4. the page tests, on a staging catalogue with only this product on show ──
 let server = null;
 if (!fast) {
+  // at most two gates run their browsers at once: with seven agents gating together the Mac's load reached 30-70 and page
+  // tests timed out. A slot is a folder in .work/; a slot whose gate has died is taken over.
+  const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  let slot = null;
+  for (let waited = 0; !slot; waited++) {
+    for (const s of [0, 1]) {
+      const dir = `${SITE}/.work/gate-pages-${s}.lock`;
+      try { fs.mkdirSync(dir, { recursive: false }); fs.writeFileSync(`${dir}/pid`, String(process.pid)); slot = dir; break; } catch {}
+      let pid = 0; try { pid = +fs.readFileSync(`${dir}/pid`, "utf8"); } catch {}
+      const old = Date.now() - (fs.statSync(dir, { throwIfNoEntry: false })?.mtimeMs ?? 0) > 60000;
+      if ((pid && !alive(pid)) || (!pid && old)) fs.rmSync(dir, { recursive: true, force: true });
+    }
+    if (!slot) { if (waited % 12 === 0) console.log("waiting for a free page-test slot (two gates already running their browsers)"); await new Promise((r) => setTimeout(r, 5000)); }
+  }
+  process.on("exit", () => { try { if (+fs.readFileSync(`${slot}/pid`, "utf8") === process.pid) fs.rmSync(slot, { recursive: true, force: true }); } catch {} });
   const staged = { ...catalogue, products: catalogue.products.filter((p) => p.id !== id).map((p) => ({ ...p, hidden: true })) };
   const mine = { ...entry }; delete mine.hidden; staged.products.push(mine);
   fs.writeFileSync(`${OUT}/catalog.json`, JSON.stringify(staged));
@@ -231,6 +246,7 @@ if (!fast) {
   const shots = fs.existsSync(`${OUT}/look`) ? fs.readdirSync(`${OUT}/look`).filter((f) => f.endsWith(".png")) : [];
   record("renders", shots.length === views.length, `${shots.length} of ${views.length} views rendered in look/ ${r.status ? tail(r.stderr) : ""}`);
   server.kill();
+  fs.rmSync(slot, { recursive: true, force: true });
   fs.writeFileSync(`${OUT}/REVIEW.md`, [
     `# ${entry.brand} ${entry.model}: what a person must look at (STANDARD.md section 7)`, "",
     "Open each picture next to the maker's photo at the same angle. Tick a line only when it matches; write what is wrong otherwise.", "",

@@ -17,6 +17,8 @@ await b.viewport(1440, 900, false, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15
 const CAM = `(() => { const mv = document.querySelector('model-viewer'), o = mv.getCameraOrbit(), t = mv.getCameraTarget();
   return JSON.stringify({ theta: o.theta * 180 / Math.PI, phi: o.phi * 180 / Math.PI, r: o.radius, fov: mv.getFieldOfView(), t: [t.x, t.y, t.z] }); })()`;
 const cam = async () => { await sleep(900); return JSON.parse(await b.evalJS(CAM)); };
+// for a check that something moved: polls until ok(c) or the time is up, as the camera glides slowly on a busy machine
+const camUntil = async (ok, ms = 6000) => { const end = Date.now() + ms; let c; do { await sleep(300); c = JSON.parse(await b.evalJS(CAM)); } while (!ok(c) && Date.now() < end); return c; };
 const near = (a, b, tol) => Math.abs(a - b) <= tol;
 const sameTarget = (a, b) => a.t.every((v, i) => near(v, b.t[i], 0.005));
 const key = async (k, code, vk) => {
@@ -60,17 +62,18 @@ for (const id of ids) {
   await reset();
   await sleep(400);
   await wheel(0, -4.000244140625);
-  c = await cam();
+  c = await camUntil((c) => c.r < home.r * 0.92);
   check(c.r < home.r * 0.92 && near(c.theta, home.theta, 0.5) && near(c.phi, home.phi, 0.5), `a Mac mouse-wheel click zooms one step (${home.r.toFixed(2)} -> ${c.r.toFixed(2)} m), no turn`);
 
   await reset();
   const views = {};
   // a unit on the wall has no Back button, and turns only as far as its sides
   const wall = await b.evalJS("window.__demo.product.placement === 'wall'");
+  const want = { front: (c) => near(c.theta, 0, 1), side: (c) => near(c.theta, -90, 1), back: (c) => near(Math.abs(c.theta), 180, 1), top: (c) => near(c.phi, 20, 1) };
   for (const v of ["front", "side", "back", "top"]) {
     if (wall && v === "back") continue;
     await b.evalJS(`document.querySelector('.controls .view[data-view=${v}]').click()`);
-    views[v] = await cam();
+    views[v] = await camUntil(want[v]);
   }
   check(near(views.front.theta, 0, 1) && near(views.side.theta, -90, 1) && (wall || near(Math.abs(views.back.theta), 180, 1)) && near(views.top.phi, 20, 1),
     wall ? "Front, Side and Top buttons turn the view" : "Front, Side, Back and Top buttons turn the view");
@@ -107,6 +110,7 @@ for (const id of ids) {
   const top0 = await b.evalJS("document.querySelector('aside').scrollTop");
   await key("ArrowDown", "ArrowDown", 40);
   await key("ArrowDown", "ArrowDown", 40);
+  await b.waitFor(`document.querySelector('aside').scrollTop > ${top0}`, 5000); // it scrolls smoothly
   c = await cam();
   const top1 = await b.evalJS("document.querySelector('aside').scrollTop");
   check(near(c.phi, home.phi, 0.5) && top1 > top0, `after a click in the side panel, arrows scroll it (${top0} -> ${top1} px) and the model stays`);

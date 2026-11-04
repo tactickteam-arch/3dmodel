@@ -312,7 +312,10 @@ export function Food({ brandDir = null } = {}) {
     g.add(mesh("CanBody", body, C("can" + bodyColor.toString(16), bodyColor, { metal: 0.5, rough: 0.35 }), 0, 0, 0));
     g.add(mesh("CanTop", new THREE.CircleGeometry(0.0272, 20), C("canalu", 0xc9ccd0, { metal: 0.9, rough: 0.3 }), 0, 0.1208, 0).rotateX(-Math.PI / 2));
     g.add(mesh("PullTab", new THREE.BoxGeometry(0.014, 0.0008, 0.009), C("canalu", 0xc9ccd0, { metal: 0.9, rough: 0.3 }), 0, 0.122, 0));
-    if (labelM) g.add(mesh("CanPrint", flipUV(new THREE.CylinderGeometry(r + 0.0004, r + 0.0004, labelH, 16, 1, true, -labelArc / 2, labelArc)), labelM, 0, 0.011 + labelH / 2, 0));
+    // the print's sides lie on the body's 24 sides, 1.3 mm out, past defight's and zfight's reach: 0.4 mm out with
+    // 16 sides of its own it dipped into the body between corners and flickered. Its arc snaps to the body's sides.
+    const side = Math.PI / 12, n = Math.max(2, Math.round(labelArc / side)), start = Math.round(-n / 2) * side;
+    if (labelM) g.add(mesh("CanPrint", flipUV(new THREE.CylinderGeometry(r + 0.0013, r + 0.0013, labelH, n, 1, true, start, n * side)), labelM, 0, 0.011 + labelH / 2, 0));
     return tag(at(g, x, y, z));
   }
   function flipUV(geo) { const uv = geo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - uv.getY(i)); return geo; }

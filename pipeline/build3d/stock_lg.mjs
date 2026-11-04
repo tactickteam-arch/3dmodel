@@ -100,12 +100,13 @@ export function LGStock({ T3, TF, BR, BRT = BR }) {
     g.add(plane(name + "Print", w * 0.97, d * 0.97, brand(key), 0, h + 0.0007, 0).rotateX(-Math.PI / 2));
     return tag(g);
   };
-  // an ice-cream tub: a white tub with the brand's lid photo on top
+  // an ice-cream tub: a white tub with the brand's lid photo on top. The rim's top sits 1 mm above the tub's and the
+  // photo 1 mm above the rim's: in one plane they flickered (BENCHMARK 0d, STANDARD 5 "flicker")
   function iceTub(name, key, w, h, d, x, y, z) {
     const g = group(name, x, y, z);
     g.add(box(name + "Body", w, h, d, M.iceWhite, 0, h / 2, 0));
-    g.add(box(name + "Rim", w + 0.006, 0.006, d + 0.006, M.iceLid, 0, h - 0.003, 0));
-    g.add(plane(name + "Lid", w * 0.94, d * 0.94, brand(key), 0, h + 0.0008, 0).rotateX(-Math.PI / 2));
+    g.add(box(name + "Rim", w + 0.006, 0.006, d + 0.006, M.iceLid, 0, h - 0.002, 0));
+    g.add(plane(name + "Lid", w * 0.94, d * 0.94, brand(key), 0, h + 0.002, 0).rotateX(-Math.PI / 2));
     return tag(g);
   }
   // soft packs from the manifest's real sizes: lying flat, or standing and facing +z
@@ -435,8 +436,11 @@ export function LGStock({ T3, TF, BR, BRT = BR }) {
     packs(["fresho_green_peas", "viswas_parotta", "nitya_parotta", "amul_paneer"], P.b1);
     packs(["nitya_parotta", "amul_paneer", "fresho_green_peas", "viswas_parotta"], P.b2);
   }
+  // eggX: where the eggs stand across the door (default the LG 343 L's six cups), eggDY: their base above eggY,
+  // eggTurn: the turn from one egg to the next (default food.mjs's own; a quarter turn keeps each egg's box square in
+  // a shallow egg bin). canY null: the door has no can basket (the Samsung 330 L), so no cans.
   function doorFridgeFit(g, P) {
-    const { eggY, jarY, botY, canY, deps } = P;
+    const { eggY, jarY, botY, canY, deps, eggX = [0, 1, 2, 3, 4, 5].map((i) => -0.115 - i * 0.056), eggDY = 0.006, eggTurn = null } = P;
     const row = (items, y, dep) => {
       const [x0, x1, zm] = P.inside(dep);
       items.forEach((o) => { face(o); o.position.y = y + 0.004; g.add(o); });
@@ -444,7 +448,7 @@ export function LGStock({ T3, TF, BR, BRT = BR }) {
     };
     // eggs sit in the egg tray's cups
     const [, , ze] = P.inside(deps.egg);
-    for (let i = 0; i < 6; i++) g.add(food.egg("Egg", -0.115 - i * 0.056, eggY + 0.006, ze, i + 1));
+    eggX.forEach((x, i) => { const e = food.egg("Egg", x, eggY + eggDY, ze, i + 1); if (eggTurn != null) e.rotation.y = eggTurn * (i + 1); g.add(e); });
     row([
       brandJar("MothersPickle", "mothers_mango_pickle", 0.036, 0.07, M.jarGreen, M.goldLid, 0, 0, 0),
       brandJar("MothersPickle2", "mothers_mango_pickle", 0.036, 0.07, M.jarGreen, M.goldLid, 0, 0, 0),
@@ -461,6 +465,7 @@ export function LGStock({ T3, TF, BR, BRT = BR }) {
       carton("RealMixedFruit", "real_mixed_fruit", 0, 0, 0, 1),
       carton("AmulTaaza", "amul_taaza_carton", 0, 0, 0, 3),
     ], botY, deps.bottle);
+    if (canY == null) return;
     const cans = [[0x1b2d72, "thumsup_can", 0.105], [0xb82a20, "coke_label", 0.06], [0xe8820e, "fanta_label", 0.06], [0x0e9a48, "sprite_label", 0.07], [0x1b2d72, "thumsup_can", 0.105], [0xb82a20, "coke_label", 0.06]];
     row(cans.map(([col, key, lh]) => food.can("Can", col, 0, 0, 0, brand(key), arcFor(asp(key, 1) * lh, 0.033), lh)), canY, deps.can);
   }

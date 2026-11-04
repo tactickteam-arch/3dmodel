@@ -1,0 +1,159 @@
+{
+  "products": [
+    {
+      "id": "samsung-rt34hg5a42bxhl",
+      "hidden": true,
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT34HG5A42BXHL",
+      "name": "Samsung 330 L double-door refrigerator with Bespoke AI",
+      "shortName": "330 L Bespoke AI refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt34hg5a42bxhl.glb",
+      "thumb": "/photos/samsung-rt34hg5a42bxhl/0.jpg",
+      "photos": ["/photos/samsung-rt34hg5a42bxhl/0.jpg", "/photos/samsung-rt34hg5a42bxhl/1.jpg", "/photos/samsung-rt34hg5a42bxhl/2.jpg", "/photos/samsung-rt34hg5a42bxhl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Luxe Black",
+          "swatchColor": "#2b2d31",
+          "usdz": "/models/usdz/samsung-rt34hg5a42bxhl-luxe-black.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.315, 1.148, 0.219],
+              [0.315, 1.71, 0.371]
+            ],
+            "open": [
+              [0.242, 1.148, 0.303],
+              [0.577, 1.71, 0.91]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.214, 1.206, -0.026],
+              [-0.041, 1.376, 0.182]
+            ],
+            "open": [
+              [-0.214, 1.206, 0.094],
+              [-0.041, 1.376, 0.302]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.315, 0.04, 0.204],
+              [0.315, 1.142, 0.371]
+            ],
+            "open": [
+              [0.237, 0.04, 0.299],
+              [0.626, 1.142, 0.889]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.03, 0, 0.66],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.275, 0.075, -0.334],
+              [0.275, 0.957, 0.201]
+            ],
+            "open": [
+              [-0.305, 0.075, 0.326],
+              [0.245, 0.957, 0.861]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "63 cm",
+        "h": "171 cm",
+        "d": "74 cm"
+      },
+      "sizeNote": "Samsung's manual lists 129.4 cm total depth and 91.3 cm total width with the doors open",
+      "specs": [
+        ["Total capacity", "330 L (fridge 255 L, freezer 75 L)"],
+        ["Type", "Frost free, double door"],
+        ["Convertible", "5-in-1"],
+        ["Energy rating", "2 star, 241 units a year"],
+        ["Compressor", "Digital Inverter"],
+        ["Cooling", "Twin Cooling Plus, Multi Flow"],
+        ["Smart features", "Wi-Fi, SmartThings, AI Energy Mode"],
+        ["Shelves", "2 tempered glass (fridge), 1 (freezer)"],
+        ["Extras", "Twist Ice Maker, Active Fresh Filter+"],
+        ["Handle", "Recessed"],
+        ["Weight", "61 kg"],
+        ["Warranty", "1 year product, 10 years compressor"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-330-l-double-door-refrigerator-2026-model-with-bespoke-ai-or-2-or-active-fresh-filter-or-luxe-black-or-rt34hg5a42bx-rt34hg5a42bxhl/21090",
+      "source": "https://www.samsung.com/in/refrigerators/double-door/rt6300dh-top-mount-freezer-twin-cooling-plus-330l-black-rt34hg5a42bxhl/",
+      "hotspots": [
+        {
+          "title": "Convertible 5-in-1",
+          "text": "Using Twin Cooling technology, the Convertible 5-in-1 feature lets you switch between 5 smart modes, so the freezer can become a fridge.",
+          "pos": [-0.06, 1.46, 0.371],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "SmartThings with Wi-Fi",
+          "text": "Control the cooling mode, change the temperature and get alerts if the door is left open, from the SmartThings app.",
+          "pos": [-0.06, 0.78, 0.371],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Twin Cooling Plus",
+          "text": "Independent evaporators, fans and vents in the fridge and freezer keep food moist and stop odours mixing between them.",
+          "pos": [0, 1.46, -0.329],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Active Fresh Filter+",
+          "text": "Air passes through an activated carbon filter, so it is deodorised, and an anti-bacterial mesh removes bacteria.",
+          "pos": [0, 0.62, -0.329],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 56,
+        "sides": 5,
+        "back": 5,
+        "note": "From Samsung's user manual for this range: at least 5 cm at each side, more than 5 cm behind it, and 129.4 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
+      }
+    }
+  ]
+}

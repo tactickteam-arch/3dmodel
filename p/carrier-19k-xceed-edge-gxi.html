@@ -928,7 +928,10 @@ for (const b of document.querySelectorAll(".controls .view")) b.addEventListener
 const MIN_FOV = 4, MAX_PHI = 157.5 * Math.PI / 180;
 const rad = (d) => (d * Math.PI) / 180, deg = (r) => (r * 180) / Math.PI;
 let goal = null, goalAt = 0, minRadius = 0, maxRadius = Infinity, baseFov = 30, home = null;
-mv.addEventListener("load", () => {
+// fn runs on every model load, and also once now if the model already loaded while this module waited for the headset
+// check above: on a slow phone "load" can come first, and then the doors, Fill and the fit were never set up
+function onLoad(fn) { mv.addEventListener("load", fn); if (mv.loaded) setTimeout(fn); }
+onLoad(() => {
   // the same limits model-viewer itself uses: 2.2 x the bounding sphere, up to 300% of the start distance
   const d = mv.getDimensions();
   minRadius = 2.2 * Math.hypot(d.x, d.y, d.z) / 2;
@@ -1428,7 +1431,7 @@ mv.addEventListener("progress", (e) => {
   if (p >= 1) $("progress").classList.add("done");
 });
 let baseRadius = null;
-mv.addEventListener("load", () => {
+onLoad(() => {
   applyFinish(finishIndex);
   placeDims();
   for (const k in state) state[k] = false;
