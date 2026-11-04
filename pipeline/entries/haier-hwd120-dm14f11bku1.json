@@ -1,0 +1,119 @@
+{
+  "products": [
+    {
+      "id": "haier-hwd120-dm14f11bku1",
+      "hidden": true,
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HWD120-DM14F11BKU1",
+      "name": "Haier F11 12 kg front-load washer dryer with AI Colour Full Touch Panel",
+      "shortName": "12 kg F11 front-load washer dryer",
+      "summary": "Open the door to see the 525 mm Super Drum and pull out the Smart Dosing drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/haier-hwd120-dm14f11bku1.glb",
+      "thumb": "/photos/haier-hwd120-dm14f11bku1/0.jpg",
+      "photos": ["/photos/haier-hwd120-dm14f11bku1/0.jpg", "/photos/haier-hwd120-dm14f11bku1/1.jpg", "/photos/haier-hwd120-dm14f11bku1/2.jpg", "/photos/haier-hwd120-dm14f11bku1/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#3c3f46",
+          "usdz": "/models/usdz/haier-hwd120-dm14f11bku1-black.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.24],
+          "zone": {
+            "closed": [
+              [-0.29, 0.738, -0.004],
+              [-0.097, 0.845, 0.296]
+            ],
+            "open": [
+              [-0.29, 0.738, 0.236],
+              [-0.097, 0.845, 0.536]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -126,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.268, 0.182, 0.206],
+              [0.268, 0.718, 0.324]
+            ],
+            "open": [
+              [-0.564, 0.182, 0.294],
+              [-0.204, 0.718, 0.738]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.5 cm",
+        "h": "85 cm",
+        "d": "59.3 cm"
+      },
+      "sizeNote": "About 62 cm deep with the door (Haier's shop gives 62 cm)",
+      "specs": [
+        ["Capacity", "12 kg wash, 7 kg dry"],
+        ["Type", "Front-load washer dryer, fully automatic"],
+        ["Max spin", "1400 rpm"],
+        ["Motor", "Direct Motion inverter motor"],
+        ["Drum", "525 mm Super Drum, pillow-shape stainless steel drum"],
+        ["Panel", "AI Colour Full Touch Panel, AI One Touch"],
+        ["Programmes", "Drum Clean, Spin, Rinse + Spin, Dry Only, Bedding, Cotton, Delicate, Jeans, Eco, Quick, Smart Wash, AI One Touch"],
+        ["Features", "Ultra Fresh Air, Smart Dosing, Steam, Essence Wash, Stain Remover, Night Wash"],
+        ["Smart", "HaiSmart app over Wi-Fi"],
+        ["Wash temperature", "Cold to 90°C"],
+        ["Energy", "5 star"],
+        ["Noise", "Wash 62 dB or less, spin 76 dB or less"],
+        ["Supply", "2000 W, 50 Hz"],
+        ["Door", "Hinged on the left, two-layer half-transparent glass, silver rim"],
+        ["Warranty", "4 years comprehensive, 12 years on the motor"]
+      ],
+      "source": "https://www.haier.com/in/washing-machines/haier-f11-12kg-washer-dryerai-colorful-touch-panel-front-load-washing-machine.shtml",
+      "hotspots": [
+        {
+          "title": "Ultra Fresh Air Technology",
+          "text": "Enjoy up to 12 hours of lasting freshness after your wash cycle, keeping clothes hygienic and odor-free.",
+          "pos": [0.035, 0.7547, 0.2925],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "AI Colour Full Panel",
+          "text": "An AI-powered colourful display panel offers an intuitive and vibrant interface, making laundry smarter and more interactive.",
+          "pos": [0.12, 0.81, 0.2965],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Smart Dosing",
+          "text": "Automatically detects the laundry load and dispenses the right amount of detergent for every wash.",
+          "pos": [-0.24, 0.828, 0.33],
+          "normal": [0, 1, 0],
+          "show": "drawer"
+        },
+        {
+          "title": "Wash & Dry",
+          "text": "Wash and dry in one seamless cycle. Clothes come out dry and ready to wear, saving time and effort.",
+          "pos": [0.1, 0.505, -0.1385],
+          "normal": [0, 0, 1],
+          "show": "door"
+        }
+      ]
+    }
+  ]
+}
