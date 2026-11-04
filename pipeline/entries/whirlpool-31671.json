@@ -1,0 +1,105 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-31671",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Washing machine",
+      "model": "31671",
+      "name": "Whirlpool 360° Bloomwash Pro 8.5 kg top-load washing machine",
+      "shortName": "8.5 kg 360° Bloomwash Pro top-load washer",
+      "summary": "Lift the edge-to-edge glass lid, look into the steel drum at the Hexa Bloom impeller, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/whirlpool-31671.glb",
+      "thumb": "/photos/whirlpool-31671/0.jpg",
+      "photos": ["/photos/whirlpool-31671/0.jpg", "/photos/whirlpool-31671/1.jpg", "/photos/whirlpool-31671/2.jpg", "/photos/whirlpool-31671/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Midnight Grey",
+          "swatchColor": "#464d56",
+          "usdz": "/models/usdz/whirlpool-31671-midnight-grey.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -102,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.257, 0.835, -0.172],
+              [0.257, 0.95, 0.283]
+            ],
+            "open": [
+              [-0.257, 0.924, -0.287],
+              [0.257, 1.392, -0.08]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "102.5 cm",
+        "d": "58 cm"
+      },
+      "sizeNote": "Body only, 102.5 cm tall; with the lid open it is about 140 cm",
+      "specs": [
+        ["Capacity", "8.5 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star, 0.0107 kWh/kg/cycle"],
+        ["Water", "17.19 L/kg/cycle (energy label)"],
+        ["Heater", "In-built, 3 hot water modes up to 60 °C: Warm, Hot, Allergen Free"],
+        ["Programmes", "12: Daily, Heavy, Delicates, Whites, Woolens, Eco Wash, Bed Sheets, Rinse+Dry, Dry Only, Wash Only, Stainwash, Anti-Bacterial"],
+        ["Technology", "360° Bloomwash, Hexa Bloom impeller, Hot Catalytic Soak, Power Dry, Hard Water Wash, ZPF, Dynamix"],
+        ["Spin speed", "Up to 740 rpm"],
+        ["Water levels", "10"],
+        ["Tub", "Stainless steel"],
+        ["Lid", "Toughened glass, soft closing"],
+        ["Display", "Digital"],
+        ["Extras", "Express Wash, Child Lock, Lint Filter, Rat Mesh, Self Clean Tub"],
+        ["Power", "360 W, 220-240 V, 50 Hz"],
+        ["Colour", "Midnight Grey"],
+        ["Weight", "32 kg"],
+        ["Warranty", "3 years comprehensive, 10 years on the motor and prime mover"]
+      ],
+      "source": "https://india.whirlpool.in/360-bloomwash-pro-8-5kg-5-star-top-load-washing-machine-with-in-built-heater/p",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-360-bloomwash-pro-85-kg-5-star-fully-automatic-top-load-washing-machine-midnight-grey-31671/21171",
+      "hotspots": [
+        {
+          "title": "Edge to edge design",
+          "text": "360° Bloomwash Pro has a wide edge to edge, one piece glass lid which gives a better and more convenient drum access.",
+          "pos": [-0.16, 0.8695, 0.21],
+          "normal": [0, 0.978, 0.208],
+          "show": "!lid"
+        },
+        {
+          "title": "Hexa Bloom impeller",
+          "text": "The newly designed hexa bloom impeller with 6 vanes, washes clothes in a unique 360° blooming wash motion.",
+          "pos": [0.09, 0.345, 0.084],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "3 hot water modes",
+          "text": "Heats water upto 60° C at 3 different levels ranging from Warm, Hot to Allergen Free, offering customized care by offering different water temperatures as per cloth type.",
+          "pos": [0.0983, 0.9799, -0.2119],
+          "normal": [0, 0.792, 0.611],
+          "show": "always"
+        },
+        {
+          "title": "Removes up to 48 hours old stains",
+          "text": "No need to worry about immediate removal of stains. With the Stainwash program, one can remove stains that are even 48 hours old.",
+          "pos": [-0.1454, 1.0034, -0.2424],
+          "normal": [0, 0.792, 0.611],
+          "show": "always"
+        }
+      ]
+    }
+  ]
+}

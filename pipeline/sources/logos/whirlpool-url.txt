@@ -1,0 +1,1 @@
+whirlpool.svg: the header logo of india.whirlpool.in (Whirlpool India's own site), https://whirlpoolindia.vtexassets.com/assets/vtex.file-manager-graphql/images/afcf6b75-2a22-478a-87a1-23615d20ba82___4f1a2e9c5442ab4d175eb1f897705c00.svg, saved 4 Nov 2026. logos/whirlpool.png is it rendered 300 px tall on a transparent background.
