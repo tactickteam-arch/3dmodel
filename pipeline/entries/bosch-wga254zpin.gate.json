@@ -1,0 +1,5 @@
+{
+  "sticksOut": {
+    "Door[A-Z]\\w*|Knob[A-Z]\\w*|Flap[A-Z]\\w*|Drawer(Face|Bar)|DisplayGlass|LockSlot": "Bosch's manual gives an appliance depth of 59.0 cm and 63.6 cm with the door closed (manual 9001946103, technical data). The door, the dial, the drawer face and its bar, the display glass, the lock slot and the pump-filter flap stand in front of the cabinet."
+  }
+}

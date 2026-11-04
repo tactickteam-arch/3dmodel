@@ -2343,6 +2343,272 @@
       }
     },
     {
+      "id": "bosch-wga254zpin",
+      "brand": "Bosch",
+      "brandLogo": "/logos/bosch.png",
+      "category": "Washing machine",
+      "model": "WGA254ZPIN",
+      "name": "Bosch Series 6 front-load 10 kg washing machine with Iron Steam Assist",
+      "shortName": "10 kg Series 6 front-load washer",
+      "summary": "Open the door to see the Vario Drum, pull out the detergent drawer and open the pump filter, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the round flap to open it",
+      "glb": "/models/bosch-wga254zpin.glb",
+      "thumb": "/photos/bosch-wga254zpin/0.jpg",
+      "photos": [
+        "/photos/bosch-wga254zpin/0.jpg",
+        "/photos/bosch-wga254zpin/1.jpg",
+        "/photos/bosch-wga254zpin/2.jpg",
+        "/photos/bosch-wga254zpin/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Dark Lake",
+          "swatchColor": "#4a5060",
+          "usdz": "/models/usdz/bosch-wga254zpin-dark-lake.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.19
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.262,
+                0.744,
+                0.085
+              ],
+              [
+                -0.091,
+                0.822,
+                0.301
+              ]
+            ],
+            "open": [
+              [
+                -0.262,
+                0.744,
+                0.275
+              ],
+              [
+                -0.091,
+                0.822,
+                0.491
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -118,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.247,
+                0.215,
+                0.205
+              ],
+              [
+                0.247,
+                0.709,
+                0.341
+              ]
+            ],
+            "open": [
+              [
+                -0.543,
+                0.215,
+                0.229
+              ],
+              [
+                -0.24,
+                0.709,
+                0.681
+              ]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 90,
+          "zone": {
+            "closed": [
+              [
+                0.116,
+                0.025,
+                0.295
+              ],
+              [
+                0.271,
+                0.181,
+                0.303
+              ]
+            ],
+            "open": [
+              [
+                0.116,
+                0.018,
+                0.295
+              ],
+              [
+                0.271,
+                0.026,
+                0.45
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.8 cm",
+        "h": "84.8 cm",
+        "d": "59 cm"
+      },
+      "sizeNote": "63.6 cm deep with the door, 104.9 cm with the door open at 90 degrees",
+      "specs": [
+        [
+          "Capacity",
+          "10 kg, 60 L drum"
+        ],
+        [
+          "Type",
+          "Front load, freestanding"
+        ],
+        [
+          "Max spin",
+          "1400 rpm"
+        ],
+        [
+          "Motor",
+          "EcoSilence Drive (SilentPowerDrive)"
+        ],
+        [
+          "Anti Stain",
+          "Anti Stain Plus, up to 16 kinds of stain"
+        ],
+        [
+          "Steam",
+          "Iron Steam Assist, up to 50% fewer wrinkles"
+        ],
+        [
+          "Speed",
+          "SpeedPerfect"
+        ],
+        [
+          "Programmes",
+          "Cottons, Cottons 60° Label, Synthetics, Daily Mix Load, Wool, Delicates/Silk, Rinse, Spin/Drain, Drum Descale, Duvet, Quick 15/30 min, Shirts, Allergy Plus, Steam"
+        ],
+        [
+          "Display",
+          "LED display with countdown"
+        ],
+        [
+          "Smart",
+          "Loading sensor, reload function, balance control, multiple water protection"
+        ],
+        [
+          "Side panels",
+          "Anti Vibration design"
+        ],
+        [
+          "Door",
+          "Hinged on the left, silver-black grey frame"
+        ],
+        [
+          "Supply",
+          "220-240 V, 2300 W, 160 cm cord"
+        ],
+        [
+          "Weight",
+          "73.8 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/bosch-series-4-front-load-10-kg-washing-machine-or-variodrum-or-blue-or-wga254zpin-wga254zpin/21199",
+      "source": "https://www.bosch-home.in/en/product/washer-dryer/washing-machines/front-loading-washing-machines/WGA254ZPIN",
+      "hotspots": [
+        {
+          "title": "Anti Stain Plus",
+          "text": "Removes up to 16 kinds of stubborn stains without pre-treatment.",
+          "pos": [
+            0.1009,
+            0.7554,
+            0.298
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!door"
+        },
+        {
+          "title": "SpeedPerfect",
+          "text": "Washes in a shorter time with the cleaning results of the standard programme.",
+          "pos": [
+            0.2503,
+            0.7554,
+            0.298
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!door"
+        },
+        {
+          "title": "10 kg Vario Drum",
+          "text": "Enough space for big loads or large items, and a gentle wash with even water distribution, without creasing garments.",
+          "pos": [
+            0.08,
+            0.4,
+            -0.095
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        },
+        {
+          "title": "Anti Vibration Design",
+          "text": "The side walls give more stability and reduce vibration, so it stays quiet even during the spin.",
+          "pos": [
+            0.299,
+            0.43,
+            -0.02
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "show": "always"
+        }
+      ],
+      "fit": {
+        "front": 46,
+        "note": "From Bosch: 63.6 cm deep with the door closed and 104.9 cm with the door open at 90 degrees. Bosch's page and manual publish no side or back gaps; leave room for the hoses and the plug."
+      }
+    },
+    {
       "id": "carrier-19k-xceed-edge-gxi",
       "brand": "Carrier",
       "brandLogo": "/logos/carrier.png",
