@@ -82,9 +82,9 @@ for (const p of catalogue.products.filter((p) => !p.hidden)) {
   if (!wall) { const d2 = await dataset(); ok(+d2.yb > +d1.yb, "dragging down the photo brings it nearer, and it is drawn larger"); }
   // another spot, size, parts, fine-tune
   const before = await handleRect();
-  await click("#roomAgain"); await sleep(400);
-  const after = await handleRect();
-  ok(Math.abs(after.x - before.x) > 5 || Math.abs(after.y - before.y) > 5, "\"Another spot\" moves it to a different place");
+  await click("#roomAgain");
+  // it moves on the next frame, which can be slow on a busy machine
+  ok(await b.waitFor(`(()=>{const r=document.querySelector('.room-drag').getBoundingClientRect();return Math.abs(r.x-${before.x})>5||Math.abs(r.y-${before.y})>5})()`, 3000), "\"Another spot\" moves it to a different place");
   await click("#roomBigger"); await sleep(300);
   ok(/10[0-9]%|1[1-9][0-9]%/.test(await b.evalJS(`document.getElementById('roomSizeOut').textContent`)), "the size nudge shows a percentage");
   await click("#roomSizeOut"); await sleep(200);

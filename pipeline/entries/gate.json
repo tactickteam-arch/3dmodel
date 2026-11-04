@@ -1,0 +1,22 @@
+{
+  "*": {
+    "sticksOut": {
+      "Plug|PlugPin|PowerCord|Cord[A-Z]\\w*|DrainHose|Hose[A-Z]\\w*|Inlet[A-Z]\\w*|Bolt[A-Z]\\w*|Grommet|TubPlate": "The cord and plug, the hoses and inlet, the transit bolts and the tub's rear plate stand out at the back as on the real unit. Makers' sizes are the cabinet without them."
+    }
+  },
+  "lg-fhp1412z9b": {
+    "sticksOut": {
+      "Door[A-Z]\\w*|Knob[A-Z]\\w*|\\w*Button(Face|Cap)": "LG gives 56.5 cm for the cabinet and 61.5 cm with the door (LG's size drawing and product page). The door, the dial and the buttons stand in front of the cabinet."
+    }
+  },
+  "bosch-wga1420pin": {
+    "sticksOut": {
+      "Door[A-Z]\\w*|Knob[A-Z]\\w*|Flap[A-Z]\\w*|DrawerFace": "Bosch's manual gives an appliance depth of 59.0 cm and 63.6 cm with the door closed. The door, the dial, the drawer face and the pump-filter flap stand in front of the cabinet."
+    }
+  },
+  "lg-fhb1208z2m": {
+    "sticksOut": {
+      "Door[A-Z]\\w*|Knob[A-Z]\\w*|Flap[A-Z]\\w*|LockSlot|HingePlate": "LG's manual gives D 550 mm for the cabinet and D' 590 mm to the door (manual p.11). The door, its hinge and lock, the dial and the filter flap stand in front of the cabinet."
+    }
+  }
+}

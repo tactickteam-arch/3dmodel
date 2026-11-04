@@ -42,8 +42,8 @@
             "closed": [
               [
                 -0.298,
-                0.746,
-                0
+                0.739,
+                0.003
               ],
               [
                 -0.091,
@@ -54,8 +54,8 @@
             "open": [
               [
                 -0.298,
-                0.746,
-                0.2
+                0.739,
+                0.203
               ],
               [
                 -0.091,
@@ -77,24 +77,24 @@
               [
                 -0.257,
                 0.207,
-                0.19
+                0.199
               ],
               [
                 0.267,
                 0.731,
-                0.342
+                0.333
               ]
             ],
             "open": [
               [
-                -0.476,
+                -0.47,
                 0.207,
-                0.27
+                0.269
               ],
               [
-                -0.19,
+                -0.201,
                 0.731,
-                0.775
+                0.773
               ]
             ]
           }
@@ -161,7 +161,7 @@
           "pos": [
             0.06,
             0.53,
-            0.341
+            0.331
           ],
           "normal": [
             0,
@@ -218,7 +218,9 @@
       ],
       "fit": {
         "front": 54,
-        "note": "LG: 61.5 cm deep with the door closed and 110 cm with the door open at 90°."
+        "sides": 2,
+        "back": 10,
+        "note": "From LG's owner's manual: at least 2 cm at each side and 10 cm behind for the hoses and air, and 110 cm of depth in total with the door open at 90°."
       }
     }
   ]

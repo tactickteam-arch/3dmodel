@@ -156,11 +156,15 @@ for (const sx of [-1, 1]) cab.add(box("HingeCover", 0.06, 0.03, 0.04, black, sx 
 const lid = group("Lid", 0, (topY(HINGE) + plateY(HINGE) + 0.004) / 2, xz(HINGE));
 {
   const hy = lid.position.y;
-  const pts = [[0.0, plateY(0.0) + 0.012], [0.004, topY(0.0) - 0.004], [0.03, topY(0.03)], [HINGE, topY(HINGE)], [HINGE, plateY(HINGE) + 0.004], [0.03, plateY(0.03) + 0.004]];
+  // the bevel grows the outline by BEV on every side, so the outline is drawn BEV inside the lid's real edges (BENCHMARK 2).
+  // Samsung's side photo (Sangeetha photo 2) shows the lid about 25 mm thick with its front 7 mm behind the cabinet's front.
+  // An 11 mm bevel on the outline had made it 49 mm thick, 11 mm too high and 14 mm in front of the cabinet
+  const BEV = 0.003, SET = 0.007, f0 = SET + BEV;
+  const pts = [[f0, plateY(f0) + 0.012 + BEV], [f0 + 0.004, topY(SET) - 0.004 - BEV], [0.03 + SET, topY(0.03 + SET) - BEV], [HINGE - BEV, topY(HINGE - BEV) - BEV], [HINGE - BEV, plateY(HINGE) + 0.004 + BEV], [0.03 + SET, plateY(0.03 + SET) + 0.004 + BEV]];
   // local frame: shape x = zlocal = HINGE - xf (grows toward the front), shape y = y - hinge height
   const s = new THREE.Shape();
   pts.forEach(([xf, y], i) => { const px = HINGE - xf, py = y - hy; i ? s.lineTo(px, py) : s.moveTo(px, py); });
-  const g = new THREE.ExtrudeGeometry(s, { depth: WD - 0.024, bevelEnabled: true, bevelSize: 0.011, bevelThickness: 0.012, bevelSegments: 4 });
+  const g = new THREE.ExtrudeGeometry(s, { depth: WD - 0.024, bevelEnabled: true, bevelSize: BEV, bevelThickness: 0.012, bevelSegments: 4 });
   g.rotateY(-Math.PI / 2); g.translate((WD - 0.024) / 2, 0, 0);
   lid.add(mesh("LidFrame", g, black, 0, 0, 0));
   // window: a dark glass pane on the sloped top, framed by the plastic

@@ -2,6 +2,8 @@
 
 Site: /Users/apple/Documents/REL/3D (call it SITE). Local-only data in SITE/private, tools in SITE/tools (neither is in git).
 
+**Read `STANDARD.md` first.** It says what the finished product must have (the same as its category's reference product), the steps, and the gate it must pass: `node pipeline/scripts/gate.mjs <id>`, with 0 FAIL, then a ticked REVIEW.md. This brief adds the practical details. Where they differ, STANDARD.md wins.
+
 Goal: one real Sangeetha product, made "pitch perfect": a 3D model built to the maker's published
 dimensions, its surfaces textured from the real product photos, every real moving part opening on its
 own, and Apple Quick Look, Android and headset AR all working. The client (Sangeetha) compares this
@@ -39,14 +41,13 @@ test breaks in page code rather than your model, report it.
   Wall units: back at z = 0, centred on x, y = 0 at the unit's bottom.
 - Moving part = a named group with its pivot at the hinge: {axis, angle} or {slide:[x,y,z]}. A door hinged on its
   left edge opens with a negative y angle, right edge positive. Mark the most important part "hint": true.
-  At most 3 moving parts. Parts list order = top to bottom / left to right.
+  At most 4 moving parts (a fridge: its doors, the ice tray, the trays). Parts list order = top to bottom / left to right.
 - Call `stateClips(root, parts)` and, before export, `saveZones(<your entries file>, id, root, parts)` (writes each
   part's closed/open bounding box into your entry; the page uses it to know which part a tap landed on).
 - Textures from the real photos (perspective-rectified fronts, control panels, logos, labels), like
   prep_textures.py does. Use flipV / frontWithHoles for UV orientation. One-sided rendering: use inward() for surfaces
   seen from inside. Real interior: shelves, bins, drum, filters etc. as the photos show them.
-- Keep the GLB under ~1.2 MB and the USDZ under ~1.5 MB (jpg textures ~1024 px, quality 85-90). If real detail
-  needs more, go up to ~2 MB and say so in the report.
+- Stay within the budgets in STANDARD.md section 10 (jpg textures ~1024 px, quality 85-90).
 
 ## Detail: the user's standard is "exactly like the real one"
 The user: "i want all 3d models to be exactly like the real one, look at every intricate details the wiring the
@@ -96,6 +97,10 @@ manual show; if you can't see a detail, say so in the report instead of guessing
     Read the reports and screenshots: model loads, each part opens on its own and closes, Quick Look href and USDZ
     content type are right, headset AR/VR trigger opens each part, no errors, no horizontal overflow on phones.
 
+  The gate runs all of these and more in one go: `GATE_PORT=<your base port> node SITE/pipeline/scripts/gate.mjs <id>`
+  (use `--fast` while iterating; only a full run counts). Then tick its REVIEW.md by looking at every picture.
+
 ## Report back (under 300 words)
-id, model, final dims (and source), parts, hotspots, fit values and their source, file sizes, every check's result,
-anything not verified or any shared-code change you need (with the diff), and the paths of 2-3 best renders.
+id, model, final dims (and source), parts, hotspots, fit values and their source, file sizes, the gate's REPORT.md
+path and its result (0 FAIL is required; list every WARN and why), the ticked REVIEW.md path, anything not verified
+or any shared-code change you need (with the diff), and the paths of 2-3 best renders.
