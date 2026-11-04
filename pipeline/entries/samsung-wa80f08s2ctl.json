@@ -1,0 +1,127 @@
+{
+  "products": [
+    {
+      "id": "samsung-wa80f08s2ctl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Washing machine",
+      "model": "WA80F08S2CTL",
+      "name": "Samsung 8 kg AI Wash top-load washing machine",
+      "shortName": "8 kg AI Wash top-load washer",
+      "summary": "Lift the soft-closing glass lid, pull out the detergent box and look into the diamond drum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/samsung-wa80f08s2ctl.glb",
+      "thumb": "/photos/samsung-wa80f08s2ctl/0.jpg",
+      "photos": ["/photos/samsung-wa80f08s2ctl/0.jpg", "/photos/samsung-wa80f08s2ctl/1.jpg", "/photos/samsung-wa80f08s2ctl/2.jpg", "/photos/samsung-wa80f08s2ctl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Deep Charcoal",
+          "swatchColor": "#323235",
+          "usdz": "/models/usdz/samsung-wa80f08s2ctl-deep-charcoal.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -100,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.258, 0.866, -0.125],
+              [0.258, 0.934, 0.275]
+            ],
+            "open": [
+              [-0.258, 0.933, -0.195],
+              [0.258, 1.339, -0.059]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent box",
+          "node": "DetergentBox",
+          "slide": [0, 0, 0.06],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [-0.09, 0.839, -0.131],
+              [0.09, 0.904, -0.048]
+            ],
+            "open": [
+              [-0.09, 0.839, -0.071],
+              [0.09, 0.904, 0.012]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "98.8 cm",
+        "d": "56.8 cm"
+      },
+      "sizeNote": "Body only, 98.8 cm tall; with the lid open it is about 134 cm",
+      "specs": [
+        ["Capacity", "8 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star, 0.0083 kWh/kg/cycle"],
+        ["Motor", "Digital Inverter, 10 years on the motor"],
+        ["Spin speed", "700 rpm"],
+        ["Technology", "AI Wash, Super Speed, Ecobubble, BubbleStorm, Dual Storm pulsator"],
+        ["Drum", "2nd Diamond drum"],
+        ["Programmes", "AI Wash, Normal, Quick Wash, Delicates, Bedding, Jeans, Energy Saving, Rinse+Spin, Tub Clean, Downloaded"],
+        ["Water levels", "10"],
+        ["Display", "Red LED, rear control panel"],
+        ["Lid", "Soft closing, tempered glass"],
+        ["Filter", "Magic Filter"],
+        ["Smart", "Wi-Fi, SmartThings, AI Energy Mode, Smart Check"],
+        ["Extras", "Delay End, Child Lock, Auto Restart, Monsoon, Intensive Wash, Power Tub Clean"],
+        ["Colour", "Deep Charcoal"],
+        ["Weight", "29.5 kg"],
+        ["Warranty", "2 years on the machine, 10 years on the motor"]
+      ],
+      "source": "https://www.samsung.com/in/support/model/WA80F08S2CTL/",
+      "hotspots": [
+        {
+          "title": "AI Wash",
+          "text": "Senses the weight and softness of the load, then suggests the water level, the agitation and the wash and rinse times.",
+          "pos": [0.03, 0.9668, -0.1847],
+          "normal": [0, 0.881, 0.474],
+          "show": "always"
+        },
+        {
+          "title": "Ecobubble",
+          "text": "Cleans with up to 25% less energy and 11% less water, and BubbleStorm helps detergent get into the fabric 2.5x faster (Samsung's tests).",
+          "pos": [-0.13, 0.8395, -0.086],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "Magic Filter",
+          "text": "A dual mesh at the front and back gathers lint, fluff and particles from the wash, and it opens 180 degrees to empty.",
+          "pos": [0.17, 0.66, 0.059],
+          "normal": [-1, 0, 0],
+          "show": "lid"
+        },
+        {
+          "title": "Soft closing lid",
+          "text": "A damper lets the lid shut slowly, gently and quietly, and the tempered glass lets you see the wash without lifting it.",
+          "pos": [0, 0.8868, 0.254],
+          "normal": [0, 0.992, 0.128],
+          "show": "!lid"
+        }
+      ],
+      "fit": {
+        "sides": 10,
+        "back": 10,
+        "top": 36,
+        "note": "From Samsung's user manual: keep the machine 10 cm from each adjacent wall. The lid swings up and back: with it open, this model is about 134 cm tall (the opening angle is estimated), so keep 36 cm free above it."
+      }
+    }
+  ]
+}

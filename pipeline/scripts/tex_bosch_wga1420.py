@@ -9,8 +9,11 @@ usage: python tex_bosch_wga1420.py <photos dir> <logos dir> <out dir>
 The control strip is drawn again from the photo's measurements at twice its resolution: every word (set in Avenir Next) at the
 place and size it has in the photo, the leader lines, the 7-segment time, the display. The small icons are the photo's own,
 smoothed by upscaling and re-thresholding so their edges are clean. The knob in the photo is left out because the model has a real 3D knob.
-The side panels (concentric ring relief), the open steel back with its hoses and plug, and the drawer front are cropped from Bosch's photos.
+The side panels (concentric ring relief), the open steel back and the drawer front are cropped from Bosch's photos.
+The drain hose, the inlet hose, the power cord and its plug lie over the back; the builder models them in 3D along the centre
+lines below (written to rear_paths.json), so the flat back has them painted out along the same lines.
 """
+import json
 import math
 import os
 import sys
@@ -218,6 +221,80 @@ def crop_side(name, box, size):
     return im.crop(box).resize(size, Image.LANCZOS)
 
 
+# ── the back: Bosch's 360-degree frame taken square-on to it (rear.jpg). The body spans columns 616-1026 (598 mm) and rows
+# 163-747 (848 mm to the floor under the feet): 0.688 px per mm. Centre lines below are photo pixels read off a 4x enlargement,
+# seen from behind (photo right = the machine's left). Hose, cord and plug sizes are measured on the photo (ESTIMATED); Bosch
+# publishes only their lengths (inlet hose 120 cm, drain hose 150 cm, cord 160 cm: the manual's technical data, p. 13).
+PPM, CX, YB = 0.688, 821.0, 747.5
+DRAIN = [(657, 210), (660, 240), (663, 290), (666, 350), (667, 400), (667, 450), (668, 500), (669, 550), (674, 580), (684, 605),
+         (700, 627), (726, 648), (762, 663), (800, 671), (840, 672), (880, 666), (910, 652), (935, 633), (952, 610), (966, 585),
+         (975, 555), (979, 520), (981, 480), (981, 430), (981, 380), (980, 345), (979, 314)]
+INLET = [(967, 243), (975, 256), (984, 275), (991, 297), (997, 322), (1001, 350), (1003, 385), (1003, 420), (1001, 445), (996, 465),
+         (985, 485), (968, 500), (945, 512), (915, 520), (885, 523), (855, 521), (830, 513), (805, 501), (780, 490), (755, 477),
+         (730, 465), (705, 452), (680, 437), (662, 418), (652, 400), (647, 375), (646, 350), (648, 328), (655, 313), (668, 305),
+         (685, 305), (700, 311), (713, 319)]
+NUT = ((713, 319), (733, 335))          # the inlet hose's tap nut: from where the hose enters it to its end
+CORDS = {                               # the power cord's runs as they show between the hoses and holders
+    "CordRight": [(962, 544), (930, 533), (895, 523), (860, 511), (830, 499), (805, 490), (778, 479), (748, 463), (722, 446), (704, 433)],
+    "CordToPlug": [(704, 433), (697, 446), (693, 460), (690, 474)],
+    "CordUpper": [(652, 360), (656, 377), (668, 395), (683, 412), (704, 433)],
+    "CordLower": [(700, 537), (730, 539), (755, 542), (780, 547), (805, 552), (830, 558), (870, 566), (920, 574), (960, 578)],
+    "CordDown": [(640, 562), (638, 590), (643, 625), (650, 650), (660, 676), (669, 700)],
+}
+PLUG = {"sleeve": (690, 478, 690, 490), "body": (676, 490, 697, 520), "pins": [(680, 520, 535), (689, 520, 535)]}
+WIDTH = {"drain": 17, "inlet": 10, "cord": 4.5}  # photo px across
+
+
+def to_m(p):
+    return [round(-(p[0] - CX) / PPM / 1000, 4), round((YB - p[1]) / PPM / 1000, 4)]
+
+
+def rear_and_paths():
+    im = Image.open(os.path.join(PHOTOS, "bosch_fl", "rear.jpg")).convert("RGB")
+    bgr = cv2.cvtColor(np.asarray(im), cv2.COLOR_RGB2BGR)
+    mask = np.zeros(bgr.shape[:2], np.uint8)
+    poly = lambda pts, w: cv2.polylines(mask, [np.array(pts, np.int32)], False, 255, int(round(w + 8)), cv2.LINE_AA)
+    poly(DRAIN, WIDTH["drain"])
+    poly(INLET, WIDTH["inlet"])
+    poly(list(NUT), 17)
+    for pts in CORDS.values():
+        poly(pts, WIDTH["cord"])
+    x0, y0, x1, y1 = PLUG["body"]
+    cv2.rectangle(mask, (x0 - 3, PLUG["sleeve"][1] - 3), (x1 + 3, max(y for _, _, y in PLUG["pins"]) + 3), 255, -1)
+    # fill under them with the plain steel round about: close the thin dark pressing lines first (so they don't smear into
+    # streaks), then take the local average of the unmasked pixels; feather the edge by 2 px
+    rgb = np.asarray(im).astype(np.float32)
+    closed = cv2.morphologyEx(rgb, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)))
+    keep = (mask < 128).astype(np.float32)
+    num = cv2.GaussianBlur(closed * keep[..., None], (0, 0), 10)
+    den = cv2.GaussianBlur(keep, (0, 0), 10)[..., None]
+    fill = num / np.maximum(den, 1e-3)
+    a = cv2.GaussianBlur((mask >= 128).astype(np.float32), (0, 0), 1.2)[..., None]
+    clean = Image.fromarray((rgb * (1 - a) + fill * a).clip(0, 255).astype(np.uint8))
+    # the builder's back panel: x +-287 mm (between the sides), y 12 to 834 mm (from the feet to under the top)
+    box = (CX - 287 * PPM, YB - 834 * PPM, CX + 287 * PPM, YB - 12 * PPM)
+    rear = clean.crop(tuple(round(v) for v in box)).resize((396, 566), Image.LANCZOS)
+    save(rear, "rear.jpg", 88)
+    # the drain hose's ribs: light grey corrugation (the builder repeats it every 4 mm along the hose)
+    rib = np.ones((64, 32, 3), np.float32) * np.array([176, 178, 182], np.float32)
+    rib *= (0.86 + 0.14 * np.cos(np.linspace(0, 2 * np.pi, 32, endpoint=False)) ** 2)[None, :, None]
+    Image.fromarray(rib.clip(0, 255).astype(np.uint8)).save(os.path.join(D, "hose.jpg"), quality=90)
+    paths = {
+        "drain": [to_m(p) for p in DRAIN], "inlet": [to_m(p) for p in INLET], "nut": [to_m(p) for p in NUT],
+        "cords": {k: [to_m(p) for p in v] for k, v in CORDS.items()},
+        "plug": {"sleeve": [to_m(PLUG["sleeve"][:2]), to_m(PLUG["sleeve"][2:])],
+                 "body": [to_m(PLUG["body"][:2]), to_m(PLUG["body"][2:])],
+                 "pins": [[to_m((x, ya)), to_m((x, yb))] for x, ya, yb in PLUG["pins"]]},
+        "drain_d": round(WIDTH["drain"] / PPM / 1000, 4), "inlet_d": round(WIDTH["inlet"] / PPM / 1000, 4),
+        "cord_d": round(WIDTH["cord"] / PPM / 1000, 4),
+    }
+    with open(os.path.join(D, "rear_paths.json"), "w") as f:
+        json.dump(paths, f, indent=1)
+    print("wrote", os.path.join(D, "rear_paths.json"), "and hose.jpg; rear box", [round(v) for v in box])
+    if os.environ.get("REAR_DEBUG"):
+        Image.fromarray(mask).save(os.environ["REAR_DEBUG"])
+
+
 def main():
     ph = photo()
     save(panel(ph), "panel.jpg", 90)
@@ -249,15 +326,7 @@ def main():
         crop = Image.fromarray(tint.astype(np.uint8))
         save(crop, name, 88)
 
-    # rear: the open steel back with its hoses, cord and plug
-    im = Image.open(os.path.join(PHOTOS, "bosch_fl", "rear.jpg")).convert("RGB")
-    a = np.asarray(im).astype(int)
-    ys, xs = np.where(a.sum(2) < 720)
-    x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
-    h = y1 - y0 + 1
-    rear = im.crop((x0 + 1, y0 + int(0.015 * h), x1, y1 - int(0.03 * h))).resize((414, 540), Image.LANCZOS)
-    save(rear, "rear.jpg", 88)
-    print("rear source box", x0, y0, x1, y1)
+    rear_and_paths()
 
     # drum: stainless with the pattern of small dimples, as in Bosch's drum photo
     w, h = 1024, 512

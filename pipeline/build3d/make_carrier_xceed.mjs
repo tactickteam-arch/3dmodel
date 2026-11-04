@@ -56,16 +56,27 @@ const chD = D - panelT - 0.002;
 }
 cab.add(box("CoilStrip", W - 0.06, 0.02, 0.004, coil, 0, panelY0 + 0.012, chD + 0.001));
 // ── underside and the air outlet the louvre covers ──
-cab.add(mesh("Bottom", new RoundedBoxGeometry(W, outY0 * 2, D, 3, 0.008), white, 0, outY0, D / 2));
-cab.add(box("EndLeft", 0.03, outY1 - outY0, D, white, -W / 2 + 0.015, (outY0 + outY1) / 2, D / 2));
-cab.add(box("EndRight", 0.03, outY1 - outY0, D, white, W / 2 - 0.015, (outY0 + outY1) / 2, D / 2));
-cab.add(mesh("OutletDuct", inward(new THREE.BoxGeometry(W - 0.06, outY1 - outY0, D - 0.01)), outlet, 0, (outY0 + outY1) / 2, (D - 0.01) / 2));
+// the chin under the louvre: 30 mm tall (10% of the height, as in Carrier's front photo). It used to be 60 mm (a box centred
+// on outY0), which stood in front of the louvre's lower half and made the chin look twice as tall as the photo's.
+cab.add(mesh("Bottom", new RoundedBoxGeometry(W, outY0, D, 3, 0.008), white, 0, outY0 / 2, D / 2));
+// the outlet's end walls sit 1.5 mm inside the bottom's faces, so they share no plane with it (defight would push them 0.8 mm out)
+// (they reach 8 mm down into the chin, over its rounded top edge, so the side shows no notch)
+cab.add(box("EndLeft", 0.03, outY1 - outY0 + 0.008, D - 0.003, white, -W / 2 + 0.0165, (outY0 - 0.008 + outY1) / 2, D / 2));
+cab.add(box("EndRight", 0.03, outY1 - outY0 + 0.008, D - 0.003, white, W / 2 - 0.0165, (outY0 - 0.008 + outY1) / 2, D / 2));
+// the back of the outlet zone, between the end walls: closed like the rest of the back (it used to be open, so the gate's back view
+// looked into the duct). 1.5 mm inside the back plane, like the end walls, and behind the duct's back wall; Carrier shows no rear
+// photo, so its finish is the body's.
+cab.add(box("BackPlate", W - 0.063, outY1 - outY0, 0.003, white, 0, (outY0 + outY1) / 2, 0.003));
+// the duct's dark back wall stands 1.5 mm in front of the plate, so through the slot the outlet still reads dark
+cab.add(mesh("OutletDuct", inward(new THREE.BoxGeometry(W - 0.06, outY1 - outY0, D - 0.016)), outlet, 0, (outY0 + outY1) / 2, 0.006 + (D - 0.016) / 2));
 // vertical vanes sit back in the outlet, below the gap line, so only the louvre shows from the front
 // Carrier's open-louvre photo shows the outlet in three groups of four cells: eleven vanes, the two between groups heavier
+// (40 mm deep, ESTIMATED: at 80 mm their lit tops showed through the slot as white dashes from the viewer's slightly-down
+// default angle, where Carrier's front photo shows a solid dark line)
 const outW = W - 0.09;
 for (let i = 1; i <= 11; i++) {
   const sep = i === 4 || i === 8;
-  cab.add(box(`Vane${i}`, sep ? 0.008 : 0.004, outY1 - outY0 - 0.022, 0.08, vane, -outW / 2 + (i * outW) / 12, outY0 + (outY1 - outY0 - 0.022) / 2 + 0.003, D - 0.085));
+  cab.add(box(`Vane${i}`, sep ? 0.008 : 0.004, outY1 - outY0 - 0.022, 0.04, vane, -outW / 2 + (i * outW) / 12, outY0 + (outY1 - outY0 - 0.022) / 2 + 0.003, D - 0.065));
 }
 
 // ── front panel: hinged along its top edge, lifts up to show the filters ──
@@ -78,9 +89,10 @@ const fp = group("FrontPanel", 0, H, D);
 root.add(fp);
 
 // ── louvre: the wide flap over the outlet, hinged along its top edge ──
-const lv = group("Louvre", 0, outY1 - 0.002, D - 0.004);
+// its top edge sits 4 mm under the panel: Carrier's front photo shows a dark slot of about that size between them (ESTIMATED)
+const lv = group("Louvre", 0, outY1 - 0.004, D - 0.004);
 { // a thin flap bowed outward by 6 mm, like the one in Carrier's photos: white body plus the textured outer skin
-  const fw = W - 0.07, fh = outY1 - outY0 - 0.004, thick = 0.004, bulge = 0.006, N = 12;
+  const fw = W - 0.07, fh = outY1 - outY0 - 0.006, thick = 0.004, bulge = 0.006, N = 12;
   const zf = (t) => -0.002 + bulge * Math.sin(Math.PI * t) - 0.002;        // outer surface z at t = 0 (top) .. 1 (bottom)
   const prof = new THREE.Shape();                                              // shape x = -z, y = height
   for (let i = 0; i <= N; i++) { const t = i / N; i === 0 ? prof.moveTo(-zf(t), -t * fh) : prof.lineTo(-zf(t), -t * fh); }
@@ -103,4 +115,9 @@ await exportGLB(root, clips, OUT, {
   PanelFront: `${TEX}/carrier/front.jpg`,
   LouvreFront: `${TEX}/carrier/louvre.jpg`,
   Filter: `${TEX}/carrier/filter.jpg`,
-});
+}, { dir: `${TEX}/grain`, materials: {
+  // Grain (BENCHMARK.md section 10): Carrier publishes no material; its photos show a glossy moulded white plastic,
+  // so the shell, the panel's edges and the louvre get the gentle peel, as on the Haier HSO52. Not on the front panel's
+  // face: it carries the printed Carrier oval and the badge, and the ripple would mottle the print in close-ups.
+  Body: { type: "peel_soft" }, LouvreFront: { type: "peel_soft" },
+} });
