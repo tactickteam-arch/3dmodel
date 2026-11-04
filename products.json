@@ -3196,6 +3196,250 @@
       ]
     },
     {
+      "id": "lg-t12sjmb1z",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "T12SJMB1Z",
+      "name": "LG 12 kg TurboDrum top-load washing machine",
+      "shortName": "12 kg TurboDrum top-load washer",
+      "summary": "Lift the tempered glass lid, pull out the detergent drawer and look into the TurboDrum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/lg-t12sjmb1z.glb",
+      "thumb": "/photos/lg-t12sjmb1z/0.jpg",
+      "photos": [
+        "/photos/lg-t12sjmb1z/0.jpg",
+        "/photos/lg-t12sjmb1z/1.jpg",
+        "/photos/lg-t12sjmb1z/2.jpg",
+        "/photos/lg-t12sjmb1z/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Middle Black",
+          "swatchColor": "#323232",
+          "usdz": "/models/usdz/lg-t12sjmb1z-middle-black.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.289,
+                0.92,
+                -0.132
+              ],
+              [
+                0.289,
+                0.965,
+                0.221
+              ]
+            ],
+            "open": [
+              [
+                -0.289,
+                0.95,
+                -0.147
+              ],
+              [
+                0.289,
+                1.304,
+                -0.103
+              ]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent drawer",
+          "node": "DetergentDrawer",
+          "slide": [
+            0,
+            0,
+            0.08
+          ],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [
+                -0.075,
+                0.887,
+                -0.232
+              ],
+              [
+                0.075,
+                0.929,
+                -0.105
+              ]
+            ],
+            "open": [
+              [
+                -0.075,
+                0.887,
+                -0.152
+              ],
+              [
+                0.075,
+                0.929,
+                -0.025
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59 cm",
+        "h": "96.5 cm",
+        "d": "62.5 cm"
+      },
+      "sizeNote": "96.5 cm tall with the lid shut; with the lid open it is 130 cm",
+      "specs": [
+        [
+          "Capacity",
+          "12 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Energy rating",
+          "5 star, 0.0077 kWh/kg/cycle"
+        ],
+        [
+          "Motor",
+          "Smart Inverter, 10 years on the motor"
+        ],
+        [
+          "Wash",
+          "TurboDrum, Smart Motion, Jet Spray+, Side Water Fall"
+        ],
+        [
+          "Drum",
+          "Punch + 3, embossed inner drum"
+        ],
+        [
+          "Programmes",
+          "Normal, Turbo Wash, Quick Wash, Strong (Jeans), Pre Wash + Normal, Aqua Reserve, Gentle (Wool/Saree), Tub Clean"
+        ],
+        [
+          "Water levels",
+          "10"
+        ],
+        [
+          "Display",
+          "LED with hard buttons"
+        ],
+        [
+          "Lid",
+          "Tempered glass, soft closing"
+        ],
+        [
+          "Delay timer",
+          "3 to 19 hours"
+        ],
+        [
+          "Filter",
+          "Lint filter"
+        ],
+        [
+          "Extras",
+          "Smart Diagnosis, Child Lock, Auto Restart, Foam detection, LoadSense, Air Dry"
+        ],
+        [
+          "Water inlet",
+          "Cold only"
+        ],
+        [
+          "Colour",
+          "Middle Black"
+        ],
+        [
+          "Weight",
+          "39 kg"
+        ]
+      ],
+      "source": "https://www.lg.com/in/laundry/top-loading-washing-machines/t12sjmb1z/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-12-kg-top-load-washing-machine-with-smart-inverter-motor-turbodrum-5-star-or-middle-black-t12sjmb1zabmqeil/21237",
+      "hotspots": [
+        {
+          "title": "Smart Inverter",
+          "text": "An energy-saving motor that cuts wasted operation. LG says its water-proof motor doesn't corrode, and the motor carries a 10-year warranty.",
+          "pos": [
+            0.225,
+            0.9125,
+            0.2385
+          ],
+          "normal": [
+            0,
+            0.921,
+            0.391
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Smart Diagnosis",
+          "text": "If an error occurs, use the LG app or call the LG service centre: the machine can be diagnosed over the phone, saving time and needless visits.",
+          "pos": [
+            0.139,
+            0.9125,
+            0.2395
+          ],
+          "normal": [
+            0,
+            0.921,
+            0.391
+          ],
+          "show": "always"
+        },
+        {
+          "title": "TurboDrum",
+          "text": "The drum and the pulsator turn in opposite directions, for a strong water stream that takes out the toughest dirt.",
+          "pos": [
+            -0.1,
+            0.412,
+            -0.0075
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "Smart Closing Door",
+          "text": "The tempered glass lid closes softly: safe, convenient and quiet.",
+          "pos": [
+            -0.2,
+            0.9665,
+            0.12
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "!lid"
+        }
+      ],
+      "fit": {
+        "sides": 2,
+        "back": 10,
+        "top": 33.5,
+        "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 130 cm, so keep 33.5 cm free above it."
+      }
+    },
+    {
       "id": "carrier-19k-xceed-edge-gxi",
       "brand": "Carrier",
       "brandLogo": "/logos/carrier.png",
