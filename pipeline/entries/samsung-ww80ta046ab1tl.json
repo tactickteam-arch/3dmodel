@@ -1,0 +1,144 @@
+{
+  "products": [
+    {
+      "id": "samsung-ww80ta046ab1tl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Washing machine",
+      "model": "WW80TA046AB1TL",
+      "name": "Samsung 8 kg front-load washing machine with Eco Bubble, Hygiene Steam and Digital Inverter",
+      "shortName": "8 kg Eco Bubble front-load washer",
+      "summary": "Open the door to see the diamond drum, pull out the detergent drawer and open the filter cover, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the filter cover to open it",
+      "glb": "/models/samsung-ww80ta046ab1tl.glb",
+      "thumb": "/photos/samsung-ww80ta046ab1tl/0.jpg",
+      "photos": ["/photos/samsung-ww80ta046ab1tl/0.jpg", "/photos/samsung-ww80ta046ab1tl/1.jpg", "/photos/samsung-ww80ta046ab1tl/2.jpg", "/photos/samsung-ww80ta046ab1tl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 114%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#2f3033",
+          "usdz": "/models/usdz/samsung-ww80ta046ab1tl-black.usdz"
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "55 cm"
+      },
+      "sizeNote": "63.5 cm deep with the door, 107.2 cm with the door open at 90 degrees",
+      "specs": [
+        ["Capacity", "8 kg"],
+        ["Type", "Front load, fully automatic"],
+        ["Max spin", "1400 rpm"],
+        ["Energy", "5 star (2024-26 label), 0.05 kWh/kg/cycle"],
+        ["Motor", "Digital Inverter Technology, 10-year warranty on the motor"],
+        ["Wash", "Eco Bubble, Hygiene Steam, Bubble Soak"],
+        ["Drum", "2nd Diamond drum"],
+        ["Programmes", "Cotton, eCotton, Synthetics, Hygiene Steam, Rinse+Spin, Drain/Spin, Drum Clean, Bedding, Colors, Super Eco Wash, Wool, Delicates, Daily Wash, 15' Quick Wash"],
+        ["Options", "Delay End, Easy Iron, Pre Wash, Intensive, Smart Check, Child Lock"],
+        ["Drawer", "StayClean Drawer"],
+        ["Display", "LED"],
+        ["Door", "Carved door in black, hinged on the left"],
+        ["Supply", "220-240 V, 50 Hz, 1900-2300 W"],
+        ["Water pressure", "50-800 kPa"],
+        ["Weight", "65 kg"],
+        ["Made in", "India"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-80-kg-ecobubbletm-front-loading-washing-machine-with-hygiene-steam-and-dit-motor-or-ww80ta046ab1-or-black-ww80ta046ab1tl/20282",
+      "source": "https://www.samsung.com/in/washers-and-dryers/washing-machines/ww5000t-front-loading-eco-bubble-hygiene-steam-dit-8kg-black-ww80ta046ab1tl/",
+      "hotspots": [
+        {
+          "title": "Eco Bubble",
+          "text": "Detergent is turned into bubbles, so it quickly penetrates fabric and removes dirt easily, while saving energy and protecting its color and texture.",
+          "pos": [-0.24, 0.79, 0.29],
+          "normal": [0, 0.2, 1],
+          "show": "!drawer"
+        },
+        {
+          "title": "Digital Inverter Technology",
+          "text": "It uses strong magnets for a quieter and more powerful performance, but consumes less energy than a Universal Motor, backed up by a 10 year warranty.",
+          "pos": [-0.15, 0.79, 0.29],
+          "normal": [0, 0.2, 1],
+          "show": "!drawer"
+        },
+        {
+          "title": "Hygiene Steam",
+          "text": "It releases steam from the bottom of the drum, so every item is thoroughly saturated, removing ingrained grime and 99.9% of bacteria and allergens.",
+          "pos": [0.004, 0.3, 0.1],
+          "normal": [0, 0.4, 1],
+          "show": "door"
+        },
+        {
+          "title": "StayClean Drawer",
+          "text": "More of the detergent is washed away with a specially designed water flushing system, so there's less unsightly soap residue and the tray stays cleaner and more hygienic.",
+          "pos": [-0.19, 0.8, 0.3],
+          "normal": [0, 1, 0],
+          "show": "drawer"
+        }
+      ],
+      "fit": {
+        "front": 55,
+        "sides": 2.5,
+        "top": 2.5,
+        "back": 5,
+        "note": "From Samsung's manual (DC68-04383A): at least 25 mm at the sides and top, 50 mm behind and 550 mm in front when it stands in an alcove or closet. Samsung gives 63.5 cm deep with the door closed and 107.2 cm with the door open at 90 degrees."
+      },
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.2],
+          "zone": {
+            "closed": [
+              [-0.299, 0.721, -0.029],
+              [-0.076, 0.848, 0.299]
+            ],
+            "open": [
+              [-0.299, 0.721, 0.171],
+              [-0.076, 0.848, 0.499]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -125,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.246, 0.212, 0.219],
+              [0.254, 0.712, 0.361]
+            ],
+            "open": [
+              [-0.582, 0.212, 0.262],
+              [-0.227, 0.712, 0.704]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "filter cover",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 90,
+          "zone": {
+            "closed": [
+              [0.091, 0.033, 0.281],
+              [0.243, 0.136, 0.295]
+            ],
+            "open": [
+              [0.091, 0.021, 0.283],
+              [0.243, 0.035, 0.386]
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
