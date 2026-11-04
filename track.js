@@ -21,9 +21,11 @@
 
   let params;
   try { params = new URLSearchParams(location.search); } catch { params = new URLSearchParams(); }
+  // false until pipeline/admin/schema.sql has been run in Supabase: until then the live site sends nothing at all
+  const READY = false;
   const local = location.protocol === "file:" || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   if (params.get("track") === "1") put(tab, "s3d-track", "1"); // stays on for this tab while testing locally
-  const on = !local || params.get("track") === "1" || get(tab, "s3d-track") === "1";
+  const on = (READY && !local) || params.get("track") === "1" || get(tab, "s3d-track") === "1";
 
   const ua = navigator.userAgent || "";
   const platform = /OculusBrowser|Quest|Pico|Wolvic/i.test(ua) ? "quest"
@@ -71,7 +73,7 @@
 
   // ── pairing a shop device: /?pair=<CODE> ──
   const code = params.get("pair");
-  if (code === null) return;
+  if (code === null || !(READY || on)) return;
   try {
     const u = new URL(location.href);
     u.searchParams.delete("pair");
