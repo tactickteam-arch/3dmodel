@@ -57,9 +57,17 @@ for (const p of catalogue.products.filter((p) => !p.hidden)) {
   await sleep(1200);
   const d0 = await dataset();
   ok(+d0.k > 0 && +d0.yb > +d0.yh || wall, "it has a spot on the photo");
-  { // the front face is drawn at its real width for its distance from the camera (width, not height: a sloped top recedes)
+  { // the product is drawn at its real width for its distance from the camera (width, not height: a sloped top recedes).
+    // A floor unit off the middle of the photo is seen turned, so its side shows too: expect the W x D footprint's width as
+    // the page's camera sees it, not the front alone (a centred spot gives the front width, as before)
     const k = +d0.k, f = +d0.focal, dist = wall ? +d0.dist : (+d0.hc * f) / (+d0.yb - +d0.yh);
-    const expected = Wm * f / dist;                                      // photo pixels
+    let expected = Wm * f / dist;                                        // photo pixels
+    if (!wall) {
+      const o = JSON.parse(await b.evalJS(`(()=>{const o=document.querySelector('.room-model').getCameraOrbit();return JSON.stringify({t:o.theta,r:o.radius})})()`));
+      const Dm = parseFloat(p.size.d) / 100, us = [];
+      for (const x of [-Wm / 2, Wm / 2]) for (const z of [-Dm / 2, Dm / 2]) us.push(f * (x * Math.cos(o.t) - z * Math.sin(o.t)) / (o.r - (x * Math.sin(o.t) + z * Math.cos(o.t))));
+      expected = Math.max(...us) - Math.min(...us);
+    }
     const drawn = (await drawnSize()).w / k;
     ok(Math.abs(drawn - expected) / expected < 0.06, `drawn width ${drawn.toFixed(0)} px is within 6% of the ${expected.toFixed(0)} px real width at ${dist.toFixed(1)} m`);
   }

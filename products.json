@@ -3850,6 +3850,558 @@
       ]
     },
     {
+      "id": "ifb-executive-plus-mbn-1014k-cms",
+      "brand": "IFB",
+      "brandLogo": "/logos/ifb.png",
+      "category": "Washing machine",
+      "model": "EXECUTIVE PLUS MBN 1014K CMS",
+      "name": "IFB Executive Plus 10 kg front-load washing machine with Ai and Eco Inverter Motor",
+      "shortName": "10 kg Executive Plus front-load washer",
+      "summary": "Open the door to see the drum, pull out the detergent drawer and open the pump-filter door, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the round flap to open it",
+      "glb": "/models/ifb-executive-plus-mbn-1014k-cms.glb",
+      "thumb": "/photos/ifb-executive-plus-mbn-1014k-cms/0.jpg",
+      "photos": [
+        "/photos/ifb-executive-plus-mbn-1014k-cms/0.jpg",
+        "/photos/ifb-executive-plus-mbn-1014k-cms/1.jpg",
+        "/photos/ifb-executive-plus-mbn-1014k-cms/2.jpg",
+        "/photos/ifb-executive-plus-mbn-1014k-cms/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Mocha",
+          "swatchColor": "#5b4a42",
+          "usdz": "/models/usdz/ifb-executive-plus-mbn-1014k-cms-mocha.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.19
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.299,
+                0.752,
+                0.086
+              ],
+              [
+                -0.1,
+                0.875,
+                0.334
+              ]
+            ],
+            "open": [
+              [
+                -0.299,
+                0.752,
+                0.276
+              ],
+              [
+                -0.1,
+                0.875,
+                0.524
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -130,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.258,
+                0.219,
+                0.237
+              ],
+              [
+                0.254,
+                0.731,
+                0.379
+              ]
+            ],
+            "open": [
+              [
+                -0.569,
+                0.219,
+                0.323
+              ],
+              [
+                -0.208,
+                0.731,
+                0.739
+              ]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter",
+          "node": "FilterFlap",
+          "axis": "y",
+          "angle": 100,
+          "zone": {
+            "closed": [
+              [
+                0.086,
+                0.041,
+                0.32
+              ],
+              [
+                0.228,
+                0.183,
+                0.325
+              ]
+            ],
+            "open": [
+              [
+                0.226,
+                0.041,
+                0.325
+              ],
+              [
+                0.256,
+                0.183,
+                0.466
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.8 cm",
+        "h": "87.5 cm",
+        "d": "66.7 cm"
+      },
+      "sizeNote": "IFB gives 66.7 cm deep and does not say if that includes the door; here the door stands about 5 cm in front of it",
+      "specs": [
+        [
+          "Capacity",
+          "10 kg"
+        ],
+        [
+          "Type",
+          "Front load"
+        ],
+        [
+          "Max spin",
+          "1400 rpm (No Spin, 400, 600, 800, 1000, 1200, 1400)"
+        ],
+        [
+          "Motor",
+          "Eco Inverter Motor, 10 years motor warranty"
+        ],
+        [
+          "Energy",
+          "5 star (BEE), 0.057 kWh/kg/cycle on its energy label"
+        ],
+        [
+          "Water",
+          "8.3 L/kg/cycle on its energy label"
+        ],
+        [
+          "Programmes",
+          "9 on the dial (Mix/Daily, Cotton, Synthetic, Baby Wear, Refresh, Express 15', Bulky, CradleWash, Spin Dry/Rinse) plus 12 in the My IFB app"
+        ],
+        [
+          "Features",
+          "Ai, Power Steam, Steam Refresh, 9 Swirl Wash, Warm Soak, Time Saver, Aqua Energie, Laundry Add"
+        ],
+        [
+          "Smart",
+          "Wi-Fi and voice through the My IFB app"
+        ],
+        [
+          "Temperatures",
+          "Cold, 30, 40, 60 and 95 °C"
+        ],
+        [
+          "Controls",
+          "Touch keys and a dial, LED display"
+        ],
+        [
+          "Door",
+          "Black with chrome, hinged on the left, 320 mm opening"
+        ],
+        [
+          "Colour",
+          "Mocha body, black control panel"
+        ],
+        [
+          "Supply",
+          "220-240 V, single phase, 50 Hz; 2000 W heater"
+        ],
+        [
+          "Weight",
+          "76 kg"
+        ],
+        [
+          "Warranty",
+          "4 years on the machine, 10 years on the motor, 10 years spare parts support"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/ifb-executive-plus-10-kg-front-load-washing-machine-or-ai-or-eco-inverter-motor-or-executive-plus-mbn-1014k-cms-executive-plus-mbn-1/21207",
+      "source": "https://www.ifbappliances.com/executive-plus-mbn-1014k-cms",
+      "hotspots": [
+        {
+          "title": "Powered by Ai",
+          "text": "Ai detects the weight and type of the fabric, then tailors the water level, wash motions and time to suit the load.",
+          "pos": [
+            0,
+            0.84,
+            0.334
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Power Steam",
+          "text": "Steam twice in the wash: at the start to dislodge dirt and kill 99.99% germs, and at the end to reduce wrinkles and keep clothes soft.",
+          "pos": [
+            -0.052,
+            0.766,
+            0.334
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "9 Swirl Wash",
+          "text": "Mimics hand wash motions to give your clothes the care they deserve.",
+          "pos": [
+            0.08,
+            0.45,
+            -0.1
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        },
+        {
+          "title": "Eco Inverter Motor",
+          "text": "Consumes up to 40% less energy, and the washer operates quietly with minimal vibration.",
+          "pos": [
+            0.299,
+            0.45,
+            -0.05
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "show": "always"
+        }
+      ],
+      "fit": {
+        "back": 10,
+        "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
+      }
+    },
+    {
+      "id": "ifb-serena-mbn-7012k-cms",
+      "brand": "IFB",
+      "brandLogo": "/logos/ifb.png",
+      "category": "Washing machine",
+      "model": "SERENA MBN 7012K CMS",
+      "name": "IFB Serena 7 kg front-load washing machine with Ai, Power Steam and Eco Inverter Motor",
+      "shortName": "7 kg Serena front-load washer",
+      "summary": "Open the door to see the drum, pull out the detergent drawer and open the pump-filter door, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the round flap to open it",
+      "glb": "/models/ifb-serena-mbn-7012k-cms.glb",
+      "thumb": "/photos/ifb-serena-mbn-7012k-cms/0.jpg",
+      "photos": [
+        "/photos/ifb-serena-mbn-7012k-cms/0.jpg",
+        "/photos/ifb-serena-mbn-7012k-cms/1.jpg",
+        "/photos/ifb-serena-mbn-7012k-cms/2.jpg",
+        "/photos/ifb-serena-mbn-7012k-cms/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Mocha",
+          "swatchColor": "#5b4a42",
+          "usdz": "/models/usdz/ifb-serena-mbn-7012k-cms-mocha.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.19
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.299,
+                0.752,
+                0.013
+              ],
+              [
+                -0.1,
+                0.875,
+                0.261
+              ]
+            ],
+            "open": [
+              [
+                -0.299,
+                0.752,
+                0.203
+              ],
+              [
+                -0.1,
+                0.875,
+                0.451
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -130,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.26,
+                0.214,
+                0.164
+              ],
+              [
+                0.257,
+                0.731,
+                0.297
+              ]
+            ],
+            "open": [
+              [
+                -0.565,
+                0.214,
+                0.257
+              ],
+              [
+                -0.211,
+                0.731,
+                0.67
+              ]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter",
+          "node": "FilterFlap",
+          "axis": "y",
+          "angle": 100,
+          "zone": {
+            "closed": [
+              [
+                0.086,
+                0.038,
+                0.247
+              ],
+              [
+                0.229,
+                0.181,
+                0.252
+              ]
+            ],
+            "open": [
+              [
+                0.226,
+                0.038,
+                0.252
+              ],
+              [
+                0.256,
+                0.181,
+                0.393
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.8 cm",
+        "h": "87.5 cm",
+        "d": "52.1 cm"
+      },
+      "sizeNote": "IFB gives 52.1 cm deep and does not say if that includes the door; here the door stands about 4 cm in front of it",
+      "specs": [
+        [
+          "Capacity",
+          "7 kg"
+        ],
+        [
+          "Type",
+          "Front load"
+        ],
+        [
+          "Max spin",
+          "1200 rpm (No Spin, 400, 600, 800, 1000, 1200)"
+        ],
+        [
+          "Motor",
+          "Eco Inverter Motor, 10 years motor warranty"
+        ],
+        [
+          "Energy",
+          "5 star (BEE), 0.045 kWh/kg/cycle on its energy label"
+        ],
+        [
+          "Water",
+          "7.9 L/kg/cycle on its energy label"
+        ],
+        [
+          "Programmes",
+          "9 on the dial (Mix/Daily, Cotton, Synthetic, Baby Wear, Refresh, Express 15', Bulky, CradleWash, Spin Dry/Rinse) plus 12 in the My IFB app"
+        ],
+        [
+          "Features",
+          "Ai, Power Steam, Steam Refresh, 9 Swirl Wash, Warm Soak, Time Saver, Aqua Energie, Laundry Add, Crescent Moon Drum"
+        ],
+        [
+          "Smart",
+          "Wi-Fi and voice through the My IFB app"
+        ],
+        [
+          "Temperatures",
+          "Cold, 30, 40, 60 and 95 °C"
+        ],
+        [
+          "Controls",
+          "Touch keys and a dial, LED 7-segment display"
+        ],
+        [
+          "Door",
+          "Black, hinged on the left, 320 mm opening"
+        ],
+        [
+          "Colour",
+          "Mocha body, black control panel"
+        ],
+        [
+          "Safety",
+          "Child lock, protective rat mesh, auto imbalance vibration control"
+        ],
+        [
+          "Supply",
+          "220-240 V, single phase, 50 Hz, 16 A; 2000 W heater"
+        ],
+        [
+          "Weight",
+          "66 kg"
+        ],
+        [
+          "Warranty",
+          "4 years on the machine, 10 years on the motor, 10 years spare parts support"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/ifb-serena-7-kg-front-load-washing-machine-or-ai-or-power-steam-or-eco-inverter-motor-or-serena-mbn-7012k-cms-serena-mbn-7012k-cms/21208",
+      "source": "https://www.ifbappliances.com/serena-mbn-7012k",
+      "hotspots": [
+        {
+          "title": "Powered by Ai",
+          "text": "Ai detects the weight and type of the fabric, then tailors the wash cycle by optimising the water level, wash motions and time to suit the load.",
+          "pos": [
+            0,
+            0.84,
+            0.261
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Steam Refresh",
+          "text": "Fresh clothes, free of odour and wrinkles, in just 30 minutes. Steam unclogs and cleans the pores of the fabric without detergent or water.",
+          "pos": [
+            -0.013,
+            0.788,
+            0.261
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "9 Swirl Wash",
+          "text": "Mimics hand wash motions to give your clothes the care they deserve.",
+          "pos": [
+            0.08,
+            0.45,
+            -0.08
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        },
+        {
+          "title": "Eco Inverter Motor",
+          "text": "Consumes up to 40% less energy, and the washer operates quietly with minimal vibration.",
+          "pos": [
+            0.299,
+            0.45,
+            -0.05
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "show": "always"
+        }
+      ],
+      "fit": {
+        "back": 10,
+        "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
+      }
+    },
+    {
       "id": "carrier-19k-xceed-edge-gxi",
       "brand": "Carrier",
       "brandLogo": "/logos/carrier.png",

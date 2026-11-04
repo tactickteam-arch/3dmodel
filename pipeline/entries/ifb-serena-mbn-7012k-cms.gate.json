@@ -1,0 +1,6 @@
+{
+  "sticksOut": {
+    "Door[A-Z]\\w*": "The door stands in front of the fascia: IFB's 3/4 photos of this model show the black glass door standing out of the black fascia's plane, and IFB gives 52.1 cm deep without saying whether the door is included.",
+    "Knob[A-Z]\\w*|Power[A-Z]\\w*": "The dial and the power button stand on the panel's face (IFB's 3/4 photos of this model show both raised)."
+  }
+}
