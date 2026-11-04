@@ -27,6 +27,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
   const cm = (s) => parseFloat(s) / 100;
   const size = { w: cm(product.size.w), h: cm(product.size.h), d: cm(product.size.d) };
   const onWall = product.placement === "wall";
+  window.s3dTrack?.("HEADSET", product.id, mode); // usage counts for the admin (/track.js)
 
   // ── renderer and reference space ──
   let spaceType = "local-floor";
@@ -170,6 +171,11 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     s.start = performance.now();
     panel.draw();
   }
+  // a press on a part (its panel button, or pointing at it); opening one counts for the admin's usage counts
+  function pressPart(key) {
+    if (moving.has(key) && !moving.get(key).isOpen) window.s3dTrack?.("PART", product.id, key);
+    togglePart(key);
+  }
   // a hit on a moving part's own mesh names it; a hit on the cabinet goes by the parts' zones
   function partFor(hit) {
     if (hit.object.userData.partKey) return hit.object.userData.partKey;
@@ -230,7 +236,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     get finishIndex() { return finishIndex; },
     moving,
     onAction: (a) => {
-      if (a.type === "part") togglePart(a.key);
+      if (a.type === "part") pressPart(a.key);
       else if (a.type === "finish") applyFinish(a.index);
       else if (a.type === "turn") turn(a.deg);
       else if (a.type === "exit") session.end();
@@ -319,7 +325,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     if (!hit) return;
     if (hit.type === "ui" && hit.button) panel.press(hit.button);
     else if (hit.type === "spot") pinnedSpot = pinnedSpot === hit.spot ? -1 : hit.spot;
-    else if (hit.type === "part") togglePart(hit.key);
+    else if (hit.type === "part") pressPart(hit.key);
     else if (hit.type === "floor") placeOnFloor(hit.point);
     else if (hit.type === "wall") placeOnWall(hit.point, hit.normal);
     src?.gamepad?.hapticActuators?.[0]?.pulse?.(0.35, 28);

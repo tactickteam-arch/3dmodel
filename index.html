@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="/track.js" defer></script>
 <style>
   :root {
     --ink: #0E0E0F;
@@ -176,6 +177,7 @@
 import { esc, CATEGORIES, fitCheck } from "/site.js";
 // products marked "hidden": true stay in products.json and /models, but are not shown; remove the flag to show one again
 const products = (await fetch("/products.json").then((r) => r.json())).products.filter((p) => !p.hidden);
+window.s3dTrack?.("CATALOGUE"); // usage counts for the admin (/track.js: off on localhost)
 const CATS = [["All", null], ...CATEGORIES.map(([value, label]) => [label, value])];
 let cat = null;
 const $ = (id) => document.getElementById(id);

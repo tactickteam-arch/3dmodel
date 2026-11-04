@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const [root, port, extra] = process.argv.slice(2);
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".mjs": "text/javascript", ".json": "application/json", ".glb": "model/gltf-binary", ".usdz": "model/vnd.usdz+zip", ".jpg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript", ".mjs": "text/javascript", ".json": "application/json", ".glb": "model/gltf-binary", ".usdz": "model/vnd.usdz+zip", ".jpg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml" };
 http.createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
   let base = root;

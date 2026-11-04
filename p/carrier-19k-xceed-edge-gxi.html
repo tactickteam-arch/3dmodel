@@ -27,6 +27,7 @@
 </script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="/track.js" defer></script>
 <style>
   :root {
     /* Sangeetha: black, white and the orange of the logo */
@@ -663,6 +664,10 @@ const platform = hasQuickLook ? (isVisionPro ? "visionos" : "ios")
   : isApple ? "ios-inapp"
   : /Android/i.test(ua) ? "android"
   : "desktop";
+// usage counts for the admin (/track.js: fire and forget, off on localhost)
+const track = (kind, detail) => window.s3dTrack?.(kind, product.id, detail);
+track("VIEW");
+if (document.documentElement.classList.contains("embed")) track("EMBED", (() => { try { return new URL(document.referrer).hostname; } catch { return ""; } })());
 
 // ── fill the page ──
 const parts = product.parts || [];
@@ -670,6 +675,7 @@ const state = Object.fromEntries(parts.map((p) => [p.key, false]));
 let finishIndex = 0;
 const onWall = product.placement === "wall";
 initRoom({ product, model: model(product.glb), parts, onWall, toast, openButton: $("btnRoom") });
+$("btnRoom")?.addEventListener("click", () => track("ROOM"));
 
 document.title = `${product.brand} ${product.model} in 3D and AR`;
 $("eyebrow").textContent = `${product.brand} · ${product.category}`;
@@ -822,6 +828,7 @@ window.__organise = null;
 // Fill opens the doors itself; a door still moving from a press finishes first, so none is skipped
 const doorWhenIdle = async (key) => { while (busy || chaining) await sleep(50); return togglePart(key); };
 queueMicrotask(() => { window.__organise = initOrganise({ mv, product, state, togglePart: doorWhenIdle, bar: $("parts"), toast }); fitParts(); });
+$("parts").addEventListener("click", (e) => { if (e.target.closest("#part-organise")?.getAttribute("aria-pressed") === "false") track("FILL"); });
 
 // the model carries one clip per change of state, named S<bits>_<bits>
 const stateKey = () => parts.map((p) => (state[p.key] ? 1 : 0)).join("");
@@ -839,6 +846,7 @@ let chaining = 0, pressChain = Promise.resolve();
 const pressing = new Set();
 function pressPart(key) {
   if (pressing.has(key)) return;
+  if (!state[key]) track("PART", key);
   pressing.add(key);
   const idle = async () => { while (busy || chaining || window.__organise?.openingDoors?.()) await sleep(50); };
   pressChain = pressChain.then(async () => { await idle(); await togglePart(key); await idle(); }).catch(() => {}).finally(() => pressing.delete(key));
@@ -1283,6 +1291,7 @@ async function showFeature(i, { tour = false } = {}) {
     }
   }
   featureIndex = i;
+  track("FEATURE", h.title);
   hsEls.forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
   labEls.forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
   $("fcCount").textContent = `Feature ${i + 1} of ${hotspots.length}`;
@@ -1421,8 +1430,10 @@ function renderFitBox() {
     L[i].setAttribute("x2", B.canvasPosition.x); L[i].setAttribute("y2", B.canvasPosition.y);
   });
 }
-let fitTimer = null;
-$("fitIn").addEventListener("input", () => { clearTimeout(fitTimer); fitTimer = setTimeout(renderFit, 300); });
+let fitTimer = null, fitTrackTimer = null, fitSent = "";
+// counted once the shopper has stopped typing a full space, once per different space
+const trackFit = () => { const k = fitFields.map(([f]) => $(`fit-${f}`).value).join("x"); if (fitResult?.given && k !== fitSent) { fitSent = k; track("FIT", fitResult.ok ? "fits" : "too-big"); } };
+$("fitIn").addEventListener("input", () => { clearTimeout(fitTimer); fitTimer = setTimeout(renderFit, 300); clearTimeout(fitTrackTimer); fitTrackTimer = setTimeout(trackFit, 2000); });
 
 // ── loading ──
 mv.addEventListener("progress", (e) => {
@@ -1489,6 +1500,8 @@ async function openHeadset(mode) {
   }
 }
 function launchAR() {
+  const arKind = ["ios", "visionos", "quest"].includes(platform) ? platform : mv.canActivateAR ? "android" : null;
+  if (arKind) track("AR", arKind);
   if (platform === "ios" || platform === "visionos") return openQuickLook();
   if (platform === "quest") return openHeadset("ar");
   if (mv.canActivateAR) return mv.activateAR();
