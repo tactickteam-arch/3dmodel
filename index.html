@@ -15,6 +15,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="/track.js" defer></script>
+<script type="module" src="/store-bridge.js"></script>
+<script>
+  // In the store app's frame (/embed/discovery sends it to /?embed): the catalogue without our header and welcome.
+  // Set here, before the first paint, so the header never flashes.
+  if (new URLSearchParams(location.search).has("embed") || /^\/embed(\/|$)/.test(location.pathname)) document.documentElement.classList.add("embed");
+</script>
 <style>
   :root {
     --ink: #0E0E0F;
@@ -108,6 +114,8 @@
   .empty { grid-column: 1 / -1; text-align: center; padding: 48px 16px; color: var(--slate); background: var(--card); border: 1px dashed var(--hair); border-radius: 20px; font-size: 16px; line-height: 1.5; }
   .empty b { color: var(--ink); }
   footer { border-top: 1px solid var(--hair); padding: 22px 0 36px; font-size: 13px; line-height: 1.6; color: var(--slate); }
+  .embed header, .embed .hero { display: none; }
+  .note { margin: 24px 0 0; padding: 14px 18px; border-radius: 14px; background: var(--orange-bg); font-size: 16px; line-height: 1.45; }
 
   @media (max-width: 900px) {
     header { height: 56px; padding: 0 16px; }
@@ -154,6 +162,8 @@
     <div class="go">Enter the showroom <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
   </a>
 
+  <p class="note" id="oldLink" hidden>We couldn’t find the product for that link. It may not be in 3D yet; here is everything that is.</p>
+
   <div class="bar">
     <label class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -181,6 +191,8 @@ window.s3dTrack?.("CATALOGUE"); // usage counts for the admin (/track.js: off on
 const CATS = [["All", null], ...CATEGORIES.map(([value, label]) => [label, value])];
 let cat = null;
 const $ = (id) => document.getElementById(id);
+// an old link with no page of its own (/ar-experience/<id>, /id/<Product ID>) lands here (vercel.json, make_pages.mjs)
+if (/^\/(ar-experience|id)\//.test(location.pathname)) $("oldLink").hidden = false;
 const q = $("q");
 // Back from a product: the same search and filter, scrolled to the card that was opened. The cards are built
 // after products.json loads, too late for the browser's own scroll restore, which put the list back at the top.

@@ -1,5 +1,6 @@
-// Static server for the demo site with the same /p/:id rewrite as vercel.json: /p/<id> is p/<id>.html when
-// make_pages.mjs has written one (Vercel serves a file before it rewrites), otherwise product.html.
+// Static server for the demo site with the same rewrites as vercel.json: /p/<id> is p/<id>.html when
+// make_pages.mjs has written one (Vercel serves a file before it rewrites), otherwise product.html; an old link
+// under /ar-experience/, /id/ or /embed/ with no page of its own is the catalogue.
 // usage: node serve.mjs <siteDir> <port> [extraDir mounted at /__test]
 import http from "node:http";
 import fs from "node:fs";
@@ -12,10 +13,13 @@ http.createServer((req, res) => {
   let base = root;
   // PRODUCTS=<file> serves another catalogue in place of /products.json (to test a new product alone)
   if (p === "/products.json" && process.env.PRODUCTS) { res.writeHead(200, { "Content-Type": TYPES[".json"] }); fs.createReadStream(process.env.PRODUCTS).pipe(res); return; }
+  // SITE_CONFIG=<file> serves another /site-config.js (test_store_bridge.mjs: the store app bridge switched on)
+  if (p === "/site-config.js" && process.env.SITE_CONFIG) { res.writeHead(200, { "Content-Type": TYPES[".js"] }); fs.createReadStream(process.env.SITE_CONFIG).pipe(res); return; }
   if (extra && p.startsWith("/__test/")) { base = extra; p = p.slice(7); }
   else if (/^\/p\/[^/]+\/?$/.test(p)) { const own = `/p/${p.split("/")[2]}.html`; p = fs.existsSync(path.join(root, own)) ? own : "/product.html"; }
   else if (p === "/") p = "/index.html";
   else if (!path.extname(p) && fs.existsSync(path.join(root, p + ".html"))) p += ".html";
+  else if (/^\/(ar-experience|id|embed)(\/|$)/.test(p) && !p.endsWith(".html")) p = "/index.html";
   const file = path.join(base, path.normalize(p));
   if (!file.startsWith(base) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); res.end("not found"); return; }
   res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream" });

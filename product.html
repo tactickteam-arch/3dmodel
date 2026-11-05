@@ -18,6 +18,7 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="/track.js" defer></script>
+<script type="module" src="/store-bridge.js"></script>
 <style>
   :root {
     /* Sangeetha: black, white and the orange of the logo */
@@ -559,6 +560,7 @@
 import { esc, cm, partAt, hotspotShown, fitCheck } from "/site.js";
 import { initRoom } from "/room.js";
 import { initOrganise } from "/organise.js";
+import { SITE } from "/site-config.js";
 const $ = (id) => document.getElementById(id);
 const mv = $("viewer");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -610,11 +612,13 @@ if (!product) {
   document.title = "Product not found";
   await new Promise(() => {}); // nothing below applies to a missing product
 }
-// Vercel's other addresses for this site (per deployment and per branch) ask for a Vercel
-// login, so the links people scan and share always point at the public address
-const PUBLIC_ORIGIN = "https://3dmodelssangeetha.vercel.app";
+// Vercel's other addresses for this site (per deployment and per branch) ask for a Vercel login, and
+// the other addresses in site-config.js are kept for old links, so the links people scan and share
+// always point at the public address
+const PUBLIC_ORIGIN = SITE.publicOrigin;
 const shareUrl = (() => {
-  const u = new URL((location.hostname.endsWith(".vercel.app") ? PUBLIC_ORIGIN : location.origin) + location.pathname + location.search);
+  const elsewhere = location.hostname.endsWith(".vercel.app") || SITE.alsoServedAt.includes(location.origin);
+  const u = new URL((elsewhere ? PUBLIC_ORIGIN : location.origin) + location.pathname + location.search);
   u.searchParams.delete("embed");   // links people share always open the full page
   u.searchParams.delete("ql");      // and the standard iPhone AR
   return u.href;

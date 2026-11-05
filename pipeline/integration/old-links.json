@@ -1,0 +1,4 @@
+{
+  "about": "The store app's old AR links, /ar-experience/<old id>, and the product each one opens here. Keys: the old id exactly as it appears in the link (the previous viewer's ids are UUIDs, in the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). Values: our product id (such as lg-glt3426snpz) or Sangeetha's Product ID (such as 21040). Run node pipeline/scripts/make_pages.mjs after any change: it writes ar-experience/<old id>.html for each product on show. Any old id not listed here opens the catalogue with a short note.",
+  "links": {}
+}

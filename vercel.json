@@ -12,6 +12,18 @@
     {
       "source": "/p/:id",
       "destination": "/product"
+    },
+    {
+      "source": "/ar-experience/:path*",
+      "destination": "/"
+    },
+    {
+      "source": "/id/:path*",
+      "destination": "/"
+    },
+    {
+      "source": "/embed/:path*",
+      "destination": "/"
     }
   ],
   "headers": [
