@@ -1,0 +1,158 @@
+{
+  "products": [
+    {
+      "id": "samsung-rt45hg6a22slhl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT45HG6A22SLHL",
+      "name": "Samsung 419 L double-door refrigerator with Bespoke AI",
+      "shortName": "419 L Bespoke AI refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt45hg6a22slhl.glb",
+      "thumb": "/photos/samsung-rt45hg6a22slhl/0.jpg",
+      "photos": ["/photos/samsung-rt45hg6a22slhl/0.jpg", "/photos/samsung-rt45hg6a22slhl/1.jpg", "/photos/samsung-rt45hg6a22slhl/2.jpg", "/photos/samsung-rt45hg6a22slhl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "EZ Clean Steel",
+          "swatchColor": "#8f9296",
+          "usdz": "/models/usdz/samsung-rt45hg6a22slhl-ez-clean-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.35, 1.21, 0.226],
+              [0.35, 1.79, 0.378]
+            ],
+            "open": [
+              [0.277, 1.21, 0.31],
+              [0.636, 1.79, 0.983]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.264, 1.281, -0.019],
+              [-0.088, 1.451, 0.19]
+            ],
+            "open": [
+              [-0.264, 1.281, 0.101],
+              [-0.088, 1.451, 0.31]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.35, 0.045, 0.211],
+              [0.35, 1.204, 0.378]
+            ],
+            "open": [
+              [0.272, 0.045, 0.306],
+              [0.69, 1.204, 0.96]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.03, 0, 0.68],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.31, 0.075, -0.342],
+              [0.31, 1.016, 0.209]
+            ],
+            "open": [
+              [-0.34, 0.075, 0.338],
+              [0.28, 1.016, 0.889]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "70 cm",
+        "h": "179 cm",
+        "d": "75.5 cm"
+      },
+      "sizeNote": "Samsung's manual lists 136.3 cm total depth and 102.6 cm total width with the doors open",
+      "specs": [
+        ["Total capacity", "419 L (fridge 324 L, freezer 95 L)"],
+        ["Type", "Frost free, double door"],
+        ["Convertible", "5-in-1"],
+        ["Energy rating", "2 star, 252 units a year"],
+        ["Compressor", "Digital Inverter"],
+        ["Cooling", "Twin Cooling Plus, Multi Flow"],
+        ["Smart features", "Wi-Fi, SmartThings, AI Energy Mode"],
+        ["Shelves", "2 (fridge), 1 plastic (freezer)"],
+        ["Extras", "Twist Ice Maker, Deodorizer, Fresh Room"],
+        ["Handle", "Recessed"],
+        ["Colour", "EZ Clean Steel"],
+        ["Weight", "67 kg"],
+        ["Warranty", "1 year product, 10 years compressor"]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/double-door/rt6300dh-top-mount-freezer-twin-cooling-plus-419l-silver-rt45hg6a22slhl/",
+      "hotspots": [
+        {
+          "title": "Convertible 5-in-1",
+          "text": "Using Twin Cooling technology, the Convertible 5-in-1 feature lets you switch between 5 smart modes, so the freezer can become a fridge.",
+          "pos": [-0.18, 1.62, 0.378],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "SmartThings with Wi-Fi",
+          "text": "Control the cooling mode, change the temperature and get alerts if the door is left open, from the SmartThings app.",
+          "pos": [-0.18, 0.95, 0.378],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Twin Cooling Plus",
+          "text": "Independent evaporators, fans and vents in the fridge and freezer keep food moist and stop odours mixing between them.",
+          "pos": [-0.005, 1.679, -0.331],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Power Cool and Power Freeze",
+          "text": "At the touch of a button, Power Cool blows intensely cold air into the fridge and Power Freeze a fast blast into the freezer.",
+          "pos": [0.318, 0.99, 0.188],
+          "normal": [-1, 0, 0],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 61,
+        "sides": 5,
+        "back": 5,
+        "note": "From Samsung's user manual for this model: at least 5 cm at each side, more than 5 cm behind it, and 136.3 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
+      }
+    }
+  ]
+}
