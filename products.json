@@ -1167,6 +1167,306 @@
       "hidden": true
     },
     {
+      "id": "haier-hrf-2902icmc-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-2902ICMC-P",
+      "name": "Haier 240 L double-door refrigerator, Marine Carnation flower door",
+      "shortName": "240 L Marine Carnation refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-2902icmc-p.glb",
+      "thumb": "/photos/haier-hrf-2902icmc-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrf-2902icmc-p/0.jpg",
+        "/photos/haier-hrf-2902icmc-p/1.jpg",
+        "/photos/haier-hrf-2902icmc-p/2.jpg",
+        "/photos/haier-hrf-2902icmc-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Marine Carnation",
+          "swatchColor": "#1d3f9c",
+          "usdz": "/models/usdz/haier-hrf-2902icmc-p-marine-carnation.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                1.075,
+                0.161
+              ],
+              [
+                0.274,
+                1.56,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.254,
+                1.075,
+                0.21
+              ],
+              [
+                0.728,
+                1.56,
+                0.641
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.235,
+                1.318,
+                -0.086
+              ],
+              [
+                -0.109,
+                1.398,
+                0.149
+              ]
+            ],
+            "open": [
+              [
+                -0.235,
+                1.318,
+                0.034
+              ],
+              [
+                -0.109,
+                1.398,
+                0.269
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                0.04,
+                0.141
+              ],
+              [
+                0.274,
+                1.07,
+                0.307
+              ]
+            ],
+            "open": [
+              [
+                0.241,
+                0.04,
+                0.21
+              ],
+              [
+                0.728,
+                1.07,
+                0.656
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.01,
+            0,
+            0.5
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.239,
+                0.107,
+                -0.258
+              ],
+              [
+                0.239,
+                1.032,
+                0.134
+              ]
+            ],
+            "open": [
+              [
+                -0.249,
+                0.107,
+                0.242
+              ],
+              [
+                0.229,
+                1.032,
+                0.634
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "156 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier gives 54.8 × 61.5 × 156 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "240 L"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Convertible",
+          "5-in-1 (Normal, Veg, Energy Saving, Turbo Icing and Retention modes)"
+        ],
+        [
+          "Energy rating",
+          "2 star, 270 units a year"
+        ],
+        [
+          "Features",
+          "Turbo Icing, Twin Energy Saving modes"
+        ],
+        [
+          "Compressor",
+          "Normal"
+        ],
+        [
+          "Shelves",
+          "Toughened glass (refrigerator)"
+        ],
+        [
+          "Storage",
+          "Fruit case, vegetable case, egg tray"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Flat door, flower finish, recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "53 kg"
+        ],
+        [
+          "Warranty",
+          "1 year product, 10 years compressor"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-240l-frost-free-double-door-refrigerator-or-flat-door-or-marine-carnation-or-2-star-or-hrf-2902icmc-p-hrf-2902icmc-p/20637",
+      "source": "https://www.haier.com/in/refrigerators/240-litres-frost-free-twin-energy-saving-top-mount-refrigerator-hrf-2902icmc-p.shtml",
+      "hotspots": [
+        {
+          "title": "5 in 1 Convertible",
+          "text": "Convert your fridge to 5 different modes as per your requirement and keep your food fresh for longer.",
+          "pos": [
+            0.17,
+            1.1,
+            0.3075
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo icing technology speeds up freezing in the freezer section.",
+          "pos": [
+            0.12,
+            1.405,
+            -0.2415
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Twin Energy Saving Modes",
+          "text": "Two energy saving modes in one refrigerator save up to 15% energy in mode one and up to 30% in convertible mode.",
+          "pos": [
+            -0.12,
+            0.75,
+            0.3075
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Separate Fruit Box",
+          "text": "Store all your favourite fruits in a separate compartment and avoid mixing of odours.",
+          "pos": [
+            0.17,
+            0.43,
+            0.132
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
       "id": "lg-fhp1412z9b",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",
@@ -3240,7 +3540,7 @@
               ],
               [
                 0.289,
-                0.965,
+                0.964,
                 0.221
               ]
             ],
@@ -3421,7 +3721,7 @@
           "text": "The tempered glass lid closes softly: safe, convenient and quiet.",
           "pos": [
             -0.2,
-            0.9665,
+            0.9575,
             0.12
           ],
           "normal": [

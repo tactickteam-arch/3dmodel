@@ -28,23 +28,27 @@ const seatR = 0.2475, gasketR = 0.163;                         // the door seat'
 const drumR = 0.235, drumDepth = 0.40, drumZ = zF - 0.095 - drumDepth / 2;   // ESTIMATED; the drum's volume is not published
 
 // ── materials ──
-const MOCHA = 0x3e3632;                                        // matched to IFB's front photo, mean over its height (see NOTES)
-const mocha = mat("Front", MOCHA, { metal: 0.25, rough: 0.42 });
-const sideM = mat("Side", MOCHA, { metal: 0.25, rough: 0.45 });
-const topM = mat("TopPlate", MOCHA, { metal: 0.15, rough: 0.6 });
-const rearM = mat("Rear", 0x3a332f, { metal: 0.2, rough: 0.55 });
-const flapM = mat("FlapFace", MOCHA, { metal: 0.25, rough: 0.42 });
+// IFB's mocha is a plain paint (metal 0: a part-metal paint tints its reflections and reads redder on the web, and the USDZ
+// can only approximate it). Its colour is matched to IFB's front photo against the photo's white (layout "mocha", from the
+// texture script, look pass 5 Nov 2026); the front, its rounded edges, the door seat and the filter door carry front.jpg, the
+// same colour with half the photo's fall in brightness from the chin to the feet.
+const MOCHA = (L.mocha[0] << 16) | (L.mocha[1] << 8) | L.mocha[2];   // 0x2c2622
+const mocha = mat("Front", MOCHA, { rough: 0.42 });
+const sideM = mat("Side", MOCHA, { rough: 0.45 });
+const topM = mat("TopPlate", MOCHA, { rough: 0.6 });
+const rearM = mat("Rear", 0x292320, { rough: 0.55 });          // the back a shade darker than the body, as before (0.94 of it)
+const flapM = mat("FlapFace", MOCHA, { rough: 0.42 });
 const panelM = mat("Panel", 0xffffff, { rough: 0.3 });
 const drawerM = mat("DrawerFace", 0xffffff, { rough: 0.32 });
-const fascia = mat("Fascia", 0x1c1c1e, { rough: 0.32 });
+const fascia = mat("Fascia", 0x303032, { rough: 0.32 });                 // the printed panel's base (BASE in the texture script)
 const glassBlack = mat("DisplayGlassEdge", 0x050506, { rough: 0.1 });
 const dark = mat("Dark", 0x0b0b0c, { rough: 0.8 });
 const chrome = mat("Chrome", 0xd2d5d9, { metal: 1, rough: 0.14 });
 const knobSide = mat("KnobSide", 0xc9ccd0, { metal: 1, rough: 0.22 });
 const knobTop = mat("KnobTop", 0xffffff, { metal: 0.7, rough: 0.3 });
 const btnFace = mat("BtnPower", 0xffffff, { metal: 0.6, rough: 0.3 });
-const doorBlack = mat("DoorBlack", 0x09090a, { metal: 0.3, rough: 0.1 });
-const tint = mat("DoorGlass", 0x0d1115, { rough: 0.05, opacity: 0.68, side: THREE.DoubleSide });   // tinted, the drum showing through (IFB's front photo); dark from behind when open
+const doorBlack = mat("DoorBlack", 0x202021, { rough: 0.22 });   // the glossy black ring: plain gloss plastic (look pass 5 Nov 2026, see NOTES)
+const tint = mat("DoorGlass", 0x0d1115, { rough: 0.05, opacity: 0.78, side: THREE.DoubleSide });   // tinted, the drum showing through (IFB's front photo); dark from behind when open; opacity matched to the photo (look pass 5 Nov 2026)
 const bowl = mat("GlassBowl", 0x23282d, { rough: 0.05, opacity: 0.12, side: THREE.DoubleSide });
 const doorIn = mat("DoorInner", 0x6e6a66, { rough: 0.55 });       // the door's back ring is warm grey plastic (IFB's open-door photo)
 const hingeM = mat("Hinge", 0x3a2f2a, { rough: 0.5 });
@@ -129,6 +133,14 @@ const stadium = (zc, y0, y1, w, seg = 10) => {        // a vertical pill in the 
   return pts;
 };
 
+// front.jpg runs from the chin (v 0) down to the feet (v 1), as frontWithHoles maps the front; every textured mocha part on the
+// front takes its v from its own height (y0: where its geometry's origin stands)
+const frontV = (g, y0) => {
+  const p = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, 0.5, (chinBot - (p.getY(i) + y0)) / (chinBot - feet));
+  return g;
+};
+
 // ── cabinet body: mocha sides with three pressed grooves each, top plate, back, base, rounded front edges ──
 const bodyTop = H - 0.012;
 const GROOVES = [0.25, 0.57, 0.85].map((f) => zF - f * (zF - zB));   // pressed-in panels; centres ESTIMATED from IFB's 3/4 photos
@@ -147,7 +159,7 @@ for (const side of [1, -1]) {
   for (const zc of GROOVES) cab.add(mesh(side > 0 ? "GrooveRight" : "GrooveLeft", dish(side, zc), sideM));
 }
 for (const side of [1, -1]) {  // the rounded front edges, from the feet to the chin
-  const g = new THREE.CylinderGeometry(rc, rc, chinBot - feet, 8, 1, true, side > 0 ? 0 : -Math.PI / 2, Math.PI / 2);
+  const g = frontV(new THREE.CylinderGeometry(rc, rc, chinBot - feet, 8, 1, true, side > 0 ? 0 : -Math.PI / 2, Math.PI / 2), (feet + chinBot) / 2);
   cab.add(mesh("FrontEdge", g, mocha, side * (SX - rc), (feet + chinBot) / 2, zF - rc));
 }
 // top plate in two pieces with the seam IFB's 3/4 photos show near the back (ESTIMATED 120 mm from the back)
@@ -232,7 +244,11 @@ front.position.set(0, feet, zF - 0.004);
 cab.add(front);
 // the door seat: a dark groove, then the dish in the body colour down to the gasket (open-door photo)
 cab.add(lathe("SeatGroove", [[seatR - 0.0003, 0.0002], [seatR - 0.0003, -0.005], [0.2405, -0.005], [0.2405, -0.0025]], dark).translateX(door.x).translateY(door.y).translateZ(zF));
-cab.add(lathe("DoorSeat", [[0.2405, -0.0025], [0.225, -0.0045], [0.205, -0.008], [0.185, -0.012], [0.172, -0.0155], [0.1635, -0.0185]], mocha).translateX(door.x).translateY(door.y).translateZ(zF));
+{
+  const seat = lathe("DoorSeat", [[0.2405, -0.0025], [0.225, -0.0045], [0.205, -0.008], [0.185, -0.012], [0.172, -0.0155], [0.1635, -0.0185]], mocha);
+  frontV(seat.geometry, door.y);
+  cab.add(seat.translateX(door.x).translateY(door.y).translateZ(zF));
+}
 // the hinge plate in the dish at the left, with its two screws, and the lock's slot at the right (open-door photo)
 cab.add(box("HingePlate", 0.03, 0.2, 0.004, hingeM, door.x - 0.21, door.y, zF - 0.009));
 for (const dy of [0.08, -0.08]) cab.add(mesh("HingeScrew", new THREE.CylinderGeometry(0.0035, 0.0035, 0.002, 10), steel, door.x - 0.21, door.y + dy, zF - 0.006).rotateX(Math.PI / 2));
@@ -285,7 +301,11 @@ cab.add(gasketRing);
 // the round filter door: hinged at its right edge (it swings out to the right in the manual's drawing, p.61), with the coin
 // slot at its left edge (IFB's photos)
 const filter = group("FilterFlap", flap.x + flap.r, flap.y, zF);
-filter.add(mesh("FlapDisc", new THREE.CylinderGeometry(flap.r - 0.0012, flap.r - 0.0012, 0.004, 64), [flapM, flapM, flapM], -flap.r, 0, -0.0016).rotateX(Math.PI / 2));
+{ // turned in its geometry (not the mesh) so its texture's v follows the height
+  const g = new THREE.CylinderGeometry(flap.r - 0.0012, flap.r - 0.0012, 0.004, 64);
+  g.rotateX(Math.PI / 2);
+  filter.add(mesh("FlapDisc", frontV(g, flap.y), [flapM, flapM, flapM], -flap.r, 0, -0.0016));
+}
 filter.add(box("FlapNotch", 0.012, 0.016, 0.0016, dark, L.flap_slot.x - (flap.x + flap.r), L.flap_slot.y - flap.y, 0.0007));
 filter.add(box("FlapCatch", 0.006, 0.008, 0.0016, bayGrey, L.flap_slot.x - (flap.x + flap.r) - 0.001, L.flap_slot.y - flap.y, 0.0012));
 root.add(filter);
@@ -399,5 +419,5 @@ const grain = { dir: `${TEX}/grain`, materials: {
   Front: { type: "peel_soft" }, Side: { type: "peel_soft" }, TopPlate: { type: "peel_soft" }, FlapFace: { type: "peel_soft" }, Fascia: { type: "peel_soft" },
 } };
 await exportGLB(root, clips, OUT, {
-  Panel: `${T}/panel.jpg`, DrawerFace: `${T}/drawer.jpg`, KnobTop: `${T}/knob_top.jpg`, BtnPower: `${T}/btn_power.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`,
+  Front: `${T}/front.jpg`, FlapFace: `${T}/front.jpg`, Panel: `${T}/panel.jpg`, DrawerFace: `${T}/drawer.jpg`, KnobTop: `${T}/knob_top.jpg`, BtnPower: `${T}/btn_power.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`,
 }, grain);

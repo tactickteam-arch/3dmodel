@@ -10,6 +10,7 @@
 // usage: node make_whirlpool_31671.mjs <entry.json> <tex dir> <out.glb>
 import { THREE, mat, mesh, box, group, flipV, inward, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import fs from "node:fs";
 
 export function buildBloomwash(K) {
   const { W, H, D } = K;
@@ -33,7 +34,7 @@ export function buildBloomwash(K) {
   const backM = mat("BackPanel", 0xffffff, { rough: 0.7 });
   const backBlack = mat("BackPlastic", 0x18181a, { rough: 0.7 });
   const gloss = mat("BlackGloss", 0x0b0b0d, { rough: 0.12 });
-  const glassM = mat("LidGlass", 0x050607, { rough: 0.04, opacity: 0.9 });
+  const glassM = mat("LidGlass", 0x050607, { rough: 0.04, opacity: K.lidOpacity ?? 0.9 });
   const lidFrameM = mat("LidFrame", K.innerHex, { rough: 0.5 });
   const chrome = mat("Chrome", 0xd9dbde, { metal: 1, rough: 0.18 });
   const panelM = mat("PanelFace", 0xffffff, { rough: 0.38 });   // satin enough that a studio light does not wash the print out from above (top_open.jpg: black)
@@ -212,11 +213,28 @@ export function buildBloomwash(K) {
       p.rotation.y = sx * Math.PI / 2;
       cab.add(p);
     }
-    // the black back: its covers and frame (the photo's relief) on the cabinet's back, down over the plinth. Only for a model
-    // whose back Whirlpool shows (K.back); without a rear photo the back stays the plain cabinet
+    // the black back: Whirlpool's rear photo itself (back.jpg, with the hose, pipe, cord and plug painted out: they are modelled
+    // below), on a plate cut to the back's flat face from the plinth's foot up to the panel housing's top edge, and kept inside
+    // the machine's outline in the photo (K.rear.silhouette). Only for a model whose back Whirlpool shows (K.back); without a
+    // rear photo the back stays the plain cabinet
     if (K.back) {
-      const bw = W - 2 * R, bh = K.seam[1] - 0.025;
-      const bp = mesh("BackDecal", flipV(new THREE.PlaneGeometry(bw, bh)), backM, 0, 0.025 + bh / 2, zB - 0.0006);
+      const RP = K.rear, y0 = RP.bottom, y1 = RP.top, topBack = seat(D);
+      const silAt = (y) => { const s = RP.silhouette; let i = 0; while (i < s.length - 2 && s[i + 1][0] < y) i++; const [ya, a] = s[i], [yb, b] = s[i + 1]; return a + (b - a) * Math.min(1, Math.max(0, (y - ya) / (yb - ya))); };
+      const flat = (y) => y < K.plinthTop ? W / 2 - 0.004 - R : y < K.seam[1] ? W / 2 - R : y <= topBack ? hw((y - K.seam[1]) / (topBack - K.seam[1])) - R : TOPW;
+      const half = (y) => Math.min(silAt(y) - 0.001, flat(y) - 0.0005);
+      const ys = [];
+      for (let y = y0; y < y1 - 1e-6; y += 0.005) ys.push(y);
+      ys.push(y1);
+      for (const y of [K.plinthTop, K.seam[1], topBack]) { ys.push(y - 1e-4, y + 1e-4); }
+      ys.sort((a, b) => a - b);
+      const sh = new THREE.Shape();
+      ys.forEach((y, i) => (i ? sh.lineTo(half(y), y) : sh.moveTo(half(y), y)));
+      for (let i = ys.length - 1; i >= 0; i--) sh.lineTo(-half(ys[i]), ys[i]);
+      const g = new THREE.ShapeGeometry(sh);
+      const pos = g.attributes.position, uv = g.attributes.uv;
+      // the plate is turned to face the back, so its local x is the machine's -x: the photo's left (+x) is u = 0
+      for (let i = 0; i < uv.count; i++) uv.setXY(i, (0.27 + pos.getX(i)) / 0.54, (y1 - pos.getY(i)) / (y1 - y0));
+      const bp = mesh("BackDecal", g, backM, 0, 0, zB - 0.0006);
       bp.rotation.y = Math.PI;
       cab.add(bp);
     }
@@ -378,37 +396,101 @@ export function buildBloomwash(K) {
     }
   }
 
-  // ── the back: the inlet valve's nut and the inlet pipe on it, the cord with its Indian 3-pin plug, the drain hose (back.jpg) ──
+  // ── the back (back.jpg, on the paths the texture script measured, K.rear): the inlet pipe hanging from its valve, the cord
+  // coiled in a figure-of-eight below its slot with the Indian 3-pin plug lying pins out, and the corrugated drain hose ──
   if (K.back) {
-    const I = K.inlet, zb = zB;
-    cab.add(cyl("InletNut", 0.017, 0.017, 0.012, white, I.x, I.y, zb - 0.008, 4).rotateX(Math.PI / 2).rotateY(Math.PI / 4));
-    cab.add(cyl("InletBoss", 0.009, 0.009, 0.022, white, I.x, I.y, zb - 0.011, 16).rotateX(Math.PI / 2));
-    cab.add(cyl("InletPipe", 0.0055, 0.0055, I.y - I.coupling - 0.03, white, I.x, (I.y + I.coupling + 0.03) / 2, zb - 0.02, 12));
-    cab.add(cyl("InletCoupling", 0.013, 0.012, 0.06, white, I.x, I.coupling, zb - 0.02, 16));
-    // the cord: from its grommet down in a loop and back up to the plug, laid against the back as Whirlpool's photo shows it
-    const C = K.cord;
-    cab.add(box("CordGrommet", 0.022, 0.04, 0.01, backBlack, C.x, C.y, zb - 0.005));
-    const cp = C.path.map(([x, y]) => new THREE.Vector3(x, y, zb - 0.009));
-    cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(cp, false, "centripetal"), 90, 0.0032, 6, false), white));
-    const [px, py] = C.plug;
-    cab.add(box("Plug", 0.042, 0.05, 0.022, white, px, py, zb - 0.014));
-    for (const [dx, dy] of [[0, 0.011], [-0.0095, -0.007], [0.0095, -0.007]]) cab.add(cyl("PlugPin", 0.0026, 0.0026, 0.018, pinM, px + dx, py + 0.025 + 0.009, zb - 0.014 + dy * 0.6, 10));
-    // the drain hose: a smooth end at the top, then corrugated, down the left and under to the drain at the bottom
-    const hp = K.hose.map(([x, y]) => new THREE.Vector3(x, y, zb - 0.02));
-    const tg = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(hp, false, "centripetal"), 160, 0.016, 10, false);
+    const RP = K.rear, zb = zB;
+    // a cylinder standing between two heights, ribbed round its side when ribs > 0
+    const post = (name, d, ya, yb, m, x, z, seg = 20, ribs = 0) => {
+      const g = new THREE.CylinderGeometry(d / 2, d / 2, Math.abs(ya - yb), ribs ? ribs * 2 : seg, 1);
+      if (ribs) { const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const a = Math.atan2(p.getZ(i), p.getX(i)), r = Math.hypot(p.getX(i), p.getZ(i)); if (r < 1e-6) continue; const k = Math.round(((a + Math.PI) / (2 * Math.PI)) * ribs * 2) % 2 ? 1 : (d / 2 - 0.0009) / (d / 2); p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); } g.computeVertexNormals(); }
+      return mesh(name, g, m, x, (ya + yb) / 2, z);
+    };
+    // the inlet: the 4-lobed nut on the valve, the pipe bending out of it and down, its collar, sleeve and tap coupling
     {
-      const p = tg.attributes.position, n = tg.attributes.normal;
-      const per = 11;   // radial vertices + 1 per ring
+      const I = RP.inlet, zp = zb - 0.025;
+      const nut = new THREE.Shape(), tips = [[I.nut_w / 2, 0], [0, I.nut_h / 2], [-I.nut_w / 2, 0], [0, -I.nut_h / 2]], tr = 0.0055;
+      tips.forEach(([tx, ty], k) => {
+        const a = (k * Math.PI) / 2, cx = tx - tr * Math.cos(a), cy = ty - tr * Math.sin(a);
+        const s0 = [cx + tr * Math.cos(a - 1.2), cy + tr * Math.sin(a - 1.2)];
+        if (k === 0) nut.moveTo(...s0); else nut.quadraticCurveTo(0.0125 * Math.cos(a - Math.PI / 4), 0.0125 * Math.sin(a - Math.PI / 4), ...s0);
+        nut.absarc(cx, cy, tr, a - 1.2, a + 1.2, false);
+      });
+      const [fx, fy] = [tips[0][0] - tr + tr * Math.cos(-1.2), tr * Math.sin(-1.2)];
+      nut.quadraticCurveTo(0.0125 * Math.cos(-Math.PI / 4), 0.0125 * Math.sin(-Math.PI / 4), fx, fy);
+      const ng = new THREE.ExtrudeGeometry(nut, { depth: 0.009, bevelEnabled: true, bevelSize: 0.0012, bevelThickness: 0.0012, bevelSegments: 1, curveSegments: 3 });
+      cab.add(mesh("InletNut", ng, white, I.x, I.nut, zb - 0.0114));
+      const el = new THREE.CatmullRomCurve3([[I.x, I.nut, zb - 0.006], [I.x, I.nut, zb - 0.016], [I.x, I.nut - 0.006, zp + 0.001], [I.x, I.nut - 0.014, zp], [I.x, I.collar[0], zp]].map((p) => new THREE.Vector3(...p)), false, "centripetal");
+      cab.add(mesh("InletElbow", new THREE.TubeGeometry(el, 24, I.pipe_d / 2, 16, false), white));
+      cab.add(post("InletCollar", I.collar_d, I.collar[0], I.collar[1], white, I.x, zp));
+      cab.add(post("InletPipe", I.pipe_d, I.pipe[0], I.pipe[1], white, I.x, zp));
+      cab.add(post("InletSleeve", I.sleeve_d, I.sleeve[0], I.sleeve[1], white, I.x, zp));
+      cab.add(post("InletRing", I.ring_d, I.ring[0], I.ring[1], white, I.x, zp, 0, 18));
+      cab.add(post("InletNeck", I.neck_d, I.neck[0], I.neck[1], white, I.x, zp));
+      cab.add(post("InletBody", I.body_d, I.body[0], I.body[1], white, I.x, zp, 28));
+      // the coupling's wire clip, on its +x side
+      cab.add(box("InletClip", 0.0025, I.clip[0] - I.clip[1], 0.0025, white, I.x + I.ring_d / 2 + 0.004, (I.clip[0] + I.clip[1]) / 2, zp));
+      cab.add(box("InletClipArm", 0.005, 0.0025, 0.0025, white, I.x + I.ring_d / 2 + 0.0015, I.clip[0] - 0.001, zp));
+    }
+    // the cord, laid on the back as the texture script stacked it where its strands cross, out of its slot at the top
+    const cd = RP.cord_d, C = RP.cord;
+    {
+      const [gx, gy] = RP.grommet;
+      const g = cyl("CordGrommet", 0.0045, 0.0045, 0.004, backBlack, gx, gy, zb - 0.0018, 16);
+      g.rotation.x = Math.PI / 2; cab.add(g);
+      const pts = [new THREE.Vector3(C[0][0], C[0][1] + 0.002, zb + 0.004), ...C.map(([x, y, l]) => new THREE.Vector3(x, y, zb - l))];
+      cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), Math.round(pts.length * 1.4), cd / 2, 6, false), white));
+    }
+    // the plug: a rounded triangle lying on the back, its three pins out, the ribbed sleeve the cord leaves it by
+    {
+      const P = RP.plug, t = P.t, bt = 0.0015, cr = 0.006;
+      const c = P.body.reduce((a, [x, y]) => [a[0] + x / 3, a[1] + y / 3], [0, 0]);
+      // inradius of the photo's triangle, shrunk so the rounded outline (shrunk triangle + a disc of cr) keeps its size
+      const [A, B, Cc] = P.body, ar = Math.abs((B[0] - A[0]) * (Cc[1] - A[1]) - (Cc[0] - A[0]) * (B[1] - A[1])) / 2;
+      const per = [[A, B], [B, Cc], [Cc, A]].reduce((s, [p, q]) => s + Math.hypot(q[0] - p[0], q[1] - p[1]), 0);
+      const rho = (2 * ar) / per, k = (rho - cr) / rho;
+      const V = P.body.map(([x, y]) => [c[0] + (x - c[0]) * k - c[0], c[1] + (y - c[1]) * k - c[1]]);
+      const sh = new THREE.Shape();
+      for (let i = 0; i < 30; i++) {
+        const a = (i / 30) * 2 * Math.PI, n = [Math.cos(a), Math.sin(a)];
+        const v = V.reduce((b, p) => (p[0] * n[0] + p[1] * n[1] > b[0] * n[0] + b[1] * n[1] ? p : b));
+        i ? sh.lineTo(v[0] + cr * n[0], v[1] + cr * n[1]) : sh.moveTo(v[0] + cr * n[0], v[1] + cr * n[1]);
+      }
+      const pg = new THREE.ExtrudeGeometry(sh, { depth: t - 2 * bt, bevelEnabled: true, bevelSize: bt, bevelThickness: bt, bevelSegments: 1, curveSegments: 4 });
+      cab.add(mesh("Plug", pg, white, c[0], c[1], zb - 0.0006 - t + bt));
+      for (const [x, y] of P.pins) {
+        const pin = cyl("PlugPin", P.pin_d / 2, P.pin_d / 2, 0.019, pinM, x, y, zb - 0.0006 - t - 0.0095, 12);
+        pin.rotation.x = Math.PI / 2; cab.add(pin);
+      }
+      const [[sx0, sy0], [sx1, sy1]] = P.sleeve, za = zb - 0.0006 - t / 2, zc = zb - C[C.length - 1][2];
+      const a0 = new THREE.Vector3(sx0, sy0, za), a1 = new THREE.Vector3(sx1, sy1, zc), len = a0.distanceTo(a1);
+      const sg = new THREE.CylinderGeometry(0.0062, cd / 2 + 0.0008, len, 14, 12, true);
+      { const p = sg.attributes.position; for (let i = 0; i < p.count; i++) { const ring = Math.round(((p.getY(i) + len / 2) / len) * 12); if (ring % 2 && ring < 11) { p.setX(i, p.getX(i) * 1.18); p.setZ(i, p.getZ(i) * 1.18); } } sg.computeVertexNormals(); }
+      const sl = mesh("CordSleeve", sg, white, (sx0 + sx1) / 2, (sy0 + sy1) / 2, (za + zc) / 2);
+      sl.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), a0.clone().sub(a1).normalize());
+      cab.add(sl);
+    }
+    // the drain hose: its smooth end piece at the top, then corrugated, down the machine's right and into the plinth
+    {
+      const r = RP.hose_d / 2, H0 = RP.hose, zh = zb - r - 0.0025;
+      const last = H0[H0.length - 1];
+      const hp = [...H0.map(([x, y]) => new THREE.Vector3(x, y, zh)), new THREE.Vector3(last[0], last[1] - 0.008, zb + 0.006)];
+      const curve = new THREE.CatmullRomCurve3(hp, false, "centripetal");
+      const N = 170, tg = new THREE.TubeGeometry(curve, N, r, 10, false);
+      const cuffRings = Math.ceil((N * RP.hose_cuff) / curve.getLength());
+      const p = tg.attributes.position, n = tg.attributes.normal, perRing = 11;
       for (let i = 0; i < p.count; i++) {
-        const ringI = Math.floor(i / per);
-        if (ringI < 14) continue;                     // the smooth end piece
-        const s = ringI % 2 ? 0.0024 : -0.0010;
+        const ringI = Math.floor(i / perRing);
+        if (ringI <= cuffRings) continue;                     // the smooth end piece
+        const s = ringI % 2 ? 0.0022 : -0.0009;
         p.setXYZ(i, p.getX(i) + n.getX(i) * s, p.getY(i) + n.getY(i) * s, p.getZ(i) + n.getZ(i) * s);
       }
       tg.computeVertexNormals();
+      cab.add(mesh("DrainHose", tg, hoseM));
+      // the open top end: dark inside
+      const e = cyl("HoseEnd", r - 0.0012, r - 0.0012, 0.001, grooveM, H0[0][0], H0[0][1] - 0.004, zh, 20);
+      cab.add(e);
     }
-    cab.add(mesh("DrainHose", tg, hoseM));
-    cab.add(box("HoseClip", 0.04, 0.02, 0.012, backBlack, K.hose[0][0], K.hose[0][1] - 0.03, zb - 0.006));
   }
   return root;
 }
@@ -418,6 +500,7 @@ export const K31671 = {
   rootName: "Whirlpool31671",
   W: 0.54, H: 1.025, D: 0.58,
   bodyHex: 0x464d56, plinthHex: 0x41474f, innerHex: 0x2c323b,
+  lidOpacity: 0.97,                // near black from above as in front.jpg and three_quarter_dims.jpg; at 0.9 the drum showed through
   footR: 0.017, footH: 0.02, feetX: 0.232, feetXf: [0.045, 0.535],
   plinthTop: 0.067, notchTop: 0.041, notch: 0.17,
   cornerR: 0.012,
@@ -435,18 +518,14 @@ export const K31671 = {
   sideH: 0.69,
   label: { w: 0.09, h: 0.1663, x: 0.17, y: 0.6 },
   back: true,                      // Whirlpool shows this model's back (back.jpg)
-  // the back, as back.jpg shows it (taken from behind, so the photo's left is the machine's right, +x)
-  inlet: { x: -0.035, y: 0.93, coupling: 0.715 },
-  cord: { x: -0.103, y: 0.875, plug: [-0.198, 0.905],
-    path: [[-0.103, 0.86], [-0.108, 0.74], [-0.116, 0.6], [-0.128, 0.53], [-0.142, 0.525], [-0.152, 0.56], [-0.162, 0.66], [-0.178, 0.78], [-0.192, 0.85], [-0.198, 0.878]] },
-  hose: [[0.224, 0.84], [0.224, 0.78], [0.222, 0.6], [0.21, 0.35], [0.18, 0.15], [0.14, 0.05], [0.11, 0.022]],
 };
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
   const ID = "whirlpool-31671";
   const T = `${TEX}/whirlpool_31671`;
-  const root = buildBloomwash(K31671);
+  // the back's paths, measured on back.jpg by tex_whirlpool_31671.py
+  const root = buildBloomwash({ ...K31671, rear: JSON.parse(fs.readFileSync(`${T}/rear_paths.json`, "utf8")) });
   const parts = productParts(PRODUCTS, ID);
   const clips = stateClips(root, parts);
   saveZones(PRODUCTS, ID, root, parts);

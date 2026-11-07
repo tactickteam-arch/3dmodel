@@ -19,6 +19,7 @@ export const K31688 = {
   W: 0.57, H: 1.046, D: 0.607,
   // Graphite: neutral dark grey in every Whirlpool photo of it (sRGB 47-68 under studio light); plinth and well a shade darker
   bodyHex: 0x363638, plinthHex: 0x2a2a2c, innerHex: 0x2b2c2e,
+  lidOpacity: 0.97,                // top_closed.jpg: the glass reads near black from above, the drum only faintly; at 0.9 it showed through
   footR: 0.017, footH: 0.02, feetX: 0.247, feetXf: [0.045, 0.562],
   // front.png at 0.906 mm/px: the plinth band from 20 to 35 mm, its front cut-away 416 mm wide and 5 mm high
   plinthTop: 0.035, notchTop: 0.025, notch: 0.208,

@@ -173,6 +173,8 @@ def put(canvas, m, box, origin, colour, keep="w", align="c"):
     h, w = m.shape
     k = bw / w if keep == "w" else bh / h if keep == "h" else min(bw / w, bh / h)
     nw, nh = max(1, round(w * k)), max(1, round(h * k))
+    if keep == "xy":                # stretched to the box both ways (a measured ink box)
+        nw, nh = max(1, round(bw)), max(1, round(bh))
     mm = cv2.resize(m.astype(np.float32), (nw, nh), interpolation=cv2.INTER_AREA)
     X = bx0 if align == "l" else bx1 - nw if align == "r" else (bx0 + bx1) / 2 - nw / 2
     blend(canvas, mm, round(X), round((by0 + by1) / 2 - nh / 2), colour)
@@ -301,8 +303,10 @@ DIGITS = [("1", (1078.5, 158, 1082, 176.5), False), ("8", (1083, 158, 1093.5, 17
           ("0", (1111.5, 158, 1124, 176.5), True)]
 
 
-# the fascia's black: the photo reads about 40, but the viewer's light lifts a gloss black near 2x, so the texture holds 30
-BASE = 30
+# the fascia's charcoal: IFB's photo reads 44 (median of print-free columns on the panel; 0.17 of white), a little darker than
+# the Executive Plus's 49. Under the page's light (studio.hdr, exposure 1.05) this gloss black renders at about its texture
+# value, so the texture holds 44 (look pass 5 Nov 2026; it held 30 for the older neutral light, which lifted it about 2x).
+BASE = 44
 
 
 def panel():
@@ -391,6 +395,67 @@ LOGO = (816.0, 155.0, 860.5, 171.5)                # IFB's mark (photo ink box)
 GRIP = (743.5, 183.5, 932.5, 229.5)                # the grip pocket, its chrome lip along the top (rows 183-191)
 LIP_BOT = 191.0
 PRINT = (747.0, 235.0, 825.0, 248.5)               # [Ai] [eco] ECO INVERTER
+# IFB's drawer photo (photo 7) lined up on the front photo with cv2.findTransformECC (affine, look pass 5 Nov 2026) gives the
+# print's boxes in front px. The mark drawn before (an arc over a small leaf) inked 9.4 x 10.0 px (7.0 x 7.4 mm); IFB's
+# inks 10.9 x 11.9 px (8.1 x 8.9 mm), its leaf filling the lower half:
+ECO_ICON = (748.0, 235.17, 759.5, 246.93)          # the eco mark (ECO_FRAME fitted by correlation, 0.81)
+ECO_TEXT = (759.5, 242.0, 802.5, 247.0)            # ECO INVERTER's ink box
+DIN = "/System/Library/Fonts/Supplemental/DIN Alternate Bold.ttf"   # ECO INVERTER: square C and O, upright (I stems within 2 deg)
+PRINT_GREY = (205, 205, 205)
+# IFB's eco mark (the same on the Executive Plus), traced on IFB's lined-up drawer photos: a drop outline with a leaf in its
+# lower left and two bubbles at its right. Units are px of the 6 x lined-up crop; ECO_FRAME is the mark's frame in them.
+ECO_FRAME = (23.0, 18.0, 92.0, 90.0)
+
+
+def tbox(box, org, pad=0.0):
+    x0, y0, x1, y1 = [(v - o) * K for v, o in zip(box, org * 2)]
+    return int(x0 - pad * K), int(y0 - pad * K), int(np.ceil(x1 + pad * K)), int(np.ceil(y1 + pad * K))
+
+
+def vec(can, org, box, colour, fn, ss=8):
+    """Vector marks drawn by fn(d, P, W) in front-photo px (P maps a point, W a width), at ss x, then blended on."""
+    X0, Y0, X1, Y1 = tbox(box, org, 1.0)
+    im = Image.new("L", ((X1 - X0) * ss, (Y1 - Y0) * ss), 0)
+    fn(ImageDraw.Draw(im), lambda x, y: (((x - org[0]) * K - X0) * ss, ((y - org[1]) * K - Y0) * ss), lambda w: w * K * ss)
+    m = cv2.resize(np.asarray(im).astype(np.float32) / 255, (X1 - X0, Y1 - Y0), interpolation=cv2.INTER_AREA)
+    blend(can, m, X0, Y0, colour)
+
+
+def bez(p0, p1, p2, p3, n=40):
+    t = np.linspace(0, 1, n)[:, None]
+    p0, p1, p2, p3 = (np.array(q, float) for q in (p0, p1, p2, p3))
+    return [tuple(q) for q in (1 - t) ** 3 * p0 + 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t ** 2 * p2 + t ** 3 * p3]
+
+
+def stroke(d, pts, w, caps=True):
+    d.line(pts, fill=255, width=max(1, round(w)), joint="curve")
+    if caps:
+        for x, y in (pts[0], pts[-1]):
+            d.ellipse([x - w / 2, y - w / 2, x + w / 2, y + w / 2], fill=255)
+
+
+def eco_mark(box, weight=1.0):
+    """IFB's eco mark fitted into a front-photo box; weight scales the strokes (dark print on light reads thinner in the
+    photo than light print on dark: about 3.9 units against 7 at the arch)."""
+    fx0, fy0, fx1, fy1 = ECO_FRAME
+    sx, sy = (box[2] - box[0]) / (fx1 - fx0), (box[3] - box[1]) / (fy1 - fy0)
+    def fn(d, P, W):
+        Q = lambda pts: [P(box[0] + (x - fx0) * sx, box[1] + (y - fy0) * sy) for x, y in pts]
+        ww = lambda u: W(u * sx * weight)
+        a = np.linspace(-np.pi / 2, 0, 50)
+        stroke(d, Q([(32, 44), (32, 19)] + list(zip(32 + 28.5 * np.cos(a), 70 + 51 * np.sin(a))) + [(60.5, 72)]), ww(5.4))
+        A, T = (26.5, 49.0), (57.0, 87.0)
+        stroke(d, Q(bez(A, (44, 55), (55, 64), T)), ww(4.3))
+        stroke(d, Q([A, (26.5, 66)] + bez((26.5, 66), (28, 74), (42, 82), T)), ww(4.3))
+        stroke(d, Q(bez((37, 60), (37.5, 70), (44, 77), (54, 84))), ww(4.0))
+        for (cx, cy), r, w in (((70, 30.3), 5.4, 4.4), ((79, 56), 7.6, 4.8)):
+            (X, Y), = Q([(cx, cy)])
+            for rr, fill in ((r + w * weight / 2, 255), (r - w * weight / 2, 0)):
+                rx, ry = W(rr * sx), W(rr * sy)
+                d.ellipse([X - rx, Y - ry, X + rx, Y + ry], fill=fill)
+    return fn
+
+
 
 
 def drawer():
@@ -411,18 +476,10 @@ def drawer():
     put(can, logo, LOGO, org, (214, 214, 214), keep="w")
     # the pocket's inside, seen through its opening, is a separate dark part; here the face keeps its tone
     if DRAWER_ICONS == "leaf":
-        # IFB's eco mark: an arc over a leaf, with two small bubbles at its right; then ECO INVERTER (IFB's drawer photo)
-        lf = Image.new("L", (250, 250), 0)
-        dl = ImageDraw.Draw(lf)
-        dl.arc([30, 30, 190, 190], 180, 25, fill=255, width=16)
-        leaf = [(28 + 85 * u + 30 * math.sin(math.pi * u) * sd, 150 + 85 * u - 30 * math.sin(math.pi * u) * sd)
-                for sd, us in ((1, np.linspace(0, 1, 24)), (-1, np.linspace(1, 0, 24))) for u in us]
-        dl.polygon(leaf, outline=255, width=14)
-        dl.line([(40, 162), (100, 222)], fill=255, width=10)
-        dl.ellipse([190, 8, 226, 44], outline=255, width=10)
-        dl.ellipse([204, 96, 240, 132], outline=255, width=10)
-        put(can, np.asarray(lf).astype(np.float32) / 255, (748, 235, 759, 247), org, (205, 205, 205), keep="fit")
-        put(can, text_mask("ECO INVERTER", 80, AVENIR, 5), (759.5, 241.5, 803.5, 247.5), org, (205, 205, 205), keep="w")
+        # IFB's eco mark (the drop, the leaf and two bubbles), drawn again as vectors on IFB's lined-up drawer photo, then
+        # ECO INVERTER in DIN Alternate; both in the print's light grey
+        vec(can, org, ECO_ICON, PRINT_GREY, eco_mark(ECO_ICON, 1.0))
+        put(can, text_mask("ECO INVERTER", 80, DIN), ECO_TEXT, org, PRINT_GREY, keep="xy")
     if DRAWER_ICONS == "ai_eco":
         # [Ai] in a blue rounded box, the eco mark in a light outlined box, then ECO INVERTER (IFB's drawer photo)
         ai = Image.new("L", (200, 200), 0)
@@ -441,6 +498,57 @@ def drawer():
         put(can, np.asarray(eco).astype(np.float32) / 255, (763.5, 236.5, 772, 246.5), org, (205, 205, 205), keep="fit")
         put(can, text_mask("ECO INVERTER", 80, AVENIR, 5), (774.5, 239.5, 825, 247), org, (205, 205, 205), keep="w")
     save(Image.fromarray(np.clip(can, 0, 255).astype(np.uint8)), "drawer.jpg", 90)
+
+
+# ── the mocha front: IFB's colour, with half of the photo's fall in brightness from top to bottom ──
+# Colour: IFB's front photo reads (55, 48, 43) on average over the mocha front, 0.191 of white (its print and background
+# white are 255), R/G 1.157, B/G 0.893. Rendered as a plain paint (metal 0, rough 0.42) under the page's light, this base
+# gives 0.195 of the white card on the web (R/G 1.19, B/G 0.87) and 0.181 in RealityKit (R/G 1.10, B/G 0.93): the web's dark
+# end turns redder and RealityKit's greyer, so the base sits between them (look pass 5 Nov 2026). Metal 0.25 (before)
+# tinted the web's reflections and read redder (R/G 1.20 at 0.24 of white).
+MOCHA = (44, 38, 34)
+FALL = 0.5                                       # the share of the photo's top-to-bottom fall kept; the viewer's light gives the rest
+
+
+def lin(v):
+    v = np.asarray(v, np.float64) / 255
+    return np.where(v <= 0.04045, v / 12.92, ((v + 0.055) / 1.055) ** 2.4)
+
+
+def srgb(v):
+    v = np.clip(v, 0, 1)
+    return 255 * np.where(v <= 0.0031308, v * 12.92, 1.055 * v ** (1 / 2.4) - 0.055)
+
+
+def front_fall():
+    """front.jpg: the mocha front from the chin (top, v 0) to the feet (bottom, v 1). The photo's light is split into a
+    column part (the softbox's bright left and right edges, left out) and a row part, of which FALL is kept."""
+    Y = lin(ph).mean(-1)
+    H, W = Y.shape
+    yy, xx = np.mgrid[0:H, 0:W]
+    body = (ALPHA > 250) & (xx > C0 + 8) & (xx < C1 - 8) & (yy > CHIN_BOT + 4) & (yy < CAB_BOT - 4)
+    body &= np.hypot(xx - dcx, yy - dcy) > RING_OUT * PPM + 8
+    body &= np.hypot(xx - fcx, yy - fcy) > fr + 8
+    low = body & (yy > DOOR_ROW_BOT + 10)
+    col = np.array([np.median(Y[low[:, c], c]) if low[:, c].sum() > 20 else np.nan for c in range(W)])
+    cs = np.isfinite(col)
+    col = np.interp(np.arange(W), np.where(cs)[0], col[cs])
+    col /= np.median(col[C0 + 8:C1 - 8])
+    rows = np.arange(int(CHIN_BOT) + 5, int(CAB_BOT) - 4)
+    prof = np.array([np.median(Y[r, body[r]] / col[body[r]]) for r in rows])
+    weight = np.array([body[r].sum() for r in rows], np.float64)
+    prof = cv2.GaussianBlur(prof.reshape(-1, 1).astype(np.float32), (1, 0), 12).ravel()
+    gain = (prof / np.average(prof, weights=weight)) ** FALL
+    gain /= np.average(gain, weights=weight)
+    # texture rows: v from the chin (y = CHIN_Y) to the floor of the front (y = FEET), through the photo rows
+    th = 512
+    ys = CHIN_Y - (np.arange(th) + 0.5) / th * (CHIN_Y - FEET / 1000)
+    row_of = np.interp(ys[::-1], [my(r) for r in rows[::-1]], rows[::-1])[::-1]
+    g = np.interp(row_of, rows, gain)
+    tex = srgb(lin(MOCHA)[None, :] * g[:, None])
+    img = np.repeat(tex[:, None, :], 8, 1)
+    save(Image.fromarray(np.clip(np.round(img), 0, 255).astype(np.uint8)), "front.jpg", 92)
+    print(f"front fall: top {g[:20].mean():.2f}, middle {g[th // 2]:.2f}, bottom {g[-20:].mean():.2f} of the mean (linear)")
 
 
 # ── generated surfaces: the dial's brushed top, the power button, the drum's holes, the ribbed hose ──
@@ -522,6 +630,7 @@ def open_layout():
 
 panel()
 drawer()
+front_fall()
 knob_top()
 power_button()
 drum()
@@ -543,6 +652,7 @@ L = {
     # the coin slot at the flap's left edge (photo: columns 1214-1236, rows 1081-1107)
     "flap_slot": {"x": mx(1225), "y": my(1094), "w": round(16 / 1000, 4), "h": round(19 / 1000, 4)},
     "feet_x": mx(727) * -1,
+    "mocha": list(MOCHA),
 }
 with open(os.path.join(D, "layout.json"), "w") as f:
     json.dump(L, f, indent=1)

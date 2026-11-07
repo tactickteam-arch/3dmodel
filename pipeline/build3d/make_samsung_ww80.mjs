@@ -64,20 +64,28 @@ const sideL = mat("SideL", 0xffffff, { rough: 0.45 });
 const sideR = mat("SideR", 0xffffff, { rough: 0.45 });
 const rearM = mat("Rear", 0xffffff, { metal: 0.25, rough: 0.5 });
 const panelM = mat("Panel", 0xffffff, { rough: 0.38 });
-const glassFace = mat("PanelGlass", 0xffffff, { metal: 0.75, rough: 0.3 });
+// the display glass and the dial cap are gloss black: metal 0.85 over the near-black print keeps the face dark, and roughness 0.42
+// spreads the viewer's bright lights instead of mirroring them grey. Look pass 5 Nov 2026, display as a share of the label white
+// (Samsung's front photo 0.117, its dark glass 0.089): gate light 0.158 (was 0.40), page light 0.044 (was 0.027)
+const glassFace = mat("PanelGlass", 0xffffff, { metal: 0.85, rough: 0.42 });
 const bodyDark = mat("BodyDark", 0x2c2d30, { rough: 0.45 });
 const topM = mat("TopPlate", 0x2e2f32, { rough: 0.7 });
 const flapM = mat("FlapFace", 0x2c2d30, { rough: 0.45 });
 const dark = mat("Dark", 0x0b0c0d, { rough: 0.8 });
 const trayM = mat("Tray", 0xffffff, { rough: 0.5 });
 const trayWall = mat("TrayWall", 0xdfe2e6, { rough: 0.5 });
-const knobCap = mat("KnobCap", 0x0c0d0f, { metal: 0.7, rough: 0.18 });
+const knobCap = mat("KnobCap", 0x0c0d0f, { metal: 0.85, rough: 0.42 });   // photo 0.074; 0.054 page light, 0.154 gate light
 const chrome = mat("Chrome", 0xd0d3d8, { metal: 1, rough: 0.12 });
-const doorBlack = mat("DoorBlack", 0x0a0b0c, { metal: 0.25, rough: 0.12 });   // the "Carved Door (Black)": glossy black
-const glass = mat("DoorGlass", 0x1c2126, { rough: 0.04, opacity: 0.07, side: THREE.DoubleSide });
-const bowl = mat("GlassBowl", 0x23282d, { rough: 0.05, opacity: 0.08, side: THREE.DoubleSide });
+const doorBlack = mat("DoorBlack", 0x0a0b0c, { metal: 0.25, rough: 0.22 });   // the "Carved Door (Black)": glossy black, its sheen
+// soft (front photo: the ring reads 0.087 of the label white; 0.094 here under the page light, was 0.041 at rough 0.12)
+// the door glass and its bowl: a blended surface scales its own reflection by its opacity, so a 7-8 % dielectric showed no glass at
+// all. As a metal it is only reflection: 1 - opacity of the drum shows through (the tint) and opacity x the base colour comes back as
+// the bowl's curved highlights, as in Samsung's front photo (window 0.547 of the label white under the page light, 0.458 in
+// RealityKit; photo 0.549)
+const glass = mat("DoorGlass", 0x96989b, { metal: 1, rough: 0.03, opacity: 0.15, side: THREE.DoubleSide });
+const bowl = mat("GlassBowl", 0xb4b6b9, { metal: 1, rough: 0.05, opacity: 0.25, side: THREE.DoubleSide });
 const doorIn = mat("DoorInner", 0x56585c, { rough: 0.45 });    // the door's inner frame: mid grey (3/4 open photo)
-const gasket = mat("Gasket", 0x8a8d91, { rough: 0.85 });         // light grey in the open-door photos
+const gasket = mat("Gasket", 0x5c5f63, { rough: 0.85 });         // mid grey in the open-door photos (the lip reads ~95 sRGB)
 const drumM = mat("Drum", 0xffffff, { metal: 0.6, rough: 0.3 });
 const steel = mat("Steel", 0xb9bcc1, { metal: 0.9, rough: 0.25 });
 const footBase = mat("FootBase", 0x161718, { rough: 0.7 });
@@ -138,7 +146,25 @@ cab.add(mesh("SideLeft", flipV(new THREE.BoxGeometry(t, sideH, sideD)), [dark, s
 cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(t, sideH, sideD)), [sideR, dark, dark, dark, bodyDark, dark], W / 2 - t / 2, sideY0 + sideH / 2, (sideZ0 + sideZ1) / 2));
 { // the worktop: a 10 mm slab over the full 600 x 550 mm, with 27 mm skirts down the sides and the back (the side photo's 36 mm
   // band, the rear photo's 39 mm); no skirt at the front, where the strip stands under the slab's edge
-  const parts = [new THREE.BoxGeometry(W, 0.01, D).translate(0, H - 0.005, 0),
+  // The slab's top is not flat (panel.png from above, 3/4 photo): an 18 mm rim runs round all four edges, then a narrow slope
+  // (about 9 mm, darker in the photo) steps down to the field; the outer edge is rounded. Widths measured on panel.png (rim
+  // 18.2-18.6 mm, field from 27.5-27.9 mm, at two depths); the 1.5 mm step and the 2 mm edge radius are ESTIMATED (no photo
+  // shows them edge-on). Each side is its own strip, so the corners and the rim's inner edge stay crisp.
+  const rimW = 0.0185, fieldIn = 0.0277, drop = 0.0015, rr = 0.002;
+  const arc = [0, 1, 2, 3, 4].map((i) => { const a = (i / 4) * Math.PI / 2; return [rr - rr * Math.cos(a), H - rr + rr * Math.sin(a)]; });
+  const profiles = [[[0, H - 0.01], ...arc, [rimW, H]], [[rimW, H], [fieldIn, H - drop]]];
+  const sides = [(s) => [[-W / 2 + s, zF - s], [W / 2 - s, zF - s]], (s) => [[W / 2 - s, zF - s], [W / 2 - s, zB + s]],
+    (s) => [[W / 2 - s, zB + s], [-W / 2 + s, zB + s]], (s) => [[-W / 2 + s, zB + s], [-W / 2 + s, zF - s]]];
+  const strip = (side, prof) => {
+    const pos = [], uv = [], idx = [];
+    for (const [s, y] of prof) for (const [x, z] of side(s)) { pos.push(x, y, z); uv.push((x + W / 2) / W, (z - zB) / D); }
+    for (let k = 0; k < prof.length - 1; k++) { const a0 = 2 * k, b0 = a0 + 1, a1 = a0 + 2, b1 = a0 + 3; idx.push(a0, b0, b1, a0, b1, a1); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx); g.computeVertexNormals(); return g;
+  };
+  const field = new THREE.PlaneGeometry(W - 2 * fieldIn, D - 2 * fieldIn).rotateX(-Math.PI / 2).translate(0, H - drop, (zF + zB) / 2);
+  const parts = [...sides.flatMap((sd) => profiles.map((pr) => strip(sd, pr))), field,
     new THREE.BoxGeometry(0.006, 0.0265, D - 0.001).translate(-W / 2 + 0.003, 0.8265, -0.0005),
     new THREE.BoxGeometry(0.006, 0.0265, D - 0.001).translate(W / 2 - 0.003, 0.8265, -0.0005),
     new THREE.BoxGeometry(W - 0.013, 0.0265, 0.006).translate(0, 0.8265, zB + 0.003)];
@@ -313,15 +339,17 @@ cab.add(mesh("ButtonFaces", mergeGeometries([raised(L.power, 0.008, 0.0022, 0.00
 const dx0 = -W / 2 + 0.0005, dx1 = seam - 0.0005;
 const pk = L.pocket, lipY = pk.y1;
 const smooth = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+// the pocket's ends are steep walls in the 3/4 photos (crisp, not a long ramp): 8 mm, ESTIMATED from three_quarter.png
+const pkRamp = 0.008;
 const pocketDepth = (x, y) => {
-  const fx = smooth((x - pk.x0) / 0.04) * smooth((pk.x1 - x) / 0.04);
+  const fx = smooth((x - pk.x0) / pkRamp) * smooth((pk.x1 - x) / pkRamp);
   const fy = y > lipY ? 0 : y > lipY - 0.0007 ? 1 - (y - (lipY - 0.0007)) / 0.0007 : smooth((y - pk.y0) / (lipY - 0.0007 - pk.y0));
   return 0.014 * fx * fy;                                    // 14 mm deep under its lip: ESTIMATED from the 3/4 photos
 };
 const drawer = group("Drawer", 0, 0, 0);
 {
   const rows = uniq([...stripRows, ...range(pk.y0, lipY - 0.0007, 18), lipY - 0.0007, lipY, lipY + 0.001]);
-  const cols = uniq([...range(dx0, dx1, 20), ...range(pk.x0, pk.x0 + 0.04, 8), ...range(pk.x1 - 0.04, pk.x1, 8)]);
+  const cols = uniq([...range(dx0, dx1, 20), ...range(pk.x0, pk.x0 + pkRamp, 6), ...range(pk.x1 - pkRamp, pk.x1, 6)]);
   drawer.add(grid("DrawerFace", rows.length, cols.length, (i, j) => [cols[j], rows[i], stripZ(rows[i]) - pocketDepth(cols[j], rows[i])], panelUV, panelM));
   // the face's rim: 12 mm deep round its four edges
   const yr = stripRows, dep = 0.012;

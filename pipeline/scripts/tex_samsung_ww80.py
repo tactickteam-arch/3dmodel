@@ -194,7 +194,8 @@ START_REC = (238.8, 752.6, 261.9, 793.6)
 SEAM = -75.5                                          # the drawer's right edge (the groove between the drawer and the controls)
 DRAWER_TEXT = (-266.0, 780.5, -112.0, 794.0)          # the photo's "Ecobubble ... 8kg" (rectified mm)
 LOGO = (-262.2, 815.15, -194.8, 825.0)                # the photo's SAMSUNG
-POCKET = (-255.0, 744.0, -105.0, 778.5)               # the grip pocket under the drawer's print (rectified mm)
+POCKET = (-266.0, 744.0, -104.0, 778.5)               # the grip pocket under the drawer's print (rectified mm); x from panel.png,
+                                                      # where the face starts to darken (-266, -104), look pass 5 Nov 2026
 
 
 def tbox(b):                                          # rectified (x0, h0, x1, h1) -> texture px (x0, y0, x1, y1)

@@ -43,7 +43,9 @@ const PIV = [0.95, 0.445];                          // the lid's hinge axis: hei
 
 // ── materials ──
 const bodyM = mat("Body", 0x323232, { rough: 0.34, metal: 0.1 });               // Middle Black: sRGB (40-54) in LG's photos
-const coverM = mat("TopCover", 0x0c0c0d, { rough: 0.22 });          // gloss black, the panel print's own background
+// gloss black, the panel print's own background. Metal 0.6 and roughness 0.45 (look pass 5 Nov 2026): as a plain gloss dielectric
+// it mirrored the viewer's back light (rear band 0.55 of the label white in the default view; LG's photos 0.25, 0.09 from above)
+const coverM = mat("TopCover", 0x0c0c0d, { metal: 0.6, rough: 0.45 });
 const plinthM = mat("Plinth", 0x525254, { rough: 0.7 });
 const footM = mat("Foot", 0x4a4a4c, { rough: 0.7 });
 const backM = mat("BackPanel", 0xffffff, { rough: 0.55, metal: 0.2 });
@@ -51,8 +53,13 @@ const labelM = mat("LabelBEE", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const panelM = mat("PanelFace", 0xffffff, { rough: 0.16 });
 const chromeM = mat("Chrome", 0xc9cbce, { metal: 0.9, rough: 0.22 });
 const capM = mat("BlackCap", 0x0a0a0b, { rough: 0.2 });
-const lidM = mat("LidTop", 0x0b0b0c, { rough: 0.1 });
-const glassM = mat("LidGlass", 0x060607, { rough: 0.14, opacity: 0.9, side: THREE.DoubleSide });  // LG's photos show the drum through it, dimly
+// The lid is seen at a grazing angle in every 3/4 view, where a gloss dielectric reflects ~10 % of whatever is behind the machine:
+// the gate's bright room made it read silver (0.99 of the label white), the page's rim light 0.54 (LG's photo 0.22). Metal 1 over
+// near-black keeps its face dark and rough 0.5 spreads the lights: 0.18 under the page light, 0.37 in the gate light, 0.42 in
+// RealityKit under the page's studio.hdr (was 0.83), look pass 5 Nov 2026. Rougher matches RealityKit (0.75: 0.22) but leaves the page
+// light's lid near black (0.07), so 0.5 is the middle.
+const lidM = mat("LidTop", 0x0b0b0c, { metal: 1, rough: 0.5 });
+const glassM = mat("LidGlass", 0x060607, { metal: 1, rough: 0.5, opacity: 0.9, side: THREE.DoubleSide });  // LG's photos show the drum through it, dimly
 const handleM = mat("HandleFrame", 0x8c8a86, { rough: 0.35, metal: 0.3 });   // silver-grey, sRGB 125-150 in LG's side photo
 const pocketM = mat("HandlePocket", 0x262627, { rough: 0.6 });
 const wellM = mat("WellGrey", 0x3a3b3e, { rough: 0.45, side: THREE.DoubleSide });
@@ -376,20 +383,25 @@ const lid = group("Lid", 0, PIV[0], xz(PIV[1]));
   const bot = (x, xf) => coverTop(xf) + 0.002;
   // the back edge rounds down to 958 mm, into the notch in front of the rear band, so it clears the band as it turns
   // the frame is flat on top, its back edge sloping down; the chrome handle in front of it curves down to the panel
-  const top = (x, xf) => Math.min(H, 0.958 + (LB - xf) * 1.5);
-  const lipTop = (x, xf) => { const b = bot(x, xf) + 0.012, t = Math.min(1, Math.max(0, (xf - bCurve(x) - 0.002) / 0.008)); return b + (H - b) * Math.sqrt(t); };
-  const lip = shapeOf(across((x) => bCurve(x) + 0.002, -LX, LX));
-  across((x) => bCurve(x) + 0.01, LX, -LX).forEach((p) => lip.lineTo(p.x, p.y));
-  const lm = prism("LidHandle", lip, bot, lipTop, chromeM, { bev: 0.0015, segs: 1 });
-  const fr = shapeOf(across((x) => bCurve(x) + 0.01, -LX, LX));
+  // LG's side photos (look pass 5 Nov 2026): the lid's top falls from 964 mm at the back to 955 mm at the front; the chrome nose
+  // stands above it at 965 mm. The top photo: the chrome is a crescent, 36 mm deep at the middle, its back edge 0.125 + 0.10 x^2
+  // from the front, narrowing to 10 mm at the ends.
+  const top = (x, xf) => Math.min(0.955 + (xf - 0.16) * 0.0316, 0.958 + (LB - xf) * 1.5);
+  const cBack = (x) => Math.max(bCurve(x) + 0.01, 0.125 + 0.1 * x * x), nose = (x) => (bCurve(x) + 0.002 + cBack(x)) / 2;
+  const rise = (x, xf) => { const b = bot(x, xf) + 0.012, t = Math.min(1, Math.max(0, (xf - bCurve(x) - 0.002) / (nose(x) - bCurve(x) - 0.002))); return b + (H - b) * t; };
+  const fall = (x, xf) => { const t = Math.min(1, Math.max(0, (xf - nose(x)) / (cBack(x) - nose(x)))); return H + (top(x, cBack(x)) - H) * t; };
+  const band = (f0, f1) => { const sh = shapeOf(across(f0, -LX, LX)); across(f1, LX, -LX).forEach((p) => sh.lineTo(p.x, p.y)); return sh; };
+  const lm = prism("LidHandle", band((x) => bCurve(x) + 0.002, nose), bot, rise, chromeM, { bev: 0.0015, segs: 1 });
+  const lm2 = prism("LidHandleRear", band(nose, cBack), bot, fall, chromeM, { bev: 0.0015, segs: 1 });
+  const fr = shapeOf(across(cBack, -LX, LX));
   fr.lineTo(LX, LB - 0.012 - zF); fr.absarc(LX - 0.012, LB - 0.012 - zF, 0.012, 0, Math.PI / 2, false);
   fr.lineTo(-LX + 0.012, LB - zF); fr.absarc(-LX + 0.012, LB - 0.012 - zF, 0.012, Math.PI / 2, Math.PI, false);
   fr.closePath();
   fr.holes.push(roundRect(new THREE.Path(), -0.25, 0.25, 0.159, 0.41, 0.03, 0.03));
   const fm = prism("LidFrame", dense(fr, 0.03), bot, top, lidM, { bev: 0.0025, segs: 1 });
-  const pane = mesh("LidWindow", new THREE.PlaneGeometry(0.5, 0.251), glassM, 0, H - 0.0006, xz(0.2845));
-  pane.rotation.x = -Math.PI / 2;
-  for (const m of [lm, fm, pane]) { m.position.y -= PIV[0]; m.position.z -= xz(PIV[1]); lid.add(m); }
+  const pane = mesh("LidWindow", new THREE.PlaneGeometry(0.5, 0.251), glassM, 0, top(0, 0.2845) - 0.0006, xz(0.2845));
+  pane.rotation.x = -Math.PI / 2 + Math.atan(0.0316);                  // follows the frame's slope
+  for (const m of [lm, lm2, fm, pane]) { m.position.y -= PIV[0]; m.position.z -= xz(PIV[1]); lid.add(m); }
 }
 root.add(lid);
 
