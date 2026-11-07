@@ -2076,6 +2076,319 @@
       }
     },
     {
+      "id": "lg-gl-b257jds3",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GL-B257JDS3",
+      "name": "LG 650 L side-by-side refrigerator with Smart Inverter Compressor",
+      "shortName": "650 L side-by-side refrigerator",
+      "summary": "Open the freezer and its drawer, open the fridge and take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-gl-b257jds3.glb",
+      "thumb": "/photos/lg-gl-b257jds3/0.jpg",
+      "photos": [
+        "/photos/lg-gl-b257jds3/0.jpg",
+        "/photos/lg-gl-b257jds3/1.jpg",
+        "/photos/lg-gl-b257jds3/2.jpg",
+        "/photos/lg-gl-b257jds3/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Dazzle Steel",
+          "swatchColor": "#6e6f73",
+          "usdz": "/models/usdz/lg-gl-b257jds3-dazzle-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -133,
+          "zone": {
+            "closed": [
+              [
+                -0.456,
+                0.022,
+                0.144
+              ],
+              [
+                -0.065,
+                1.79,
+                0.368
+              ]
+            ],
+            "open": [
+              [
+                -0.775,
+                0.022,
+                0.248
+              ],
+              [
+                -0.38,
+                1.79,
+                0.645
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezerDrawer",
+          "label": "freezer drawer",
+          "node": "FreezerDrawer",
+          "slide": [
+            0,
+            0,
+            0.26
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.408,
+                0.106,
+                -0.282
+              ],
+              [
+                -0.107,
+                0.395,
+                0.137
+              ]
+            ],
+            "open": [
+              [
+                -0.408,
+                0.106,
+                -0.022
+              ],
+              [
+                -0.107,
+                0.395,
+                0.397
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 133,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.06,
+                0.022,
+                0.134
+              ],
+              [
+                0.456,
+                1.79,
+                0.368
+              ]
+            ],
+            "open": [
+              [
+                0.373,
+                0.022,
+                0.248
+              ],
+              [
+                0.86,
+                1.79,
+                0.736
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.27
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.037,
+                0.104,
+                -0.282
+              ],
+              [
+                0.41,
+                1.55,
+                0.127
+              ]
+            ],
+            "open": [
+              [
+                -0.037,
+                0.104,
+                -0.012
+              ],
+              [
+                0.41,
+                1.55,
+                0.397
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "91.3 cm",
+        "h": "179 cm",
+        "d": "73.5 cm"
+      },
+      "sizeNote": "With both doors open, LG's manual gives 163.5 cm across and 118 cm deep",
+      "specs": [
+        [
+          "Total capacity",
+          "650 L (freezer 234 L, fridge 416 L)"
+        ],
+        [
+          "Type",
+          "Side by side"
+        ],
+        [
+          "Convertible",
+          "Yes, turn the freezer into a fridge"
+        ],
+        [
+          "Energy rating",
+          "3 star, 552 units a year"
+        ],
+        [
+          "Compressor",
+          "Smart Inverter (BLDC), 10 years on the compressor (part only)"
+        ],
+        [
+          "Cooling",
+          "Multi Air Flow, Multi Digital Sensors"
+        ],
+        [
+          "Shelves",
+          "3 tempered glass in the fridge, 3 in the freezer"
+        ],
+        [
+          "Drawers",
+          "2 vegetable boxes in the fridge, 1 transparent drawer in the freezer"
+        ],
+        [
+          "Door baskets",
+          "4 in the freezer, 4 in the fridge, transparent"
+        ],
+        [
+          "Control",
+          "Internal LED display, Express Freeze, door alarm"
+        ],
+        [
+          "Door",
+          "PET, Dazzle Steel, horizontal pocket handle"
+        ],
+        [
+          "Light",
+          "Top LED in the fridge and the freezer"
+        ],
+        [
+          "Smart",
+          "Smart Diagnosis, Auto Smart Connect"
+        ],
+        [
+          "Plumbing",
+          "None needed"
+        ],
+        [
+          "Weight",
+          "100 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-650l-side-by-side-refrigerator-convertible-multi-air-flow-smart-diagnosis-dazzle-steel-3-star-gl-b257jds3/19386",
+      "source": "https://www.lg.com/in/refrigerators/side-by-side-refrigerators/gl-b257jds3/",
+      "hotspots": [
+        {
+          "title": "Convertible",
+          "text": "Creating more space in your refrigerator is now easier than ever. Turn your Freezer into Fridge with LG Side-By-Side Convertible Refrigerator.",
+          "pos": [
+            -0.2575,
+            1.56,
+            -0.2925
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Multiple cooling air vents distribute and circulate cool air to every corner of the refrigerator, ensuring that each and every food item is properly cooled.",
+          "pos": [
+            0.1865,
+            1.56,
+            -0.2925
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Cutting edge Smart Inverter Compressor technology that takes energy efficiency to another level and helps you save more. It comes with 10 year warranty and provides super silent operation.",
+          "pos": [
+            0.2,
+            0.5,
+            0.3675
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Auto Smart Connect",
+          "text": "Once the refrigerator is connected to the home inverter, every time the power goes off it automatically takes inverter power to run the refrigerator without any manual supervision.",
+          "pos": [
+            -0.26,
+            1.2,
+            0.3675
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        }
+      ],
+      "fit": {
+        "front": 44.5,
+        "back": 5,
+        "note": "From LG's owner's manual: allow over 5 cm between the back and the wall. The manual gives 118 cm of depth with the doors open, which is 44.5 cm in front of the fridge, and 163.5 cm across with both doors open."
+      }
+    },
+    {
       "id": "lg-fhp1412z9b",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",
