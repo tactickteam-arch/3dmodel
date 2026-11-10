@@ -394,7 +394,8 @@ if (await enter("btnAR", "ar")) {
   check(!info.hallVisible, "the hall is hidden: the room shows through");
   const seen = new Set();
   for (let k = 0; k < info.sets.length; k++) {
-    if (k > 0) {
+    // passthrough opens on the ring holding the product in focus, which need not be the first
+    if ((await xi()).set !== k) {
       await aim(await xs(`menuButton("set:${k}")`));
       await trigger();
       await sleep(600);
@@ -408,7 +409,7 @@ if (await enter("btnAR", "ar")) {
     const walls = vis.filter((s) => byId.get(s.id).placement === "wall");
     const arc = vis.reduce((t, s) => t + sz(byId.get(s.id)).w + 0.45, 0);
     check(info.set === k && vis.every((s) => byId.get(s.id).category === cat) && ring.every((r, i) => (walls.some((w) => w.id === vis[i].id) ? r > 2 && r < 2.7 : Math.abs(r - 2.4) < 0.05)) && facingYou && arc <= 2 * Math.PI * 2.4 * 0.9 + 0.01,
-      `"${info.sets[k]}": ${vis.length} ${cat} in a ring ${Math.min(...ring).toFixed(2)}-${Math.max(...ring).toFixed(2)} m round you, all facing you`);
+      `"${info.sets[k]}": ${vis.length} ${cat} in a ring ${Math.min(...ring).toFixed(2)}-${Math.max(...ring).toFixed(2)} m round you, all facing you (set ${info.set} of ${info.sets.length}, arc ${arc.toFixed(2)} of ${(2 * Math.PI * 2.4 * 0.9).toFixed(2)} m, categories ${[...new Set(vis.map((s) => byId.get(s.id).category))].join("/")}, facing ${facingYou})`);
     if (walls.length) check(walls.every((s) => Math.abs(s.center[1] - 2.05) < 0.02), `its air conditioners hang at 2.05 m (${walls.map((s) => s.center[1]).join(", ")})`);
     if (k === 0) {
       // a door on the one most in front of you
