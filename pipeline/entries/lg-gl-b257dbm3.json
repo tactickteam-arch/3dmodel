@@ -1,0 +1,176 @@
+{
+  "products": [
+    {
+      "id": "lg-gl-b257dbm3",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GL-B257DBM3",
+      "name": "LG 650 L side-by-side refrigerator with glass doors, Wi-Fi Convertible and DoorCooling+",
+      "shortName": "650 L side-by-side refrigerator, glass doors",
+      "summary": "Open the freezer and slide out its two drawers, open the fridge and take the trays out, find the ice maker on the freezer door, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-gl-b257dbm3.glb",
+      "thumb": "/photos/lg-gl-b257dbm3/0.jpg",
+      "photos": ["/photos/lg-gl-b257dbm3/0.jpg", "/photos/lg-gl-b257dbm3/1.jpg", "/photos/lg-gl-b257dbm3/2.jpg", "/photos/lg-gl-b257dbm3/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-20deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Black Mirror",
+          "swatchColor": "#1b1b1d",
+          "usdz": "/models/usdz/lg-gl-b257dbm3-black-mirror.usdz",
+          "variant": "Black Mirror",
+          "code": "GL-B257DBM3"
+        },
+        {
+          "name": "Linen White",
+          "swatchColor": "#e4e4e7",
+          "usdz": "/models/usdz/lg-gl-b257dbm3-linen-white.usdz",
+          "variant": "Linen White",
+          "code": "GL-B257DLW3"
+        },
+        {
+          "name": "Linen Brown",
+          "swatchColor": "#2f231e",
+          "usdz": "/models/usdz/lg-gl-b257dbm3-linen-brown.usdz",
+          "variant": "Linen Brown",
+          "code": "GL-B257DLN3"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -133,
+          "zone": {
+            "closed": [
+              [-0.456, 0.022, 0.132],
+              [-0.065, 1.79, 0.368]
+            ],
+            "open": [
+              [-0.775, 0.022, 0.248],
+              [-0.38, 1.79, 0.645]
+            ]
+          }
+        },
+        {
+          "key": "freezerDrawer",
+          "label": "freezer drawers",
+          "node": "FreezerDrawer",
+          "slide": [0, 0, 0.26],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.408, 0.108, -0.282],
+              [-0.107, 0.626, 0.137]
+            ],
+            "open": [
+              [-0.408, 0.108, -0.022],
+              [-0.107, 0.626, 0.397]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 133,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.06, 0.022, 0.134],
+              [0.456, 1.79, 0.368]
+            ],
+            "open": [
+              [0.373, 0.022, 0.248],
+              [0.86, 1.79, 0.736]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.27],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.037, 0.104, -0.282],
+              [0.41, 1.55, 0.127]
+            ],
+            "open": [
+              [-0.037, 0.104, -0.012],
+              [0.41, 1.55, 0.397]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "91.3 cm",
+        "h": "179 cm",
+        "d": "73.5 cm"
+      },
+      "sizeNote": "With both doors open, LG's manual gives 163.5 cm across and 118 cm deep",
+      "specs": [
+        ["Total capacity", "650 L (freezer 234 L, fridge 416 L)"],
+        ["Type", "Side by side"],
+        ["Convertible", "Wi-Fi Convertible: turn the freezer into a fridge, from the ThinQ app too"],
+        ["Energy rating", "3 star, 546 units a year"],
+        ["Compressor", "Smart Inverter (BLDC); 1 year on the product, 9 more years on the compressor"],
+        ["Cooling", "DoorCooling+, Multi Air Flow, Hygiene Fresh+ filter"],
+        ["Shelves", "3 tempered glass in the fridge, 3 in the freezer"],
+        ["Drawers", "2 vegetable boxes in the fridge, 2 non-transparent drawers in the freezer"],
+        ["Door baskets", "4 in the freezer, 4 in the fridge, transparent"],
+        ["Ice", "Easy-Fill Ice Maker on the freezer door (1 lever, 2 trays); no plumbing needed"],
+        ["Wine rack", "Holds up to 4 bottles"],
+        ["Control", "Internal LED display, Express Freeze, door alarm"],
+        ["Door", "Glass, horizontal pocket handle: Black Mirror, Linen White or Linen Brown"],
+        ["Light", "Top LED in the fridge and the freezer"],
+        ["Smart", "ThinQ (Wi-Fi), Smart Diagnosis"],
+        ["Weight", "113 kg"]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/side-by-side-refrigerators/gl-b257dbm3/",
+      "hotspots": [
+        {
+          "title": "Wi-Fi Convertible",
+          "text": "No matter where you are, now enjoy the convenience of controlling your refrigerator's mode from anywhere with LG Side by Side Wi-Fi Convertible Refrigerators.",
+          "pos": [-0.2575, 1.56, -0.2928],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Hygiene Fresh+",
+          "text": "Up to 99.99% reduction in activity of bacteria: keep your food items fresher in a cleaner environment.",
+          "pos": [0.1865, 1.56, -0.2748],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "DoorCooling+",
+          "text": "Delivers faster, more even cooling to areas where cold air is easily lost, helping keep food fresher for longer.",
+          "pos": [0.1865, 1.706, 0.185],
+          "normal": [0, -1, 0],
+          "show": "fridge"
+        },
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Cutting edge Smart Inverter Compressor technology that takes energy efficiency to another level and helps you save more. It comes with 10 year warranty and provides super silent operation.",
+          "pos": [0.2, 0.5, 0.3675],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ],
+      "fit": {
+        "front": 44.5,
+        "back": 5,
+        "note": "From LG's owner's manual: allow over 5 cm between the back and the wall. The manual gives 118 cm of depth with the doors open, which is 44.5 cm in front of the fridge, and 163.5 cm across with both doors open."
+      }
+    }
+  ]
+}
