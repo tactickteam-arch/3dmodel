@@ -1,0 +1,230 @@
+{
+  "products": [
+    {
+      "id": "samsung-rr21h2h25brhl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RR21H2H25BR",
+      "name": "Samsung 189 L single-door refrigerator with Base Stand Drawer, Digital Inverter Compressor",
+      "shortName": "189 L single-door refrigerator",
+      "summary": "Open the door and the freezer box, slide out the trays and the base drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/samsung-rr21h2h25brhl.glb",
+      "thumb": "/photos/samsung-rr21h2h25brhl/0.jpg",
+      "photos": ["/photos/samsung-rr21h2h25brhl/0.jpg", "/photos/samsung-rr21h2h25brhl/1.jpg", "/photos/samsung-rr21h2h25brhl/2.jpg", "/photos/samsung-rr21h2h25brhl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Begonia Red",
+          "swatchColor": "#834940",
+          "variant": "Begonia Red",
+          "code": "RR21H2H25BR",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-begonia-red.usdz"
+        },
+        {
+          "name": "Begonia Blue",
+          "swatchColor": "#5c475a",
+          "variant": "Begonia Blue",
+          "code": "RR21H2H25BB",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-begonia-blue.usdz"
+        },
+        {
+          "name": "Camellia Purple",
+          "swatchColor": "#401a49",
+          "variant": "Camellia Purple",
+          "code": "RR21H2H25CR",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-camellia-purple.usdz"
+        },
+        {
+          "name": "Camelia Blue",
+          "swatchColor": "#1a3362",
+          "variant": "Camelia Blue",
+          "code": "RR21H2H25CU",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-camelia-blue.usdz"
+        },
+        {
+          "name": "Paradise Bloom Blue",
+          "swatchColor": "#154769",
+          "variant": "Paradise Bloom Blue",
+          "code": "RR21H2H259U",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-paradise-bloom-blue.usdz"
+        },
+        {
+          "name": "Midnight Blossom Blue",
+          "swatchColor": "#192d4f",
+          "variant": "Midnight Blossom Blue",
+          "code": "RR21H2H25UZ",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-midnight-blossom-blue.usdz"
+        },
+        {
+          "name": "Hydrangea Blue",
+          "swatchColor": "#17205c",
+          "variant": "Hydrangea Blue",
+          "code": "RR21H2H25HS",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-hydrangea-blue.usdz"
+        },
+        {
+          "name": "Hydrangea Plum",
+          "swatchColor": "#50121b",
+          "variant": "Hydrangea Plum",
+          "code": "RR21H2H25HT",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-hydrangea-plum.usdz"
+        },
+        {
+          "name": "Paradise Bloom Purple",
+          "swatchColor": "#502c57",
+          "variant": "Paradise Bloom Purple",
+          "code": "RR21H2H259R",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-paradise-bloom-purple.usdz"
+        },
+        {
+          "name": "Wild Lily Blue",
+          "swatchColor": "#7e467c",
+          "variant": "Wild Lily Blue",
+          "code": "RR21H2H25WB",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-wild-lily-blue.usdz"
+        },
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#8a8c93",
+          "variant": "Elegant Inox",
+          "code": "RR21H2H25S8",
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-elegant-inox.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 127,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.281, 0.155, 0.095],
+              [0.283, 1.32, 0.355]
+            ],
+            "open": [
+              [0.219, 0.155, 0.142],
+              [0.724, 1.32, 0.694]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": 90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.207, 1.032, 0.08],
+              [0.164, 1.2, 0.1]
+            ],
+            "open": [
+              [0.164, 1.032, 0.08],
+              [0.184, 1.2, 0.451]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.05, 0, 0.26],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.248, 0.232, -0.288],
+              [0.248, 1.016, 0.112]
+            ],
+            "open": [
+              [-0.298, 0.232, -0.028],
+              [0.198, 1.016, 0.372]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "base drawer",
+          "node": "BaseDrawer",
+          "slide": [0, 0, 0.25],
+          "zone": {
+            "closed": [
+              [-0.28, 0.015, -0.16],
+              [0.28, 0.148, 0.295]
+            ],
+            "open": [
+              [-0.28, 0.015, 0.09],
+              [0.28, 0.148, 0.545]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "56.5 cm",
+        "h": "132 cm",
+        "d": "71 cm"
+      },
+      "sizeNote": "Samsung India gives 565 × 1320 × 710 mm (W × H × D, with the hinge and the handle), 1270 mm high without the hinge and 1150 mm deep with the door open 90°; the manual table gives the stand model 578 × 1325 × 716 mm",
+      "fit": {
+        "back": 10,
+        "note": "Samsung's manual for this model: 100 mm between the back of the fridge and the wall; the door opens to 127°"
+      },
+      "specs": [
+        ["Total capacity", "189 L (fridge 171 L, freezer 18 L)"],
+        ["Type", "Direct cool, single door"],
+        ["Energy rating", "5 star, 115 units a year"],
+        ["Compressor", "Digital Inverter Compressor"],
+        ["Power cuts", "Stabilizer Free Operation"],
+        ["Controls", "Knob"],
+        ["Shelves", "2 toughened glass"],
+        ["Door storage", "5 transparent door pockets, egg tray, Deep Door Bin"],
+        ["Vegetable box", "1, Vege Box"],
+        ["Ice", "Ice tray"],
+        ["Base stand drawer", "For potatoes and onions"],
+        ["Light", "LED lamp"],
+        ["Handle", "New H-Bar, with lock and key"],
+        ["Refrigerant", "R-600a"],
+        ["Colours", "Begonia Red, Begonia Blue, Camellia Purple, Camelia Blue, Paradise Bloom Blue, Midnight Blossom Blue, Hydrangea Blue, Hydrangea Plum, Paradise Bloom Purple, Wild Lily Blue, Elegant Inox"],
+        ["Weight", "35.5 kg"],
+        ["Warranty", "1 year on the product, 10 years on the compressor"]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/one-door/rr2000th-single-door-refrigerator-with-horizontal-curve-design-189l-red-rr21h2h25br-hl/",
+      "hotspots": [
+        {
+          "title": "Next Crown Door & Handle Design",
+          "text": "Its Crown Door design features a round-top shape and clean lines, as well as a new horizontal handle, in various colours and patterns.",
+          "pos": [-0.12, 1.0775, 0.3555],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "It automatically adjusts its speed in response to cooling demand, so it is quiet, uses power efficiently and keeps working for long, backed by a 10 year warranty on the compressor.",
+          "pos": [0, 0.27, -0.211],
+          "normal": [0, 0, -1]
+        },
+        {
+          "title": "Base Stand Drawer",
+          "text": "A large drawer in the lower part of the refrigerator: a convenient place for food items that don't need cooling, such as potatoes and onions.",
+          "pos": [0.15, 0.07, 0.293],
+          "normal": [0, 0, 1]
+        },
+        {
+          "title": "Toughened Glass Shelves",
+          "text": "Designed and tested to withstand weights of up to 175 kg, so heavy items like watermelons, or dishes in large pots and pans, can be kept cool.",
+          "pos": [0, 0.653, 0.0835],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}
