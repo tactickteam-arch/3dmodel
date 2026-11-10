@@ -157,6 +157,15 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     node.quaternion.copy(isOpen ? open : closed);
     node.position.copy(isOpen ? out : at);
     node.traverse((o) => { if (o.isMesh) o.userData.partKey = p.key; });
+    // the other nodes the part moves (`also`: both freezer doors on one button), each on its own hinge or slide
+    s.also = (p.also || []).map((a) => [a, model.getObjectByName(a.node)]).filter(([, n]) => n).map(([a, n]) => {
+      const c = { node: n, closed: n.quaternion.clone(), at: n.position.clone() };
+      c.open = a.slide ? c.closed.clone() : c.closed.clone().multiply(new THREE.Quaternion().setFromAxisAngle(AXES[a.axis || p.axis], THREE.MathUtils.degToRad(a.angle)));
+      c.out = a.slide ? c.at.clone().add(new THREE.Vector3(...a.slide)) : c.at.clone();
+      n.quaternion.copy(isOpen ? c.open : c.closed); n.position.copy(isOpen ? c.out : c.at);
+      n.traverse((o) => { if (o.isMesh) o.userData.partKey = p.key; });
+      return c;
+    });
     moving.set(p.key, s);
   }
   function togglePart(key) {
@@ -374,6 +383,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
       if (k >= 1) s.t = s.to;
       s.node.quaternion.slerpQuaternions(s.closed, s.open, s.t);
       s.node.position.lerpVectors(s.at, s.out, s.t);
+      for (const c of s.also) { c.node.quaternion.slerpQuaternions(c.closed, c.open, s.t); c.node.position.lerpVectors(c.at, c.out, s.t); }
     }
 
     updateSpots();
@@ -445,6 +455,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     spotWorld: (i) => spots[i] && spots[i].dot.visible ? spots[i].dot.getWorldPosition(new THREE.Vector3()).toArray() : null,
     card: () => card.current,
     partWorld: (key) => { const s = moving.get(key); if (!s) return null; const b = new THREE.Box3().setFromObject(s.node); return b.getCenter(new THREE.Vector3()).toArray(); },
+    alsoWorld: (key) => (moving.get(key)?.also || []).map((c) => new THREE.Box3().setFromObject(c.node).getCenter(new THREE.Vector3()).toArray()),
   };
 
   await applyFinish(finishIndex);

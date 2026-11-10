@@ -436,14 +436,17 @@ async function prepare(s, gltf) {
   // the moving parts, as xr.js swings them
   const nodes = new Map();
   for (const part of s.p.parts || []) { const n = root.getObjectByName(part.node); if (n) nodes.set(n, part); }
-  compact(root, new Set(nodes.keys()));
+  // the other nodes a part moves (`also`: both freezer doors on one button)
+  const alsoNodes = new Map();
+  for (const part of s.p.parts || []) for (const a of part.also || []) { const n = root.getObjectByName(a.node); if (n) alsoNodes.set(n, [part, a]); }
+  compact(root, new Set([...nodes.keys(), ...alsoNodes.keys()]));
   const keep = inUse(root);
   disposeTree(dropped, keep);
   // textures no bigger than a headset or phone needs
   if (TEX_MAX < 4096) for (const t of keep.texs) shrink(t);
   root.traverse((o) => {
     if (!o.isMesh) return;
-    for (let n = o; n && n !== root; n = n.parent) if (nodes.has(n)) { o.userData.partKey = nodes.get(n).key; break; }
+    for (let n = o; n && n !== root; n = n.parent) if (nodes.has(n) || alsoNodes.has(n)) { o.userData.partKey = (nodes.get(n) || alsoNodes.get(n)[0]).key; break; }
   });
   s.moving.clear();
   for (const [node, part] of nodes) {
@@ -454,7 +457,16 @@ async function prepare(s, gltf) {
     const isOpen = !!s.state[part.key]; // a door left open stays open when the model comes back
     node.quaternion.copy(isOpen ? open : closed);
     node.position.copy(isOpen ? out : at);
-    s.moving.set(part.key, { part, node, closed, open, at, out, isOpen, t: isOpen ? 1 : 0, from: 0, to: isOpen ? 1 : 0, start: 0 });
+    s.moving.set(part.key, { part, node, closed, open, at, out, isOpen, t: isOpen ? 1 : 0, from: 0, to: isOpen ? 1 : 0, start: 0, also: [] });
+  }
+  for (const [node, [part, a]] of alsoNodes) {
+    const m = s.moving.get(part.key);
+    if (!m) continue;
+    const c = { node, closed: node.quaternion.clone(), at: node.position.clone() };
+    c.open = a.slide ? c.closed.clone() : c.closed.clone().multiply(new THREE.Quaternion().setFromAxisAngle(AXES[a.axis || part.axis], THREE.MathUtils.degToRad(a.angle)));
+    c.out = a.slide ? c.at.clone().add(new THREE.Vector3(...a.slide)) : c.at.clone();
+    node.quaternion.copy(m.isOpen ? c.open : c.closed); node.position.copy(m.isOpen ? c.out : c.at);
+    m.also.push(c);
   }
 }
 function shrink(t) {
@@ -540,6 +552,7 @@ function animateParts(now) {
     m.t = k >= 1 ? m.to : m.from + (m.to - m.from) * ease(k);
     m.node.quaternion.slerpQuaternions(m.closed, m.open, m.t);
     m.node.position.lerpVectors(m.at, m.out, m.t);
+    for (const c of m.also) { c.node.quaternion.slerpQuaternions(c.closed, c.open, m.t); c.node.position.lerpVectors(c.at, c.out, m.t); }
     any = true;
   }
   return any;

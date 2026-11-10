@@ -110,7 +110,10 @@ for (const finish of finishes) {
   const sceneRoot = root.listScenes()[0].listChildren()[0];
   const scenePath = "/Root/Scenes/Scene";
   const parts = product.parts || [];
-  const partByNode = new Map(parts.map((p) => [p.node, p]));
+  // a part can move more than one node (`also`: both freezer doors on one button, see lib.mjs stateClips). Each of
+  // those is written like a part of its own (`of` names its part), and its part's taps and moves take it along.
+  const companions = parts.flatMap((p) => (p.also || []).map((a) => ({ key: p.key, of: p.key, node: a.node, axis: a.axis || p.axis, angle: a.angle, slide: a.slide })));
+  const partByNode = new Map([...parts, ...companions].map((p) => [p.node, p]));
   const partInfo = new Map(); // node name -> { closedPath, openPath, closedTargets, openTargets, poseClosed, poseOpen, poseAjar }
 
   // writes a node and its children; returns the paths of xforms that directly hold meshes
@@ -321,15 +324,23 @@ for (const finish of finishes) {
   // tap the closed copy: it swings open, then the open copy takes its place and it parks;
   // tap the open copy: the reverse. The swap is two instant moves in one frame.
   for (const [node, info] of partInfo) {
+    if (info.part.of) continue; // a companion node moves with its part, below
     const n = safe(node);
-    behavior(`Open_${n}`, tap(info.closedTargets), {
+    // the part's own node, then its companions: a tap on any of them moves all of them, together. With no
+    // companions this writes what it always did (one Swing, one PlaceOpen/ParkClosed pair).
+    const all = [info, ...[...partInfo.values()].filter((i) => i.part.of === info.part.key)];
+    const sx = (j) => (j ? String(j) : "");
+    const swing = (from, pose) => (all.length === 1
+      ? { name: "Swing", write: () => transform("Swing", from(info), pose(info), SWING) }
+      : { name: "Swing", write: () => group("Swing", "parallel", all.map((i, j) => ({ name: `Swing${j}`, write: () => transform(`Swing${j}`, from(i), pose(i), SWING) }))) });
+    behavior(`Open_${n}`, tap(all.flatMap((i) => i.closedTargets)), {
       name: "Open",
       write: () => group("Open", "serial", [
-        { name: "Swing", write: () => transform("Swing", info.closedPath, info.poseOpen, SWING) },
-        { name: "Swap", write: () => group("Swap", "parallel", [
-          { name: "PlaceOpen", write: () => transform("PlaceOpen", info.openPath, info.poseOpen, 0) },
-          { name: "ParkClosed", write: () => transform("ParkClosed", info.closedPath, info.poseParked, 0) },
-        ]) },
+        swing((i) => i.closedPath, (i) => i.poseOpen),
+        { name: "Swap", write: () => group("Swap", "parallel", all.flatMap((i, j) => [
+          { name: `PlaceOpen${sx(j)}`, write: () => transform(`PlaceOpen${sx(j)}`, i.openPath, i.poseOpen, 0) },
+          { name: `ParkClosed${sx(j)}`, write: () => transform(`ParkClosed${sx(j)}`, i.closedPath, i.poseParked, 0) },
+        ])) },
       ]),
     });
     // a part inside this one (the trays behind the fridge door, the ice tray behind the freezer's) goes back in at
@@ -339,21 +350,22 @@ for (const finish of finishes) {
       { name: `In${k}Place`, write: () => transform(`In${k}Place`, i.closedPath, i.poseClosed, 0) },
       { name: `In${k}Park`, write: () => transform(`In${k}Park`, i.openPath, i.poseParked, 0) },
     ])) }] : [];
-    behavior(`Close_${n}`, tap(info.openTargets), {
+    behavior(`Close_${n}`, tap(all.flatMap((i) => i.openTargets)), {
       name: "Close",
       write: () => group("Close", "serial", [
         ...putBack,
-        { name: "Swing", write: () => transform("Swing", info.openPath, info.poseClosed, SWING) },
-        { name: "Swap", write: () => group("Swap", "parallel", [
-          { name: "PlaceClosed", write: () => transform("PlaceClosed", info.closedPath, info.poseClosed, 0) },
-          { name: "ParkOpen", write: () => transform("ParkOpen", info.openPath, info.poseParked, 0) },
-        ]) },
+        swing((i) => i.openPath, (i) => i.poseClosed),
+        { name: "Swap", write: () => group("Swap", "parallel", all.flatMap((i, j) => [
+          { name: `PlaceClosed${sx(j)}`, write: () => transform(`PlaceClosed${sx(j)}`, i.closedPath, i.poseClosed, 0) },
+          { name: `ParkOpen${sx(j)}`, write: () => transform(`ParkOpen${sx(j)}`, i.openPath, i.poseParked, 0) },
+        ])) },
       ]),
     });
   }
 
   // on start: nudge the main part ajar once so people know it moves
-  const hint = [...partInfo.values()].find((i) => i.part.hint) || [...partInfo.values()][0];
+  const own = [...partInfo.values()].filter((i) => !i.part.of);
+  const hint = own.find((i) => i.part.hint) || own[0];
   if (partInfo.size) {
     behavior("OnStart", ['token info:id = "SceneTransition"', 'token type = "enter"'], {
       name: "Start",

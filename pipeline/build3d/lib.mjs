@@ -104,6 +104,22 @@ export function stateClips(root, parts, seconds = 1) {
     const T = prop === "position" ? THREE.VectorKeyframeTrack : THREE.QuaternionKeyframeTrack;
     return new T(`${p.node}.${prop}`, [0, seconds], [...a, ...a]);
   });
+  // a part can move more than one node (both freezer doors on one button): `also` lists the others, each
+  // { node, angle } on its own hinge (axis defaults to the part's) or { node, slide }; each gets its own track,
+  // moving with its part. A product without `also` gets exactly the clips it always had.
+  const also = parts.flatMap((p, i) => (p.also || []).map((a) => {
+    const n = root.getObjectByName(a.node);
+    if (!n) throw new Error(`no node ${a.node}`);
+    return { p: { node: a.node, axis: a.axis || p.axis, angle: a.angle, slide: a.slide }, n, i };
+  }));
+  const alsoTrack = ({ p, n, i }, from, to) => {
+    const [prop, a] = pose(p, n, from[i] === "1");
+    const [, b] = pose(p, n, to[i] === "1");
+    const T = prop === "position" ? THREE.VectorKeyframeTrack : THREE.QuaternionKeyframeTrack;
+    return new T(`${p.node}.${prop}`, [0, seconds], [...a, ...b]);
+  };
+  const shut = "0".repeat(parts.length);
+  rest.push(...also.map((c) => alsoTrack(c, shut, shut)));
   const clips = [new THREE.AnimationClip("Rest", seconds, rest)];
   // the pages move one part at a time (a part inside another waits for it), so only states one part apart
   // need a clip: 2^n x n clips instead of 2^n x (2^n - 1), which keeps a four-part model small
@@ -115,6 +131,7 @@ export function stateClips(root, parts, seconds = 1) {
       const T = prop === "position" ? THREE.VectorKeyframeTrack : THREE.QuaternionKeyframeTrack;
       return new T(`${p.node}.${prop}`, [0, seconds], [...a, ...b]);
     });
+    tracks.push(...also.map((c) => alsoTrack(c, from, to)));
     clips.push(new THREE.AnimationClip(`S${from}_${to}`, seconds, tracks));
   }
   return clips;
@@ -235,6 +252,17 @@ export function saveZones(productsPath, id, root, parts) {
     root.updateMatrixWorld(true);
     const open = zone(n);
     n.position.copy(pos); n.quaternion.copy(q); root.updateMatrixWorld(true);
+    // a part that moves more nodes (`also`, see stateClips) covers all of them, closed and open
+    for (const a of p.also || []) {
+      const c = root.getObjectByName(a.node), cp = c.position.clone(), cq = c.quaternion.clone();
+      const c0 = zone(c);
+      if (a.slide) c.position.add(new THREE.Vector3(...a.slide));
+      else c.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(AX[a.axis || p.axis], THREE.MathUtils.degToRad(a.angle)));
+      root.updateMatrixWorld(true);
+      const c1 = zone(c);
+      c.position.copy(cp); c.quaternion.copy(cq); root.updateMatrixWorld(true);
+      for (const [z, y] of [[closed, c0], [open, c1]]) for (let k = 0; k < 3; k++) { z[0][k] = Math.min(z[0][k], y[0][k]); z[1][k] = Math.max(z[1][k], y[1][k]); }
+    }
     entry.parts.find((x) => x.key === p.key).zone = { closed, open };
   }
   fs.writeFileSync(productsPath, tidyJSON(data));
