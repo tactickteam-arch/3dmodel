@@ -300,7 +300,8 @@
         "sides": 5,
         "back": 5,
         "note": "From Samsung's user manual for this range: at least 5 cm at each side, more than 5 cm behind it, and 129.4 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "lg-glt2526xwpz",
@@ -613,7 +614,8 @@
         "front": 36,
         "back": 5,
         "note": "From LG's owner's manual: keep at least 5 cm between the back and the wall. The manual gives 99.9 cm total depth with a door open, which is 36 cm in front of the fridge."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "lg-glt3426snpz",
@@ -929,7 +931,8 @@
       "fit": {
         "back": 5,
         "note": "From LG's owner's manual for its double-door range: keep at least 5 cm between the back and the wall. The 343 L model's own door swing is not published; the doors open about 135 degrees in this model."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "lg-glt4626tmpz",
@@ -1245,7 +1248,8 @@
       "fit": {
         "back": 5,
         "note": "From LG's owner's manual for its double-door range: keep at least 5 cm between the back and the wall. The 466 L model's own door swing is not published; the doors open about 135 degrees in this model."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "haier-hrf-2902icmc-p",
@@ -1545,7 +1549,8 @@
           ],
           "show": "fridge"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "samsung-rt45hg6a22slhl",
@@ -1850,7 +1855,8 @@
         "sides": 5,
         "back": 5,
         "note": "From Samsung's user manual for this model: at least 5 cm at each side, more than 5 cm behind it, and 136.3 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "samsung-rt40h28w1cpnl",
@@ -2154,7 +2160,8 @@
         "sides": 5,
         "back": 5,
         "note": "From Samsung's user manual for this model: at least 5 cm at each side, more than 5 cm behind it, and 114.5 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "lg-gl-b257jds3",
@@ -2467,7 +2474,8 @@
         "front": 44.5,
         "back": 5,
         "note": "From LG's owner's manual: allow over 5 cm between the back and the wall. The manual gives 118 cm of depth with the doors open, which is 44.5 cm in front of the fridge, and 163.5 cm across with both doors open."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "whirlpool-73723",
@@ -2750,7 +2758,8 @@
           ],
           "show": "!fridge"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "samsung-rs76cg80x0s9hl",
@@ -3068,7 +3077,8 @@
           ],
           "show": "!fridge"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "haier-hes-690gk",
@@ -4334,7 +4344,8 @@
           ],
           "show": "fridge"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "lg-glt4416cces",
@@ -4953,7 +4964,8 @@
           ],
           "show": "fridge"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "haier-hrf-3182ibns-p",
@@ -5893,7 +5905,8 @@
           ],
           "show": "fridge"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "samsung-rs76cg8113slhl",
@@ -7131,7 +7144,8 @@
           ],
           "show": "!fridge"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "samsung-rr24h2823htnl",
@@ -10323,7 +10337,8 @@
         "sides": 2,
         "back": 10,
         "note": "From LG's owner's manual: at least 2 cm at each side and 10 cm behind for the hoses and air, and 110 cm of depth in total with the door open at 90°."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "samsung-wa70bg4441bytl",
@@ -10563,7 +10578,8 @@
         "back": 10,
         "top": 34,
         "note": "From Samsung's user manual: keep the machine 10 cm from the adjacent wall. The lid swings up and back: with it open, this model is about 132 cm tall (the opening angle is estimated), so keep 34 cm free above it."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "bosch-wga1420pin",
@@ -10833,7 +10849,8 @@
       "fit": {
         "front": 46,
         "note": "From Bosch: 63.6 cm deep with the door closed and 104.9 cm with the door open at 90 degrees. Bosch's page and manual publish no side or back gaps; leave room for the hoses and the plug."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "lg-fhb1208z2m",
@@ -11106,7 +11123,8 @@
           ],
           "show": "always"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "samsung-wa80f08s2ctl",
@@ -11354,7 +11372,8 @@
         "back": 10,
         "top": 36,
         "note": "From Samsung's user manual: keep the machine 10 cm from each adjacent wall. The lid swings up and back: with it open, this model is about 134 cm tall (the opening angle is estimated), so keep 36 cm free above it."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "bosch-wga254zpin",
@@ -11620,7 +11639,8 @@
       "fit": {
         "front": 46,
         "note": "From Bosch: 63.6 cm deep with the door closed and 104.9 cm with the door open at 90 degrees. Bosch's page and manual publish no side or back gaps; leave room for the hoses and the plug."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "haier-hwd120-dm14f11bku1",
@@ -11853,7 +11873,8 @@
           ],
           "show": "door"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "samsung-ww80ta046ab1tl",
@@ -12130,7 +12151,8 @@
             ]
           }
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "lg-t12sjmb1z",
@@ -12374,7 +12396,8 @@
         "back": 10,
         "top": 33.5,
         "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 130 cm, so keep 33.5 cm free above it."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "whirlpool-31671",
@@ -12579,7 +12602,8 @@
           ],
           "show": "always"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "whirlpool-31688",
@@ -12784,7 +12808,8 @@
           ],
           "show": "always"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "ifb-executive-plus-mbn-1014k-cms",
@@ -13058,7 +13083,8 @@
       "fit": {
         "back": 10,
         "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "ifb-serena-mbn-7012k-cms",
@@ -13336,7 +13362,8 @@
       "fit": {
         "back": 10,
         "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
-      }
+      },
+      "hidden": true
     },
     {
       "id": "carrier-19k-xceed-edge-gxi",
@@ -13550,7 +13577,8 @@
           ],
           "show": "always"
         }
-      ]
+      ],
+      "hidden": true
     },
     {
       "id": "voltas-183inv-vertis-ai-zest-gold",
@@ -13946,7 +13974,8 @@
           ],
           "show": "always"
         }
-      ]
+      ],
+      "hidden": true
     }
   ]
 }
