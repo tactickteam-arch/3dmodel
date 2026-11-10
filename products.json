@@ -9494,6 +9494,290 @@
       }
     },
     {
+      "id": "haier-hrd-752ksa",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRD-752KSA",
+      "name": "Haier 50 L bedroom single-door refrigerator (mini bar), Black Steel",
+      "shortName": "50 L mini bar refrigerator",
+      "summary": "Open the door and the freezer flap, take out the trays, then stand it in your room at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/haier-hrd-752ksa.glb",
+      "thumb": "/photos/haier-hrd-752ksa/0.jpg",
+      "photos": [
+        "/photos/haier-hrd-752ksa/0.jpg",
+        "/photos/haier-hrd-752ksa/1.jpg",
+        "/photos/haier-hrd-752ksa/2.jpg",
+        "/photos/haier-hrd-752ksa/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your room",
+      "orbit": "-28deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black Steel",
+          "swatchColor": "#16171b",
+          "code": "HRD-752KSA",
+          "usdz": "/models/usdz/haier-hrd-752ksa-black-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 165,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.232,
+                0.028,
+                0.111
+              ],
+              [
+                0.231,
+                0.554,
+                0.245
+              ]
+            ],
+            "open": [
+              [
+                0.232,
+                0.028,
+                0.163
+              ],
+              [
+                0.689,
+                0.554,
+                0.389
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "x",
+          "angle": -90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.082,
+                0.364,
+                0.076
+              ],
+              [
+                0.116,
+                0.484,
+                0.087
+              ]
+            ],
+            "open": [
+              [
+                -0.082,
+                0.482,
+                0.078
+              ],
+              [
+                0.116,
+                0.492,
+                0.198
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.16
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.192,
+                0.287,
+                -0.102
+              ],
+              [
+                0.192,
+                0.454,
+                0.081
+              ]
+            ],
+            "open": [
+              [
+                -0.192,
+                0.287,
+                0.058
+              ],
+              [
+                0.192,
+                0.454,
+                0.241
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "46.5 cm",
+        "h": "55.4 cm",
+        "d": "49 cm"
+      },
+      "sizeNote": "Haier gives 46.5 cm wide and 49 cm deep. Its page lists the height as 89 cm, which does not match this 50 L model or Haier's own photos; 55.4 cm is the height measured off those photos",
+      "specs": [
+        [
+          "Total capacity",
+          "50 L (fresh food 45 L, freezer 5 L)"
+        ],
+        [
+          "Type",
+          "Direct cool, single door (bedroom / mini bar)"
+        ],
+        [
+          "Energy rating",
+          "2 star"
+        ],
+        [
+          "Energy consumption",
+          "157 (as Haier lists it)"
+        ],
+        [
+          "Compressor",
+          "Fixed speed"
+        ],
+        [
+          "Freezer",
+          "Built-in freezer box"
+        ],
+        [
+          "Shelves",
+          "1 toughened glass shelf"
+        ],
+        [
+          "Door racks",
+          "1 full and 1 half"
+        ],
+        [
+          "Lock",
+          "Lock and key"
+        ],
+        [
+          "Light",
+          "Interior LED light"
+        ],
+        [
+          "Handle",
+          "Recess"
+        ],
+        [
+          "Defrost",
+          "Manual"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Voltage",
+          "160 to 260 V"
+        ],
+        [
+          "Colour",
+          "Black Steel"
+        ],
+        [
+          "Weight",
+          "15.5 kg"
+        ],
+        [
+          "Warranty",
+          "1 year on the product, 2 years on the compressor"
+        ],
+        [
+          "Made in",
+          "India"
+        ]
+      ],
+      "source": "https://shop.haierindia.com/products/Direct-Cool-Refrigerators/Haier-50L-Bedroom-Single-Door-Refrigerator/2351",
+      "hotspots": [
+        {
+          "title": "Lock & key",
+          "text": "Enhanced safety feature that provides secure storage.",
+          "pos": [
+            -0.186,
+            0.368,
+            0.245
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Built in Freezer Box",
+          "text": "In built freezer space for ice and frozen essentials.",
+          "pos": [
+            -0.082,
+            0.42,
+            0.081
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Toughened Glass Shelf",
+          "text": "Can accommodate heavy utensils.",
+          "pos": [
+            -0.12,
+            0.292,
+            0.0815
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Spacious Bottle Storage",
+          "text": "Can accommodate big bottles.",
+          "pos": [
+            0.368,
+            0.178,
+            0.328
+          ],
+          "normal": [
+            -0.259,
+            0,
+            0.966
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
       "id": "lg-fhp1412z9b",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",
