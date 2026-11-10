@@ -23,8 +23,9 @@ A static site that shows Sangeetha's appliances in 3D and AR:
 - **`private/`** holds client files, research and pitch decks. **`tools/`** holds local tools. Both are gitignored. Never commit them.
 
 ## Deploy
-Pushing to `main` of https://github.com/tanmayagr2021/3dmodelssangeetha deploys the Vercel project "3dmodelssangeetha".
-- That repo is the user's personal GitHub. Push as `tanmayagr2021`, never as `tanmay-viamagus`.
+From 10 Nov 2026 the repo is https://github.com/tactickteam-arch/3dmodel (remote `origin`). Push `main` there.
+- Push as `tanmayagr2021`, the account with push access; never as `tanmay-viamagus`.
+- The old repo, https://github.com/tanmayagr2021/3dmodelssangeetha (remote `personal`), is the one the Vercel project "3dmodelssangeetha" deploys from. Nothing deploys from the new repo until it is connected to a host.
 - Don't run `vercel deploy` for this project.
 
 ## Rules
