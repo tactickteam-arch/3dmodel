@@ -1,0 +1,169 @@
+{
+  "products": [
+    {
+      "id": "lg-glt4416cces",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GLT4416CCES",
+      "name": "LG 446 L convertible double-door refrigerator with Door Cooling+",
+      "shortName": "446 L double-door refrigerator",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-glt4416cces.glb",
+      "thumb": "/photos/lg-glt4416cces/0.jpg",
+      "photos": ["/photos/lg-glt4416cces/0.jpg", "/photos/lg-glt4416cces/1.jpg", "/photos/lg-glt4416cces/2.jpg", "/photos/lg-glt4416cces/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 140%",
+      "finishes": [
+        {
+          "name": "Ebony Sheen",
+          "swatchColor": "#141416",
+          "usdz": "/models/usdz/lg-glt4416cces-ebony-sheen.usdz",
+          "variant": "Ebony Sheen",
+          "code": "GLT4416CCES"
+        },
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#b4b5b7",
+          "usdz": "/models/usdz/lg-glt4416cces-shiny-steel.usdz",
+          "variant": "Shiny Steel",
+          "code": "GLT4416CCPZ"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [-0.346, 1.221, 0.24],
+              [0.35, 1.78, 0.366]
+            ],
+            "open": [
+              [0.329, 1.221, 0.288],
+              [0.874, 1.78, 0.833]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.16],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.239, 1.301, 0.029],
+              [-0.058, 1.457, 0.231]
+            ],
+            "open": [
+              [-0.239, 1.301, 0.189],
+              [-0.058, 1.457, 0.391]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.346, 0.031, 0.215],
+              [0.35, 1.214, 0.365]
+            ],
+            "open": [
+              [0.318, 0.031, 0.288],
+              [0.874, 1.214, 0.844]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.6],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.31, 0.102, -0.266],
+              [0.31, 1.144, 0.209]
+            ],
+            "open": [
+              [-0.31, 0.102, 0.334],
+              [0.31, 1.144, 0.809]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "70 cm",
+        "h": "178 cm",
+        "d": "73 cm"
+      },
+      "sizeNote": "73 cm deep with the rear spacers, from LG's manual (LG's page gives 70 cm); the doors open to about 135 degrees",
+      "specs": [
+        ["Total capacity", "446 L (freezer 114 L, fridge 332 L)"],
+        ["Type", "Frost free, top-mount double door"],
+        ["Convertible", "Yes"],
+        ["Energy rating", "1 star, 297 units a year"],
+        ["Compressor", "Smart Inverter (BLDC), 10 years on the compressor (part only)"],
+        ["Cooling", "Door Cooling+, Multi Air Flow"],
+        ["Fridge", "3 tempered glass shelves, 1 vegetable box, top LED"],
+        ["Freezer", "1 tempered glass shelf, top LED"],
+        ["Door baskets", "2 in the freezer; 2 full and 5 half in the fridge, transparent"],
+        ["Ice maker", "Manual, 1 lever and 2 trays, a moving ice tray"],
+        ["Control", "Inside the fridge, inner dot display; Express Freeze, door alarm"],
+        ["Doors", "PET, Ebony Sheen or Shiny Steel"],
+        ["Handle", "Horizontal pocket"],
+        ["Smart", "Smart Diagnosis"],
+        ["Weight", "75 kg"],
+        ["Made in", "India"]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt4416cces/",
+      "hotspots": [
+        {
+          "title": "Convertible",
+          "text": "Convert a section of the freezer to more refrigeration as needed to keep foods fresher for longer.",
+          "pos": [0.01, 1.51, -0.2524],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Moving Ice Tray",
+          "text": "Shifts out of the way automatically, freeing up freezer space when you need it most.",
+          "pos": [-0.089, 1.447, 0.2251],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Circulates cool air evenly through multiple vents, keeping food fresher for longer.",
+          "pos": [0, 0.975, -0.2548],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Door Cooling+",
+          "text": "Food stays fresh and drinks get ice cold on any shelf with even and faster cooling performance.",
+          "pos": [0, 0.8, 0.3655],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ],
+      "fit": {
+        "front": 60,
+        "back": 5,
+        "note": "From LG's owner's manual for this range (GLT44***): allow over 5 cm between the back and the wall. The manual gives 133.1 cm of depth with the fridge door open, which is 60 cm in front of the fridge, and 123.2 cm across with it open."
+      }
+    }
+  ]
+}

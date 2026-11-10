@@ -1,0 +1,174 @@
+{
+  "products": [
+    {
+      "id": "samsung-rt80h51c2fhl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT80H51C2FHL",
+      "name": "Samsung 467 L double-door refrigerator with Bespoke AI",
+      "shortName": "467 L Bespoke AI refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt80h51c2fhl.glb",
+      "thumb": "/photos/samsung-rt80h51c2fhl/0.jpg",
+      "photos": ["/photos/samsung-rt80h51c2fhl/0.jpg", "/photos/samsung-rt80h51c2fhl/1.jpg", "/photos/samsung-rt80h51c2fhl/2.jpg", "/photos/samsung-rt80h51c2fhl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Black DOI",
+          "swatchColor": "#313235",
+          "usdz": "/models/usdz/samsung-rt80h51c2fhl-black-doi.usdz",
+          "variant": "Black DOI",
+          "code": "RT80H51C2FHL"
+        },
+        {
+          "name": "EZ Clean Steel",
+          "swatchColor": "#8f9296",
+          "usdz": "/models/usdz/samsung-rt80h51c2fhl-ez-clean-steel.usdz",
+          "variant": "EZ Clean Steel",
+          "code": "RT80H51C2SHL"
+        },
+        {
+          "name": "Black Glass",
+          "swatchColor": "#15131d",
+          "usdz": "/models/usdz/samsung-rt80h51c2fhl-black-glass.usdz",
+          "variant": "Black Glass",
+          "code": "RT80H51C2BHL"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.35, 1.245, 0.246],
+              [0.35, 1.82, 0.398]
+            ],
+            "open": [
+              [0.277, 1.245, 0.33],
+              [0.636, 1.82, 1.003]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.264, 1.295, 0.001],
+              [-0.088, 1.465, 0.209]
+            ],
+            "open": [
+              [-0.264, 1.295, 0.121],
+              [-0.088, 1.465, 0.329]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.35, 0.037, 0.231],
+              [0.35, 1.238, 0.398]
+            ],
+            "open": [
+              [0.272, 0.037, 0.326],
+              [0.69, 1.238, 0.98]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.03, 0, 0.72],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.31, 0.082, -0.361],
+              [0.31, 0.989, 0.228]
+            ],
+            "open": [
+              [-0.34, 0.082, 0.359],
+              [0.28, 0.989, 0.948]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "70 cm",
+        "h": "182 cm",
+        "d": "79.4 cm"
+      },
+      "sizeNote": "Samsung's user manual (its RT80F51* column) lists 140.3 cm total depth and 102.6 cm total width with the doors open",
+      "specs": [
+        ["Total capacity", "467 L (fridge 360 L, freezer 107 L)"],
+        ["Type", "Frost free, double door"],
+        ["Convertible", "5-in-1"],
+        ["Energy rating", "2 star, 258 units a year"],
+        ["Compressor", "Digital Inverter"],
+        ["Cooling", "Twin Cooling Plus, Multi Flow"],
+        ["Smart features", "Wi-Fi, SmartThings, AI Energy Mode"],
+        ["Shelves", "3 tempered glass (fridge), 1 plastic (freezer)"],
+        ["Extras", "Twist Ice Maker, Active Fresh Filter+, Fresh Room"],
+        ["Handle", "Recessed"],
+        ["Colours", "Black DOI, EZ Clean Steel, Black Glass"],
+        ["Weight", "73.5 kg (Black Glass 79.5 kg)"],
+        ["Warranty", "1 year product, 10 years compressor"]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/double-door/refrigerator-tmf-convertible-5in1-bespoke-ai-double-door-refrigerator-467l-black-rt80h51c2fhl/",
+      "hotspots": [
+        {
+          "title": "Convertible 5-in-1",
+          "text": "Using Twin Cooling technology, the Convertible 5-in-1 feature lets you switch between 5 smart modes, so the freezer can become a fridge.",
+          "pos": [-0.18, 1.62, 0.397],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "AI Energy Mode",
+          "text": "Reduce your energy use by up to 10% with AI Energy mode in SmartThings Energy, which adjusts the compressor speed and defrost cycle to how you use it.",
+          "pos": [-0.18, 0.95, 0.397],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Twin Cooling Plus",
+          "text": "Independent evaporators, fans and vents in the fridge and freezer keep food moist and stop odours mixing between them.",
+          "pos": [-0.005, 1.656, -0.351],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Active Fresh Filter+",
+          "text": "Built into the middle of the fridge, it removes 99.99% of certain bacteria: air passes through an activated carbon filter and an anti-bacterial mesh.",
+          "pos": [-0.006, 0.636, -0.3355],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 61,
+        "sides": 5,
+        "back": 5,
+        "note": "From Samsung's user manual for this model: at least 5 cm at each side, more than 5 cm behind it, and 140.3 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
+      }
+    }
+  ]
+}

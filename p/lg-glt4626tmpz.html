@@ -1,0 +1,1826 @@
+<!doctype html>
+<!-- made from product.html by pipeline/scripts/make_pages.mjs: edit product.html, then run it -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LG GLT4626TMPZ in 3D and AR</title>
+<meta name="description" content="Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.">
+<link rel="canonical" href="https://3dmodelssangeetha.vercel.app/p/lg-glt4626tmpz">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sangeetha 3D and AR">
+<meta property="og:title" content="LG 466 L double-door refrigerator in 3D and AR">
+<meta property="og:description" content="Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.">
+<meta property="og:url" content="https://3dmodelssangeetha.vercel.app/p/lg-glt4626tmpz">
+<meta property="og:image" content="https://3dmodelssangeetha.vercel.app/photos/lg-glt4626tmpz/0.jpg">
+<meta property="og:image:alt" content="LG 466 L double-door refrigerator with Hygiene Fresh and Door Cooling+">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0E0E0F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="/track.js" defer></script>
+<script type="module" src="/store-bridge.js"></script>
+<style>
+  :root {
+    /* Sangeetha: black, white and the orange of the logo */
+    --navy: #0E0E0F;
+    --navy-2: #2A2A2D;
+    --paper: #F4F4F5;
+    --card: #FFFFFF;
+    --copper: #F58A29;
+    --copper-dk: #B85A12;
+    --copper-bg: #FDEBDC;
+    --slate: #5E6066;
+    --hair: #E3E3E6;
+    --stage: #E7E7EA;
+    --serif: Outfit, -apple-system, Arial, sans-serif;
+    --sans: Outfit, -apple-system, Arial, sans-serif;
+    --shadow: 0 8px 24px rgba(18,34,58,.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--navy); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; cursor: pointer; color: inherit; }
+  button:focus { outline: none; }
+  button:focus-visible, a:focus-visible { outline: 3px solid var(--copper); outline-offset: 2px; }
+  a { color: inherit; }
+  .hide { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* header */
+  header { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 28px; background: var(--navy); color: var(--paper); }
+  .back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: .3px; opacity: .9; }
+  .back:hover { opacity: 1; }
+  .back svg { width: 18px; height: 18px; }
+  .brand { display: flex; align-items: center; }
+  .brand img { height: 34px; width: auto; display: block; }
+  .head-right { display: flex; align-items: center; gap: 16px; }
+  .pill { font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--navy); background: var(--copper); padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+  .brand-logo { height: 26px; width: auto; display: block; margin-bottom: 14px; }
+  .buy { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 15px; font-weight: 600; color: var(--copper-dk); text-decoration: none; }
+  .buy:hover { text-decoration: underline; }
+  .buy svg { width: 16px; height: 16px; }
+  .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .gallery button { border: 1px solid var(--hair); background: #fff; border-radius: 10px; padding: 0; overflow: hidden; aspect-ratio: 1; }
+  .gallery img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .files { display: grid; gap: 8px; }
+  .files a { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--hair); border-radius: 12px; padding: 11px 14px; text-decoration: none; background: #fff; font-size: 14px; }
+  .files a b { font-weight: 600; }
+  .files a span { color: var(--slate); font-size: 13px; }
+  .lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(10,10,12,.82); display: grid; place-items: center; padding: 24px; }
+  .lightbox img { max-width: min(92vw, 900px); max-height: 86vh; background: #fff; border-radius: 14px; }
+  .lightbox button { position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #fff; display: grid; place-items: center; }
+  .lightbox button svg { width: 20px; height: 20px; }
+
+  /* layout */
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 440px; height: calc(100vh - 64px); min-height: 620px; }
+  .stage { position: relative; min-height: 0; background: radial-gradient(ellipse at 50% 42%, #FBFBFC 0%, var(--stage) 75%); overflow: hidden; }
+  model-viewer { width: 100%; height: 100%; --poster-color: transparent; --progress-bar-color: transparent; --min-hotspot-opacity: 0; background: transparent; }
+  model-viewer:focus { outline: none; }
+  model-viewer::part(default-progress-bar) { display: none; }
+
+  /* on the 3D view */
+  .glass { background: rgba(253,252,249,.94); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .controls { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; border-radius: 999px; padding: 6px; z-index: 5; }
+  .controls button { width: 42px; height: 42px; border: 0; background: transparent; border-radius: 50%; display: grid; place-items: center; color: var(--navy); }
+  .controls button:hover { background: rgba(18,34,58,.06); }
+  .controls button[aria-pressed="true"] { background: var(--navy); color: var(--paper); }
+  .controls svg { width: 20px; height: 20px; }
+  .controls hr { width: 22px; border: 0; border-top: 1px solid var(--hair); margin: 4px auto; }
+  .controls .view { font: 600 11px var(--sans); letter-spacing: .2px; }
+
+  .hint { position: absolute; left: 20px; top: 20px; max-width: calc(100% - 230px); text-wrap: balance; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate); padding: 9px 14px 9px 10px; border-radius: 999px; z-index: 5; transition: opacity .5s; }
+  .hint svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
+  .hint.gone { opacity: 0; pointer-events: none; }
+
+  .parts { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 8px; padding: 6px; border-radius: 999px; z-index: 5; max-width: calc(100% - 32px); }
+  .parts button { display: flex; align-items: center; gap: 8px; border: 0; background: transparent; border-radius: 999px; padding: 11px 18px 11px 14px; font-size: 14px; font-weight: 600; white-space: nowrap; color: var(--navy); }
+  .parts button:hover { background: rgba(18,34,58,.06); }
+  .parts button[aria-pressed="true"] { background: var(--navy); color: var(--paper); }
+  .parts svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
+  .parts button[aria-pressed="true"] svg { color: var(--copper); }
+
+  /* when the part buttons don't fit across the 3D view (the fridge's five on a small laptop) they sit under it, as on phones */
+  .stage.parts-below { display: flex; flex-direction: column; }
+  .stage.parts-below > model-viewer { flex: 1 1 0; min-height: 0; height: auto; }
+  .stage.parts-below .parts { position: relative; left: auto; bottom: auto; transform: none; flex: none; margin: 6px auto 12px; flex-wrap: wrap; justify-content: center; border-radius: 24px; width: max-content; }
+  .stage.parts-below .fcard { bottom: calc(var(--bar, 60px) + 26px); }
+  .all-btn { position: absolute; left: 20px; top: 20px; z-index: 6; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 10px 16px 10px 12px; font: 600 14px var(--sans); color: var(--navy); }
+  .all-btn svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
+
+  .progress { position: absolute; left: 50%; bottom: 96px; width: 180px; height: 3px; margin-left: -90px; background: rgba(18,34,58,.12); border-radius: 3px; overflow: hidden; transition: opacity .3s; z-index: 4; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--copper-dk); transition: width .2s; }
+  .progress.done { opacity: 0; }
+
+  /* feature callouts: a small dot on the model, a label in the margin, a line between them */
+  .hs { --s: 22px; width: var(--s); height: var(--s); padding: 0; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; transition: opacity .3s, transform .2s; }
+  .hs i { width: 12px; height: 12px; border-radius: 50%; background: var(--navy); border: 2.5px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,.45); transition: background .2s, transform .2s; }
+  .hs::before { content: ""; position: absolute; inset: 1px; border-radius: 50%; border: 2px solid var(--copper); opacity: 0; animation: ping 2.4s ease-out infinite; }
+  .hs:hover i, .hs[aria-pressed="true"] i { background: var(--copper); transform: scale(1.3); }
+  .hs.off, model-viewer.no-hs .hs { opacity: 0 !important; pointer-events: none; }
+  @keyframes ping { 0% { transform: scale(.7); opacity: .9; } 70%, 100% { transform: scale(1.6); opacity: 0; } }
+  .feat-layer { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+  .feat-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .feat-lines path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .55s ease, opacity .25s; }
+  .feat-lines .case { stroke: rgba(255,255,255,.92); stroke-width: 4; }
+  .feat-lines .core { stroke: var(--navy); stroke-width: 1.6; }
+  .feat-lines .on { stroke-dashoffset: 0; }
+  .feat-lines .active.core { stroke: var(--copper-dk); stroke-width: 2.2; }
+  .flab { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 8px; max-width: 210px; padding: 5px 12px 5px 5px; border: 1px solid var(--hair); border-radius: 999px; background: rgba(253,252,249,.97); box-shadow: 0 4px 14px rgba(14,14,15,.14); font: 600 13px/1.2 var(--sans); color: var(--navy); text-align: left; pointer-events: auto; opacity: 0; transform: translateY(4px); transition: opacity .3s, transform .3s, border-color .2s; will-change: left, top; }
+  .flab.on { opacity: 1; transform: none; }
+  .flab:hover, .flab[aria-pressed="true"] { border-color: var(--copper-dk); }
+  .flab[aria-pressed="true"] { background: var(--navy); color: var(--paper); }
+  .flab b { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--copper); color: var(--navy); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  .flab span { overflow: hidden; }
+  .flab em { display: block; margin-top: 2px; font: 500 11.5px/1.2 var(--sans); font-style: normal; color: var(--copper-dk); }
+  .flab em:empty { display: none; }
+  .flab.away { background: rgba(253,252,249,.88); color: var(--slate); }
+  .flab.away b { background: #E6E6E9; color: var(--slate); }
+  .flab.num { padding: 5px; }
+  .flab.num span { display: none; }
+  .feat-btn { position: absolute; right: 20px; top: 20px; z-index: 6; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 18px 11px 14px; font: 600 14px var(--sans); color: var(--navy); }
+  .feat-btn svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
+  .feat-btn[aria-pressed="true"] { background: var(--navy); color: var(--paper); }
+  .feat-btn[aria-pressed="true"] svg { color: var(--copper); }
+  @media (prefers-reduced-motion: reduce) { .flab, .feat-lines path, .hs::before { transition: none; animation: none; } }
+  .fcard { position: absolute; left: 20px; bottom: 92px; width: min(360px, calc(100% - 40px)); border-radius: 18px; padding: 16px 16px 14px 18px; z-index: 6; transition: opacity .25s, transform .25s; }
+  .fcard.gone { opacity: 0; transform: translateY(8px); pointer-events: none; }
+  .fcard .top { display: flex; align-items: flex-start; gap: 10px; }
+  .fcard small { display: block; font-size: 11.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--copper-dk); }
+  .fcard h3 { margin: 3px 0 0; font-size: 18px; font-weight: 600; line-height: 1.25; }
+  .fcard p { margin: 8px 0 12px; font-size: 14.5px; line-height: 1.5; color: var(--slate); }
+  .fcard .x { margin-left: auto; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #F1F1F3; display: grid; place-items: center; flex: none; }
+  .fcard .x svg { width: 16px; height: 16px; }
+  .fcard .nav { display: flex; gap: 8px; }
+  .fcard .nav button { flex: 1; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 9px 12px; font-size: 13.5px; font-weight: 600; }
+  .fcard .nav button:hover { border-color: var(--navy); }
+
+  /* will it fit */
+  .fit-in { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .fit-in.two { grid-template-columns: repeat(2, 1fr); }
+  .fit-in label { display: flex; flex-direction: column; gap: 5px; font-size: 11px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--slate); }
+  .fit-in .box { display: flex; align-items: center; border: 1px solid var(--hair); border-radius: 12px; background: #fff; padding: 0 10px 0 12px; }
+  .fit-in .box:focus-within { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+  .fit-in input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; padding: 12px 0; font: 500 18px var(--sans); color: var(--navy); }
+  .fit-in .box span { font-size: 13px; color: var(--slate); letter-spacing: 0; text-transform: none; }
+  .fit-help { font-size: 13px; line-height: 1.5; color: var(--slate); margin: 8px 0 0; }
+  .fit-out { margin-top: 12px; border-radius: 14px; padding: 14px 16px; background: #F1F1F3; }
+  .fit-out.yes { background: #E6F4EA; }
+  .fit-out.no { background: #FCE8E6; }
+  .fit-out .verdict { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; }
+  .fit-out .verdict svg { width: 22px; height: 22px; flex: none; }
+  .fit-out.yes .verdict svg { color: #1E7B34; }
+  .fit-out.no .verdict svg { color: #B3261E; }
+  .fit-out ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.4; }
+  .fit-out li { display: flex; justify-content: space-between; gap: 12px; }
+  .fit-out li span { color: var(--slate); }
+  .fit-out li b { font-weight: 600; text-align: right; }
+  .fit-out li b.short { color: #B3261E; }
+  .fit-out .front { margin: 10px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--navy); }
+  .fit-out .src { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--slate); }
+  .fit-show { margin-top: 10px; }
+  .flist { display: grid; gap: 8px; }
+  .flist button { display: block; text-align: left; border: 1px solid var(--hair); background: #fff; border-radius: 12px; padding: 11px 14px; }
+  .flist button:hover { border-color: var(--navy); }
+  .flist b { display: block; font-size: 14.5px; font-weight: 600; }
+  .flist span { display: block; margin-top: 2px; font-size: 13.5px; line-height: 1.45; color: var(--slate); }
+  .fit-lines { pointer-events: none; position: absolute; inset: 0; }
+  .fit-lines line { stroke-width: 2.5; stroke-dasharray: 7 5; stroke-linecap: round; }
+  .fit-lines.yes line { stroke: #1E9E45; }
+  .fit-lines.no line { stroke: #D93025; }
+  .fit-tag { background: #1E9E45; color: #fff; border-radius: 6px; padding: 5px 9px; font-size: 13px; font-weight: 600; white-space: nowrap; border: 0; pointer-events: none; }
+  .fit-tag.no { background: #D93025; }
+
+  .dot { display: none; }
+  .dim { background: var(--navy); color: var(--paper); border-radius: 6px; padding: 5px 9px; font-size: 13px; font-weight: 600; white-space: nowrap; border: 0; pointer-events: none; }
+  .dim-lines { pointer-events: none; position: absolute; inset: 0; }
+  .dim-lines line { stroke: var(--navy); stroke-width: 2; stroke-dasharray: 4 3; }
+
+  /* inside phone AR (Android) */
+  .ar-ui { position: absolute; inset: 0; pointer-events: none; }
+  .ar-status { position: absolute; left: 50%; top: calc(18px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); width: max-content; max-width: calc(100% - 120px); background: rgba(18,34,58,.88); color: var(--paper); font-size: 15px; font-weight: 500; line-height: 1.35; text-align: center; padding: 11px 18px; border-radius: 20px; transition: opacity .4s; white-space: pre-line; }
+  .ar-status.gone { opacity: 0; }
+  .ar-bottom { position: absolute; left: 0; right: 0; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
+  .ar-bottom > * { pointer-events: auto; }
+  .ar-finishes { display: flex; gap: 8px; background: rgba(253,252,249,.94); padding: 6px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  .ar-finishes button { width: 40px; height: 40px; border-radius: 50%; border: 2px solid transparent; padding: 0; background-size: cover; background-position: center; }
+  .ar-finishes button[aria-pressed="true"] { border-color: var(--navy); box-shadow: inset 0 0 0 2px #fff; }
+  .ar-parts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 12px; }
+  .ar-parts button { border: 0; border-radius: 999px; background: var(--navy); color: var(--paper); padding: 14px 20px; font-size: 16px; font-weight: 600; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+  .ar-parts button[aria-pressed="true"] { background: var(--paper); color: var(--navy); }
+  /* Android: point the dot at the floor, Place here, and it stays (see "the product stands where you point") */
+  .ar-aim, .ar-place, .ar-move { display: none; }
+  .ar-ui.aiming .ar-aim { display: block; position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1.5px rgba(0,0,0,.4), inset 0 0 0 1.5px rgba(0,0,0,.4); }
+  .ar-ui.aiming .ar-aim::after { content: ""; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,.4); }
+  .ar-ui.aiming .ar-place { display: block; border: 0; border-radius: 999px; background: var(--copper); color: var(--navy); padding: 18px 40px; font-size: 19px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.3); transition: opacity .2s; }
+  .ar-ui.aiming .ar-place:disabled { opacity: .5; }
+  .ar-ui.aiming .ar-finishes, .ar-ui.aiming .ar-parts { display: none; }
+  .ar-ui.placed .ar-move { display: block; border: 0; border-radius: 999px; background: rgba(253,252,249,.94); color: var(--navy); padding: 11px 18px; font-size: 15px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+
+  /* side panel */
+  aside { background: var(--card); border-left: 1px solid var(--hair); padding: 34px 36px 30px; display: flex; flex-direction: column; gap: 26px; overflow-y: auto; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--copper-dk); }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: 34px; line-height: 1.14; margin: 8px 0 0; }
+  .model-no { display: inline-flex; margin-top: 12px; font-size: 13px; font-weight: 600; letter-spacing: .4px; color: var(--slate); background: #F1F1F3; border-radius: 6px; padding: 5px 9px; }
+  .blurb { font-size: 16px; line-height: 1.55; color: var(--slate); margin: 12px 0 0; }
+  .label { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 12px; }
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+  .swatch { display: flex; align-items: center; gap: 10px; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 6px 16px 6px 6px; font-size: 14px; font-weight: 500; }
+  .swatch i { width: 28px; height: 28px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); background-size: cover; background-position: center; }
+  .swatch[aria-pressed="true"] { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+  .swatch:disabled { cursor: default; }
+
+  .ar-box .cta { border: 0; border-radius: 14px; background: var(--navy); color: var(--paper); height: 58px; padding: 0 20px; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; box-shadow: 0 10px 24px rgba(18,34,58,.18); }
+  .ar-box .cta:hover { background: var(--navy-2); }
+  .ar-box .cta svg { width: 22px; height: 22px; color: var(--copper); }
+  .ar-box .cta.secondary { background: #fff; color: var(--navy); border: 1px solid var(--navy); box-shadow: none; height: 52px; margin-top: 10px; font-size: 16px; }
+  .ar-box .cta.secondary svg { color: var(--copper-dk); }
+  .ar-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--slate); margin: 10px 0 0; text-align: center; }
+  .ar-note svg { width: 15px; height: 15px; color: var(--copper-dk); flex: none; }
+
+  .size { display: flex; border: 1px solid var(--hair); border-radius: 12px; overflow: hidden; background: #fff; }
+  .size div { flex: 1; padding: 12px 14px; border-left: 1px solid var(--hair); }
+  .size div:first-child { border-left: 0; }
+  .size small { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--slate); }
+  .size b { font-family: var(--serif); font-weight: 500; font-size: 20px; white-space: nowrap; }
+  .size-note { font-size: 13px; color: var(--slate); margin: 8px 0 0; }
+  .room-lead { font-size: 14px; line-height: 1.5; color: var(--slate); margin: 0 0 12px; }
+  .room-open { width: 100%; height: 54px; border: 1px solid var(--navy); border-radius: 14px; background: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .room-open:hover { background: var(--navy); color: var(--paper); }
+  .room-open svg { width: 22px; height: 22px; color: var(--copper); flex: none; }
+  a.room-open { text-decoration: none; }
+  .need ul { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--hair); border-radius: 14px; background: #fff; overflow: hidden; }
+  .need li { display: flex; justify-content: space-between; gap: 12px; padding: 11px 16px; font-size: 14px; line-height: 1.4; }
+  .need li + li { border-top: 1px solid var(--hair); }
+  .need li span { color: var(--slate); }
+  .need li b { font-weight: 600; text-align: right; }
+  .need p { font-size: 13px; line-height: 1.5; color: var(--slate); margin: 8px 0 0; }
+
+  .specs { margin: 0; display: grid; grid-template-columns: auto 1fr; border-top: 1px solid var(--hair); }
+  .specs dt, .specs dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--hair); font-size: 14px; line-height: 1.4; }
+  .specs dt { color: var(--slate); padding-right: 16px; }
+  .specs dd { font-weight: 500; text-align: right; }
+
+  .share { border: 1px solid var(--hair); background: #fff; border-radius: 14px; padding: 14px; display: flex; gap: 16px; align-items: center; }
+  .share .code { width: 104px; height: 104px; flex: none; }
+  .share .code svg { width: 100%; height: 100%; display: block; }
+  .share p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; color: var(--slate); }
+  .share p b { color: var(--navy); }
+  .link-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .link-btn svg { width: 16px; height: 16px; flex: none; }
+  .link-btn.wa svg { color: #1FA855; }
+  .share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .share-top { margin-top: 14px; }
+
+  h1 { font-weight: 600 !important; letter-spacing: -0.3px; }
+  .credit { margin-top: auto; font-size: 12.5px; line-height: 1.55; color: var(--slate); border-top: 1px solid var(--hair); padding-top: 18px; }
+  .credit a { color: var(--copper-dk); }
+
+  .missing { max-width: 560px; margin: 80px auto; padding: 0 16px; text-align: center; }
+  .missing a { display: inline-block; margin-top: 18px; color: var(--copper-dk); font-weight: 600; }
+
+  /* AR guide sheet */
+  .scrim { position: fixed; inset: 0; background: rgba(10,18,32,.45); z-index: 40; opacity: 0; transition: opacity .25s; }
+  .scrim.show { opacity: 1; }
+  .sheet { position: fixed; left: 50%; top: 50%; width: min(480px, calc(100vw - 32px)); max-height: calc(100vh - 48px); transform: translate(-50%, -46%); opacity: 0; transition: transform .28s cubic-bezier(.2,.8,.2,1), opacity .2s; background: var(--card); border-radius: 22px; z-index: 41; display: flex; flex-direction: column; box-shadow: 0 30px 80px rgba(10,18,32,.35); }
+  .sheet.show { transform: translate(-50%, -50%); opacity: 1; }
+  .sheet-body { overflow-y: auto; padding: 26px 26px 8px; }
+  .sheet-head { display: flex; align-items: flex-start; gap: 14px; }
+  .sheet-head .ic { width: 44px; height: 44px; border-radius: 13px; background: var(--navy); display: grid; place-items: center; flex: none; }
+  .sheet-head .ic svg { width: 24px; height: 24px; color: var(--copper); }
+  .sheet-head h2 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 23px; line-height: 1.2; }
+  .sheet-head p { margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: var(--slate); }
+  .sheet-close { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #F1F1F3; display: grid; place-items: center; flex: none; }
+  .sheet-close svg { width: 18px; height: 18px; }
+  .place { display: flex; gap: 12px; margin: 20px 0 4px; padding: 14px; border-radius: 14px; background: #F1F1F3; font-size: 14px; line-height: 1.5; }
+  .place svg { width: 22px; height: 22px; flex: none; color: var(--copper-dk); margin-top: 1px; }
+  .g-label { margin: 22px 0 8px; font-size: 11.5px; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: var(--slate); }
+  .g-row { display: flex; align-items: center; gap: 14px; padding: 8px 0; }
+  .g-row .ic { width: 42px; height: 42px; border-radius: 12px; background: #F1F1F3; display: grid; place-items: center; flex: none; }
+  .g-row .ic svg { width: 21px; height: 21px; color: var(--navy); }
+  .g-row b { display: block; font-size: 15px; font-weight: 600; }
+  .g-row span { display: block; font-size: 14px; color: var(--slate); margin-top: 1px; }
+  .g-steps { margin-top: 18px; }
+  .g-row.step { align-items: flex-start; padding: 9px 0; }
+  .g-row.step .ic { width: 34px; height: 34px; border-radius: 50%; background: var(--copper); color: var(--navy); font-size: 17px; font-weight: 700; }
+  .g-row.step b { font-size: 16px; margin-top: 6px; }
+  .g-row.key .ic { background: var(--copper-bg); }
+  .g-row.key .ic svg { color: var(--copper-dk); }
+  .g-note { display: flex; gap: 10px; margin: 16px 0 6px; padding: 12px 14px; border-radius: 12px; background: #F5F5F6; font-size: 13.5px; line-height: 1.5; color: var(--slate); }
+  .g-note svg { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+  .g-qr { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 22px 0 8px; }
+  .g-qr .code { width: 200px; height: 200px; padding: 10px; background: #fff; border-radius: 16px; border: 1px solid var(--hair); }
+  .g-qr .code svg { width: 100%; height: 100%; display: block; }
+  .g-qr p { margin: 0; text-align: center; font-size: 14px; line-height: 1.5; color: var(--slate); max-width: 34ch; }
+  .sheet-foot { padding: 14px 26px calc(20px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hair); }
+  .sheet-foot .go { width: 100%; height: 56px; border: 0; border-radius: 14px; background: var(--navy); color: var(--paper); font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .sheet-foot .go svg { width: 21px; height: 21px; color: var(--copper); }
+  .sheet-foot .alt { width: 100%; height: 48px; margin-top: 8px; border: 1px solid var(--hair); border-radius: 14px; background: #fff; font-size: 15px; font-weight: 600; }
+  .sheet-foot label { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--slate); }
+  .sheet-foot input { width: 16px; height: 16px; accent-color: var(--navy); }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--navy); color: var(--paper); padding: 12px 18px; border-radius: 10px; font-size: 14px; opacity: 0; transition: all .25s; pointer-events: none; z-index: 60; max-width: calc(100vw - 32px); }
+  .toast.show { opacity: 1; transform: translateX(-50%); }
+
+  @media (max-width: 900px) {
+    header { height: 56px; padding: 0 16px; }
+    .brand span, .pill { display: none; }
+    main { display: block; height: auto; min-height: 0; }
+    .stage { height: 64svh; min-height: 420px; }
+    /* top right, under "Show features": at the bottom, the part buttons wrap to two rows and covered it */
+    .controls { right: 12px; top: 68px; bottom: auto; transform: none; padding: 4px; }
+    .feat-btn { top: 12px; right: 12px; }
+    .controls button { width: 40px; height: 40px; }
+    /* on touch screens pinch zooms, and phones can't go full screen */
+    #btnZoomIn, #btnZoomOut, #btnFullscreen, .controls hr, .controls .view { display: none; }
+    .hint { left: 12px; top: 12px; right: auto; width: fit-content; max-width: calc(100% - 196px); font-size: 12.5px; text-wrap: balance; } /* clear of "Show features" */
+    .parts { bottom: 16px; }
+    .fcard { left: 12px; right: 12px; width: auto; bottom: 74px; }
+    .parts { flex-wrap: wrap; justify-content: center; border-radius: 24px; width: max-content; }
+    /* the part buttons sit under the model, not over it: the fridge's four parts and Fill wrap to three rows,
+       which hid its drawer and the trays */
+    .stage { display: flex; flex-direction: column; }
+    .stage > model-viewer { flex: 1 1 0; min-height: 0; height: auto; }
+    .parts { position: relative; left: auto; bottom: auto; transform: none; flex: none; margin: 6px auto 12px; }
+    .parts button { padding: 10px 14px 10px 12px; font-size: 13.5px; }
+    aside { border-left: 0; padding: 24px 16px 120px; gap: 24px; overflow: visible; }
+    h1 { font-size: 28px; }
+    .ar-box { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(246,244,238,.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--hair); }
+    .ar-box .cta { height: 54px; }
+    .ar-box .cta.secondary { height: 46px; margin-top: 8px; }
+    .ar-note { margin-top: 6px; font-size: 12px; }
+    .sheet { left: 0; right: 0; top: auto; bottom: 0; width: 100%; max-height: 90svh; border-radius: 22px 22px 0 0; transform: translateY(100%); opacity: 1; }
+    .sheet.show { transform: translateY(0); }
+    .sheet::before { content: ""; position: absolute; left: 50%; top: 8px; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: var(--hair); }
+    .sheet-body { padding: 26px 20px 8px; }
+    .sheet-foot { padding: 12px 20px calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .toast { bottom: calc(118px + env(safe-area-inset-bottom, 0px)); } /* above the AR bar, not over it */
+    .all-btn { left: 12px; top: 12px; font-size: 13px; }
+    .fit-in label, .size small { font-size: 12px; }
+  }
+  /* a phone on its side: the 3D view and its buttons fill the screen, and the AR bar scrolls with the page
+     instead of covering the product */
+  @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+    .stage { height: calc(100svh - 56px); min-height: 0; }
+    .ar-box { position: static; padding: 0; background: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    aside { padding-bottom: 32px; }
+    .toast { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .hint { max-width: 40%; } /* in the corner, clear of the product */
+  }
+
+  /* /p/<id>?embed: the viewer alone, filling the frame a retailer's page puts it in */
+  .embed-open { display: none; }
+  .embed header, .embed aside { display: none !important; }
+  .embed main { display: block; height: 100vh; min-height: 0; }
+  .embed .stage { height: 100vh; min-height: 0; }
+  .embed .embed-open { display: inline-flex; text-decoration: none; background: var(--navy); color: var(--paper); box-shadow: var(--shadow); }
+  .embed .embed-open svg { color: var(--copper); }
+  .embed #btnShowFeat { top: 72px; }
+  .embed .hint { right: auto; max-width: calc(100% - 230px); }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/"><img src="/logos/sangeetha.png" alt="Sangeetha" width="105" height="34"></a>
+  <div class="head-right">
+    <a class="back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      All products
+    </a>
+    <span class="pill">3D &amp; AR</span>
+  </div>
+</header>
+
+<main id="main">
+  <section class="stage" id="stage">
+    <model-viewer id="viewer"
+      alt=""
+      camera-controls touch-action="pan-y" disable-tap
+      max-camera-orbit="Infinity 157.5deg 300%" min-field-of-view="4deg"
+      shadow-intensity="1" shadow-softness="0.8"
+      environment-image="/env/studio.hdr" exposure="1.05"
+      interaction-prompt="none"
+      ar ar-modes="webxr scene-viewer" ar-scale="fixed" ar-placement="floor" xr-environment>
+      <button slot="ar-button" class="hide" aria-hidden="true"></button>
+      <div slot="progress-bar" class="progress" id="progress"><i></i></div>
+
+      <div class="ar-ui hide" id="arUi">
+        <div class="ar-status" id="arStatus"></div>
+        <div class="ar-aim" aria-hidden="true"></div>
+        <div class="ar-bottom">
+          <button class="ar-place" id="arPlace" type="button" disabled>Place here</button>
+          <button class="ar-move" id="arMove" type="button">Move to another spot</button>
+          <div class="ar-finishes hide" id="arFinishes"></div>
+          <div class="ar-parts" id="arParts"></div>
+        </div>
+      </div>
+
+      <button class="dot" slot="hotspot-dot-X-Y+Z" data-position="0 0 0" data-normal="-1 0 0"></button>
+      <button class="dot" slot="hotspot-dot+X-Y+Z" data-position="0 0 0" data-normal="-1 0 0"></button>
+      <button class="dot" slot="hotspot-dot-X+Y+Z" data-position="0 0 0" data-normal="-1 0 0"></button>
+      <button class="dot" slot="hotspot-dot-X-Y-Z" data-position="0 0 0" data-normal="-1 0 0"></button>
+      <button class="dim hide" slot="hotspot-dim-Y+Z" data-position="0 0 0" data-normal="0 0 1" tabindex="-1"></button>
+      <button class="dim hide" slot="hotspot-dim-X+Z" data-position="0 0 0" data-normal="0 0 1" tabindex="-1"></button>
+      <button class="dim hide" slot="hotspot-dim-X-Y" data-position="0 0 0" data-normal="-1 0 0" tabindex="-1"></button>
+      <svg class="dim-lines hide" id="dimLines" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line></line><line></line><line></line>
+      </svg>
+      <svg class="fit-lines hide" id="fitLines" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
+      <button class="fit-tag hide" slot="hotspot-fit-tag" id="fitTag" data-position="0 0 0" data-normal="0 0 1" tabindex="-1"></button>
+    </model-viewer>
+
+    <div class="feat-layer" id="featLayer" aria-hidden="false"><svg class="feat-lines" id="featLines" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg></div>
+    <button class="feat-btn glass hide" id="btnShowFeat" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>Show features</span></button>
+    <a class="feat-btn embed-open" id="embedOpen" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg><span>View in your room</span></a>
+
+    <div class="hint glass" id="hint"></div>
+    <button class="all-btn glass hide" id="btnAll" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>See all of it</span></button>
+
+    <div class="controls glass" role="toolbar" aria-label="View controls">
+      <button id="btnZoomIn" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button id="btnZoomOut" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+      <hr>
+      <button id="btnDims" title="Show dimensions" aria-label="Show dimensions" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 8.7 8.7 21.3a1 1 0 0 1-1.4 0l-4.6-4.6a1 1 0 0 1 0-1.4L15.3 2.7a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2"/></svg></button>
+      <button id="btnReset" title="Reset view" aria-label="Reset view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+      <button id="btnFullscreen" title="Full screen" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <hr>
+      <button class="view" data-view="front" title="Front view" aria-label="Front view">Front</button>
+      <button class="view" data-view="side" title="Side view" aria-label="Side view">Side</button>
+      <button class="view" data-view="back" title="Back view" aria-label="Back view">Back</button>
+      <button class="view" data-view="top" title="View from above" aria-label="View from above">Top</button>
+    </div>
+
+    <div class="parts glass hide" id="parts" role="group" aria-label="Open and close"></div>
+
+    <div class="fcard glass gone" id="fcard" role="dialog" aria-labelledby="fcTitle" aria-hidden="true" inert>
+      <div class="top"><div><small id="fcCount"></small><h3 id="fcTitle"></h3></div><button class="x" id="fcClose" aria-label="Close"></button></div>
+      <p id="fcText"></p>
+      <div class="nav"><button id="fcPrev">Previous feature</button><button id="fcNext">Next feature</button></div>
+    </div>
+  </section>
+
+  <aside>
+    <div>
+      <img class="brand-logo" id="brandLogo" alt="">
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="productName"></h1>
+      <span class="model-no" id="modelNo"></span>
+      <p class="blurb" id="productBlurb"></p>
+      <a class="buy hide" id="buyLink" target="_blank" rel="noopener">See price and offers on sangeetha.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <div><button class="link-btn share-top" id="btnShare" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>
+    </div>
+
+    <div id="finishBox">
+      <div class="label">Finish</div>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="ar-box" id="arBox">
+      <button class="cta" id="btnAR">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>
+        <span id="btnARLabel">View in your room</span>
+      </button>
+      <button class="cta secondary hide" id="btnVR">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="11" rx="4"/><circle cx="8" cy="12.5" r="2"/><circle cx="16" cy="12.5" r="2"/></svg>
+        <span>See it alone in VR</span>
+      </button>
+      <p class="ar-note" id="arNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 12h8"/></svg><span>Real size · Opens in your camera · No app</span></p>
+    </div>
+
+    <div>
+      <div class="label">Size</div>
+      <div class="size">
+        <div><small>Width</small><b id="sizeW">–</b></div>
+        <div><small>Height</small><b id="sizeH">–</b></div>
+        <div><small>Depth</small><b id="sizeD">–</b></div>
+      </div>
+      <p class="size-note hide" id="sizeNote"></p>
+    </div>
+
+    <div class="need" id="needBox">
+      <div class="label">Space it needs</div>
+      <ul id="needList"></ul>
+      <p id="needNote"></p>
+    </div>
+
+    <div id="roomBox">
+      <div class="label">See it in your room</div>
+      <p class="room-lead">Upload a photo of the spot. It stands there at its real size, and you can drag it anywhere, turn it and open it.</p>
+      <button class="room-open" id="btnRoom" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></svg>Try it in a photo of your room</button>
+    </div>
+
+    <div id="showroomBox">
+      <div class="label">The 3D showroom</div>
+      <p class="room-lead">Every product stands in one 3D showroom. Walk around this one beside the others and open their doors, on your screen or inside it on Meta Quest or Vision Pro.</p>
+      <a class="room-open" id="showroomLink" href="/showroom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-6 9 6v12"/><path d="M3 21h18M9 21v-6h6v6"/></svg>Walk around it in the showroom</a>
+    </div>
+
+    <div id="fitBox">
+      <div class="label">Will it fit?</div>
+      <div class="fit-in" id="fitIn"></div>
+      <p class="fit-help" id="fitHelp"></p>
+      <div class="fit-out hide" id="fitOut" aria-live="polite"></div>
+    </div>
+
+    <div>
+      <div class="label">Photos</div>
+      <div class="gallery" id="gallery"></div>
+    </div>
+
+    <div id="featureBox" class="hide">
+      <div class="label">Features</div>
+      <div class="flist" id="flist"></div>
+    </div>
+
+    <div>
+      <div class="label">Key specifications</div>
+      <dl class="specs" id="specs"></dl>
+    </div>
+
+    <div>
+      <div class="label">3D files, owned by Sangeetha</div>
+      <div class="files" id="files"></div>
+    </div>
+
+    <div class="share" id="share">
+      <div class="code" id="qrCode"></div>
+      <div>
+        <p id="shareText"><b>Share it, or open it on another device</b><br>Scan with a phone, or open the link on a Meta Quest or Vision Pro.</p>
+        <div class="share-btns">
+          <button class="link-btn" id="btnCopy">Copy link</button>
+          <a class="link-btn wa" id="btnWhatsApp" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="credit" id="credit"></p>
+  </aside>
+</main>
+
+<div class="scrim hide" id="scrim"></div>
+<div class="sheet hide" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-body" id="sheetBody"></div>
+  <div class="sheet-foot" id="sheetFoot"></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { esc, cm, partAt, hotspotShown, fitCheck, finishSlug, finishIndexOf } from "/site.js";
+import { initRoom } from "/room.js";
+import { initOrganise } from "/organise.js";
+import { SITE } from "/site-config.js";
+const $ = (id) => document.getElementById(id);
+const mv = $("viewer");
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function toast(text) {
+  const t = $("toast");
+  t.textContent = text;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// ── icons ──
+const svg = (d, extra = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+const I = {
+  ar: svg('<path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>'),
+  tap: svg('<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.6 16a1.6 1.6 0 0 1 2.4-2.1L9 15.5"/>'),
+  move: svg('<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>'),
+  rotate: svg('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>'),
+  zoom: svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M11 8v6M8 11h6"/>'),
+  lock: svg('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
+  floor: svg('<path d="M2 18h20M5 18l3-8h8l3 8"/><path d="M12 6v4"/>'),
+  wall: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="6" y="8" width="12" height="4" rx="1"/>'),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'),
+  close: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+  trigger: svg('<path d="M7 4h7a5 5 0 0 1 5 5v2a9 9 0 0 1-9 9H9"/><path d="M7 4v8a3 3 0 0 0 3 3h1"/>'),
+  pinch: svg('<path d="M8 13V6a2 2 0 0 1 4 0v5"/><path d="M12 11l3.5-3.5a2 2 0 0 1 2.8 2.8L14 14.6"/><path d="M8 13l-1.6-1.6a1.8 1.8 0 0 0-2.5 2.5L8 18a6 6 0 0 0 10-2"/>'),
+  panel: svg('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'),
+  eye: svg('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  swatch: svg('<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>'),
+  door: svg('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 9h14M8 5.5v1.5M8 11.5v3"/>'),
+  round: svg('<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4.5"/><path d="M7 6.5h4"/>'),
+  louvre: svg('<rect x="2" y="6" width="20" height="8" rx="2"/><path d="M5 17l2 3M12 17v3M19 17l-2 3"/>'),
+  panel: svg('<path d="M3 10 21 5"/><rect x="2" y="12" width="20" height="7" rx="2"/><path d="M6 15.5h12"/>'),
+  drawer: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M7 7h5"/>'),
+  link: svg('<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'),
+  yes: svg('<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.6L16 9.5"/>'),
+  no: svg('<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>'),
+  plus: svg('<path d="M12 6v12M6 12h12"/>', 'stroke-width="3"'),
+  box: svg('<path d="M12 3 3 7.5v9L12 21l9-4.5v-9z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>'),
+};
+
+// ── which product: /p/<id>, or ?id=<id> ──
+const id = decodeURIComponent((location.pathname.match(/\/p\/([^/]+)/) || [])[1] || new URLSearchParams(location.search).get("id") || "").toLowerCase();
+const catalogue = await fetch("/products.json").then((r) => r.json());
+const product = catalogue.products.find((p) => p.id === id && !p.hidden); // hidden products are not shown (see products.json)
+if (!product) {
+  $("main").outerHTML = `<div class="missing"><h1>We couldn’t find that product</h1><p class="blurb">The link may be old, or the model isn’t in the catalogue yet.</p><a href="/">See all products</a></div>`;
+  document.title = "Product not found";
+  await new Promise(() => {}); // nothing below applies to a missing product
+}
+// Vercel's other addresses for this site (per deployment and per branch) ask for a Vercel login, and
+// the other addresses in site-config.js are kept for old links, so the links people scan and share
+// always point at the public address
+const PUBLIC_ORIGIN = SITE.publicOrigin;
+// it follows the address bar, which carries the chosen colour (?finish=, below)
+const makeShareUrl = () => {
+  const elsewhere = location.hostname.endsWith(".vercel.app") || SITE.alsoServedAt.includes(location.origin);
+  const u = new URL((elsewhere ? PUBLIC_ORIGIN : location.origin) + location.pathname + location.search);
+  u.searchParams.delete("embed");   // links people share always open the full page
+  u.searchParams.delete("ql");      // and the standard iPhone AR
+  return u.href;
+};
+let shareUrl = makeShareUrl();
+// Phones kept model files for an hour before 24 Oct 2026; this query string made them fetch
+// the files with the fixed doors. The files now revalidate on every load (vercel.json); v=3 (29 Oct)
+// made sure Quick Look's own copy was replaced by the files with the panel grain, v=4 (30 Oct)
+// by the files with the iPhone colour fixes, and v=5 (30 Oct) by the fridge with removable trays.
+const model = (url) => `${url}?v=7`;
+
+// ── what this device can do ──
+const ua = navigator.userAgent;
+// In-app browsers (WhatsApp, Instagram…) are web views that can't open Apple's AR view;
+// Chrome, Edge, Firefox and Google on iPhone are web views that can.
+const inWebView = !!(window.webkit && window.webkit.messageHandlers);
+const relAR = (() => { const a = document.createElement("a"); return !!a.relList?.supports?.("ar"); })();
+const hasQuickLook = inWebView ? relAR && /CriOS\/|EdgiOS\/|FxiOS\/|GSA\/|DuckDuckGo\//.test(ua) : relAR;
+const xrSupport = async (mode) => { try { return !!(await navigator.xr?.isSessionSupported(mode)); } catch { return false; } };
+const [xrAR, xrVR] = await Promise.all([xrSupport("immersive-ar"), xrSupport("immersive-vr")]);
+const isHeadset = /OculusBrowser|Quest|Pico|Wolvic/i.test(ua);
+// Vision Pro's Safari looks like a Mac, but has both Apple's AR view and WebXR
+const isVisionPro = hasQuickLook && xrVR && !/iPhone|iPod/.test(ua);
+const isIPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+const isApple = /iPhone|iPad|iPod/.test(ua) || isIPadOS;
+const isPhone = !isHeadset && !isVisionPro && (/Android|iPhone|iPad|iPod/i.test(ua) || isIPadOS);
+const headsetAR = xrAR && !isPhone && !hasQuickLook; // Meta Quest and similar
+const headsetVR = xrVR && !isPhone;                  // Quest, Vision Pro, PC headsets
+const framed = window.self !== window.top;
+// ?embed shows the viewer alone, for a box on a retailer's product page. AR from inside another
+// site's frame is not dependable on every phone, so its button opens the full page in a new tab.
+if (new URLSearchParams(location.search).has("embed")) {
+  document.documentElement.classList.add("embed");
+  $("embedOpen").href = shareUrl;
+}
+const platform = hasQuickLook ? (isVisionPro ? "visionos" : "ios")
+  : headsetAR ? "quest"
+  : isApple ? "ios-inapp"
+  : /Android/i.test(ua) ? "android"
+  : "desktop";
+// usage counts for the admin (/track.js: fire and forget, off on localhost)
+const track = (kind, detail) => window.s3dTrack?.(kind, product.id, detail);
+track("VIEW");
+if (document.documentElement.classList.contains("embed")) track("EMBED", (() => { try { return new URL(document.referrer).hostname; } catch { return ""; } })());
+
+// ── fill the page ──
+const parts = product.parts || [];
+const state = Object.fromEntries(parts.map((p) => [p.key, false]));
+// ?finish=<slug> opens that colour (an old or mistyped one opens the first); a colour chosen here goes into the
+// address, so the link people copy or share keeps it
+let finishIndex = finishIndexOf(product, new URLSearchParams(location.search).get("finish"));
+const onWall = product.placement === "wall";
+initRoom({ product, model: model(product.glb), parts, onWall, toast, openButton: $("btnRoom") });
+$("btnRoom")?.addEventListener("click", () => track("ROOM"));
+
+document.title = `${product.brand} ${product.model} in 3D and AR`;
+$("eyebrow").textContent = `${product.brand} · ${product.category}`;
+$("productName").textContent = product.name;
+$("modelNo").textContent = `Model ${product.model}`;
+$("productBlurb").textContent = product.summary;
+$("btnARLabel").textContent = product.arLabel;
+mv.alt = `${product.brand} ${product.name} in 3D`;
+mv.poster = product.thumb;
+// wide products need the camera further back on a portrait phone screen
+const portrait = () => innerWidth < 600 && innerHeight > innerWidth;
+const orbit = () => {
+  const cm = (v) => parseFloat(v);
+  if (!portrait() || cm(product.size.w) <= cm(product.size.h)) return product.orbit;
+  return product.orbit.replace(/(\d+)%$/, (_, r) => `${Math.round(r * 1.12)}%`);
+};
+mv.cameraOrbit = orbit();
+mv.arPlacement = onWall ? "wall" : "floor";
+// a unit on the wall turns as far as its sides, not round to its flat back, which looked broken to a shopper
+if (onWall) { mv.maxCameraOrbit = "100deg 157.5deg 300%"; document.querySelector('.controls .view[data-view="back"]').classList.add("hide"); }
+mv.src = model(product.glb);
+$("specs").innerHTML = product.specs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
+$("credit").innerHTML = `3D model made for Sangeetha from ${esc(product.brand)}’s official photos and published size (${esc(product.size.w)} W × ${esc(product.size.h)} H × ${esc(product.size.d)} D). <a href="${esc(product.source)}" target="_blank" rel="noopener">${esc(product.brand)} product page</a> · Demo by Tanmay Agarwal`;
+$("brandLogo").src = product.brandLogo;
+$("brandLogo").alt = product.brand;
+if (product.sangeethaUrl) { $("buyLink").href = product.sangeethaUrl; $("buyLink").classList.remove("hide"); }
+
+// real product photos, opening larger on a tap
+for (const [i, src] of (product.photos || []).entries()) {
+  const b = document.createElement("button");
+  b.setAttribute("aria-label", `Open photo ${i + 1} of ${product.photos.length}`);
+  b.innerHTML = `<img src="${src}" alt="${esc(product.brand)} ${esc(product.model)} photo" loading="lazy">`;
+  b.addEventListener("click", () => openPhoto(src));
+  $("gallery").appendChild(b);
+}
+function openPhoto(src) {
+  const box = document.createElement("div");
+  box.className = "lightbox";
+  box.innerHTML = `<img src="${src}" alt=""><button aria-label="Close">${I.close}</button>`;
+  const close = () => box.remove();
+  box.addEventListener("click", close);
+  document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); } });
+  document.body.appendChild(box);
+}
+
+// the delivered files, with their real sizes
+const files = [[product.glb, "GLB", "Android, web and headsets"], ...product.finishes.map((f) => [f.usdz, "USDZ", `iPhone, iPad and Vision Pro${product.finishes.length > 1 ? ` · ${f.name}` : ""}`])];
+for (const [url, kind, use] of files) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "";
+  a.innerHTML = `<div><b>${kind}</b> <span>${esc(use)}</span></div><span class="sz">…</span>`;
+  $("files").appendChild(a);
+  fetch(url, { method: "HEAD" }).then((r) => {
+    const n = +r.headers.get("content-length");
+    a.querySelector(".sz").textContent = n ? `${(n / 1048576).toFixed(n > 1048576 ? 1 : 2)} MB` : "";
+  }).catch(() => {});
+}
+if (product.sizeNote) { $("sizeNote").textContent = `${product.sizeNote}. Placed at real size.`; $("sizeNote").classList.remove("hide"); }
+{ // the gaps the maker publishes, shown before the shopper types anything
+  const f = product.fit || {};
+  const rows = [
+    f.sides && ["At each side", `${f.sides} cm`],
+    f.back && ["Behind it", `${f.back} cm`],
+    f.top && [onWall ? "Below the ceiling" : "Above it", `${f.top} cm`],
+    f.front && !onWall && ["In front, doors open", `${f.front} cm`],
+  ].filter(Boolean);
+  $("needList").innerHTML = rows.map(([k, v]) => `<li><span>${k}</span><b>${v}</b></li>`).join("");
+  $("needList").classList.toggle("hide", !rows.length);
+  $("needNote").textContent = f.note || `${product.brand} doesn’t publish installation gaps for this ${onWall ? "unit" : "model"}, so only its size is checked. Leave a little room for air.`;
+}
+const turnHint = platform === "desktop" ? "Drag or swipe to turn · Pinch or scroll to zoom · Double-click to look closer" : "Drag to turn · Double-tap to look closer";
+const tip = platform === "desktop" ? product.arTip.replace(/^Tap\b/, "Click") : product.arTip;
+$("hint").innerHTML = `${I.tap}<span>${parts.length ? `${turnHint} · ${tip}` : turnHint}</span>`;
+if (headsetVR) $("btnVR").classList.remove("hide");
+// the whole showroom, opening with this product in front of you (showroom.js)
+$("showroomLink").href = `/showroom?focus=${encodeURIComponent(product.id)}`;
+if (platform === "desktop") $("arNote").querySelector("span").textContent = "Real size · On a phone or headset · No app";
+
+// ── finishes ──
+function renderSwatches() {
+  $("swatches").innerHTML = "";
+  $("arFinishes").innerHTML = "";
+  product.finishes.forEach((f, i) => {
+    const bg = f.swatch ? `background-image:url(${f.swatch})` : `background:${f.swatchColor}`;
+    const b = document.createElement("button");
+    b.className = "swatch";
+    b.setAttribute("aria-pressed", String(i === finishIndex));
+    b.innerHTML = `<i style="${bg}"></i>${esc(f.name)}`;
+    if (product.finishes.length === 1) b.disabled = true;
+    b.addEventListener("click", () => chooseFinish(i));
+    $("swatches").appendChild(b);
+    const a = document.createElement("button");
+    a.style.cssText = bg;
+    a.setAttribute("aria-label", f.name);
+    a.setAttribute("aria-pressed", String(i === finishIndex));
+    a.addEventListener("click", () => chooseFinish(i));
+    $("arFinishes").appendChild(a);
+  });
+  $("arFinishes").classList.toggle("hide", product.finishes.length < 2);
+}
+function applyFinish(i) {
+  finishIndex = i;
+  const f = product.finishes[i];
+  if (f.variant || product.finishes.length > 1) mv.variantName = f.variant || null;
+  document.querySelectorAll("#swatches .swatch, #arFinishes button").forEach((b) => b.setAttribute("aria-pressed", String([...b.parentNode.children].indexOf(b) === i)));
+}
+// a colour the shopper picks: shown, and kept in the address and the share links
+function chooseFinish(i) {
+  applyFinish(i);
+  if (product.finishes.length < 2) return;
+  const u = new URL(location.href);
+  u.searchParams.set("finish", finishSlug(product.finishes[i].name));
+  history.replaceState(history.state, "", u.pathname + u.search + u.hash);
+  shareUrl = makeShareUrl();
+  renderShare();
+}
+renderSwatches();
+
+// ── moving parts: chips on the 3D view, and buttons inside phone AR ──
+const iconFor = (p) => (p.key === "louvre" ? I.louvre : p.key === "panel" ? I.panel : p.key === "drawer" || p.key === "trays" ? I.drawer : product.category === "Washing machine" ? I.round : I.door);
+// a part reads "Open <label>" and "Close <label>", or its own two words (text: [to open, to close])
+const partLabel = (p) => (p.text ? p.text[state[p.key] ? 1 : 0] : `${state[p.key] ? "Close" : "Open"} ${p.label}`);
+for (const p of parts) {
+  const b = document.createElement("button");
+  b.id = `part-${p.key}`;
+  b.setAttribute("aria-pressed", "false");
+  b.innerHTML = `${iconFor(p)}<span></span>`;
+  b.addEventListener("click", () => pressPart(p.key));
+  $("parts").appendChild(b);
+  const a = document.createElement("button");
+  a.type = "button";
+  a.id = `ar-${p.key}`;
+  a.addEventListener("click", () => pressPart(p.key));
+  $("arParts").appendChild(a);
+}
+$("parts").classList.toggle("hide", !parts.length);
+function renderParts() {
+  for (const p of parts) {
+    $(`part-${p.key}`).setAttribute("aria-pressed", String(state[p.key]));
+    $(`part-${p.key}`).querySelector("span").textContent = partLabel(p);
+    $(`ar-${p.key}`).setAttribute("aria-pressed", String(state[p.key]));
+    $(`ar-${p.key}`).textContent = partLabel(p);
+  }
+  fitParts();
+}
+// the buttons sit under the model on phones, and wherever they don't fit across it in one row
+function fitParts() {
+  const stage = $("stage"), bar = $("parts");
+  const buttons = [...bar.children], gap = 8, pad = 12;
+  const need = buttons.reduce((w, b) => w + b.offsetWidth, 0) + gap * Math.max(0, buttons.length - 1) + pad;
+  stage.classList.toggle("parts-below", innerWidth <= 900 || need > stage.clientWidth - 32);
+  stage.style.setProperty("--bar", `${bar.offsetHeight}px`);
+}
+new ResizeObserver(() => fitParts()).observe($("stage"));
+new MutationObserver(() => fitParts()).observe($("parts"), { childList: true, subtree: true, characterData: true }); // Fill joins once the model loads
+document.fonts?.ready.then(fitParts);
+renderParts();
+
+// a fridge starts empty; "Fill the fridge" flies the items into their places (organise.js)
+window.__organise = null;
+// Fill opens the doors itself; a door still moving from a press finishes first, so none is skipped
+const doorWhenIdle = async (key) => { while (busy || chaining) await sleep(50); return togglePart(key); };
+queueMicrotask(() => { window.__organise = initOrganise({ mv, product, state, togglePart: doorWhenIdle, bar: $("parts"), toast }); fitParts(); });
+$("parts").addEventListener("click", (e) => { if (e.target.closest("#part-organise")?.getAttribute("aria-pressed") === "false") track("FILL"); });
+
+// the model carries one clip per change of state, named S<bits>_<bits>
+const stateKey = () => parts.map((p) => (state[p.key] ? 1 : 0)).join("");
+// a part that swings 90 degrees or more (side doors, a top-loader's lid) reaches well outside the closed
+// outline, so the camera steps back while it is open
+const swingsWide = parts.some((p) => p.axis && Math.abs(p.angle) >= 90);
+let busy = false, movedAt = 0;
+// model-viewer cross-fades from a clip still running, and setting currentTime rewinds that fade too: the new
+// clip stays hidden behind the old one and a door the state calls open is drawn shut or half-open. So a clip
+// starts from a paused element, once the last one has ended (or cut short, for a jump to the end).
+const clipEnded = () => (mv.paused ? null : new Promise((r) => { mv.addEventListener("finished", r, { once: true }); setTimeout(r, 1200); }));
+// A press while a part is moving waits its turn instead of being lost. A second press on a part that is
+// already moving or waiting does nothing, so a double tap doesn't open it and shut it again.
+let chaining = 0, pressChain = Promise.resolve();
+const pressing = new Set();
+function pressPart(key) {
+  if (pressing.has(key)) return;
+  if (!state[key]) track("PART", key);
+  pressing.add(key);
+  const idle = async () => { while (busy || chaining || window.__organise?.openingDoors?.()) await sleep(50); };
+  pressChain = pressChain.then(async () => { await idle(); await togglePart(key); await idle(); }).catch(() => {}).finally(() => pressing.delete(key));
+}
+async function togglePart(key, { instant = false } = {}) {
+  if (busy || !(key in state)) return;
+  // a part inside another (the ice tray lives behind the freezer door): open the outer one first, and close the inner one before the outer
+  const self = parts.find((x) => x.key === key);
+  const outer = self?.needs && !state[key] && !state[self.needs] ? self.needs : null;
+  // every open part inside it shuts first (one door can hold both a freezer box's flap and the trays)
+  const first = outer ? [outer] : state[key] ? parts.filter((x) => x.needs === key && state[x.key]).map((x) => x.key) : [];
+  if (first.length) {
+    chaining++;
+    try { for (const k of first) { await togglePart(k, { instant }); await sleep(instant ? 80 : 950); } } finally { chaining--; }
+    if (busy) return;
+  }
+  busy = true;
+  if (!instant) await clipEnded();
+  mv.pause();
+  const from = stateKey();
+  const anyBefore = Object.values(state).some(Boolean);
+  state[key] = !state[key];
+  const anyAfter = Object.values(state).some(Boolean);
+  mv.animationName = `S${from}_${stateKey()}`;
+  await mv.updateComplete;
+  mv.currentTime = instant ? mv.duration : 0;
+  mv.play({ repetitions: 1 });
+  movedAt = performance.now();
+  if (swingsWide && anyBefore !== anyAfter && !instant && !arActive) {
+    const o = mv.getCameraOrbit();
+    mv.cameraOrbit = `${o.theta}rad ${o.phi}rad ${anyAfter ? o.radius * 1.3 : o.radius / 1.3}m`;
+  }
+  renderParts();
+  renderHotspots(instant ? 0 : 850);
+  $("hint").classList.add("gone");
+  setTimeout(() => (busy = false), instant ? 50 : 900);
+}
+
+// tap the product (a tap, not a drag) to open or close the part under your finger;
+// inside Android AR too, where model-viewer raycasts from the phone's camera.
+// Two quick taps (a double-click) look closely at that spot instead (closeUp, below), so outside AR a
+// single tap waits a moment to see whether a second one follows.
+const DOUBLE_MS = 320;
+let press = null, lastTap = null;
+mv.addEventListener("pointerdown", (e) => (press = { x: e.clientX, y: e.clientY, t: Date.now() }));
+mv.addEventListener("pointerup", (e) => {
+  if (!press) return;
+  const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y);
+  const quick = Date.now() - press.t < 450;
+  press = null;
+  if (moved > 6 || !quick || e.target.closest?.("button")) return;
+  const x = e.clientX, y = e.clientY, now = Date.now();
+  if (!arActive && lastTap && now - lastTap.t < DOUBLE_MS && Math.hypot(x - lastTap.x, y - lastTap.y) < 30) {
+    clearTimeout(lastTap.timer);
+    lastTap = null;
+    return closedUp ? $("btnReset").click() : closeUp(x, y);
+  }
+  const hit = mv.positionAndNormalFromPoint(x, y);
+  const key = hit && parts.length ? partAt(product, state, hit.position) : null;
+  if (arActive) { if (pin.mode === "aim") placeHere(); else if (key && now - pin.placedAt > 600) pressPart(key); return; } // not the second tap of a double-tap that placed it
+  lastTap = { x, y, t: now, timer: setTimeout(() => { lastTap = null; if (key) pressPart(key); }, DOUBLE_MS) };
+});
+
+// ── camera ──
+// A click no longer moves the pivot or zooms out (disable-tap): a click opens a door and nothing else.
+let closedUp = false;
+const setClosedUp = (on) => { closedUp = on; $("btnAll").classList.toggle("hide", !on); };
+$("btnReset").addEventListener("click", () => {
+  mv.cameraOrbit = orbit();
+  mv.cameraTarget = "auto";
+  mv.fieldOfView = "auto";
+  setClosedUp(false);
+});
+$("btnAll").addEventListener("click", () => $("btnReset").click());
+// front, side, back and top, at the product's own height and distance
+const VIEWS = { front: [0, null], side: [-90, null], back: [180, null], top: [0, 20] };
+for (const b of document.querySelectorAll(".controls .view")) b.addEventListener("click", () => {
+  const [theta, phi] = VIEWS[b.dataset.view];
+  const [, phi0, radius0] = orbit().split(" ");
+  mv.cameraTarget = "auto";
+  mv.fieldOfView = "auto";
+  mv.cameraOrbit = `${theta}deg ${phi === null ? phi0 : `${phi}deg`} ${radius0}`;
+  setClosedUp(false);
+});
+
+// Zoom and turn from code, toward a point under the pointer. The camera never comes closer than
+// model-viewer allows (2.2 times the model's radius, so it can't end up inside the model when turned);
+// past that the lens narrows instead, down to 4 degrees, close enough to see the grain of a panel.
+const MIN_FOV = 4, MAX_PHI = 157.5 * Math.PI / 180;
+const rad = (d) => (d * Math.PI) / 180, deg = (r) => (r * 180) / Math.PI;
+let goal = null, goalAt = 0, minRadius = 0, maxRadius = Infinity, baseFov = 30, home = null;
+// fn runs on every model load, and also once now if the model already loaded while this module waited for the headset
+// check above: on a slow phone "load" can come first, and then the doors, Fill and the fit were never set up
+function onLoad(fn) { mv.addEventListener("load", fn); if (mv.loaded) setTimeout(fn); }
+onLoad(() => {
+  // the same limits model-viewer itself uses: 2.2 x the bounding sphere, up to 300% of the start distance
+  const d = mv.getDimensions();
+  minRadius = 2.2 * Math.hypot(d.x, d.y, d.z) / 2;
+  mv.minCameraOrbit = `${onWall ? "-100deg" : "auto"} 0deg ${minRadius}m`;   // 0deg: a close-up can look straight down on a top panel
+  requestAnimationFrame(() => {
+    const o = mv.getCameraOrbit(), t = mv.getCameraTarget();
+    baseFov = mv.getFieldOfView();
+    maxRadius = o.radius * 300 / parseFloat(orbit().split(" ")[2]);
+    home = { span: o.radius * Math.tan(rad(baseFov) / 2), target: { x: t.x, y: t.y, z: t.z } };
+  });
+});
+function readGoal() {
+  // keep adding to our own goal while a gesture runs; start again from where the camera is after a pause
+  if (!goal || performance.now() - goalAt > 250) {
+    const o = mv.getCameraOrbit(), t = mv.getCameraTarget();
+    goal = { theta: o.theta, phi: o.phi, radius: o.radius, fov: mv.getFieldOfView(), target: { x: t.x, y: t.y, z: t.z } };
+  }
+  goalAt = performance.now();
+  return goal;
+}
+function applyGoal(g) {
+  mv.cameraTarget = `${g.target.x}m ${g.target.y}m ${g.target.z}m`;
+  mv.cameraOrbit = `${g.theta}rad ${g.phi}rad ${g.radius}m`;
+  mv.fieldOfView = `${g.fov}deg`;
+}
+function turnBy(dTheta, dPhi) {
+  const g = readGoal();
+  g.theta += dTheta;
+  g.phi = Math.min(MAX_PHI, Math.max(0.05, g.phi + dPhi));
+  applyGoal(g);
+}
+// f < 1 zooms in. What is seen spans radius x tan(fov / 2); the radius moves first, then the lens.
+function zoomBy(f, x, y) {
+  const g = readGoal();
+  const tanBase = Math.tan(rad(baseFov) / 2);
+  const before = g.radius * Math.tan(rad(g.fov) / 2);
+  const span = Math.min(maxRadius * tanBase, Math.max(minRadius * Math.tan(rad(MIN_FOV) / 2), before * f));
+  if (span >= minRadius * tanBase) { g.radius = span / tanBase; g.fov = baseFov; }
+  else { g.radius = minRadius; g.fov = deg(2 * Math.atan(span / minRadius)); }
+  // zooming in, the point under the pointer stays (about) where it is; zooming out, the view glides
+  // back to the middle of the model, and is centred again by the zoom it started at
+  const hit = span < before && x !== undefined ? mv.positionAndNormalFromPoint(x, y) : null;
+  const [to, k] = hit ? [hit.position, 1 - span / before]
+    : home && span > before && before < home.span ? [home.target, Math.min(1, (span - before) / (home.span - before))] : [null, 0];
+  if (to) for (const a of ["x", "y", "z"]) g.target[a] += (to[a] - g.target[a]) * k;
+  applyGoal(g);
+}
+// A double-click (double-tap) on the product: the camera flies to that spot and faces it head-on, so the
+// customer sees a panel straight from the front without zooming and tilting. On the outside of the
+// product it faces the nearest side (front, side, back or top), so a curved or angled panel is still
+// seen square; inside (a shelf, the drum) it keeps its direction, because another way in could be blocked
+// by a wall. About 30 cm of the panel fills the view: close enough for the grain and the print, with an edge or a
+// handle still in sight (at 20 cm a plain front filled the screen with white). A double-click on the background,
+// a second double-click, or "See all of it" shows the whole product again.
+const CLOSE_SPAN = 0.3;
+function closeUp(x, y) {
+  const hit = mv.positionAndNormalFromPoint(x, y);
+  if (!hit) return $("btnReset").click();
+  const p = hit.position, n = hit.normal, c = mv.getBoundingBoxCenter(), d = mv.getDimensions();
+  const g = readGoal();
+  const axis = ["x", "y", "z"].reduce((a, b) => (Math.abs(n[b]) > Math.abs(n[a]) ? b : a));
+  const sign = Math.sign(n[axis]);
+  const face = c[axis] + sign * d[axis] / 2;
+  if (!(axis === "y" && sign < 0) && Math.abs(p[axis] - face) < 0.08) {
+    if (axis === "y") g.phi = 0.02;
+    else { g.phi = Math.PI / 2; g.theta = axis === "z" ? (sign > 0 ? 0 : Math.PI) : sign * Math.PI / 2; }
+    // the shortest way round to that side
+    const now = mv.getCameraOrbit().theta;
+    g.theta += Math.round((now - g.theta) / (2 * Math.PI)) * 2 * Math.PI;
+  }
+  g.target = { x: p.x, y: p.y, z: p.z };
+  g.radius = minRadius;
+  g.fov = Math.min(baseFov, Math.max(MIN_FOV, deg(2 * Math.atan(CLOSE_SPAN / 2 / minRadius))));
+  applyGoal(g);
+  $("hint").classList.add("gone");
+  setClosedUp(true);
+}
+$("btnZoomIn").addEventListener("click", () => zoomBy(0.75));
+$("btnZoomOut").addEventListener("click", () => zoomBy(1 / 0.75));
+
+// Laptops. model-viewer zooms on every scroll, so a two-finger swipe on a trackpad zoomed the model
+// instead of turning it. Now a two-finger swipe turns it, a pinch zooms toward the pointer, and a
+// mouse wheel zooms too. A trackpad shows itself by sideways movement or by its fine steps
+// (Chrome and Safari report wheelDeltaY = -3 x deltaY for it); once seen, the gesture stays a trackpad one.
+// A mouse wheel on a Mac also reports -3 x, but Chrome and Safari move it in exact steps of 4.000244140625
+// (mapbox-gl tells the two apart the same way), so that is checked first; each click is one zoom step.
+let padUntil = 0;
+const macWheel = (e) => e.deltaX === 0 && e.deltaY !== 0 && Math.abs(e.deltaY % 4.000244140625) < 1e-6;
+const fromPad = (e) => !macWheel(e) && (e.deltaX !== 0 || (e.wheelDeltaY ? e.wheelDeltaY === -3 * e.deltaY : e.deltaMode === 0 && !Number.isInteger(e.deltaY)));
+mv.addEventListener("wheel", (e) => {
+  if (arActive) return;
+  e.preventDefault();
+  e.stopPropagation(); // keep model-viewer's own zoom-on-scroll out of it
+  if (e.ctrlKey) return zoomBy(Math.exp(e.deltaY * 0.01), e.clientX, e.clientY); // trackpad pinch, or Ctrl + wheel
+  const now = performance.now();
+  if (fromPad(e) || now < padUntil) {
+    padUntil = now + 300;
+    return turnBy(e.deltaX * 0.006, e.deltaY * 0.004);
+  }
+  if (macWheel(e)) return zoomBy(e.deltaY > 0 ? 1.15 : 1 / 1.15, e.clientX, e.clientY);
+  zoomBy(Math.exp((e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY) * 0.0015), e.clientX, e.clientY);
+}, { capture: true, passive: false });
+// Safari on a Mac reports a trackpad pinch as gesture events, not as a wheel
+if (platform === "desktop") {
+  let lastScale = 1;
+  mv.addEventListener("gesturestart", (e) => { e.preventDefault(); lastScale = 1; });
+  mv.addEventListener("gesturechange", (e) => { e.preventDefault(); zoomBy(lastScale / e.scale, e.clientX, e.clientY); lastScale = e.scale; });
+}
+// keys: arrows turn, + and - zoom, 0 puts the view back. Only while the viewer has the customer's
+// attention: after a click or Tab into the side panel, the arrows scroll the panel as usual.
+let keysToViewer = true;
+for (const t of ["pointerdown", "focusin"]) document.addEventListener(t, (e) => { keysToViewer = !!e.target.closest?.(".stage"); }, true);
+document.addEventListener("keydown", (e) => {
+  if (!keysToViewer || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || arActive) return;
+  // not while a dialog is showing (the AR sheet, the photo tool)
+  if (e.target.closest?.("input, textarea, select, [contenteditable]") || [...document.querySelectorAll("[aria-modal='true']")].some((d) => d.getClientRects().length)) return;
+  const step = rad(10);
+  const act = { ArrowLeft: () => turnBy(-step, 0), ArrowRight: () => turnBy(step, 0), ArrowUp: () => turnBy(0, -step), ArrowDown: () => turnBy(0, step),
+    "+": () => zoomBy(0.8), "=": () => zoomBy(0.8), "-": () => zoomBy(1.25), "_": () => zoomBy(1.25), "0": () => $("btnReset").click() }[e.key];
+  if (!act) return;
+  e.preventDefault();
+  act();
+});
+if (!document.fullscreenEnabled) $("btnFullscreen").classList.add("hide");
+$("btnFullscreen").addEventListener("click", () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else $("stage").requestFullscreen?.();
+});
+const FS_ICON = $("btnFullscreen").innerHTML;
+document.addEventListener("fullscreenchange", () => {
+  const on = !!document.fullscreenElement, b = $("btnFullscreen");
+  b.title = on ? "Leave full screen" : "Full screen";
+  b.setAttribute("aria-label", b.title);
+  b.innerHTML = on ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>' : FS_ICON;
+});
+
+// ── dimensions ──
+const dimLines = $("dimLines");
+const dimEls = [...mv.querySelectorAll(".dim"), dimLines];
+let dimsOn = false;
+function drawLine(line, a, b, label) {
+  if (!a || !b) return;
+  line.setAttribute("x1", a.canvasPosition.x);
+  line.setAttribute("y1", a.canvasPosition.y);
+  line.setAttribute("x2", b.canvasPosition.x);
+  line.setAttribute("y2", b.canvasPosition.y);
+  line.classList.toggle("hide", !!label && !label.facingCamera);
+}
+function renderDims() {
+  if (!dimsOn) return;
+  const L = dimLines.querySelectorAll("line");
+  const q = (n) => mv.queryHotspot(n);
+  drawLine(L[0], q("hotspot-dot-X-Y+Z"), q("hotspot-dot+X-Y+Z"), q("hotspot-dim-Y+Z"));
+  drawLine(L[1], q("hotspot-dot-X-Y+Z"), q("hotspot-dot-X+Y+Z"), q("hotspot-dim-X+Z"));
+  drawLine(L[2], q("hotspot-dot-X-Y+Z"), q("hotspot-dot-X-Y-Z"), q("hotspot-dim-X-Y"));
+}
+function placeDims() {
+  const c = mv.getBoundingBoxCenter();
+  const s = mv.getDimensions();
+  const [x, y, z] = [s.x / 2, s.y / 2, s.z / 2];
+  const set = (name, px, py, pz) => mv.updateHotspot({ name, position: `${px} ${py} ${pz}` });
+  set("hotspot-dot-X-Y+Z", c.x - x, c.y - y, c.z + z);
+  set("hotspot-dot+X-Y+Z", c.x + x, c.y - y, c.z + z);
+  set("hotspot-dot-X+Y+Z", c.x - x, c.y + y, c.z + z);
+  set("hotspot-dot-X-Y-Z", c.x - x, c.y - y, c.z - z);
+  set("hotspot-dim-Y+Z", c.x, c.y - y * 1.12 - 0.02, c.z + z);
+  set("hotspot-dim-X+Z", c.x - x * 1.25, c.y, c.z + z);
+  set("hotspot-dim-X-Y", c.x - x * 1.25, c.y - y, c.z);
+  const spec = product.size;
+  mv.querySelector('[slot="hotspot-dim-Y+Z"]').textContent = spec.w;
+  mv.querySelector('[slot="hotspot-dim-X+Z"]').textContent = spec.h;
+  mv.querySelector('[slot="hotspot-dim-X-Y"]').textContent = spec.d;
+  $("sizeW").textContent = spec.w;
+  $("sizeH").textContent = spec.h;
+  $("sizeD").textContent = spec.d;
+  requestAnimationFrame(renderDims);
+}
+$("btnDims").addEventListener("click", () => {
+  dimsOn = !dimsOn;
+  dimEls.forEach((el) => el.classList.toggle("hide", !dimsOn));
+  $("btnDims").setAttribute("aria-pressed", String(dimsOn));
+  requestAnimationFrame(renderDims);
+});
+mv.addEventListener("camera-change", (e) => {
+  renderDims();
+  renderFitBox();
+  if (e.detail.source === "user-interaction") $("hint").classList.add("gone");
+});
+
+// ── feature callouts: "Show features" puts a numbered label in the margin for each feature, with a line to its
+// spot on the product. A label (or its dot) opens a short card; Next walks through them, opening or closing
+// whatever each one needs and turning the camera to face it ──
+const hotspots = product.hotspots || [];
+let featuresOn = false, featureIndex = -1, touring = false, featRaf = 0;
+mv.classList.add("no-hs");
+const svgNS = "http://www.w3.org/2000/svg";
+const hsEls = hotspots.map((h, i) => {
+  const b = document.createElement("button");
+  b.className = "hs off";
+  b.tabIndex = -1;
+  b.slot = `hotspot-f${i}`;
+  b.dataset.position = h.pos.map((n) => `${n}m`).join(" ");
+  b.dataset.normal = h.normal.join(" ");
+  b.setAttribute("aria-label", `Feature ${i + 1}: ${h.title}`);
+  b.setAttribute("aria-pressed", "false");
+  b.innerHTML = "<i></i>";
+  b.addEventListener("click", () => (featureIndex === i ? closeFeature() : showFeature(i)));
+  mv.appendChild(b);
+  return b;
+});
+const labEls = hotspots.map((h, i) => {
+  const b = document.createElement("button");
+  b.className = "flab";
+  b.setAttribute("aria-pressed", "false");
+  b.setAttribute("aria-label", `Feature ${i + 1}: ${h.title}`);
+  b.innerHTML = `<b>${i + 1}</b><span>${esc(h.title)}<em></em></span>`;
+  b.addEventListener("click", () => (featureIndex === i ? closeFeature() : showFeature(i, { tour: true })));
+  $("featLayer").appendChild(b);
+  return b;
+});
+const linePaths = hotspots.map(() => {
+  const g = document.createElementNS(svgNS, "g");
+  for (const c of ["case", "core"]) {
+    const p = document.createElementNS(svgNS, "path");
+    p.setAttribute("class", c);
+    p.setAttribute("pathLength", "1");
+    g.appendChild(p);
+  }
+  $("featLines").appendChild(g);
+  return g.querySelectorAll("path");
+});
+$("flist").innerHTML = hotspots.map((h, i) => `<button data-i="${i}"><b>${esc(h.title)}</b><span>${esc(h.text)}</span></button>`).join("");
+$("flist").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+  if (innerWidth <= 900) $("stage").scrollIntoView({ behavior: "smooth", block: "start" });
+  showFeature(+b.dataset.i, { tour: true });
+}));
+$("featureBox").classList.toggle("hide", !hotspots.length);
+$("btnShowFeat").classList.toggle("hide", !hotspots.length);
+$("fcClose").innerHTML = I.close;
+
+const featVisible = (i) => !hsEls[i].classList.contains("off");
+// Lays the labels out down the left and right margins (the side their spot is nearer to), in the order of
+// their spots from top to bottom, each at least a label's height apart, and draws a line from each to its spot.
+// A feature whose spot is hidden right now (behind a closed door, or on the far side) keeps its label, dimmed,
+// with what to do; tapping it does that for you. On a narrow stage the labels shrink to their numbers.
+const need = (h, facing) => {
+  const sh = h.show && h.show !== "always" ? h.show : null;
+  if (sh) {
+    const key = sh.replace("!", ""), part = parts.find((p) => p.key === key), name = (part?.label || key).toLowerCase();
+    if (key in state && state[key] === sh.startsWith("!")) return sh.startsWith("!") ? `Close the ${name}` : `Open the ${name}`;
+  }
+  return facing ? "" : "Turn to see";
+};
+function layoutFeatures() {
+  featRaf = 0;
+  if (!featuresOn) return;
+  const W = mv.clientWidth, Hh = mv.clientHeight;
+  const narrow = W < 540;
+  const left = 16, right = W - (narrow ? 70 : 84);       // the zoom and reset buttons sit down the right edge
+  const top = 72, bottom = Hh - 104, labH = narrow ? 34 : 46;
+  const rows = [];
+  hotspots.forEach((h, i) => {
+    const q = mv.queryHotspot(`hotspot-f${i}`);
+    const inView = q && q.canvasPosition.x > 0 && q.canvasPosition.x < W && q.canvasPosition.y > 0 && q.canvasPosition.y < Hh;
+    const hidden = !featVisible(i) || !q || !q.facingCamera || !inView;
+    const note = hidden ? need(h, featVisible(i) && q && q.facingCamera) || "Turn to see" : "";
+    labEls[i].classList.toggle("num", narrow);
+    labEls[i].classList.toggle("away", hidden);
+    const sub = labEls[i].querySelector("em");
+    if (sub.textContent !== note) sub.textContent = note;
+    rows.push({ i, hidden, x: hidden ? NaN : q.canvasPosition.x, y: hidden ? NaN : q.canvasPosition.y });
+    if (hidden) linePaths[i].forEach((p) => p.classList.remove("on"));
+  });
+  const live = rows.filter((r) => !r.hidden), away = rows.filter((r) => r.hidden);
+  const sides = { L: [], R: [] };
+  live.forEach((r) => sides[r.x < W / 2 ? "L" : "R"].push(r));
+  // hidden ones fill the emptier margin, below the others, so nothing crosses the product
+  for (const r of away) {
+    const side = sides.L.length <= sides.R.length ? "L" : "R";
+    r.y = Math.max(top, ...sides[side].map((o) => o.y)) + labH + 8;
+    sides[side].push(r);
+  }
+  for (const side of ["L", "R"]) {
+    const list = sides[side].sort((a, b) => a.y - b.y);
+    let prev = top - labH - 6;
+    for (const r of list) { r.ly = Math.max(r.y - labH / 2, prev + labH + 6, top); prev = r.ly; }
+    for (let k = list.length - 1, lim = Math.max(top, bottom - labH); k >= 0; k--) { list[k].ly = Math.min(list[k].ly, lim); lim = list[k].ly - labH - 6; }
+    for (const r of list) {
+      const el = labEls[r.i];
+      el.style.visibility = "visible";
+      const w = el.offsetWidth, h = el.offsetHeight;
+      const lx = side === "L" ? left : right - w;
+      el.style.left = `${lx}px`; el.style.top = `${r.ly}px`;
+      if (r.hidden) continue;
+      const ax = side === "L" ? lx + w : lx, ay = r.ly + h / 2;
+      // a short level run out of the label, then straight to the spot
+      const bx = ax + (side === "L" ? 14 : -14);
+      const d = `M${ax} ${ay} L${bx} ${ay} L${r.x} ${r.y}`;
+      linePaths[r.i].forEach((p) => p.setAttribute("d", d));
+      linePaths[r.i].forEach((p) => p.classList.add("on"));
+    }
+  }
+  for (const el of labEls) if (!el.classList.contains("on")) requestAnimationFrame(() => el.classList.add("on"));
+  linePaths.forEach((ps, i) => ps.forEach((p) => p.classList.toggle("active", i === featureIndex)));
+  featRaf = requestAnimationFrame(layoutFeatures);
+}
+function setFeatures(on) {
+  featuresOn = on;
+  mv.classList.toggle("no-hs", !on);
+  $("btnShowFeat").setAttribute("aria-pressed", String(on));
+  $("btnShowFeat").querySelector("span").textContent = on ? "Hide features" : "Show features";
+  if (on) {
+    $("hint").classList.add("gone");
+    labEls.forEach((el, i) => { el.style.transitionDelay = `${i * 70}ms`; linePaths[i].forEach((p) => (p.style.transitionDelay = `${i * 70}ms`)); });
+    if (!featRaf) featRaf = requestAnimationFrame(layoutFeatures);
+  } else {
+    closeFeature();
+    cancelAnimationFrame(featRaf); featRaf = 0;
+    labEls.forEach((el) => { el.classList.remove("on"); el.style.visibility = "hidden"; });
+    linePaths.forEach((ps) => ps.forEach((p) => p.classList.remove("on")));
+  }
+}
+labEls.forEach((el) => (el.style.visibility = "hidden"));
+$("btnShowFeat").addEventListener("click", () => setFeatures(!featuresOn));
+
+let hsTimer = null;
+// hide at once what the new door state hides; show what it reveals once the door has moved
+function renderHotspots(delay = 0) {
+  clearTimeout(hsTimer);
+  const apply = (hideOnly) => hotspots.forEach((h, i) => {
+    if (!hotspotShown(h, state)) hsEls[i].classList.add("off");
+    else if (!hideOnly) hsEls[i].classList.remove("off");
+  });
+  apply(delay > 0);
+  if (delay) hsTimer = setTimeout(() => apply(false), delay);
+  if (featureIndex >= 0 && !hotspotShown(hotspots[featureIndex], state)) closeFeature();
+}
+async function showFeature(i, { tour = false } = {}) {
+  const h = hotspots[i];
+  if (!h) return;
+  if (!featuresOn) setFeatures(true);
+  const need = h.show && h.show !== "always" ? h.show : null;
+  if (need) {
+    const key = need.replace("!", ""), wantOpen = !need.startsWith("!");
+    if (key in state && state[key] !== wantOpen) {
+      while (busy) await sleep(80);
+      await togglePart(key);
+      await sleep(700);
+    }
+  }
+  featureIndex = i;
+  track("FEATURE", h.title);
+  hsEls.forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
+  labEls.forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
+  $("fcCount").textContent = `Feature ${i + 1} of ${hotspots.length}`;
+  $("fcTitle").textContent = h.title;
+  $("fcText").textContent = h.text;
+  $("fcPrev").disabled = hotspots.length < 2;
+  $("fcNext").textContent = hotspots.length < 2 ? "Close" : "Next feature";
+  $("fcard").classList.remove("gone");
+  $("fcard").setAttribute("aria-hidden", "false");
+  $("fcard").inert = false;
+  $("hint").classList.add("gone");
+  if (tour && baseRadius) {
+    touring = true;
+    const [nx, , nz] = h.normal;
+    const o = mv.getCameraOrbit();
+    const theta = Math.hypot(nx, nz) < 0.2 ? o.theta : Math.atan2(nx, nz);
+    mv.cameraTarget = `${h.pos[0]}m ${h.pos[1]}m ${h.pos[2]}m`;
+    mv.cameraOrbit = `${theta}rad 78deg ${baseRadius * 0.6}m`;
+  }
+}
+function closeFeature() {
+  if (featureIndex < 0) return;
+  featureIndex = -1;
+  hsEls.forEach((b) => b.setAttribute("aria-pressed", "false"));
+  labEls.forEach((b) => b.setAttribute("aria-pressed", "false"));
+  $("fcard").classList.add("gone");
+  $("fcard").setAttribute("aria-hidden", "true");
+  $("fcard").inert = true;
+  if (touring) { touring = false; mv.cameraTarget = "auto"; mv.cameraOrbit = orbit(); }
+}
+const stepFeature = (d) => (hotspots.length < 2 ? closeFeature() : showFeature((featureIndex + d + hotspots.length) % hotspots.length, { tour: true }));
+$("fcNext").addEventListener("click", () => stepFeature(1));
+$("fcPrev").addEventListener("click", () => stepFeature(-1));
+$("fcClose").addEventListener("click", closeFeature);
+
+// ── will it fit: the shopper's space against the size plus the maker's gaps, drawn in 3D
+// around the product ──
+const FIT_KEY = `fit-space-${onWall ? "wall" : "floor"}`;
+const fitFields = onWall ? [["w", "Width"], ["h", "Height"]] : [["w", "Width"], ["h", "Height"], ["d", "Depth"]];
+$("fitIn").className = `fit-in${onWall ? " two" : ""}`;
+$("fitIn").innerHTML = fitFields.map(([k, l]) => `<label>${l}<span class="box"><input id="fit-${k}" type="number" inputmode="decimal" min="0" step="0.5" aria-label="${l} of your space, in centimetres"><span>cm</span></span></label>`).join("");
+$("fitHelp").textContent = onWall
+  ? "Measure the free wall where it would hang: its width, and its height up to the ceiling."
+  : "Measure the space you have for it: width, height and depth.";
+try { const saved = JSON.parse(localStorage.getItem(FIT_KEY) || "{}"); for (const [k] of fitFields) if (saved[k]) $(`fit-${k}`).value = saved[k]; } catch {}
+let fitResult = null, fitBoxOn = false;
+const fitCorners = onWall ? 4 : 8;
+for (let i = 0; i < fitCorners; i++) {
+  const d = document.createElement("div");
+  d.className = "dot";
+  d.slot = `hotspot-fc${i}`;
+  d.dataset.position = "0 0 0";
+  d.dataset.normal = "0 0 1";
+  mv.appendChild(d);
+}
+const FIT_EDGES = onWall ? [[0, 1], [1, 3], [3, 2], [2, 0]] : [[0, 1], [1, 3], [3, 2], [2, 0], [4, 5], [5, 7], [7, 6], [6, 4], [0, 4], [1, 5], [2, 6], [3, 7]];
+$("fitLines").innerHTML = FIT_EDGES.map(() => "<line></line>").join("");
+const cmText = (n) => `${+n.toFixed(1)} cm`;
+function renderFit() {
+  const space = {};
+  for (const [k] of fitFields) space[k] = parseFloat($(`fit-${k}`).value) || 0;
+  try { localStorage.setItem(FIT_KEY, JSON.stringify(space)); } catch {}
+  const r = fitResult = fitCheck(product, space);
+  const out = $("fitOut");
+  const rows = r.rows.filter((x) => x.given);
+  if (!rows.length) { out.classList.add("hide"); setFitBox(false); return; }
+  const short = rows.filter((x) => !x.ok);
+  const word = { w: "wide", h: "tall", d: "deep" };
+  let verdict;
+  if (short.length) verdict = `${I.no}<span>It won’t fit: ${short.map((x) => `${cmText(-x.margin)} too ${word[x.key]}`).join(", ")}</span>`;
+  else if (r.given) {
+    const tight = [...rows].sort((a, b) => a.margin - b.margin)[0];
+    verdict = `${I.yes}<span>It fits${tight.margin < 3 ? `, just: ${cmText(tight.margin)} to spare in ${tight.label.toLowerCase()}` : ""}</span>`;
+  } else verdict = `${I.info}<span>So far it fits. Add the ${r.rows.filter((x) => !x.given).map((x) => x.label.toLowerCase()).join(" and ")}.</span>`;
+  out.className = `fit-out ${short.length ? "no" : r.given ? "yes" : ""}`;
+  const front = r.front && !onWall ? `<p class="front">Keep about ${r.front} cm free in front so the ${(product.parts || []).filter((p) => !p.text).map((p) => p.label).join(" and ")} can open fully.</p>` : "";
+  const src = r.note || (r.gaps ? "" : `${product.brand} doesn’t publish installation gaps for it, so this checks its size alone. Leave a little room for air.`);
+  out.innerHTML = `<div class="verdict">${verdict}</div>
+    <ul>${rows.map((x) => `<li><span>${x.label}: needs ${cmText(x.need)}${x.gap ? ` (${esc(x.gapText)})` : ""}</span><b class="${x.ok ? "" : "short"}">${x.ok ? `${cmText(x.margin)} spare` : `${cmText(-x.margin)} short`}</b></li>`).join("")}</ul>
+    ${front}${src ? `<p class="src">${esc(src)}</p>` : ""}
+    <button class="link-btn fit-show" id="fitShow">${I.box}<span></span></button>`;
+  $("fitShow").addEventListener("click", () => {
+    setFitBox(!fitBoxOn);
+    if (fitBoxOn && innerWidth <= 900) $("stage").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  // on a wide screen the 3D view is beside the form, so draw the space as soon as it's typed
+  setFitBox(fitBoxOn || (innerWidth > 900 && r.given), { keepCamera: fitBoxOn });
+}
+function setFitBox(on, { keepCamera = false } = {}) {
+  fitBoxOn = !!on && !!fitResult?.rows.some((x) => x.given);
+  $("fitLines").classList.toggle("hide", !fitBoxOn);
+  $("fitTag").classList.toggle("hide", !fitBoxOn);
+  const label = $("fitShow")?.querySelector("span");
+  if (label) label.textContent = `${fitBoxOn ? "Hide" : "Show"} your space in 3D`;
+  if (fitBoxOn) placeFitBox();
+  if (baseRadius && !touring && !keepCamera) {
+    // pull back so the whole space is in view
+    const grow = fitBoxOn ? Math.min(1.8, Math.max(1, ...fitResult.rows.filter((x) => x.given).map((x) => x.have / (x.need || 1)))) : 1;
+    const o = mv.getCameraOrbit();
+    mv.cameraOrbit = `${o.theta}rad ${o.phi}rad ${baseRadius * grow}m`;
+  }
+}
+// the space: centred on the product, standing on the floor with the maker's back gap
+// behind it, or on the wall with the top gap below the ceiling
+function placeFitBox() {
+  const c = mv.getBoundingBoxCenter(), s = mv.getDimensions(), f = product.fit || {};
+  const have = (k, fallback) => { const r = fitResult.rows.find((x) => x.key === k); return r?.given ? r.have / 100 : fallback; };
+  const W = have("w", s.x), H = have("h", s.y);
+  const x0 = c.x - W / 2, x1 = c.x + W / 2;
+  let pts, tagAt;
+  if (onWall) {
+    const z = c.z - s.z / 2 + 0.002, top = c.y + s.y / 2 + (f.top || 0) / 100;
+    pts = [[x0, top - H, z], [x1, top - H, z], [x0, top, z], [x1, top, z]];
+    tagAt = [c.x, top, z];
+  } else {
+    const D = have("d", s.z), zb = c.z - s.z / 2 - (f.back || 0) / 100, y0 = c.y - s.y / 2;
+    pts = [...Array(8)].map((_, i) => [i & 1 ? x1 : x0, i & 2 ? y0 + H : y0, i & 4 ? zb + D : zb]);
+    tagAt = [c.x, y0 + H, zb + D];
+  }
+  pts.forEach((p, i) => mv.updateHotspot({ name: `hotspot-fc${i}`, position: p.map((n) => `${n}m`).join(" ") }));
+  mv.updateHotspot({ name: "hotspot-fit-tag", position: tagAt.map((n) => `${n}m`).join(" ") });
+  const bad = fitResult.rows.some((x) => x.given && !x.ok);
+  $("fitTag").textContent = `Your space · ${fitResult.rows.map((x) => (x.given ? +x.have.toFixed(1) : "?")).join(" × ")} cm`;
+  $("fitTag").className = `fit-tag${bad ? " no" : ""}`;
+  $("fitLines").setAttribute("class", `fit-lines ${bad ? "no" : "yes"}`);
+  requestAnimationFrame(renderFitBox);
+}
+function renderFitBox() {
+  if (!fitBoxOn) return;
+  const L = $("fitLines").querySelectorAll("line");
+  const q = (i) => mv.queryHotspot(`hotspot-fc${i}`);
+  FIT_EDGES.forEach(([a, b], i) => {
+    const A = q(a), B = q(b);
+    if (!A || !B) return;
+    L[i].setAttribute("x1", A.canvasPosition.x); L[i].setAttribute("y1", A.canvasPosition.y);
+    L[i].setAttribute("x2", B.canvasPosition.x); L[i].setAttribute("y2", B.canvasPosition.y);
+  });
+}
+let fitTimer = null, fitTrackTimer = null, fitSent = "";
+// counted once the shopper has stopped typing a full space, once per different space
+const trackFit = () => { const k = fitFields.map(([f]) => $(`fit-${f}`).value).join("x"); if (fitResult?.given && k !== fitSent) { fitSent = k; track("FIT", fitResult.ok ? "fits" : "too-big"); } };
+$("fitIn").addEventListener("input", () => { clearTimeout(fitTimer); fitTimer = setTimeout(renderFit, 300); clearTimeout(fitTrackTimer); fitTrackTimer = setTimeout(trackFit, 2000); });
+
+// ── loading ──
+mv.addEventListener("progress", (e) => {
+  const p = e.detail.totalProgress;
+  $("progress").querySelector("i").style.width = `${Math.round(p * 100)}%`;
+  if (p >= 1) $("progress").classList.add("done");
+});
+let baseRadius = null;
+onLoad(() => {
+  applyFinish(finishIndex);
+  placeDims();
+  for (const k in state) state[k] = false;
+  renderParts();
+  renderHotspots();
+  baseRadius ??= mv.getCameraOrbit().radius;
+  renderFit();
+});
+
+// ── AR and VR ──
+// iPhone, iPad, Vision Pro: Apple's AR view, with tap-to-open doors built into the file
+// and a banner along the bottom that keeps the tip on screen.
+// ?ql=free opens the same product without the floor anchor (the -free file), to compare on an
+// iPhone which one stands where it is pointed; Quick Look's placement can't be set from the page.
+const qlFree = new URLSearchParams(location.search).get("ql") === "free" && !onWall;
+function openQuickLook() {
+  const f = product.finishes[finishIndex];
+  const banner = `${location.origin}/banners/${product.id}`;
+  const a = document.createElement("a");
+  a.rel = "ar";
+  a.href = `${model(qlFree ? f.usdz.replace(/\.usdz$/, "-free.usdz") : f.usdz)}#allowsContentScaling=0` +
+    (location.protocol === "https:" ? `&custom=${banner}&customHeight=small` : "") +
+    `&canonicalWebPageURL=${encodeURIComponent(shareUrl)}`;
+  a.appendChild(document.createElement("img"));
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => a.remove(), 1000);
+}
+// Meta Quest and other headsets: our own WebXR scene, with point-and-press doors.
+let xrModule = null;
+const loadXR = () => (xrModule ||= import("/xr.js"));
+if (headsetAR || headsetVR) loadXR(); // fetch it early so entering is instant
+async function openHeadset(mode) {
+  const sessionReq = navigator.xr.requestSession(mode === "ar" ? "immersive-ar" : "immersive-vr", {
+    optionalFeatures: mode === "ar" ? ["local-floor", "hit-test"] : ["local-floor"],
+  });
+  let session;
+  try {
+    const [xr, s] = await Promise.all([loadXR(), sessionReq]);
+    session = s;
+    await xr.runXR(session, {
+      mode, product, finishIndex, parts: { ...state },
+      onEnd: async ({ parts: after, finishIndex: fi }) => {
+        // carry the headset's door and finish state back to the page, one part at a time as on the page
+        // (a part inside another waits for it, and the model has a clip only for one part moving)
+        if (fi !== finishIndex) chooseFinish(fi);
+        for (const p of parts) if (after[p.key] !== state[p.key]) { busy = false; await togglePart(p.key, { instant: true }); }
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    session?.end?.().catch(() => {});
+    toast("The headset view couldn’t start. Try again, or use a phone.");
+  }
+}
+function launchAR() {
+  const arKind = ["ios", "visionos", "quest"].includes(platform) ? platform : mv.canActivateAR ? "android" : null;
+  if (arKind) track("AR", arKind);
+  if (platform === "ios" || platform === "visionos") return openQuickLook();
+  if (platform === "quest") return openHeadset("ar");
+  if (mv.canActivateAR) return mv.activateAR();
+  toast("AR isn’t available in this browser. Try Chrome on Android or Safari on iPhone.");
+}
+
+// ── Android: guidance inside AR ──
+let arActive = false, statusTimer = null;
+function arStatus(text, ms) {
+  const el = $("arStatus");
+  clearTimeout(statusTimer);
+  if (!text) { el.classList.add("gone"); return; }
+  el.textContent = text;
+  el.classList.remove("gone");
+  if (ms) statusTimer = setTimeout(() => el.classList.add("gone"), ms);
+}
+let placedOnce = false;
+mv.addEventListener("ar-status", (e) => {
+  const s = e.detail.status;
+  arActive = s === "session-started" || s === "object-placed";
+  $("arUi").classList.toggle("hide", !arActive);
+  mv.classList.toggle("no-hs", arActive || !featuresOn);
+  if (arActive) closeFeature();
+  renderParts();
+  if (s === "session-started") {
+    placedOnce = false;
+    if (onWall || !startPin()) arStatus(onWall ? "Point at the wall and move your phone slowly" : "Point at the floor and move your phone slowly");
+  }
+  if (s === "object-placed" && pin.mode === "placed") arStatus(`It stays on this spot, at real size.${parts.length ? `\n${product.arTip}` : ""}`, 6500);
+  else if (s === "object-placed" && !placedOnce) { placedOnce = true; arStatus(parts.length ? `${product.arTip}\nDrag it to move · Twist two fingers to turn` : "Drag it to move · Twist two fingers to turn", 6500); }
+  if (s === "not-presenting" || s === "failed") stopPin();
+  if (s === "failed") toast("AR couldn’t start on this phone. Try Chrome with Google Play Services for AR.");
+});
+mv.addEventListener("ar-tracking", (e) => {
+  if (!arActive) return;
+  if (e.detail.status === "not-tracking") arStatus("Move your phone slowly so it can see the room");
+  else if (pin.mode === "aim") pinUI();
+  else if (placedOnce || pin.mode === "placed") arStatus("");
+});
+
+// ── Android: the product stands where you point, and stays there ──
+// model-viewer drops the product about 2 m in front of the phone, wherever that is, and one finger
+// can slide it anywhere. In the shop the staff point at a spot and it has to stand on exactly that spot,
+// so floor placement is taken over: its real footprint follows the dot in the middle of the screen,
+// Place here (or a tap) stands it on that spot facing the phone, and after that one finger can't slide it
+// or spin it away; a two-finger twist still turns it where it stands. Move to another spot starts again.
+// This reaches into model-viewer 4.0.0's AR renderer (the version is pinned at the top). If those
+// parts are ever missing, model-viewer's own placement runs instead.
+const symbolOf = (o, name) => { for (; o; o = Object.getPrototypeOf(o)) { const s = Object.getOwnPropertySymbols(o).find((x) => x.description === name); if (s) return s; } };
+const pin = { R: null, mode: "off", src: null, seen: -Infinity, ready: false, spot: null, placedAt: 0 };
+function hookAR() {
+  if (pin.R) return pin.R;
+  const R = mv[symbolOf(mv, "renderer")]?.arRenderer;
+  if (!R || !R.goalPosition || ![R.moveToFloor, R.processInput, R.getHitPoint].every((f) => typeof f === "function")) return null;
+  const stockMove = R.moveToFloor, stockInput = R.processInput;
+  R.moveToFloor = function (frame) { return pin.mode === "off" ? stockMove.call(this, frame) : aimFrame(frame); };
+  R.processInput = function (frame) { if (pin.mode !== "off") this.isTranslating = this.isRotating = false; return stockInput.call(this, frame); };
+  return (pin.R = R);
+}
+function startPin() {
+  const R = hookAR(), scene = R?.presentedScene, session = R?.currentSession;
+  if (!scene?.model || !R.placementBox || !session) return false;
+  // stand it by the middle of its footprint, not by whatever spot the 3D view was zoomed in on
+  const c = mv.getBoundingBoxCenter();
+  scene.setTarget(c.x, c.y, c.z);
+  pin.src = null;
+  session.requestReferenceSpace("viewer")
+    .then((space) => session.requestHitTestSource({ space })) // straight out of the middle of the screen
+    .then((src) => { if (R.currentSession === session) pin.src = src; else src.cancel(); })
+    .catch((err) => console.warn("AR hit test", err));
+  aim();
+  return true;
+}
+function aim() {
+  const R = pin.R, scene = R.presentedScene;
+  pin.mode = "aim"; pin.seen = -Infinity; pin.ready = false;
+  scene.model.visible = false; // only its footprint shows until it's placed
+  scene.setShadowIntensity(0.01);
+  pinUI();
+}
+function aimFrame(frame) {
+  const R = pin.R, box = R.placementBox;
+  if (pin.mode === "placed") { // hold it on its spot, whatever a touch does (model-viewer lowers it 1 mm per touch)
+    R.goalPosition.copy(pin.spot);
+    box.show = false; // a touch would show the outline, which says "drag me"
+    return;
+  }
+  R.placementComplete = true; // keeps model-viewer from hiding the outline or turning on the shadow by itself
+  let p = null;
+  for (const h of pin.src ? frame.getHitTestResults(pin.src) : []) if ((p = R.getHitPoint(h))) break;
+  if (p) {
+    const cam = R.presentedScene.getCamera().position;
+    R.goalPosition.copy(p);
+    R.goalYaw = Math.atan2(cam.x - p.x, cam.z - p.z); // front towards the phone
+    pin.seen = performance.now();
+  }
+  const ready = performance.now() - pin.seen < 700; // ride out a dropped frame or two
+  box.show = ready;
+  if (ready !== pin.ready) { pin.ready = ready; pinUI(); }
+}
+function placeHere() {
+  const R = pin.R, scene = R?.presentedScene;
+  if (pin.mode !== "aim" || !pin.ready || !scene) return;
+  pin.spot = R.goalPosition.clone();
+  scene.pivot.position.copy(pin.spot); // straight onto the spot, no glide
+  scene.yaw = R.goalYaw;
+  R.placementBox.offsetHeight = 0;
+  scene.setShadowOffset(0);
+  R.placementBox.show = false;
+  scene.model.visible = true;
+  scene.setShadowIntensity(0.8); // model-viewer's own AR shadow strength
+  pin.mode = "placed";
+  pin.placedAt = Date.now();
+  pinUI();
+  R.dispatchEvent({ type: "status", status: "object-placed" });
+}
+function stopPin() {
+  pin.mode = "off"; pin.src = null; pin.ready = false;
+  const scene = mv[symbolOf(mv, "scene")];
+  if (scene?.model) scene.model.visible = true;
+  pinUI();
+}
+function pinUI() {
+  $("arUi").classList.toggle("aiming", pin.mode === "aim");
+  $("arUi").classList.toggle("placed", pin.mode === "placed");
+  $("arPlace").disabled = !pin.ready;
+  if (pin.mode === "aim") arStatus(pin.ready ? "The outline is its real size on the floor.\nTap Place here." : "Point the dot at the floor where it should stand.\nMove the phone slowly.");
+}
+$("arPlace").addEventListener("click", placeHere);
+$("arMove").addEventListener("click", () => pin.mode === "placed" && aim());
+// a tap on these buttons is not also a touch on the AR scene
+$("arUi").addEventListener("beforexrselect", (e) => e.preventDefault());
+
+// ── the guide shown before AR ──
+const GUIDE_KEY = "ar-guide-skip";
+const skipGuide = () => { try { return localStorage.getItem(GUIDE_KEY) === "1"; } catch { return false; } };
+const step = (n, title, text) => `<div class="g-row step"><div class="ic">${n}</div><div><b>${esc(title)}</b><span>${esc(text)}</span></div></div>`;
+const row = (icon, title, text, key = false) => `<div class="g-row${key ? " key" : ""}"><div class="ic">${icon}</div><div><b>${esc(title)}</b><span>${esc(text)}</span></div></div>`;
+const openTitle = parts.length ? `Open the ${parts.filter((p) => !p.text).map((p) => p.label).join(" or ")}` : "";
+function qrSvg(size = 4) {
+  if (!/^https?:$/.test(location.protocol) || !window.qrcode) return "";
+  const q = qrcode(0, "M");
+  q.addData(shareUrl);
+  q.make();
+  return q.createSvgTag({ cellSize: size, margin: 0, scalable: true });
+}
+function guide() {
+  const name = `${product.brand} ${product.shortName}`;
+  const size = `${parseFloat(product.size.w)} cm wide, ${parseFloat(product.size.h)} cm high, ${parseFloat(product.size.d)} cm deep`;
+  const placeWall = { icon: I.wall, text: `Point the middle of your screen at the wall where it would hang, and move slowly. It appears at its real size: ${size}. If it lands on the floor, drag it up onto the wall.` };
+  const lock = row(I.lock, "Real size, locked", `${product.brand}’s own size. Pinching can’t make it bigger or smaller`);
+  switch (platform) {
+    // Phones: three steps the shop staff can follow while the customer watches. Quick Look puts it where the
+    // middle of the screen meets the floor; its Object tab shrinks the product to fit the screen, which is
+    // exactly the "it looks smaller" a customer must never see, and can't be switched off, so the note keeps
+    // them on AR.
+    case "ios": return {
+      title: "Place it at real size", sub: name,
+      steps: onWall ? [
+        step(1, "Point at the wall where it would hang", "Hold the middle of the screen there and move the phone slowly"),
+        step(2, "It appears there at real size", `${size}. If it lands on the floor, drag it up onto the wall`),
+        step(3, "Walk up to it", product.arTip),
+      ] : [
+        step(1, "Point at the spot on the floor", "Hold the middle of the screen on it and move the phone slowly"),
+        step(2, "It stands on that spot at real size", size),
+        step(3, "Walk around it", parts.length ? product.arTip : "Look at it from every side"),
+      ],
+      note: `If “AR” and “Object” show at the top of the screen, keep “AR” chosen: “Object” shrinks it to fit the screen. On a ${onWall ? "plain wall" : "shiny or plain floor"}, move the phone slowly from side to side until it settles. To nudge it, drag it with one finger.`,
+      go: onWall ? "Open on your wall" : "Open in your room",
+    };
+    case "visionos": return {
+      title: "How to use it on Vision Pro", sub: `${name}, in your room at real size.`,
+      place: onWall ? placeWall : { icon: I.floor, text: "It appears in front of you. Look at the floor where it should stand and drag it there." },
+      groups: [["In your room", [parts.length && row(I.eye, openTitle, "Look at it and pinch", true), row(I.pinch, "Move", "Pinch and drag"), row(I.rotate, "Rotate", "Pinch with both hands and twist"), lock]]],
+      note: "Prefer a virtual room around it? Try VR below.",
+      go: "Open in your room", alt: headsetVR ? "See it alone in VR" : null,
+    };
+    case "quest": return {
+      title: "How to use it on Meta Quest", sub: `${name}, in your room at real size.`,
+      place: onWall ? { icon: I.wall, text: "It appears at wall height in front of you. Point at a real wall and pull the trigger to hang it there." } : { icon: I.floor, text: "It appears on the floor in front of you, at real size." },
+      groups: [["In passthrough", [parts.length && row(I.trigger, openTitle, "Point at it and pull the trigger, or pinch", true), row(I.move, "Move", onWall ? "Point at a wall or the floor and pull the trigger" : "Point at the floor and pull the trigger"), row(I.rotate, "Turn", "Hold grip and sweep, or push the thumbstick"), row(I.panel, "Finish and exit", "On the panel beside it")]]],
+      go: "Open in your room", alt: headsetVR ? "See it alone in VR" : null,
+    };
+    case "android": return mv.canActivateAR ? {
+      title: "Place it at real size", sub: name,
+      steps: onWall ? [
+        step(1, "Point at the wall where it would hang", "Move the phone slowly until it appears there"),
+        step(2, "It’s at real size", `${size}. Drag it with one finger to move it`),
+        step(3, "Walk up to it", product.arTip),
+      ] : [
+        step(1, "Point the dot at the spot on the floor", "Move the phone slowly until its outline appears"),
+        step(2, "Tap Place here", `It stands on that spot at real size and stays there: ${size}`),
+        step(3, "Walk around it", parts.length ? product.arTip : "Look at it from every side"),
+      ],
+      note: onWall ? null : "To put it somewhere else, tap Move to another spot.",
+      go: onWall ? "Open on your wall" : "Open in your room",
+    } : {
+      title: "AR isn’t available here", sub: "This browser or phone can’t open the camera view.",
+      groups: [], note: "Open this page in Chrome on an Android phone with Google Play Services for AR, or in Safari on an iPhone.",
+      go: null, copy: true,
+    };
+    case "ios-inapp": return {
+      title: "Open in Safari to use AR", sub: "This in-app browser can’t open Apple’s AR view.",
+      groups: [], note: "Tap ••• or the compass icon and choose Open in Safari, or copy the link and paste it into Safari.",
+      go: null, copy: true,
+    };
+    default: return {
+      title: "Open it on your phone or headset", sub: `See the ${product.shortName} at real size in your room.`,
+      qr: true, groups: [],
+      note: "Works on iPhone and iPad (Safari), Android (Chrome), Meta Quest (Browser) and Vision Pro (Safari). No app needed.",
+      go: null, copy: true,
+    };
+  }
+}
+let lastFocus = null;
+function openGuide() {
+  const g = guide();
+  $("sheetBody").innerHTML = `
+    <div class="sheet-head"><div class="ic">${I.ar}</div><div><h2 id="sheetTitle">${esc(g.title)}</h2><p>${esc(g.sub)}</p></div>
+      <button class="sheet-close" id="sheetClose" aria-label="Close">${I.close}</button></div>
+    ${g.place ? `<div class="place">${g.place.icon}<div>${esc(g.place.text)}</div></div>` : ""}
+    ${g.qr ? `<div class="g-qr"><div class="code">${qrSvg(6)}</div><p>Scan with your phone camera to open this page.</p></div>` : ""}
+    ${g.steps ? `<div class="g-steps">${g.steps.join("")}</div>` : ""}
+    ${(g.groups || []).map(([label, rows]) => `<div class="g-label">${esc(label)}</div>${rows.filter(Boolean).join("")}`).join("")}
+    ${g.note ? `<div class="g-note">${I.info}<div>${esc(g.note)}</div></div>` : ""}`;
+  $("sheetFoot").innerHTML = `
+    ${g.go ? `<button class="go" id="sheetGo">${I.ar}<span>${esc(g.go)}</span></button>` : ""}
+    ${g.alt ? `<button class="alt" id="sheetAlt">${esc(g.alt)}</button>` : ""}
+    ${g.copy ? `<button class="${g.go ? "alt" : "go"}" id="sheetCopy">${g.go ? "" : I.link}<span>Copy link</span></button>` : ""}
+    ${g.go ? `<label><input type="checkbox" id="sheetSkip"> Don’t show this again on this device</label>` : ""}`;
+  $("sheetClose").addEventListener("click", closeGuide);
+  $("sheetGo")?.addEventListener("click", () => {
+    if ($("sheetSkip")?.checked) { try { localStorage.setItem(GUIDE_KEY, "1"); } catch {} }
+    launchAR(); // still inside the tap, as AR requires
+    closeGuide();
+  });
+  $("sheetAlt")?.addEventListener("click", () => { openHeadset("vr"); closeGuide(); });
+  $("sheetCopy")?.addEventListener("click", copyLink);
+  lastFocus = document.activeElement;
+  for (const el of [$("scrim"), $("sheet")]) el.classList.remove("hide");
+  requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); ($("sheetGo") || $("sheetClose")).focus(); });
+}
+function closeGuide() {
+  $("scrim").classList.remove("show");
+  $("sheet").classList.remove("show");
+  setTimeout(() => { $("scrim").classList.add("hide"); $("sheet").classList.add("hide"); }, 280);
+  lastFocus?.focus?.();
+}
+$("scrim").addEventListener("click", closeGuide);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("sheet").classList.contains("hide")) closeGuide(); });
+
+$("btnAR").addEventListener("click", () => {
+  if (framed) return void window.open(shareUrl, "_blank", "noopener");
+  const canLaunch = ["ios", "visionos", "quest"].includes(platform) || (platform === "android" && mv.canActivateAR);
+  if (canLaunch && skipGuide()) return launchAR();
+  openGuide();
+});
+$("btnVR").addEventListener("click", () => openHeadset("vr"));
+
+// ── share ──
+async function copyLink() {
+  try { await navigator.clipboard.writeText(shareUrl); toast("Link copied."); }
+  catch { toast(shareUrl); }
+}
+if (framed) {
+  $("shareText").innerHTML = "<b>Preview only.</b><br>Open the shared link on a phone or headset to place it in your room.";
+  $("qrCode").classList.add("hide");
+}
+$("btnCopy").addEventListener("click", copyLink);
+// Share by the title: a phone's own share sheet (WhatsApp and the rest); on a laptop, the QR code and links below
+$("btnShare").addEventListener("click", async () => {
+  if (navigator.share && platform !== "desktop") {
+    try { await navigator.share({ title: document.title, text: `${product.brand} ${product.shortName}: open it in 3D and see it at real size in your room.`, url: shareUrl }); } catch {}
+    return;
+  }
+  $("share").scrollIntoView({ behavior: "smooth", block: "center" });
+});
+// the QR code and links, drawn again when the colour changes
+function renderShare() {
+  if (!framed) $("qrCode").innerHTML = qrSvg();
+  $("btnWhatsApp").href = `https://wa.me/?text=${encodeURIComponent(`${product.brand} ${product.shortName}: open it in 3D and see it at real size in your room. ${shareUrl}`)}`;
+  if (document.documentElement.classList.contains("embed")) $("embedOpen").href = shareUrl;
+}
+renderShare();
+
+// test hook for automated checks
+window.__demo = { product, state, togglePart, applyFinish, chooseFinish, openHeadset, openGuide, showFeature, closeFeature, fitCheck: () => fitResult,
+  // nothing moving or waiting to move: no part, no chain of parts, no Fill or Empty, and the last clip has ended
+  idle: () => !busy && !chaining && !pressing.size && !window.__organise?.openingDoors?.() && !window.__organise?.running?.() && (mv.paused || performance.now() - movedAt > 1300),
+  caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR } };
+</script>
+</body>
+</html>

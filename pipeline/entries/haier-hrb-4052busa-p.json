@@ -1,0 +1,168 @@
+{
+  "products": [
+    {
+      "id": "haier-hrb-4052busa-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRB-4052BUSA-P",
+      "name": "Haier 355 L bottom-mount refrigerator",
+      "shortName": "355 L bottom-mount refrigerator",
+      "summary": "Open the fridge on top and the freezer below, take out the trays and the freezer drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrb-4052busa-p.glb",
+      "thumb": "/photos/haier-hrb-4052busa-p/0.jpg",
+      "photos": ["/photos/haier-hrb-4052busa-p/0.jpg", "/photos/haier-hrb-4052busa-p/1.jpg", "/photos/haier-hrb-4052busa-p/2.jpg", "/photos/haier-hrb-4052busa-p/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 124%",
+      "finishes": [
+        {
+          "name": "Ultramarine Steel",
+          "swatchColor": "#3a4256",
+          "usdz": "/models/usdz/haier-hrb-4052busa-p-ultramarine-steel.usdz",
+          "variant": "Ultramarine Steel",
+          "code": "HRB-4052BUSA-P"
+        },
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#3a4256",
+          "usdz": "/models/usdz/haier-hrb-4052busa-p-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HRB-4052BGKA-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-355l-bottom-mount-refrigerator-graphite-black-3-star-hrb-4052bgka-p-new/21342"
+        },
+        {
+          "name": "Inox Steel",
+          "swatchColor": "#a9a9aa",
+          "usdz": "/models/usdz/haier-hrb-4052busa-p-inox-steel.usdz",
+          "variant": "Inox Steel",
+          "code": "HRB-4052BISA-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.309, 0.636, 0.14],
+              [0.312, 1.73, 0.334]
+            ],
+            "open": [
+              [0.272, 0.636, 0.207],
+              [0.833, 1.73, 0.721]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.015, 0, 0.45],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.271, 0.657, -0.281],
+              [0.271, 1.577, 0.134]
+            ],
+            "open": [
+              [-0.286, 0.657, 0.169],
+              [0.256, 1.577, 0.584]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [-0.309, 0.028, 0.206],
+              [0.311, 0.632, 0.333]
+            ],
+            "open": [
+              [0.306, 0.028, 0.207],
+              [0.833, 0.632, 0.671]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "freezer drawer",
+          "node": "FreezerDrawer",
+          "slide": [0, 0, 0.3],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.271, 0.104, -0.273],
+              [0.271, 0.335, 0.203]
+            ],
+            "open": [
+              [-0.271, 0.104, 0.027],
+              [0.271, 0.335, 0.503]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "62.3 cm",
+        "h": "173 cm",
+        "d": "66.5 cm"
+      },
+      "sizeNote": "Haier gives 62.3 × 66.5 × 173 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "355 L (refrigerator 270 L, freezer 85 L)"],
+        ["Type", "Frost free, bottom-mount double door"],
+        ["Convertible", "14 in 1 (Magic Convertible series)"],
+        ["Energy rating", "2 star, 255 units a year"],
+        ["Compressor", "Inverter (Triple Inverter and Dual Fan Tech)"],
+        ["Features", "Magic Cooling, 1 Hour Icing, movable ice maker"],
+        ["Shelves", "Toughened glass (refrigerator)"],
+        ["Storage", "Vegetable case (2X BIG Box), egg tray, 2 L bottle guard"],
+        ["Light", "LED"],
+        ["Door", "Steel finish, Ultramarine Steel, Graphite Black or Inox Steel, recess handle"],
+        ["Refrigerant", "R600a"],
+        ["Weight", "67 kg"]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/355-litres-frost-free-bottom-mounted-refrigerator-hrb-4052busa-pultramarinesteel.shtml",
+      "hotspots": [
+        {
+          "title": "Magic Convertible",
+          "text": "14 in 1 convertible modes. Set the freezer to suit what you keep: −24 °C Super Freezer and Turbo Icing, −12 °C energy saving mode for ice cream and chocolate, 0 °C for beverages, 2 °C for milk and curd, 5 °C for fruit and vegetables.",
+          "pos": [-0.002, 1.4365, 0.334],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Jhukna Mat",
+          "text": "The fridge on top, the freezer below: Haier's bottom-mounted refrigerator helps reduce the bending of the back up to 90% as compared to other conventional refrigerators.",
+          "pos": [-0.17, 1, 0.3335],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "2X BIG Box",
+          "text": "This 2x veg box enables the storage space for lots of vegetables at one single place.",
+          "pos": [0.17, 0.74, 0.1315],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Movable Ice Maker",
+          "text": "When you need ice, you get it faster than you imagined, and when you need space, you can detach it to make more space.",
+          "pos": [-0.1515, 0.462, 0.1935],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        }
+      ]
+    }
+  ]
+}

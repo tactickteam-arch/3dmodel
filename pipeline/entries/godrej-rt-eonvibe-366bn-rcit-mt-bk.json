@@ -1,0 +1,169 @@
+{
+  "products": [
+    {
+      "id": "godrej-rt-eonvibe-366bn-rcit-mt-bk",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Refrigerator",
+      "model": "RT EONVIBE 366BN RCIT MT BK",
+      "name": "Godrej Eon Vibe 330 L double-door convertible refrigerator",
+      "shortName": "330 L Eon Vibe convertible refrigerator",
+      "summary": "Open the freezer and the fridge, slide the ice maker and the trays out, pick a colour, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/godrej-rt-eonvibe-366bn-rcit-mt-bk.glb",
+      "thumb": "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/0.jpg",
+      "photos": ["/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/0.jpg", "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/1.jpg", "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/2.jpg", "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Matt Black",
+          "swatchColor": "#26272c",
+          "usdz": "/models/usdz/godrej-rt-eonvibe-366bn-rcit-mt-bk-matt-black.usdz",
+          "variant": "Matt Black",
+          "code": "RT EONVIBE 366BN RCIT MT BK"
+        },
+        {
+          "name": "Champagne Gold",
+          "swatchColor": "#b9b4b0",
+          "usdz": "/models/usdz/godrej-rt-eonvibe-366bn-rcit-mt-bk-champagne-gold.usdz",
+          "variant": "Champagne Gold",
+          "code": "RT EONVIBE 366BN RCIT CH GD"
+        },
+        {
+          "name": "Steel Rush",
+          "swatchColor": "#b7b6b2",
+          "usdz": "/models/usdz/godrej-rt-eonvibe-366bn-rcit-mt-bk-steel-rush.usdz",
+          "variant": "Steel Rush",
+          "code": "RT EONVIBE 366BN RCIT ST RH"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.327, 1.264, 0.179],
+              [0.326, 1.75, 0.339]
+            ],
+            "open": [
+              [0.252, 1.264, 0.26],
+              [0.603, 1.75, 0.891]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.215, 1.436, -0.041],
+              [-0.045, 1.569, 0.167]
+            ],
+            "open": [
+              [-0.215, 1.436, 0.079],
+              [-0.045, 1.569, 0.287]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.327, 0.034, 0.164],
+              [0.326, 1.252, 0.338]
+            ],
+            "open": [
+              [0.246, 0.034, 0.255],
+              [0.653, 1.252, 0.869]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.03, 0, 0.62],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.273, 0.105, -0.289],
+              [0.273, 1.026, 0.156]
+            ],
+            "open": [
+              [-0.303, 0.105, 0.331],
+              [0.243, 1.026, 0.776]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "65.2 cm",
+        "h": "175 cm",
+        "d": "67.6 cm"
+      },
+      "sizeNote": "Godrej lists 1.75 m x 65.20 cm x 67.60 cm (H x W x D) and publishes no clearances or open-door depth for this model",
+      "specs": [
+        ["Total capacity", "330 L"],
+        ["Type", "Frost free, double door"],
+        ["Convertible", "4 in 1 Convertible Technology"],
+        ["Energy rating", "2 star, 230 kWh energy consumption"],
+        ["Compressor", "Inverter, powered by AI"],
+        ["Refrigerant", "R600a"],
+        ["Shelves", "3, toughened glass"],
+        ["Cooling", "Patented Cool Shower Technology"],
+        ["Vegetable tray", "33 litres"],
+        ["Extras", "Movable Ice Maker, Nano Shield Technology, Bright LED Prism Lens"],
+        ["Cooling retention", "Up to 12 hours"],
+        ["Colours", "Matt Black, Champagne Gold, Steel Rush"],
+        ["Weight", "64 kg"],
+        ["Warranty", "1 year comprehensive, 10 years compressor"]
+      ],
+      "source": "https://www.godrejenterprises.com/home-appliances/refrigerators/double-door-frost-free/p/rt-eonvibe-366-bn-rcit-mt-bk",
+      "hotspots": [
+        {
+          "title": "4 in 1 Convertible Technology",
+          "text": "Transform your freezer into extra fridge space or switch off the main compartment and use the freezer as a fridge to minimise energy consumption.",
+          "pos": [-0.17, 1.5, 0.338],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Powered by AI Tech",
+          "text": "Automatically optimizes cooling and energy consumption based on food load in refrigerator and door openings.",
+          "pos": [-0.17, 0.95, 0.338],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Advanced control panel",
+          "text": "Easily adjust settings with sleek display control panel.",
+          "pos": [0.06, 1.727, 0.281],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Patented Cool Shower Technology",
+          "text": "Inbuilt air vents above shelves for uniform 360° cooling.",
+          "pos": [0, 1, -0.275],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}

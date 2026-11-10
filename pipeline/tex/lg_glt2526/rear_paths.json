@@ -1,0 +1,35 @@
+{
+ "note": "u from the photo's left edge (the fridge's right side, +x), v from the top; the plate spans the cabinet's width and height",
+ "crop_px": [
+  775,
+  96,
+  1189,
+  1235
+ ],
+ "cord": [
+  [
+   0.4891,
+   0.7432
+  ],
+  [
+   0.4771,
+   0.7465
+  ],
+  [
+   0.4469,
+   0.7476
+  ],
+  [
+   0.3502,
+   0.7458
+  ],
+  [
+   0.1691,
+   0.7421
+  ],
+  [
+   0.0024,
+   0.7399
+  ]
+ ]
+}

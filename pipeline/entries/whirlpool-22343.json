@@ -1,0 +1,138 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-22343",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "22343",
+      "name": "Whirlpool Intellifresh Pro 235 L convertible double-door refrigerator, Illusia Steel",
+      "shortName": "235 L Intellifresh Pro refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, slide out the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/whirlpool-22343.glb",
+      "thumb": "/photos/whirlpool-22343/0.jpg",
+      "photos": ["/photos/whirlpool-22343/0.jpg", "/photos/whirlpool-22343/1.jpg", "/photos/whirlpool-22343/2.jpg", "/photos/whirlpool-22343/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Illusia Steel",
+          "swatchColor": "#9a9ca0",
+          "usdz": "/models/usdz/whirlpool-22343-illusia-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 120,
+          "zone": {
+            "closed": [
+              [-0.281, 1.133, 0.186],
+              [0.282, 1.587, 0.328]
+            ],
+            "open": [
+              [0.228, 1.133, 0.253],
+              [0.606, 1.587, 0.767]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 120,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.281, 0.031, 0.161],
+              [0.282, 1.12, 0.328]
+            ],
+            "open": [
+              [0.207, 0.031, 0.253],
+              [0.606, 1.12, 0.779]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.3],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.235, 0.109, -0.266],
+              [0.235, 1.049, 0.154]
+            ],
+            "open": [
+              [-0.235, 0.109, 0.034],
+              [0.235, 1.049, 0.454]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "56.4 cm",
+        "h": "158.7 cm",
+        "d": "65.5 cm"
+      },
+      "sizeNote": "Whirlpool gives 56.4 × 158.7 × 65.5 cm (W × H × D) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "235 L"],
+        ["Type", "Frost free, top-mount double door"],
+        ["Convertible", "10-in-1: All Season, Grocery Day, Beverages, Deep Freeze, Energy Saver, Fast Ice, Party, Vacation, Chef, Mini Ref"],
+        ["Energy rating", "2 star, 230 units a year (BEE label 2026-28)"],
+        ["Compressor", "IntelliSense inverter, auto-connects to a home inverter"],
+        ["Controls", "External touch panel on the freezer door"],
+        ["Shelves", "Toughened glass: 4 in the fridge, 1 in the freezer"],
+        ["Door storage", "4 fridge door pockets, 2 freezer door pockets, egg tray"],
+        ["Storage", "Vegetable and fruit drawer, ice bank"],
+        ["Light", "LED"],
+        ["Handle", "Side pocket handle"],
+        ["Voltage", "160-300 V, no stabiliser needed"],
+        ["Model on the energy label", "NDT23533IAQMC2PE"],
+        ["Colour", "Illusia Steel"],
+        ["Weight", "47 kg"],
+        ["Warranty", "1 year comprehensive, 10 years on the compressor"]
+      ],
+      "source": "https://india.whirlpool.in/intellifresh-pro-235l-2-star-convertible-frost-free-double-door-refrigerator-t/p",
+      "hotspots": [
+        {
+          "title": "Convertible 10-in-1 Modes",
+          "text": "Now convert your refrigerator at the touch of a button with 10-in-1 convertible modes.",
+          "pos": [0, 1.47, 0.3285],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Convert freezer to fridge in 10 min",
+          "text": "Now convert your freezer to fridge according to your needs in the fastest time of 10 mins.",
+          "pos": [0, 1.25, -0.25],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Up to 240 kg weight bearing capacity",
+          "text": "The toughened glass end to end shelves can bear up to 240kg of load, allowing you to keep large pots and utensils inside without any fear of breakage.",
+          "pos": [0.15, 0.695, 0.15],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Up to 15 days of extended freshness in both fridge and freezer",
+          "text": "Get up to 15 days of extended freshness in the fridge and freezer both. Now store vegetables in your freezer as well, without worrying about spoilage.",
+          "pos": [-0.12, 0.6, 0.3275],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ]
+    }
+  ]
+}

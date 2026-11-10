@@ -1,0 +1,189 @@
+{
+  "products": [
+    {
+      "id": "lg-glt2216wyro",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GLT2216WYRO",
+      "name": "LG 225 L double-door refrigerator with Smart Inverter Compressor",
+      "shortName": "225 L double-door refrigerator",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-glt2216wyro.glb",
+      "thumb": "/photos/lg-glt2216wyro/0.jpg",
+      "photos": ["/photos/lg-glt2216wyro/0.jpg", "/photos/lg-glt2216wyro/1.jpg", "/photos/lg-glt2216wyro/2.jpg", "/photos/lg-glt2216wyro/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Radiant Onyx",
+          "swatchColor": "#141318",
+          "variant": "Radiant Onyx",
+          "code": "GLT2216WYRO",
+          "usdz": "/models/usdz/lg-glt2216wyro-radiant-onyx.usdz"
+        },
+        {
+          "name": "Radiant Inox",
+          "swatchColor": "#b9babb",
+          "variant": "Radiant Inox",
+          "code": "GLT2216WYRI",
+          "usdz": "/models/usdz/lg-glt2216wyro-radiant-inox.usdz"
+        },
+        {
+          "name": "Onyx Black",
+          "swatchColor": "#0b0b0d",
+          "variant": "Onyx Black",
+          "code": "GLT2216WYOB",
+          "usdz": "/models/usdz/lg-glt2216wyro-onyx-black.usdz"
+        },
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#a9aaab",
+          "variant": "Shiny Steel",
+          "code": "GLT2216WYPZ",
+          "usdz": "/models/usdz/lg-glt2216wyro-shiny-steel.usdz"
+        },
+        {
+          "name": "Dazzle Steel",
+          "swatchColor": "#8b8c8d",
+          "variant": "Dazzle Steel",
+          "code": "GLT2216WYDS",
+          "usdz": "/models/usdz/lg-glt2216wyro-dazzle-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [-0.273, 0.958, 0.193],
+              [0.277, 1.445, 0.32]
+            ],
+            "open": [
+              [0.256, 0.958, 0.241],
+              [0.699, 1.445, 0.684]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.16],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.195, 1.048, -0.022],
+              [-0.019, 1.192, 0.187]
+            ],
+            "open": [
+              [-0.195, 1.048, 0.138],
+              [-0.019, 1.192, 0.347]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.274, 0.037, 0.168],
+              [0.278, 0.942, 0.319]
+            ],
+            "open": [
+              [0.246, 0.037, 0.241],
+              [0.699, 0.942, 0.695]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.52],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.236, 0.09, -0.244],
+              [0.236, 0.867, 0.166]
+            ],
+            "open": [
+              [-0.236, 0.09, 0.276],
+              [0.236, 0.867, 0.686]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55.5 cm",
+        "h": "144.5 cm",
+        "d": "63.7 cm"
+      },
+      "sizeNote": "LG's manual lists 99.9 cm total depth and 95.3 cm total width with a door open",
+      "specs": [
+        ["Total capacity", "225 L (freezer 59 L, fridge 166 L)"],
+        ["Type", "Frost free, double door"],
+        ["Cooling", "Smart Mode, Multi Air Flow"],
+        ["Energy rating", "1 star, 264 units a year"],
+        ["Compressor", "Smart Inverter (BLDC), 10 years on the compressor"],
+        ["Fresh Zone", "25.3 L vegetable drawer"],
+        ["Shelves", "2 tempered glass (fridge)"],
+        ["Door baskets", "2 in the freezer, 3 in the fridge, transparent; 2 L bottles fit"],
+        ["Ice maker", "Manual, Movable Twist Ice Maker"],
+        ["Control", "Knob dial, Express Freeze"],
+        ["Handle", "Golden Pocket Handle"],
+        ["Door", "PET, five colours"],
+        ["Light", "Top LED"],
+        ["Power cuts", "Auto Smart Connect (inverter-compatible)"],
+        ["Weight", "40 kg"]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt2216wyro/",
+      "hotspots": [
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Delivers higher energy efficiency, long-lasting performance with a 10-year warranty, and whisper-quiet operation.",
+          "pos": [0, 0.6, 0.3185],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Golden Pocket Handle",
+          "text": "Adds elegance to the refrigerator with a sleek, premium design.",
+          "pos": [-0.08, 0.926, 0.3185],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Multiple cooling air vents distribute and circulate cool air to every corner of the refrigerator, ensuring that each and every food item is properly cooled.",
+          "pos": [0.105, 1.372, -0.2383],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Fresh Zone",
+          "text": "A spacious 25.3 L compartment offering 20% more room than LG's 224 L refrigerator, to keep fruits and vegetables fresh and crisp.",
+          "pos": [0, 0.167, 0.1637],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 36,
+        "back": 5,
+        "note": "From LG's owner's manual: keep at least 5 cm between the back and the wall. The manual gives 99.9 cm total depth with a door open, which is 36 cm in front of the fridge."
+      }
+    }
+  ]
+}

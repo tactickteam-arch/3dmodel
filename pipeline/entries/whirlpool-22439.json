@@ -1,0 +1,161 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-22439",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "22439",
+      "name": "Whirlpool Intellifresh 431 L convertible double-door refrigerator",
+      "shortName": "431 L Intellifresh refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, slide out the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/whirlpool-22439.glb",
+      "thumb": "/photos/whirlpool-22439/0.jpg",
+      "photos": ["/photos/whirlpool-22439/0.jpg", "/photos/whirlpool-22439/1.jpg", "/photos/whirlpool-22439/2.jpg", "/photos/whirlpool-22439/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Alpha Steel",
+          "swatchColor": "#a8aaad",
+          "usdz": "/models/usdz/whirlpool-22439-alpha-steel.usdz",
+          "variant": "Alpha Steel",
+          "code": "22439"
+        },
+        {
+          "name": "Illusia Steel",
+          "swatchColor": "#989a9c",
+          "usdz": "/models/usdz/whirlpool-22439-illusia-steel.usdz",
+          "variant": "Illusia Steel",
+          "code": "22440"
+        },
+        {
+          "name": "Gravity Black",
+          "swatchColor": "#333437",
+          "usdz": "/models/usdz/whirlpool-22439-gravity-black.usdz",
+          "variant": "Gravity Black",
+          "code": "22441",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-intellifresh-431l-2-star-inverter-convertible-frost-free-double-door-refrigerator-or-gravity-black-22441/21158"
+        },
+        {
+          "name": "Platina Illusia Steel",
+          "swatchColor": "#9a9b9e",
+          "usdz": "/models/usdz/whirlpool-22439-platina-illusia-steel.usdz",
+          "variant": "Platina Illusia Steel",
+          "code": "22442"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [-0.349, 1.177, 0.207],
+              [0.35, 1.69, 0.384]
+            ],
+            "open": [
+              [0.317, 1.177, 0.247],
+              [0.9, 1.69, 0.83]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.349, 0.047, 0.187],
+              [0.35, 1.164, 0.383]
+            ],
+            "open": [
+              [0.303, 0.047, 0.247],
+              [0.9, 1.164, 0.844]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.2],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.315, 0.078, -0.331],
+              [0.315, 1.105, 0.181]
+            ],
+            "open": [
+              [-0.315, 0.078, -0.131],
+              [0.315, 1.105, 0.381]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "70 cm",
+        "h": "169 cm",
+        "d": "76.7 cm"
+      },
+      "sizeNote": "Whirlpool gives 70 × 169 × 76.7 cm (W × H × D) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "431 L"],
+        ["Type", "Frost free, top-mount double door"],
+        ["Convertible", "5-in-1: Deep Freeze, Dessert, Party, Chef, Energy Saver"],
+        ["Energy rating", "2 star, 248 units a year (BEE label 2026-28)"],
+        ["Compressor", "Inverter, auto-connects to a home inverter"],
+        ["Controls", "External touch panel on the freezer door"],
+        ["Shelves", "Toughened glass"],
+        ["Storage", "Twin Seal crispers, fruit crisper, egg tray, portable ice twister"],
+        ["Light", "LED"],
+        ["Handle", "Side pocket handle"],
+        ["Voltage", "160-300 V"],
+        ["Power", "180 W"],
+        ["Model on the energy label", "NFT43127IRM1C1TE"],
+        ["Colour", "Alpha Steel, Illusia Steel, Gravity Black or Platina Illusia Steel"],
+        ["Warranty", "1 year comprehensive, 9 more years on the compressor"]
+      ],
+      "source": "https://india.whirlpool.in/intellifresh-431l-2-star-inverter-convertible-frost-free-three-door-refrigerator-alpha-steel/p",
+      "hotspots": [
+        {
+          "title": "5-in-1 Convertible Modes",
+          "text": "Now convert your refrigerator at the touch of a button with 5-in-1 convertible modes.",
+          "pos": [0, 1.58, 0.3843],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Portable Ice Tray",
+          "text": "Quickly make and access ice with ease, a handy, portable solution right in your freezer for all your cooling needs.",
+          "pos": [-0.127, 1.25, 0.186],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Freshflow Air Tower",
+          "text": "Scientifically designed air tower lets out cool and fresh air into different sections of the refrigerator providing uniform cooling for long-lasting freshness.",
+          "pos": [0.007, 0.72, -0.322],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Twin Seal Crispers",
+          "text": "A unique two-crisper design with an advanced humidity control system lets you store vegetables with different moisture needs in separate compartments.",
+          "pos": [0.15, 0.2, 0.178],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}

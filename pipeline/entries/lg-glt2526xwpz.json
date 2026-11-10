@@ -8,7 +8,7 @@
       "model": "GLT2526XWPZ",
       "name": "LG 251 L double-door refrigerator with Smart Inverter Compressor",
       "shortName": "251 L double-door refrigerator",
-      "summary": "Open the freezer, pull out the ice tray and open the fridge, look inside, then stand it in your kitchen at its real size.",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
       "arTip": "Tap a door to open it",
       "glb": "/models/lg-glt2526xwpz.glb",
       "thumb": "/photos/lg-glt2526xwpz/0.jpg",
@@ -32,12 +32,12 @@
           "angle": 135,
           "zone": {
             "closed": [
-              [-0.273, 1.092, 0.203],
+              [-0.273, 1.089, 0.193],
               [0.277, 1.573, 0.319]
             ],
             "open": [
-              [0.263, 1.092, 0.242],
-              [0.699, 1.573, 0.677]
+              [0.256, 1.089, 0.242],
+              [0.699, 1.573, 0.684]
             ]
           }
         },
@@ -49,12 +49,12 @@
           "needs": "freezer",
           "zone": {
             "closed": [
-              [0, 1.174, 0.033],
-              [0.176, 1.318, 0.242]
+              [0.025, 1.179, -0.022],
+              [0.201, 1.323, 0.187]
             ],
             "open": [
-              [0, 1.174, 0.193],
-              [0.176, 1.318, 0.402]
+              [0.025, 1.179, 0.138],
+              [0.201, 1.323, 0.347]
             ]
           }
         },
@@ -67,12 +67,30 @@
           "hint": true,
           "zone": {
             "closed": [
-              [-0.274, 0.028, 0.177],
-              [0.278, 1.085, 0.319]
+              [-0.274, 0.032, 0.168],
+              [0.278, 1.082, 0.319]
             ],
             "open": [
-              [0.246, 0.028, 0.242],
-              [0.699, 1.085, 0.695]
+              [0.246, 0.032, 0.242],
+              [0.699, 1.082, 0.695]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.52],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.238, 0.083, -0.247],
+              [0.238, 1.011, 0.166]
+            ],
+            "open": [
+              [-0.238, 0.083, 0.273],
+              [0.238, 1.011, 0.686]
             ]
           }
         }
@@ -100,13 +118,13 @@
         ["Power cuts", "Auto Smart Connect (inverter-compatible)"],
         ["Weight", "48 kg"]
       ],
-      "sangeethaUrl": null,
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-251l-double-door-refrigerator-smart-inverter-compressor-smart-mode-or-shiny-steel-or-2-star-glt2526xwpz/21329",
       "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt2526xwpz/",
       "hotspots": [
         {
           "title": "Convertible",
           "text": "Convert the freezer into a fridge with a dedicated dairy mode.",
-          "pos": [-0.12, 1.36, -0.244],
+          "pos": [0, 1.43, -0.2455],
           "normal": [0, 0, 1],
           "show": "freezer"
         },
@@ -120,14 +138,14 @@
         {
           "title": "Multi Air Flow",
           "text": "Multiple cooling air vents circulate cool air to every corner of the refrigerator, so every food item is properly cooled.",
-          "pos": [0.085, 1.14, -0.2475],
+          "pos": [0.085, 1.163, -0.2403],
           "normal": [0, 0, 1],
           "show": "freezer"
         },
         {
           "title": "Fresh Zone",
           "text": "A spacious 25.3 L compartment with 20% more room to keep fruits and vegetables fresh and crisp.",
-          "pos": [0, 0.145, 0.2345],
+          "pos": [0, 0.1525, 0.1637],
           "normal": [0, 0, 1],
           "show": "fridge"
         }

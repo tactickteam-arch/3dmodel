@@ -1,0 +1,165 @@
+{
+ "print_hue": [
+  1.193,
+  1.051,
+  0.755
+ ],
+ "radiant_onyx_print_lift": 5.9,
+ "radiant_onyx_line": [
+  176,
+  156,
+  120
+ ],
+ "radiant_inox_line": [
+  176,
+  156,
+  120
+ ],
+ "inox_trace_shift_px": [
+  3,
+  -1
+ ],
+ "print_cut": 0.636,
+ "print_cover": {
+  "freezer": 0.044,
+  "fridge": 0.0382
+ },
+ "ink_baked": {
+  "freezer": {
+   "radiant_onyx": [
+    127,
+    112,
+    87
+   ],
+   "radiant_inox": [
+    121,
+    111,
+    99
+   ]
+  },
+  "fridge": {
+   "radiant_onyx": [
+    127,
+    112,
+    87
+   ],
+   "radiant_inox": [
+    121,
+    111,
+    99
+   ]
+  }
+ },
+ "door_photo_mean": {
+  "radiant_onyx_freezer": [
+   19,
+   18,
+   23
+  ],
+  "radiant_onyx_fridge": [
+   13,
+   12,
+   18
+  ],
+  "radiant_inox_freezer": [
+   186,
+   188,
+   188
+  ],
+  "radiant_inox_fridge": [
+   182,
+   183,
+   182
+  ],
+  "onyx_black_freezer": [
+   19,
+   18,
+   23
+  ],
+  "onyx_black_fridge": [
+   13,
+   12,
+   18
+  ],
+  "shiny_steel_freezer": [
+   172,
+   172,
+   171
+  ],
+  "shiny_steel_fridge": [
+   160,
+   160,
+   159
+  ],
+  "dazzle_steel_freezer": [
+   139,
+   139,
+   139
+  ],
+  "dazzle_steel_fridge": [
+   134,
+   134,
+   134
+  ]
+ },
+ "streak_contrast": {
+  "shiny_steel_freezer": 1.9,
+  "shiny_steel_fridge": 2.49,
+  "dazzle_steel_freezer": 6.32,
+  "dazzle_steel_fridge": 5.65
+ },
+ "gold_photo": {
+  "radiant_onyx": [
+   152,
+   134,
+   103
+  ],
+  "radiant_inox": [
+   155,
+   135,
+   100
+  ],
+  "onyx_black": [
+   154,
+   135,
+   105
+  ],
+  "shiny_steel": [
+   154,
+   135,
+   101
+  ],
+  "dazzle_steel": [
+   161,
+   133,
+   96
+  ]
+ },
+ "label_white_photo": {
+  "radiant_onyx": [
+   255,
+   255,
+   255
+  ],
+  "radiant_inox": [
+   255,
+   255,
+   255
+  ],
+  "onyx_black": [
+   255,
+   255,
+   255
+  ],
+  "shiny_steel": [
+   255,
+   255,
+   246
+  ],
+  "dazzle_steel": [
+   255,
+   255,
+   250
+  ]
+ }
+}

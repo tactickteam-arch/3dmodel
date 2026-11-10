@@ -1,12 +1,15 @@
-// LG GLT2526XWPZ.DPZZEBN, 251 L double-door refrigerator, Shiny Steel.
-// Built to LG's published size, 555 W x 1573 H x 637 D mm (manual table, GLT25**), from LG's gallery photos (front, side,
-// open, stocked, rear) and its owner's manual: freezer on top (59 L) with a Convertible knob, a wire shelf and a manual
-// ice maker (lever and two trays); fridge below (192 L) with a Turbo Fresh Zone box, two tempered-glass shelves and a
-// Fresh Zone vegetable drawer; 2 baskets in the freezer door and 3 in the fridge door; both doors hinged on the right;
-// no handles, a black pocket grip across the top of the fridge door.
-// The shelves are stocked for a south Indian kitchen (eggs, curd, idli batter, filter coffee, ghee, coconut, curry leaves...).
-// usage: node make_lg_glt2526.mjs <products.json> <tex dir> <out.glb>
+// LG GLT2526XWPZ, 251 L double-door refrigerator, Shiny Steel.
+// Built to LG's published size, 555 W x 1573 H x 637 D mm (LG's page and Sangeetha listing 21329), from LG's gallery photos
+// of this model (front, 3/4, sides, open, stocked, rear): freezer on top (59 L) with a dial and the Convertible print on its
+// back wall, one shelf and a manual ice maker (lever and two trays) hanging under it on the right; fridge below (192 L) with a
+// clear Turbo Fresh Zone box under the ceiling, two tempered-glass shelves, a glass cover and a Fresh Zone drawer with a white front; 2
+// baskets in the freezer door and 3 in the fridge door; both doors hinged on the right; a black pocket grip across the top
+// of the fridge door. As on the LG 343 L, the trays (the Turbo Fresh Zone, the shelves, the drawer's glass cover and the drawer) are
+// one part (FridgeTrays) that slides out with its food when the fridge door is open.
+// Heights are read off LG's photos (private research notes give each number and how it was measured).
+// Stocked for a south Indian kitchen. usage: node make_lg_glt2526.mjs <products.json> <tex dir> <out.glb>
 import fs from "node:fs";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { LGStock } from "./stock_lg.mjs";
 
@@ -18,20 +21,31 @@ const T = `${TEX}/lg_glt2526`;
 const W = 0.555, H = 1.573, D = 0.637;
 const doorT = 0.045, Dc = D - doorT;
 const zBack = -D / 2, zFront = zBack + Dc;
-const wall = 0.034, feet = 0.022;
+const wall = 0.036, feet = 0.022;
 const inW = W - 2 * wall, zIn1 = zBack + 0.06, inD = zFront - zIn1;
-// vertical layout (measured on LG's photos, see NOTES): freezer cavity, mullion with the grip, fridge cavity
-const fy0 = 1.119, fy1 = H - 0.045;          // freezer cavity floor and ceiling
-const gy0 = 0.045, gy1 = 1.043;               // fridge cavity floor and ceiling
-const fzBot = 1.092;                         // freezer door bottom edge
-const frTop = 1.085, frLow = 0.028;          // fridge door top (with its lip) and bottom
-const bandTop = 1.076, bandBot = 1.047;      // the black pocket grip
+// vertical layout, measured on LG's front photo (1.47 mm a pixel) and its open-door photo (50 mm grid on the cabinet's front)
+const fy0 = 1.128, fy1 = 1.533;              // freezer cavity floor and ceiling
+const gy0 = 0.070, gy1 = 1.050;              // fridge cavity floor and ceiling
+const fzBot = 1.089;                         // freezer door bottom edge
+const frTop = 1.082, frLow = 0.032;          // fridge door top and bottom
+const bandTop = 1.075, bandBot = 1.043;      // the black pocket grip under a thin silver lip
+// With the doors shut their baskets reach into the cabinet (the bottle basket 105 mm), so the shelves, the drawer and its
+// cover end 1 cm short of them, and the freezer shelf and the ice maker short of the freezer's baskets.
+const shelfFront = zFront - 0.115, drawerFront = zFront - 0.112, fzShelfFront = zFront - 0.09;
+const s1 = 0.693, s2 = 0.505;                // the two glass shelves
+const coverY = 0.375, drawerY = 0.085;       // the drawer's glass cover (food stands on it) and the drawer's floor
+const topY = 0.875;                          // the Turbo Fresh Zone's floor
+const fzShelfY = 1.334;                      // freezer shelf
 
 // ── materials ──
 const steelDoorF = mat("DoorFreezer", 0xd6d6d6, { metal: 0.38, rough: 0.5 });
 const steelDoorR = mat("DoorFridge", 0xd6d6d6, { metal: 0.38, rough: 0.5 });
 const sideSteel = mat("SideSteel", 0xd2d2d2, { metal: 0.38, rough: 0.5 });
 const sideSteelL = mat("SideSteelL", 0xd2d2d2, { metal: 0.38, rough: 0.5 });
+// the louvres are pressed into the side panel, so their faces take the side's own grey as rendered at 0.15-0.34 m
+// (0x969697 drew white bars, 0x767677 dark ones: 97 against the side's 117-122 in the -40 degree render); only the
+// 0.6 mm edges catch the light, as on LG's photo DZ-03
+const sideEmboss = mat("SideEmboss", 0x8c8c8d, { metal: 0.38, rough: 0.5 });
 const steelEdge = mat("SteelEdge", 0x9a9b9d, { metal: 0.2, rough: 0.6 });
 const topSteel = mat("TopSteel", 0x7e8083, { metal: 0.15, rough: 0.7 });
 const black = mat("GripBlack", 0x151516, { rough: 0.5 });
@@ -51,85 +65,27 @@ const glass = mat("TemperedGlass", 0xa9cdd6, { rough: 0.05, opacity: 0.55, side:
 const glassRim = mat("ShelfRim", 0xe3e7ea, { rough: 0.45 });
 const edgeGreen = mat("GlassEdge", 0x7fa7b0, { rough: 0.3 });
 const white = mat("WhitePlastic", 0xf6f7f8, { rough: 0.45 });
-const wire = mat("WireGrey", 0x4a4d52, { metal: 0.6, rough: 0.4 });
 const ice = mat("IceCube", 0xe3f4ff, { rough: 0.08, opacity: 0.72 });
 const lightM = mat("Led", 0xffffff, { emissive: 0xf4f8ff, emissiveIntensity: 1.5 });
 const footM = mat("Foot", 0x131416, { rough: 0.7 });
-const cordM = mat("Cord", 0x5d6064, { rough: 0.6 });
-const plugM = mat("Plug", 0x45474b, { rough: 0.5 });
+const cordM = mat("Cord", 0xc4c6c9, { rough: 0.6 });
+const plugM = mat("Plug", 0xd9dadc, { rough: 0.5 });
 const pinM = mat("Pin", 0xb7bbc0, { metal: 0.9, rough: 0.3 });
 const hingeM = mat("Hinge", 0xc9ccd0, { metal: 0.9, rough: 0.3 });
-const knobM = mat("KnobFace", 0xffffff, { rough: 0.5 });
+const knobFace = mat("KnobFace", 0xffffff, { rough: 0.5 });
 const knobSide = mat("KnobSide", 0xe6e8eb, { rough: 0.5 });
-const printConv = mat("PrintConvertible", 0xffffff, { rough: 0.7, opacity: 0.999 });
-const freshZoneM = mat("FreshZoneFront", 0xffffff, { rough: 0.5 });
-// food, kitchenware
-const F = {
-  egg: mat("Egg", 0xd9b98c, { rough: 0.55 }), eggCream: mat("EggCream", 0xe9d8b8, { rough: 0.55 }),
-  tubWhite: mat("TubWhite", 0xf7f7f4, { rough: 0.5 }), lidBlue: mat("LidBlue", 0x2f6fb4, { rough: 0.4 }), lidWhite: mat("LidWhite", 0xe9ebee, { rough: 0.5 }),
-  steel: mat("KitchenSteel", 0xc4c8cc, { metal: 0.95, rough: 0.28 }), steelDark: mat("KitchenSteelDark", 0x8e9296, { metal: 0.9, rough: 0.35 }),
-  amber: mat("GlassAmber", 0xc9892b, { rough: 0.12, opacity: 0.88 }), goldLid: mat("GoldLid", 0xd1a43a, { metal: 0.8, rough: 0.3 }),
-  brownGlass: mat("GlassBrown", 0x4a2a16, { rough: 0.12, opacity: 0.94 }), redGlass: mat("GlassRed", 0x992c20, { rough: 0.15, opacity: 0.92 }),
-  waterBottle: mat("WaterBottle", 0xcfe9f7, { rough: 0.1, opacity: 0.55 }), waterCap: mat("WaterCap", 0x2f6fb4, { rough: 0.4 }),
-  cola: mat("ColaLiquid", 0x3a1f10, { rough: 0.15, opacity: 0.93 }), colaCap: mat("ColaCap", 0xc42b22, { rough: 0.4 }),
-  canRed: mat("CanRed", 0xb82a20, { metal: 0.25, rough: 0.4 }), canGreen: mat("CanGreen", 0x218a40, { metal: 0.25, rough: 0.4 }), canGold: mat("CanGold", 0xd89a1f, { metal: 0.25, rough: 0.4 }), canOrange: mat("CanOrange", 0xe07a12, { metal: 0.25, rough: 0.4 }), canBlack: mat("CanBlack", 0x1a1a1e, { metal: 0.25, rough: 0.4 }), fanta: mat("FantaLiquid", 0xe8820e, { rough: 0.15, opacity: 0.93 }), fantaCap: mat("FantaCap", 0xe07a12, { rough: 0.4 }),
-  carrot: mat("Carrot", 0xe8791f, { rough: 0.55 }), drumstick: mat("Drumstick", 0x5e7f3a, { rough: 0.6 }), brinjal: mat("Brinjal", 0x4a2255, { rough: 0.3 }),
-  okra: mat("LadiesFinger", 0x6aa23a, { rough: 0.55 }), tomato: mat("Tomato", 0xc9372c, { rough: 0.4 }), chilli: mat("GreenChilli", 0x3f8a2a, { rough: 0.45 }),
-  leaf: mat("CurryLeaf", 0x2f7a2d, { rough: 0.6 }), coriander: mat("Coriander", 0x5aa543, { rough: 0.65 }), banana: mat("Banana", 0xe8c93a, { rough: 0.5 }),
-  coconutShell: mat("CoconutShell", 0x6b4426, { rough: 0.8 }), coconutFlesh: mat("CoconutFlesh", 0xf6f3ea, { rough: 0.5 }),
-  lemon: mat("Lemon", 0xe9d63a, { rough: 0.5 }), onion: mat("Onion", 0x9e4a63, { rough: 0.5 }),
-  butter: mat("ButterWrap", 0xffd24a, { rough: 0.5 }), cheese: mat("CheeseBlock", 0xf1c765, { rough: 0.5 }), cupWhite: mat("CurdCup", 0xf4f6f8, { rough: 0.5 }),
-  sachet: mat("MilkSachet", 0xe8f1fb, { rough: 0.35 }), sachetCurd: mat("CurdSachet", 0xd2e4f7, { rough: 0.35 }),
-  coconutPack: mat("GratedCoconutPack", 0xf1f3f6, { rough: 0.4 }), icecream: mat("IceCreamTub", 0x7b4528, { rough: 0.5 }),
-  meat: mat("MeatPack", 0xc94a4a, { rough: 0.4 }), soup: mat("SambarVessel", 0xb26a22, { rough: 0.45 }),
-};
-const labelMats = {};
-const lbl = (name) => (labelMats[name] ||= mat(name, 0xffffff, { rough: 0.5 }));
+const printConv = mat("print_convertible", 0xffffff, { rough: 0.6, opacity: 0.999 });
+const drawerFace = mat("FreshZoneFront", 0xffffff, { rough: 0.45 });
 const stock = LGStock({ T3: `${TEX}/lg_glt3426`, TF: `${TEX}/food`, BR: `${TEX}/brands`, BRT: `${TEX}/brands/small` });
 
 // ── small builders ──
 const cyl = (name, rt, rb, h, m, x, y, z, seg = 12) => mesh(name, new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y, z);
-const sph = (name, r, m, x, y, z, sx = 1, sy = 1, sz = 1, seg = 9) => { const o = mesh(name, new THREE.SphereGeometry(r, seg, Math.max(5, Math.round(seg * 0.7))), m, x, y, z); o.scale.set(sx, sy, sz); return o; };
-// a printed label wrapped round a cylinder's front (arc in radians), so it follows the curve instead of cutting through it
-function band(name, r, h, arc, m, x, y, z) {
-  const g = new THREE.CylinderGeometry(r + 0.0009, r + 0.0009, h, 18, 1, true, -arc / 2, arc);
-  return mesh(name, flipV(g), m, x, y, z);
-}
 const plane = (name, w, h, m, x, y, z) => mesh(name, flipV(new THREE.PlaneGeometry(w, h)), m, x, y, z);
-// a stocked tub with a printed label on its front
-function tub(name, r, h, bodyM, lidM, labelName, x, y, z) {
-  const g = group(name, x, y, z);
-  g.add(cyl(name + "Body", r, r * 0.92, h, bodyM, 0, h / 2, 0, 14));
-  g.add(cyl(name + "Lid", r * 1.03, r * 1.03, 0.012, lidM, 0, h + 0.006, 0, 14));
-  if (labelName) g.add(band(name + "Label", r * 0.96, h * 0.6, 1.9, lbl(labelName), 0, h * 0.5, 0));
-  return g;
-}
-function jar(name, r, h, glassM, lidM, labelName, x, y, z) {
-  const g = group(name, x, y, z);
-  g.add(cyl(name + "Glass", r, r, h, glassM, 0, h / 2, 0, 14));
-  g.add(cyl(name + "Lid", r * 1.02, r * 1.02, 0.014, lidM, 0, h + 0.007, 0, 14));
-  if (labelName) g.add(band(name + "Label", r, h * 0.55, 1.9, lbl(labelName), 0, h * 0.5, 0));
-  return g;
-}
-function bottle(name, r, h, liquidM, capM, x, y, z) {
-  const g = group(name, x, y, z);
-  g.add(cyl(name + "Body", r, r, h * 0.7, liquidM, 0, h * 0.35, 0, 16));
-  g.add(cyl(name + "Shoulder", r * 0.38, r, h * 0.18, liquidM, 0, h * 0.79, 0, 16));
-  g.add(cyl(name + "Neck", r * 0.38, r * 0.38, h * 0.08, liquidM, 0, h * 0.92, 0, 12));
-  g.add(cyl(name + "Cap", r * 0.42, r * 0.42, h * 0.05, capM, 0, h * 0.975, 0, 12));
-  return g;
-}
-const can = (name, m, x, y, z) => { const g = group(name, x, y, z); g.add(cyl(name + "Body", 0.0333, 0.0333, 0.122, m, 0, 0.061, 0, 14)); g.add(cyl(name + "Top", 0.0285, 0.0333, 0.008, F.steel, 0, 0.126, 0, 14)); return g; };
-// a sachet: a flat pillow of milk or curd lying down, with its printed face up
-function sachet(name, m, labelName, x, y, z, rotY = 0) {
-  const g = group(name, x, y, z); g.rotation.y = rotY;
-  g.add(mesh(name + "Body", new THREE.BoxGeometry(0.15, 0.028, 0.105), m, 0, 0.014, 0));
-  g.add(plane(name + "Label", 0.11, 0.07, lbl(labelName), 0, 0.0285, 0).rotateX(-Math.PI / 2));
-  return g;
-}
-function egg(name, x, y, z) { const e = sph(name, 0.0215, F.egg, x, y, z, 1, 1.28, 1); return e; }
-function basket(name, w, dep, h, y, front = true) { // a clear door basket, open at the top; origin at its floor
-  const g = group(name, 0, y, 0);
+// many small boxes of one material as one mesh: [w, h, d, x, y, z] each
+const boxes = (name, list, m) => mesh(name, mergeGeometries(list.map(([w, h, d, x, y, z]) => new THREE.BoxGeometry(w, h, d).translate(x, y, z))), m);
+// a clear door basket, open at the top; origin at its floor, its back on the face of the door's liner (10 mm in)
+function basket(name, w, dep, h, y, front = true) {
+  const g = group(name, 0, y, -0.01);
   g.add(box(name + "Floor", w, 0.004, dep, clear, 0, 0.002, -dep / 2));
   g.add(box(name + "Back", w, h, 0.004, clear, 0, h / 2, -0.002));
   if (front) g.add(box(name + "Lip", w, h * 0.85, 0.004, clear, 0, h * 0.425, -dep + 0.002));
@@ -138,6 +94,15 @@ function basket(name, w, dep, h, y, front = true) { // a clear door basket, open
   g.add(box(name + "Rim", w, 0.006, 0.006, clearRib, 0, h - 0.003, -dep + 0.003));
   return g;
 }
+// leave out what doesn't fit (never scaled): any stock item in grp that reaches into one of the keep-out boxes
+function leaveOut(grp, keep, why) {
+  if (!grp) return;
+  grp.updateMatrixWorld(true);
+  const out = [];
+  for (const c of [...grp.children]) if (keep.some((k) => new THREE.Box3().setFromObject(c).intersectsBox(k))) { out.push(c.name); c.removeFromParent(); }
+  if (out.length) console.log(`left out (${why}): ${out.join(", ")}`);
+}
+const B3 = (x0, y0, z0, x1, y1, z1) => new THREE.Box3(new THREE.Vector3(x0, y0, z0), new THREE.Vector3(x1, y1, z1));
 
 const root = group("LGGLT2526");
 const cab = group("Cabinet");
@@ -147,119 +112,174 @@ root.add(cab);
 const sideH = H - feet, sideMid = feet + sideH / 2, zMid = zBack + Dc / 2;
 cab.add(mesh("SideLeft", flipV(new THREE.BoxGeometry(wall, sideH, Dc)), [linerSide, sideSteelL, topSteel, plinth, sideSteelL, sideSteelL], -W / 2 + wall / 2, sideMid, zMid));
 cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(wall, sideH, Dc)), [sideSteel, linerSide, topSteel, plinth, sideSteel, sideSteel], W / 2 - wall / 2, sideMid, zMid));
+// four pressed louvres low on the left side, towards the back (LG's 3/4 photo DZ-03: 148-342 mm above the floor)
+{
+  const zb = zBack + 0.11, zf = zBack + 0.33;
+  const geos = [0.342, 0.292, 0.214, 0.164].map((yt) => {
+    const s = new THREE.Shape([new THREE.Vector2(zb, yt), new THREE.Vector2(zb, yt - 0.025), new THREE.Vector2(zf, yt - 0.043), new THREE.Vector2(zf, yt - 0.018)]);
+    return new THREE.ExtrudeGeometry(s, { depth: 0.0006, bevelEnabled: false }).rotateY(-Math.PI / 2).translate(-W / 2, 0, 0);
+  });
+  cab.add(mesh("SideLouvre", mergeGeometries(geos), sideEmboss));
+}
 cab.add(faced("Top", inW, 0.045, Dc, [topSteel, topSteel, topSteel, liner, topSteel, topSteel], 0, H - 0.0225, zMid));
 cab.add(faced("Divider", inW, fy0 - gy1, inD, [liner, liner, liner, liner, liner, liner], 0, (fy0 + gy1) / 2, zIn1 + inD / 2));
 cab.add(faced("Base", inW, gy0 - feet, Dc, [liner, liner, liner, liner, liner, liner], 0, feet + (gy0 - feet) / 2, zMid));
 cab.add(box("Kickplate", inW, 0.026, 0.012, plinth, 0, feet + 0.013, zFront - 0.006));
 cab.add(faced("BackFreezer", inW, fy1 - fy0, 0.012, [linerDk, linerDk, linerDk, linerDk, linerDk, linerDk], 0, (fy0 + fy1) / 2, zIn1 + 0.006));
 cab.add(faced("BackFridge", inW, gy1 - gy0, 0.012, [liner, liner, liner, liner, liner, liner], 0, (gy0 + gy1) / 2, zIn1 + 0.006));
-// the real back: LG's rear photo on a thin plate; the compressor bay is in the photo
+// the real back: LG's rear photo (cropped to the cabinet's full-width rows, the cord painted out) on a thin plate, from
+// 15 mm above the floor to the top, as the crop runs on the photo
+const rearBot = 0.015, rearTop = H;
+cab.add(mesh("RearPlate", flipV(new THREE.BoxGeometry(W, rearTop - rearBot, 0.004)), [steelEdge, steelEdge, steelEdge, steelEdge, steelEdge, rearM], 0, (rearTop + rearBot) / 2, zBack + 0.002));
+// feet: on LG's front photo the left one stands 15-47 mm in from the edge and set back, the right one at the very edge
+// under the bottom hinge, a black knob on a threaded stem; two rollers at the back
+cab.add(cyl("FootFront", 0.016, 0.017, 0.016, footM, -(W / 2 - 0.031), 0.008, zFront - 0.05, 16));
+cab.add(cyl("FootThread", 0.006, 0.006, feet - 0.016, pinM, -(W / 2 - 0.031), 0.016 + (feet - 0.016) / 2, zFront - 0.05, 10));
+cab.add(cyl("FootFront", 0.016, 0.017, 0.016, footM, W / 2 - 0.017, 0.008, zFront - 0.004, 16));
+cab.add(cyl("FootThread", 0.006, 0.006, 0.012, pinM, W / 2 - 0.017, 0.022, zFront - 0.004, 10));
+for (const fx of [-1, 1]) cab.add(cyl("Roller", 0.017, 0.017, 0.018, footM, fx * (W / 2 - 0.045), 0.017, zBack + 0.06).rotateZ(Math.PI / 2));
+// hinges on the right: the bottom one a dark bracket under the fridge door (486-528 mm from the left on the front photo),
+// the middle one a steel plate in the gap between the doors with two bolt heads, and a dark cover on top
+cab.add(box("HingeBottom", 0.042, 0.004, 0.045, plinth, W / 2 - 0.048, 0.026, zFront + 0.0125));
+cab.add(box("HingeMid", 0.034, 0.0035, doorT + 0.012, hingeM, W / 2 - 0.02, (fzBot + frTop) / 2, zFront + (doorT + 0.012) / 2 - 0.012));
+for (const dz of [0.008, 0.028]) cab.add(cyl("HingeBolt", 0.0045, 0.0045, 0.001, hingeM, W / 2 - 0.02, (fzBot + frTop) / 2 + 0.0022, zFront + dz, 10));
+cab.add(box("HingeCoverTop", 0.05, 0.012, 0.045, plinth, W / 2 - 0.033, H - 0.0052, zFront - 0.02));
+// power cord: its route on the back traced on LG's rear photo (rear_paths.json); past the cabinet's edge the photo does
+// not show it, so it is drawn hanging to the floor with its three-pin plug lying there (estimated)
 {
-  const rh = H - 0.075, ry = 0.075 + rh / 2;
-  cab.add(mesh("RearPlate", flipV(new THREE.BoxGeometry(W, rh, 0.004)), [steelEdge, steelEdge, steelEdge, steelEdge, steelEdge, rearM], 0, ry, zBack + 0.002));
-}
-// feet: two adjustable at the front, two rollers at the back
-for (const fx of [-1, 1]) {
-  cab.add(cyl("FootFront", 0.016, 0.018, feet, footM, fx * (W / 2 - 0.04), feet / 2, zFront - 0.05));
-  cab.add(cyl("Roller", 0.017, 0.017, 0.018, footM, fx * (W / 2 - 0.04), 0.017, zBack + 0.06).rotateZ(Math.PI / 2));
-}
-// hinge on the right: a bright block between the doors, and a dark cover on top
-cab.add(box("HingeMid", 0.034, 0.05, 0.018, hingeM, W / 2 - 0.02, (fzBot + frTop) / 2 + 0.002, zFront + 0.006));
-cab.add(box("HingeCoverTop", 0.07, 0.01, 0.045, plinth, W / 2 - 0.045, H - 0.005, zFront - 0.02));
-// power cord and its three-pin plug at the back (route and sizes estimated from the photo)
-{
-  const pts = [[-0.205, 0.44], [-0.222, 0.35], [-0.215, 0.24], [-0.17, 0.17], [-0.1, 0.12], [-0.02, 0.105]].map(([x, y]) => new THREE.Vector3(x, y, zBack - 0.006));
-  cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), 90, 0.004, 6, false), cordM));
+  const RP = JSON.parse(fs.readFileSync(`${T}/rear_paths.json`, "utf8"));
+  const zc = zBack - 0.0045, V = (x, y, z) => new THREE.Vector3(x, y, z);
+  // (kept 8 mm inside the cabinet's edge, so the cord doesn't widen the model)
+  const pts = RP.cord.map(([u, v]) => V(Math.min(W / 2 - u * W, W / 2 - 0.008), rearTop - v * (rearTop - rearBot), zc));
+  const end = pts[pts.length - 1], px = W / 2 - 0.04, py = 0.023, pz = zBack - 0.1;
+  pts.push(V(W / 2 - 0.011, end.y - 0.04, zBack - 0.012), V(W / 2 - 0.014, 0.16, zBack - 0.022), V(W / 2 - 0.022, 0.045, zBack - 0.042), V(px, py, pz + 0.006));
+  cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), 110, 0.0035, 6, false), cordM));
   const sh = new THREE.Shape(), w = 0.045, h = 0.042, r = 0.012;
   sh.moveTo(-w / 2 + r, -h / 2); sh.lineTo(w / 2 - r, -h / 2); sh.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
   sh.lineTo(w / 2, h / 2 - r); sh.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2); sh.lineTo(-w / 2 + r, h / 2);
   sh.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); sh.lineTo(-w / 2, -h / 2 + r); sh.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
-  const plug = mesh("Plug", new THREE.ExtrudeGeometry(sh, { depth: 0.016, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002, bevelSegments: 2, curveSegments: 8 }), plugM, -0.01, 0.105, zBack - 0.006);
+  const plug = mesh("Plug", new THREE.ExtrudeGeometry(sh, { depth: 0.016, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002, bevelSegments: 2, curveSegments: 8 }), plugM, px, py, pz);
   plug.rotation.y = Math.PI;
   cab.add(plug);
   for (const [dx, dy] of [[0, 0.0105], [-0.0095, -0.0065], [0.0095, -0.0065]]) {
-    const pin = cyl("PlugPin", 0.0026, 0.0026, 0.016, pinM, -0.01 + dx, 0.105 + dy, zBack - 0.006 - 0.016 - 0.008, 10);
+    const pin = cyl("PlugPin", 0.0026, 0.0026, 0.016, pinM, px + dx, py + dy, pz - 0.016 - 0.008, 10);
     pin.rotation.x = Math.PI / 2; cab.add(pin);
   }
 }
 
 // ── freezer inside ──
 const xL = -inW / 2, xR = inW / 2;
-cab.add(box("FreezerLedL", 0.1, 0.006, 0.014, lightM, -0.1, fy1 - 0.006, zIn1 + 0.05));
-cab.add(box("FreezerLedR", 0.1, 0.006, 0.014, lightM, 0.1, fy1 - 0.006, zIn1 + 0.05));
-// cold-air grilles at the bottom of the back wall
-for (let i = 0; i < 5; i++) cab.add(box("FreezerVent", 0.09, 0.004, 0.008, plinth, 0.085, fy0 + 0.014 + i * 0.012, zIn1 + 0.0145));
-// temperature knob (Min - Max) and the word Convertible, printed on the back wall
+// on the back wall (LG's open-door photo DZ-06, scaled by the wall's width): two cold-air grilles under the ceiling, two
+// slatted return vents at the foot, a black slot under the shelf on the left, and the dial with its printed scale and the
+// word Convertible
+cab.add(boxes("FreezerGrille", [[0.14, 0.022, 0.008, -0.107, fy1 - 0.03, zIn1 + 0.016], [0.064, 0.022, 0.008, -0.005, fy1 - 0.03, zIn1 + 0.016], [0.14, 0.022, 0.008, 0.105, fy1 - 0.03, zIn1 + 0.016]], white));
+cab.add(boxes("FreezerGrilleSlot", [-0.107, 0.105].flatMap((x) => [0, 1].map((i) => [0.12, 0.003, 0.002, x, fy1 - 0.035 + i * 0.01, zIn1 + 0.0205])), plinth));
+cab.add(boxes("FreezerVentPanel", [[0.14, 0.05, 0.004, -0.15, fy0 + 0.035, zIn1 + 0.014], [0.14, 0.05, 0.004, 0.145, fy0 + 0.035, zIn1 + 0.014]], white));
+cab.add(boxes("FreezerVent", [-0.15, 0.145].flatMap((x) => [0, 1, 2, 3, 4, 5].map((i) => [0.12, 0.003, 0.002, x, fy0 + 0.015 + i * 0.008, zIn1 + 0.017])), plinth));
+cab.add(box("FreezerSlot", 0.08, 0.012, 0.004, plinth, -0.148, fzShelfY - 0.016, zIn1 + 0.014));
+cab.add(plane("PrintConvertible", 0.283, 0.07, printConv, -0.086, 1.422, zIn1 + 0.0125));
 {
-  cab.add(plane("PrintConvertible", 0.17, 0.062, printConv, -0.075, 1.378, zIn1 + 0.0125));
-  const k = group("FreezerKnob", -0.12, 1.355, zIn1 + 0.012);
-  k.add(mesh("KnobBody", new THREE.CylinderGeometry(0.0165, 0.0165, 0.012, 24), knobSide).rotateX(Math.PI / 2).translateY(0.0));
-  const kf = mesh("KnobTopFace", new THREE.CircleGeometry(0.0155, 24), knobM, 0, 0, 0.0062); kf.geometry = flipV(kf.geometry); k.add(kf);
+  const k = mesh("KnobDial", new THREE.CylinderGeometry(0.021, 0.021, 0.016, 28), [knobSide, knobFace, knobSide], -0.166, 1.415, zIn1 + 0.012 + 0.008);
+  k.rotation.x = Math.PI / 2;
   cab.add(k);
 }
-// freezer shelf (a wire-edged tray) across the cavity
+// the freezer shelf across the cavity, with its rims and rails
 {
-  const y = 1.322, g = group("FreezerShelf", 0, y, 0);
-  g.add(box("TrayPlate", inW - 0.012, 0.004, inD - 0.06, glass, 0, 0, zIn1 + (inD - 0.06) / 2 + 0.02));
-  g.add(box("TrayFrame", inW - 0.008, 0.01, 0.008, wire, 0, 0.004, zFront - 0.04));
-  g.add(box("TrayBack", inW - 0.008, 0.01, 0.008, wire, 0, 0.004, zIn1 + 0.03));
-  g.add(box("TrayRailL", 0.008, 0.01, inD - 0.07, wire, xL + 0.01, 0.004, zIn1 + (inD - 0.06) / 2 + 0.02));
-  g.add(box("TrayRailR", 0.008, 0.01, inD - 0.07, wire, xR - 0.01, 0.004, zIn1 + (inD - 0.06) / 2 + 0.02));
-  for (let i = 0; i < 9; i++) g.add(box("TrayBar", 0.003, 0.003, inD - 0.07, wire, xL + 0.04 + i * 0.05, 0.003, zIn1 + (inD - 0.06) / 2 + 0.02));
+  const g = group("FreezerShelf", 0, fzShelfY, 0), bd = fzShelfFront - 0.005 - zIn1 - 0.02;
+  g.add(box("FzShelfGlass", inW - 0.012, 0.005, bd, glass, 0, 0, zIn1 + bd / 2 + 0.02));
+  g.add(box("FzShelfRimF", inW - 0.008, 0.012, 0.01, glassRim, 0, 0.004, fzShelfFront - 0.005));
+  g.add(box("FzShelfRimB", inW - 0.008, 0.01, 0.008, glassRim, 0, 0.003, zIn1 + 0.03));
+  g.add(box("FzShelfRailL", 0.008, 0.012, bd, glassRim, xL + 0.01, 0.003, zIn1 + bd / 2 + 0.02));
+  g.add(box("FzShelfRailR", 0.008, 0.012, bd, glassRim, xR - 0.01, 0.003, zIn1 + bd / 2 + 0.02));
   cab.add(g);
 }
-// the ice maker's housing: a white frame the tray and bucket slide in and out of
-const icX = 0.085, icW = 0.17, icZ = zFront - 0.04;
-cab.add(box("IceHousingTop", icW + 0.01, 0.006, 0.2, white, icX, 1.317, icZ - 0.1));
-cab.add(box("IceHousingSideL", 0.005, 0.14, 0.2, white, icX - icW / 2 - 0.0025, 1.247, icZ - 0.1));
-cab.add(box("IceHousingSideR", 0.005, 0.14, 0.2, white, icX + icW / 2 + 0.0025, 1.247, icZ - 0.1));
+// the ice maker hangs under the shelf on the right (the photo: 184 mm wide at 0.02-0.20 m, bucket floor at 1.185 m); its
+// front stays 95 mm behind the door's face so the lower door basket clears it
+const icX = 0.11, icW = 0.17, icZ = zFront - 0.095, icDY = 0.005;
+cab.add(box("IceHousingTop", icW + 0.01, 0.006, 0.2, white, icX, 1.317 + icDY, icZ - 0.1));
+cab.add(box("IceHousingSideL", 0.005, 0.14, 0.2, white, icX - icW / 2 - 0.0025, 1.247 + icDY, icZ - 0.1));
+cab.add(box("IceHousingSideR", 0.005, 0.14, 0.2, white, icX + icW / 2 + 0.0025, 1.247 + icDY, icZ - 0.1));
 
 // ── fridge inside ──
-cab.add(box("FridgeLed", 0.2, 0.006, 0.016, lightM, 0, gy1 - 0.006, zFront - 0.15));
-// Turbo Fresh Zone: a three-section box at the top
+const trays = group("FridgeTrays");
+cab.add(trays);
+cab.add(box("FridgeLed", 0.11, 0.006, 0.016, lightM, 0, gy1 - 0.006, zFront - 0.16));
+// the Turbo Fresh Zone (LG's manual): a clear box under the fridge's ceiling that keeps the cold in when the door opens
+// often; no printed words on it in LG's photos
+const tt = { bw: inW - 0.012, bd: 0.40, bh: 0.135 };
+tt.zc = zIn1 + tt.bd / 2 + 0.012;
 {
-  const g = group("TurboFreshZone", 0, 0.867, 0), bw = inW - 0.01, bd = 0.34, bh = 0.138, zc = zIn1 + bd / 2 + 0.012;
-  g.add(box("TfzFloor", bw, 0.004, bd, clear, 0, 0, zc));
-  g.add(box("TfzBack", bw, bh, 0.004, white, 0, bh / 2, zIn1 + 0.014));
-  g.add(box("TfzSideL", 0.004, bh, bd, clear, -bw / 2, bh / 2, zc));
-  g.add(box("TfzSideR", 0.004, bh, bd, clear, bw / 2, bh / 2, zc));
-  for (const dx of [-0.08, 0.08]) g.add(box("TfzDivider", 0.004, bh, bd, clear, dx, bh / 2, zc));
-  g.add(box("TfzLid", bw, 0.004, bd, glass, 0, bh, zc));
-  g.add(box("TfzFrontRail", bw, 0.01, 0.008, glassRim, 0, 0.006, zc + bd / 2));
-  cab.add(g);
-  // butter, paneer and curd cups in its sections
-  stock.fresh0(cab, { y: 0.871, z: zc + 0.04, bx: -0.165, px: 0, cx: 0.145, ex: 0.16, ez: 0.1 });
+  const { bw, bd, bh, zc } = tt, g = group("TurboFreshZone", 0, topY, 0);
+  g.add(box("TtFloor", bw, 0.004, bd, clear, 0, 0, zc));
+  g.add(box("TtBack", bw, bh, 0.004, clearLight, 0, bh / 2, zIn1 + 0.014));
+  g.add(box("TtSideL", 0.004, bh, bd, clear, -bw / 2, bh / 2, zc));
+  g.add(box("TtSideR", 0.004, bh, bd, clear, bw / 2, bh / 2, zc));
+  g.add(box("TtFront", bw, bh, 0.004, clearLight, 0, bh / 2, zc + bd / 2));
+  g.add(box("TtRim", bw, 0.008, 0.01, clearRib, 0, bh - 0.003, zc + bd / 2 - 0.004));
+  g.add(box("TtHandle", 0.12, 0.05, 0.01, white, 0, bh - 0.035, zc + bd / 2 + 0.004));
+  trays.add(g);
 }
-// two tempered-glass shelves with white rims, and the Fresh Zone drawer
+stock.fresh0(trays, { y: topY + 0.002, z: tt.zc + 0.03, bx: -0.17 });
+// two tempered-glass shelves with white rims
 function shelf(name, y) {
-  const g = group(name, 0, y, 0), bd = inD - 0.05;
+  const g = group(name, 0, y, 0), bd = shelfFront - 0.0085 - zIn1 - 0.014;
   g.add(box(name + "Glass", inW - 0.01, 0.006, bd, glass, 0, 0, zIn1 + bd / 2 + 0.014));
-  g.add(box(name + "Rim", inW - 0.01, 0.014, 0.012, glassRim, 0, 0.004, zFront - 0.036));
-  g.add(box(name + "Edge", inW - 0.01, 0.004, 0.003, edgeGreen, 0, -0.002, zFront - 0.029));
+  g.add(box(name + "Rim", inW - 0.01, 0.014, 0.012, glassRim, 0, 0.004, shelfFront - 0.0085));
+  g.add(box(name + "Edge", inW - 0.01, 0.004, 0.003, edgeGreen, 0, -0.002, shelfFront - 0.0015));
   g.add(box(name + "RimBack", inW - 0.01, 0.01, 0.01, glassRim, 0, 0.002, zIn1 + 0.02));
   g.add(box(name + "RailL", 0.01, 0.014, bd, glassRim, xL + 0.012, 0, zIn1 + bd / 2 + 0.014));
   g.add(box(name + "RailR", 0.01, 0.014, bd, glassRim, xR - 0.012, 0, zIn1 + bd / 2 + 0.014));
-  cab.add(g);
+  trays.add(g);
 }
-shelf("Shelf1", 0.744);
-shelf("Shelf2", 0.545);
-{ // Fresh Zone: the "bottom shelf" glass cover, a clear box, and a white front panel
-  const g = group("FreshZone", 0, 0, 0), bd = inD - 0.08, bw = inW - 0.02, zc = zIn1 + bd / 2 + 0.016;
-  g.add(box("FzGlassCover", inW - 0.01, 0.006, bd, glass, 0, 0.406, zc));
-  g.add(box("FzCoverRim", inW - 0.01, 0.012, 0.012, glassRim, 0, 0.409, zFront - 0.05));
-  g.add(box("FzBoxFloor", bw, 0.004, bd, clear, 0, 0.215, zc));
-  g.add(box("FzBoxBack", bw, 0.16, 0.004, clear, 0, 0.295, zIn1 + 0.018));
-  g.add(box("FzBoxL", 0.004, 0.16, bd, clear, -bw / 2, 0.295, zc));
-  g.add(box("FzBoxR", 0.004, 0.16, bd, clear, bw / 2, 0.295, zc));
-  g.add(box("FzBoxRim", bw, 0.008, 0.008, clearRib, 0, 0.375, zc + bd / 2));
-  g.add(box("FzBoxFootRim", bw, 0.008, 0.008, clearRib, 0, 0.219, zc + bd / 2));
-  g.add(mesh("FzFrontPanel", flipV(new THREE.BoxGeometry(inW - 0.01, 0.14, 0.02)), [white, white, white, white, freshZoneM, white], 0, 0.14, zFront - 0.05));
-  cab.add(g);
+shelf("Shelf1", s1);
+shelf("Shelf2", s2);
+// Fresh Zone: a glass cover over the drawer (food stands on it, as in LG's stocked photo), and the drawer, clear with a
+// white front printed Fresh Zone
+const fzD = drawerFront - zIn1 - 0.016, fzW = inW - 0.02, fzC = zIn1 + fzD / 2 + 0.016, fzH = 0.26, faceH = 0.135;
+{
+  const g = group("FreshZoneCover", 0, 0, 0);
+  g.add(box("FzGlassCover", inW - 0.01, 0.006, fzD, glass, 0, coverY, fzC));
+  g.add(box("FzCoverRim", inW - 0.01, 0.012, 0.012, glassRim, 0, coverY + 0.003, drawerFront - 0.006));
+  trays.add(g);
+}
+{
+  const g = group("FreshZone", 0, 0, 0), bd = fzD, bw = fzW, zc = fzC, yc = drawerY + fzH / 2;
+  g.add(box("FzBoxFloor", bw, 0.004, bd, clear, 0, drawerY, zc));
+  g.add(box("FzBoxBack", bw, fzH, 0.004, clear, 0, yc, zIn1 + 0.018));
+  g.add(box("FzBoxL", 0.004, fzH, bd, clear, -bw / 2, yc, zc));
+  g.add(box("FzBoxR", 0.004, fzH, bd, clear, bw / 2, yc, zc));
+  g.add(mesh("FzBoxFront", flipV(new THREE.BoxGeometry(bw, faceH, 0.004)), [white, white, white, white, drawerFace, white], 0, drawerY + faceH / 2, zc + bd / 2));
+  g.add(box("FzBoxFrontUp", bw, fzH - faceH, 0.004, clearLight, 0, drawerY + faceH + (fzH - faceH) / 2, zc + bd / 2));
+  g.add(box("FzBoxRim", bw, 0.008, 0.008, clearRib, 0, drawerY + fzH - 0.004, zc + bd / 2));
+  trays.add(g);
 }
 
 // ── stock: vegetarian South Indian food, eggs, juices, water and soft drinks (stock_lg.mjs, food.mjs) ──
-stock.shelves(cab, { zIn1, inW, inD, s1: 0.744, s2: 0.545, s3: null, fz: 0.219, z0: zIn1 + 0.17 });
-stock.freezer(cab, { zIn1, floor: fy0 + 0.002, top: 1.327 });
+// stock_lg.mjs fills three shelves; this fridge has two, and LG's stocked photo has food standing on the drawer's glass
+// cover, so the cover is the third
+stock.shelves(trays, {
+  zIn1, inW, inD, s1, s2, s3: coverY, fz: drawerY + 0.002, fit: true, vk: 0.65,
+  shelfB: { hw: inW / 2 - 0.03, z0: zIn1 + 0.034, z1: shelfFront - 0.015 },
+  drawerB: { hw: fzW / 2 - 0.014, z0: zIn1 + 0.04, z1: drawerFront - 0.006, y0: drawerY + 0.002 },
+  drawerCeil: coverY - 0.003 - 0.01 - (drawerY + 0.002), // the heap stays 1 cm under the drawer's glass cover
+});
+// rows that need more width or depth than these narrower shelves have: what reaches past a side or the front is left out
+const shw = inW / 2 - 0.03;
+for (const n of ["Shelf1Stock", "Shelf2Stock", "Shelf3Stock"]) leaveOut(trays.getObjectByName(n), [B3(-1, 0, shelfFront - 0.016, 1, 2, 1), B3(-1, 0, -1, -shw - 0.003, 2, 1), B3(shw + 0.003, 0, -1, 1, 2, 1)], `past ${n}'s side or front`);
+// the cauliflower's leaves are tilted meshes; their own turn is baked into their shape so a box round them is the real one
+trays.getObjectByName("Cauliflower")?.traverse((m) => {
+  if (!m.isMesh) return;
+  m.updateMatrix(); m.geometry = m.geometry.clone().applyMatrix4(m.matrix);
+  m.position.set(0, 0, 0); m.rotation.set(0, 0, 0); m.scale.set(1, 1, 1);
+});
+stock.freezer(cab, { fit: true, zIn1, floor: fy0, top: fzShelfY + 0.0025, box: { hw: inW / 2 - 0.015, z0: zIn1 + 0.038, z1: icZ - 0.21 } });
+// the packs on the shelf: back and front rows need 425 mm and the shelf has 410, so the rows go 4 cm further back (behind
+// the shelf's back rim) and what still reaches the front rim is left out
+{
+  const t = cab.getObjectByName("OnFreezerShelf");
+  t.position.z -= 0.04;
+  leaveOut(t, [B3(-1, fzShelfY - 0.01, fzShelfFront - 0.012, 1, fy1, 1)], "past the freezer shelf's front");
+}
 
 // ── ice maker: the tray unit and the bucket slide out together (a real part) ──
 const ic = group("IceMaker", icX, 0, icZ);
@@ -273,54 +293,76 @@ const ic = group("IceMaker", icX, 0, icZ);
   ic.add(box("IceBucketL", 0.004, 0.07, 0.17, clear, -(icW - 0.01) / 2, 1.215, -0.115));
   ic.add(box("IceBucketR", 0.004, 0.07, 0.17, clear, (icW - 0.01) / 2, 1.215, -0.115));
   ic.add(box("IceBucketHandle", 0.07, 0.008, 0.01, clearRib, 0, 1.248, -0.028));
-  const cube = new THREE.BoxGeometry(0.03, 0.025, 0.03);
+  const cubes = [];
   for (let i = 0; i < 16; i++) {
-    const c = mesh("IceCube", cube, ice, -0.055 + (i % 4) * 0.037 + (Math.floor(i / 4) % 2) * 0.012, 1.196 + Math.floor(i / 8) * 0.024, -0.06 - Math.floor((i % 8) / 4) * 0.055 - (i % 3) * 0.012);
-    c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
-    ic.add(c);
+    const c = new THREE.BoxGeometry(0.03, 0.025, 0.03);
+    c.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(-0.055 + (i % 4) * 0.037 + (Math.floor(i / 4) % 2) * 0.012, 1.196 + Math.floor(i / 8) * 0.024, -0.06 - Math.floor((i % 8) / 4) * 0.055 - (i % 3) * 0.012),
+      new THREE.Quaternion().setFromEuler(new THREE.Euler(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4))), new THREE.Vector3(1, 1, 1)));
+    cubes.push(c);
   }
+  ic.add(mesh("IceCube", mergeGeometries(cubes), ice));
 }
 cab.add(ic);
-ic.position.y = 0;     // the geometry above carries its own heights; the node only slides along z
+ic.position.y = icDY;
 
-// ── doors: hinged on the right, no handles, black pocket grip on the fridge door ──
+// ── doors: hinged on the right, no handles, black pocket grip at the top of the fridge door ──
 const pw = W - 0.004;
-function doorShell(name, y0, h, parts) { const g = group(name, W / 2, y0, zFront); parts(g); return g; }
-const freezerDoor = doorShell("FreezerDoor", fzBot, H - fzBot, (g) => {
+const inside = (w) => (dep) => [-pw / 2 - w / 2 + 0.004, -pw / 2 + w / 2 - 0.004, -(0.01 + dep / 2)];
+function doorShell(name, y0, parts) { const g = group(name, W / 2, y0, zFront); parts(g); return g; }
+function gaskets(g, p, h) {
+  g.add(box(p + "GasketT", pw - 0.02, 0.014, 0.014, gasket, -pw / 2, h - 0.012, -0.007));
+  g.add(box(p + "GasketB", pw - 0.02, 0.014, 0.014, gasket, -pw / 2, 0.012, -0.007));
+  g.add(box(p + "GasketL", 0.014, h - 0.02, 0.014, gasket, -pw + 0.012, h / 2, -0.007));
+  g.add(box(p + "GasketR", 0.014, h - 0.02, 0.014, gasket, -0.012, h / 2, -0.007));
+  g.add(box(p + "Liner", pw - 0.05, h - 0.05, 0.012, liner, -pw / 2, h / 2, -0.004));
+}
+// line items up across [x0, x1] (door space) with even gaps, their middles at depth zm
+function rowAt(g, items, x0, x1, zm) {
+  g.updateMatrixWorld(true);
+  const p = g.position, bs = items.map((o) => new THREE.Box3().setFromObject(o));
+  const gap = (x1 - x0 - bs.reduce((s, b) => s + b.max.x - b.min.x, 0)) / (items.length + 1);
+  if (gap < 0) console.warn(`rowAt: ${items.map((o) => o.name)} do not fit`);
+  let x = x0 + gap;
+  items.forEach((o, i) => { const b = bs[i]; o.position.x += x - (b.min.x - p.x); o.position.z += zm - ((b.min.z + b.max.z) / 2 - p.z); x += b.max.x - b.min.x + gap; });
+}
+const freezerDoor = doorShell("FreezerDoor", fzBot, (g) => {
   const h = H - fzBot;
   g.add(mesh("FzPanel", flipV(new THREE.BoxGeometry(pw, h, doorT)), [steelEdge, steelEdge, topSteel, steelEdge, steelDoorF, liner], -pw / 2, h / 2, doorT / 2));
-  g.add(plane("LgMarkDecal", 0.054, 0.0248, logoM, -pw + 0.066, h - 0.051, doorT + 0.0006));
-  g.add(plane("BeeLabelDecal", 0.0705, 0.1305, labelM, -0.043, h - 0.034 - 0.065, doorT + 0.0006));
-  // inside: gasket frame, liner, two baskets
-  g.add(box("FzGasketT", pw - 0.02, 0.014, 0.014, gasket, -pw / 2, h - 0.012, -0.007));
-  g.add(box("FzGasketB", pw - 0.02, 0.014, 0.014, gasket, -pw / 2, 0.012, -0.007));
-  g.add(box("FzGasketL", 0.014, h - 0.02, 0.014, gasket, -pw + 0.012, h / 2, -0.007));
-  g.add(box("FzGasketR", 0.014, h - 0.02, 0.014, gasket, -0.012, h / 2, -0.007));
-  g.add(box("FzLiner", pw - 0.05, h - 0.05, 0.012, liner, -pw / 2, h / 2, -0.004));
-  const b1 = basket("FzBasket1", pw - 0.1, 0.07, 0.065, 0.234, true); b1.position.x = -pw / 2; g.add(b1);
-  const b2 = basket("FzBasket2", pw - 0.1, 0.07, 0.065, 0.053, true); b2.position.x = -pw / 2; g.add(b2);
-  // frozen grated coconut and parotta in the baskets (small packs)
-  stock.doorFreezer(g, { n: 3, gap: 0.12, b1: 0.234, b2: 0.053 });
+  // print, measured on LG's front photo: the LG mark 36-81 mm from the left and 33-50 mm down; the energy label 19-84 mm
+  // from the right and 28-150 mm down
+  g.add(plane("LgMarkDecal", 0.047, 0.0216, logoM, -pw + 0.0585, h - 0.0415, doorT + 0.0006));
+  g.add(plane("BeeLabelDecal", 0.066, 0.122, labelM, -0.0515, h - 0.089, doorT + 0.0006));
+  gaskets(g, "Fz", h);
+  // basket floors on LG's open-door photo: 1.35 and 1.16 m
+  const b1 = 1.35 - fzBot, b2 = 1.16 - fzBot;
+  const k1 = basket("FzBasket1", pw - 0.1, 0.07, 0.065, b1, true); k1.position.x = -pw / 2; g.add(k1);
+  const k2 = basket("FzBasket2", pw - 0.1, 0.07, 0.065, b2, true); k2.position.x = -pw / 2; g.add(k2);
+  stock.doorFreezer(g, { fit: true, b1, b2, dep: 0.07, inside: inside(pw - 0.1) });
 });
-const fridgeDoor = doorShell("FridgeDoor", frLow, frTop - frLow, (g) => {
-  const h = frTop - frLow, lowH = bandBot - frLow, bandH = bandTop - bandBot, lipH = frTop - bandTop;
-  g.add(mesh("FrPanelLow", flipV(new THREE.BoxGeometry(pw, lowH, doorT)), [steelEdge, steelEdge, steelEdge, steelEdge, steelDoorR, liner], -pw / 2, lowH / 2, doorT / 2));
-  g.add(mesh("FrLip", new THREE.BoxGeometry(pw, lipH, doorT), [steelEdge, steelEdge, topSteel, steelEdge, silverLip, liner], -pw / 2, lowH + bandH + lipH / 2, doorT / 2));
-  g.add(box("GripBand", pw - 0.02, bandH, doorT - 0.016, black, -pw / 2, lowH + bandH / 2, (doorT - 0.016) / 2));
-  for (const sx of [-1, 1]) g.add(box("GripEnd", 0.012, bandH, doorT, black, -pw / 2 + sx * (pw / 2 - 0.006), lowH + bandH / 2, doorT / 2));
-  // inside: gasket, liner, three baskets
-  g.add(box("FrGasketT", pw - 0.02, 0.014, 0.014, gasket, -pw / 2, h - 0.012, -0.007));
-  g.add(box("FrGasketB", pw - 0.02, 0.014, 0.014, gasket, -pw / 2, 0.012, -0.007));
-  g.add(box("FrGasketL", 0.014, h - 0.02, 0.014, gasket, -pw + 0.012, h / 2, -0.007));
-  g.add(box("FrGasketR", 0.014, h - 0.02, 0.014, gasket, -0.012, h / 2, -0.007));
-  g.add(box("FrLiner", pw - 0.05, h - 0.05, 0.012, liner, -pw / 2, h / 2, -0.004));
-  const eggY = 0.882 - frLow, botY = 0.387 - frLow, canY = 0.14 - frLow;
-  const bE = basket("EggBasket", pw - 0.1, 0.075, 0.062, eggY, true); bE.position.x = -pw / 2; g.add(bE);
-  const bB = basket("BottleBasket", pw - 0.1, 0.095, 0.145, botY, true); bB.position.x = -pw / 2; g.add(bB);
-  const bC = basket("CanBasket", pw - 0.1, 0.075, 0.115, canY, true); bC.position.x = -pw / 2; g.add(bC);
-  // eggs in the egg basket's cups, then jars, bottles and cans (stock_lg.mjs)
-  g.add(box("EggCupsRib", pw - 0.14, 0.006, 0.05, clearRib, -pw / 2, eggY + 0.006, -0.037));
-  stock.doorFridge(g, { eggY, jarY: null, botY, canY });
+const fridgeDoor = doorShell("FridgeDoor", frLow, (g) => {
+  const h = frTop - frLow, y = (v) => v - frLow;
+  g.add(mesh("FrPanelLow", flipV(new THREE.BoxGeometry(pw, y(bandBot), doorT)), [steelEdge, steelEdge, steelEdge, steelEdge, steelDoorR, liner], -pw / 2, y(bandBot) / 2, doorT / 2));
+  g.add(box("GripBand", pw, bandTop - bandBot, doorT - 0.016, black, -pw / 2, (y(bandBot) + y(bandTop)) / 2, (doorT - 0.016) / 2));
+  for (const sx of [-1, 1]) g.add(box("GripEnd", 0.012, bandTop - bandBot - 0.0016, doorT - 0.001, black, -pw / 2 + sx * (pw / 2 - 0.006), (y(bandBot) + y(bandTop)) / 2, doorT / 2));
+  g.add(mesh("FrLip", new THREE.BoxGeometry(pw, frTop - bandTop, doorT), [steelEdge, steelEdge, topSteel, steelEdge, silverLip, liner], -pw / 2, (y(bandTop) + h) / 2, doorT / 2));
+  gaskets(g, "Fr", h);
+  // three baskets (LG's spec), floors on LG's open-door photo at 0.875, 0.355 and 0.075 m: eggs and a few jars at the top,
+  // bottles in the tall one, cans at the foot, as in LG's stocked photo
+  const eggY = y(0.875), botY = y(0.355), canY = y(0.075);
+  const add = (n, dep, hh, yy) => { const k = basket(n, pw - 0.12, dep, hh, yy, true); k.position.x = -pw / 2; g.add(k); };
+  add("EggBasket", 0.085, 0.06, eggY); add("BottleBasket", 0.095, 0.13, botY); add("CanBasket", 0.08, 0.09, canY);
+  const eggX = [0, 1, 2, 3, 4].map((i) => -0.095 - i * 0.05);
+  g.add(box("EggCupsRib", 0.26, 0.006, 0.05, clearRib, -0.195, eggY + 0.006, -0.047));
+  // stock_lg.mjs stocks four baskets (eggs, jars, bottles, cans); here the jar row is built on a spare shelf height, two jars
+  // move into the egg basket beside the eggs, and the rest of that row is left out; the bottle row loses one carton to fit
+  const deps = { egg: 0.085, jar: 0.085, bottle: 0.095, can: 0.08 };
+  stock.doorFridge(g, { fit: true, eggY, jarY: y(0.62), botY, canY, deps, inside: inside(pw - 0.12), eggX });
+  const [x0, x1] = inside(pw - 0.12)(0.075);
+  const jars = ["MothersPickle", "AavinGhee"].map((n) => g.children.find((c) => c.name === n));
+  for (const n of ["MothersPickle2", "SakthiSambar", "NandiniGhee", "RealMixedFruit"]) g.children.find((c) => c.name === n)?.removeFromParent();
+  jars.forEach((o) => (o.position.y += eggY - y(0.62)));
+  rowAt(g, jars, x0, -0.325, -(0.01 + deps.egg / 2));
+  rowAt(g, ["Coke", "Fanta", "Bisleri", "RealMango", "AmulTaaza"].map((n) => g.children.find((c) => c.name === n)), x0, x1, -(0.01 + deps.bottle / 2));
 });
 root.add(freezerDoor, fridgeDoor);
 
@@ -329,7 +371,15 @@ const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 const textures = {
   DoorFreezer: `${T}/door_freezer.jpg`, DoorFridge: `${T}/door_fridge.jpg`, SideSteel: `${T}/side.jpg`, SideSteelL: `${T}/side_l.jpg`, RearPlate: `${T}/rear.jpg`,
-  LabelBEE: `${T}/label.png`, LgMark: `${T}/lgmark.png`, PrintConvertible: `${T}/print_convertible.png`, KnobFace: `${T}/knob.jpg`, FreshZoneFront: `${T}/fresh_zone.jpg`,
+  LabelBEE: `${T}/label.png`, LgMark: `${T}/lgmark.png`, print_convertible: `${T}/print_convertible.png`, KnobFace: `${T}/knob.jpg`, FreshZoneFront: `${T}/fresh_zone.jpg`,
 };
 Object.assign(textures, stock.textures());
-await exportGLB(root, clips, OUT, textures);
+// textures of food that was left out
+{ const used = new Set(); root.traverse((o) => o.isMesh && [].concat(o.material).forEach((m) => used.add(m.name))); for (const k of Object.keys(textures)) if (!used.has(k)) delete textures[k]; }
+// Grain (BENCHMARK.md section 10), as the LG 343 L: Shiny Steel is a printed steel look with fine vertical hairlines under a
+// clear glossy film; the sides are smooth factory paint with a soft peel.
+await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
+  DoorFreezer: { type: "hairline", dir: "v", clearcoat: [0.6, 0.12] },
+  DoorFridge: { type: "hairline", dir: "v", clearcoat: [0.6, 0.12] },
+  SideSteel: { type: "peel_soft" }, SideSteelL: { type: "peel_soft" }, TopSteel: { type: "peel_soft" },
+} });

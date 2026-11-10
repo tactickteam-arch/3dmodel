@@ -1,0 +1,163 @@
+{
+  "products": [
+    {
+      "id": "haier-hes-690gk",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HES-690GK",
+      "name": "Haier 596 L side-by-side refrigerator with Expert Inverter Technology",
+      "shortName": "596 L side-by-side refrigerator",
+      "summary": "Open the freezer and its drawers, open the fridge and take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hes-690gk.glb",
+      "thumb": "/photos/haier-hes-690gk/0.jpg",
+      "photos": ["/photos/haier-hes-690gk/0.jpg", "/photos/haier-hes-690gk/1.jpg", "/photos/haier-hes-690gk/2.jpg", "/photos/haier-hes-690gk/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#42475a",
+          "usdz": "/models/usdz/haier-hes-690gk-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HES-690GK",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-596l-side-by-side-frost-free-refrigerator-or-graphite-black-finish-hes-690gk/21330"
+        },
+        {
+          "name": "Shiny Silver",
+          "swatchColor": "#c9cbce",
+          "usdz": "/models/usdz/haier-hes-690gk-shiny-silver.usdz",
+          "variant": "Shiny Silver",
+          "code": "HES-690SS"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -120,
+          "zone": {
+            "closed": [
+              [-0.453, 0.016, 0.155],
+              [-0.06, 1.745, 0.349]
+            ],
+            "open": [
+              [-0.676, 0.016, 0.26],
+              [-0.346, 1.745, 0.652]
+            ]
+          }
+        },
+        {
+          "key": "freezerDrawer",
+          "label": "freezer drawers",
+          "node": "FreezerDrawer",
+          "slide": [0, 0, 0.24],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.396, 0.094, -0.271],
+              [-0.101, 0.6, 0.149]
+            ],
+            "open": [
+              [-0.396, 0.094, -0.031],
+              [-0.101, 0.6, 0.389]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 120,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.066, 0.016, 0.151],
+              [0.453, 1.745, 0.349]
+            ],
+            "open": [
+              [0.342, 0.016, 0.26],
+              [0.715, 1.745, 0.779]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.24],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.044, 0.104, -0.271],
+              [0.398, 1.538, 0.145]
+            ],
+            "open": [
+              [-0.044, 0.104, -0.031],
+              [0.398, 1.538, 0.385]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "90.5 cm",
+        "h": "177.5 cm",
+        "d": "69.7 cm"
+      },
+      "sizeNote": "Haier gives 90.5 × 69.7 × 177.5 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "596 L"],
+        ["Type", "Side by side, convertible (100% Fridge)"],
+        ["Energy rating", "3 star"],
+        ["Compressor", "Inverter (Expert Inverter Technology)"],
+        ["Cooling", "Frost free, fan, Deo Fresh Technology"],
+        ["Control", "Digital control panel on the door"],
+        ["Shelves", "Toughened glass in the fridge and the freezer"],
+        ["Fridge", "Fruit case, vegetable case, egg tray, LED light"],
+        ["Ice", "Twist ice maker"],
+        ["Door", "Steel, recess handle"],
+        ["Refrigerant", "R600a"],
+        ["Warranty", "2 years on the product, 10 years on the compressor"],
+        ["Weight", "94 kg"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-596l-side-by-side-frost-free-refrigerator-or-graphite-black-finish-hes-690gk/21330",
+      "source": "https://www.haier.com/in/refrigerators/side-by-side-refrigerator-596-litres-hes-690gk.shtml",
+      "hotspots": [
+        {
+          "title": "Digital Control Panel",
+          "text": "Perfect temperature adjustment with a touch.",
+          "pos": [-0.036, 1.5, 0.326],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Expert Inverter Technology",
+          "text": "Advanced technology for a better and efficient cooling experience.",
+          "pos": [-0.26, 0.6, 0.3485],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "100% Fridge",
+          "text": "More than enough space for your food items.",
+          "pos": [-0.248, 1.2, -0.2828],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Deo Fresh Technology",
+          "text": "Ensures odor-free, hygienic food storage.",
+          "pos": [0.177, 1.562, -0.2313],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}

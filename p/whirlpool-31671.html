@@ -256,6 +256,7 @@
   .room-open { width: 100%; height: 54px; border: 1px solid var(--navy); border-radius: 14px; background: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
   .room-open:hover { background: var(--navy); color: var(--paper); }
   .room-open svg { width: 22px; height: 22px; color: var(--copper); flex: none; }
+  a.room-open { text-decoration: none; }
   .need ul { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--hair); border-radius: 14px; background: #fff; overflow: hidden; }
   .need li { display: flex; justify-content: space-between; gap: 12px; padding: 11px 16px; font-size: 14px; line-height: 1.4; }
   .need li + li { border-top: 1px solid var(--hair); }
@@ -489,7 +490,7 @@
       </button>
       <button class="cta secondary hide" id="btnVR">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="11" rx="4"/><circle cx="8" cy="12.5" r="2"/><circle cx="16" cy="12.5" r="2"/></svg>
-        <span>Walk around it in the showroom</span>
+        <span>See it alone in VR</span>
       </button>
       <p class="ar-note" id="arNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 12h8"/></svg><span>Real size · Opens in your camera · No app</span></p>
     </div>
@@ -514,6 +515,12 @@
       <div class="label">See it in your room</div>
       <p class="room-lead">Upload a photo of the spot. It stands there at its real size, and you can drag it anywhere, turn it and open it.</p>
       <button class="room-open" id="btnRoom" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></svg>Try it in a photo of your room</button>
+    </div>
+
+    <div id="showroomBox">
+      <div class="label">The 3D showroom</div>
+      <p class="room-lead">Every product stands in one 3D showroom. Walk around this one beside the others and open their doors, on your screen or inside it on Meta Quest or Vision Pro.</p>
+      <a class="room-open" id="showroomLink" href="/showroom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-6 9 6v12"/><path d="M3 21h18M9 21v-6h6v6"/></svg>Walk around it in the showroom</a>
     </div>
 
     <div id="fitBox">
@@ -567,7 +574,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { esc, cm, partAt, hotspotShown, fitCheck } from "/site.js";
+import { esc, cm, partAt, hotspotShown, fitCheck, finishSlug, finishIndexOf } from "/site.js";
 import { initRoom } from "/room.js";
 import { initOrganise } from "/organise.js";
 import { SITE } from "/site-config.js";
@@ -626,13 +633,15 @@ if (!product) {
 // the other addresses in site-config.js are kept for old links, so the links people scan and share
 // always point at the public address
 const PUBLIC_ORIGIN = SITE.publicOrigin;
-const shareUrl = (() => {
+// it follows the address bar, which carries the chosen colour (?finish=, below)
+const makeShareUrl = () => {
   const elsewhere = location.hostname.endsWith(".vercel.app") || SITE.alsoServedAt.includes(location.origin);
   const u = new URL((elsewhere ? PUBLIC_ORIGIN : location.origin) + location.pathname + location.search);
   u.searchParams.delete("embed");   // links people share always open the full page
   u.searchParams.delete("ql");      // and the standard iPhone AR
   return u.href;
-})();
+};
+let shareUrl = makeShareUrl();
 // Phones kept model files for an hour before 24 Oct 2026; this query string made them fetch
 // the files with the fixed doors. The files now revalidate on every load (vercel.json); v=3 (29 Oct)
 // made sure Quick Look's own copy was replaced by the files with the panel grain, v=4 (30 Oct)
@@ -676,7 +685,9 @@ if (document.documentElement.classList.contains("embed")) track("EMBED", (() => 
 // ── fill the page ──
 const parts = product.parts || [];
 const state = Object.fromEntries(parts.map((p) => [p.key, false]));
-let finishIndex = 0;
+// ?finish=<slug> opens that colour (an old or mistyped one opens the first); a colour chosen here goes into the
+// address, so the link people copy or share keeps it
+let finishIndex = finishIndexOf(product, new URLSearchParams(location.search).get("finish"));
 const onWall = product.placement === "wall";
 initRoom({ product, model: model(product.glb), parts, onWall, toast, openButton: $("btnRoom") });
 $("btnRoom")?.addEventListener("click", () => track("ROOM"));
@@ -755,6 +766,8 @@ const turnHint = platform === "desktop" ? "Drag or swipe to turn · Pinch or scr
 const tip = platform === "desktop" ? product.arTip.replace(/^Tap\b/, "Click") : product.arTip;
 $("hint").innerHTML = `${I.tap}<span>${parts.length ? `${turnHint} · ${tip}` : turnHint}</span>`;
 if (headsetVR) $("btnVR").classList.remove("hide");
+// the whole showroom, opening with this product in front of you (showroom.js)
+$("showroomLink").href = `/showroom?focus=${encodeURIComponent(product.id)}`;
 if (platform === "desktop") $("arNote").querySelector("span").textContent = "Real size · On a phone or headset · No app";
 
 // ── finishes ──
@@ -768,13 +781,13 @@ function renderSwatches() {
     b.setAttribute("aria-pressed", String(i === finishIndex));
     b.innerHTML = `<i style="${bg}"></i>${esc(f.name)}`;
     if (product.finishes.length === 1) b.disabled = true;
-    b.addEventListener("click", () => applyFinish(i));
+    b.addEventListener("click", () => chooseFinish(i));
     $("swatches").appendChild(b);
     const a = document.createElement("button");
     a.style.cssText = bg;
     a.setAttribute("aria-label", f.name);
     a.setAttribute("aria-pressed", String(i === finishIndex));
-    a.addEventListener("click", () => applyFinish(i));
+    a.addEventListener("click", () => chooseFinish(i));
     $("arFinishes").appendChild(a);
   });
   $("arFinishes").classList.toggle("hide", product.finishes.length < 2);
@@ -782,8 +795,18 @@ function renderSwatches() {
 function applyFinish(i) {
   finishIndex = i;
   const f = product.finishes[i];
-  if (f.variant) mv.variantName = f.variant;
+  if (f.variant || product.finishes.length > 1) mv.variantName = f.variant || null;
   document.querySelectorAll("#swatches .swatch, #arFinishes button").forEach((b) => b.setAttribute("aria-pressed", String([...b.parentNode.children].indexOf(b) === i)));
+}
+// a colour the shopper picks: shown, and kept in the address and the share links
+function chooseFinish(i) {
+  applyFinish(i);
+  if (product.finishes.length < 2) return;
+  const u = new URL(location.href);
+  u.searchParams.set("finish", finishSlug(product.finishes[i].name));
+  history.replaceState(history.state, "", u.pathname + u.search + u.hash);
+  shareUrl = makeShareUrl();
+  renderShare();
 }
 renderSwatches();
 
@@ -839,7 +862,7 @@ const stateKey = () => parts.map((p) => (state[p.key] ? 1 : 0)).join("");
 // a part that swings 90 degrees or more (side doors, a top-loader's lid) reaches well outside the closed
 // outline, so the camera steps back while it is open
 const swingsWide = parts.some((p) => p.axis && Math.abs(p.angle) >= 90);
-let busy = false;
+let busy = false, movedAt = 0;
 // model-viewer cross-fades from a clip still running, and setting currentTime rewinds that fade too: the new
 // clip stays hidden behind the old one and a door the state calls open is drawn shut or half-open. So a clip
 // starts from a paused element, once the last one has ended (or cut short, for a jump to the end).
@@ -860,10 +883,11 @@ async function togglePart(key, { instant = false } = {}) {
   // a part inside another (the ice tray lives behind the freezer door): open the outer one first, and close the inner one before the outer
   const self = parts.find((x) => x.key === key);
   const outer = self?.needs && !state[key] && !state[self.needs] ? self.needs : null;
-  const inner = state[key] ? parts.find((x) => x.needs === key && state[x.key])?.key : null;
-  if (outer || inner) {
+  // every open part inside it shuts first (one door can hold both a freezer box's flap and the trays)
+  const first = outer ? [outer] : state[key] ? parts.filter((x) => x.needs === key && state[x.key]).map((x) => x.key) : [];
+  if (first.length) {
     chaining++;
-    try { await togglePart(outer || inner, { instant }); await sleep(instant ? 80 : 950); } finally { chaining--; }
+    try { for (const k of first) { await togglePart(k, { instant }); await sleep(instant ? 80 : 950); } } finally { chaining--; }
     if (busy) return;
   }
   busy = true;
@@ -877,6 +901,7 @@ async function togglePart(key, { instant = false } = {}) {
   await mv.updateComplete;
   mv.currentTime = instant ? mv.duration : 0;
   mv.play({ repetitions: 1 });
+  movedAt = performance.now();
   if (swingsWide && anyBefore !== anyAfter && !instant && !arActive) {
     const o = mv.getCameraOrbit();
     mv.cameraOrbit = `${o.theta}rad ${o.phi}rad ${anyAfter ? o.radius * 1.3 : o.radius / 1.3}m`;
@@ -1493,7 +1518,7 @@ async function openHeadset(mode) {
       onEnd: async ({ parts: after, finishIndex: fi }) => {
         // carry the headset's door and finish state back to the page, one part at a time as on the page
         // (a part inside another waits for it, and the model has a clip only for one part moving)
-        if (fi !== finishIndex) applyFinish(fi);
+        if (fi !== finishIndex) chooseFinish(fi);
         for (const p of parts) if (after[p.key] !== state[p.key]) { busy = false; await togglePart(p.key, { instant: true }); }
       },
     });
@@ -1680,14 +1705,14 @@ function guide() {
       title: "How to use it on Vision Pro", sub: `${name}, in your room at real size.`,
       place: onWall ? placeWall : { icon: I.floor, text: "It appears in front of you. Look at the floor where it should stand and drag it there." },
       groups: [["In your room", [parts.length && row(I.eye, openTitle, "Look at it and pinch", true), row(I.pinch, "Move", "Pinch and drag"), row(I.rotate, "Rotate", "Pinch with both hands and twist"), lock]]],
-      note: "Prefer a whole room around it? Try the showroom below.",
-      go: "Open in your room", alt: headsetVR ? "Walk around it in the showroom" : null,
+      note: "Prefer a virtual room around it? Try VR below.",
+      go: "Open in your room", alt: headsetVR ? "See it alone in VR" : null,
     };
     case "quest": return {
       title: "How to use it on Meta Quest", sub: `${name}, in your room at real size.`,
       place: onWall ? { icon: I.wall, text: "It appears at wall height in front of you. Point at a real wall and pull the trigger to hang it there." } : { icon: I.floor, text: "It appears on the floor in front of you, at real size." },
       groups: [["In passthrough", [parts.length && row(I.trigger, openTitle, "Point at it and pull the trigger, or pinch", true), row(I.move, "Move", onWall ? "Point at a wall or the floor and pull the trigger" : "Point at the floor and pull the trigger"), row(I.rotate, "Turn", "Hold grip and sweep, or push the thumbstick"), row(I.panel, "Finish and exit", "On the panel beside it")]]],
-      go: "Open in your room", alt: headsetVR ? "Walk around it in the showroom" : null,
+      go: "Open in your room", alt: headsetVR ? "See it alone in VR" : null,
     };
     case "android": return mv.canActivateAR ? {
       title: "Place it at real size", sub: name,
@@ -1773,7 +1798,7 @@ async function copyLink() {
 if (framed) {
   $("shareText").innerHTML = "<b>Preview only.</b><br>Open the shared link on a phone or headset to place it in your room.";
   $("qrCode").classList.add("hide");
-} else $("qrCode").innerHTML = qrSvg();
+}
 $("btnCopy").addEventListener("click", copyLink);
 // Share by the title: a phone's own share sheet (WhatsApp and the rest); on a laptop, the QR code and links below
 $("btnShare").addEventListener("click", async () => {
@@ -1783,10 +1808,19 @@ $("btnShare").addEventListener("click", async () => {
   }
   $("share").scrollIntoView({ behavior: "smooth", block: "center" });
 });
-$("btnWhatsApp").href = `https://wa.me/?text=${encodeURIComponent(`${product.brand} ${product.shortName}: open it in 3D and see it at real size in your room. ${shareUrl}`)}`;
+// the QR code and links, drawn again when the colour changes
+function renderShare() {
+  if (!framed) $("qrCode").innerHTML = qrSvg();
+  $("btnWhatsApp").href = `https://wa.me/?text=${encodeURIComponent(`${product.brand} ${product.shortName}: open it in 3D and see it at real size in your room. ${shareUrl}`)}`;
+  if (document.documentElement.classList.contains("embed")) $("embedOpen").href = shareUrl;
+}
+renderShare();
 
 // test hook for automated checks
-window.__demo = { product, state, togglePart, applyFinish, openHeadset, openGuide, showFeature, closeFeature, fitCheck: () => fitResult, caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR } };
+window.__demo = { product, state, togglePart, applyFinish, chooseFinish, openHeadset, openGuide, showFeature, closeFeature, fitCheck: () => fitResult,
+  // nothing moving or waiting to move: no part, no chain of parts, no Fill or Empty, and the last clip has ended
+  idle: () => !busy && !chaining && !pressing.size && !window.__organise?.openingDoors?.() && !window.__organise?.running?.() && (mv.paused || performance.now() - movedAt > 1300),
+  caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR } };
 </script>
 </body>
 </html>

@@ -1,0 +1,163 @@
+{
+  "products": [
+    {
+      "id": "haier-hrf-3182ibns-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-3182IBNS-P",
+      "name": "Haier 268 L double-door refrigerator, Nickel Steel",
+      "shortName": "268 L Nickel Steel refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-3182ibns-p.glb",
+      "thumb": "/photos/haier-hrf-3182ibns-p/0.jpg",
+      "photos": ["/photos/haier-hrf-3182ibns-p/0.jpg", "/photos/haier-hrf-3182ibns-p/1.jpg", "/photos/haier-hrf-3182ibns-p/2.jpg", "/photos/haier-hrf-3182ibns-p/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Nickel Steel",
+          "swatchColor": "#b8babc",
+          "usdz": "/models/usdz/haier-hrf-3182ibns-p-nickel-steel.usdz",
+          "variant": "Nickel Steel",
+          "code": "HRF-3182IBNS-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-268l-frost-free-double-door-refrigerator-or-flat-door-or-nickel-steel-or-2-star-hrf-3182ibns-p/21526"
+        },
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#454b5d",
+          "usdz": "/models/usdz/haier-hrf-3182ibns-p-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HRF-3182IBGK-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [-0.272, 1.207, 0.161],
+              [0.274, 1.685, 0.308]
+            ],
+            "open": [
+              [0.254, 1.207, 0.21],
+              [0.728, 1.685, 0.641]
+            ]
+          }
+        },
+        {
+          "key": "icebox",
+          "label": "ice box",
+          "node": "IceBox",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.232, 1.232, -0.064],
+              [-0.082, 1.303, 0.137]
+            ],
+            "open": [
+              [-0.232, 1.232, 0.056],
+              [-0.082, 1.303, 0.257]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.272, 0.043, 0.141],
+              [0.274, 1.203, 0.308]
+            ],
+            "open": [
+              [0.241, 0.043, 0.21],
+              [0.728, 1.203, 0.656]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.01, 0, 0.5],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.239, 0.109, -0.258],
+              [0.239, 1.152, 0.134]
+            ],
+            "open": [
+              [-0.249, 0.109, 0.242],
+              [0.229, 1.152, 0.634]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "168.5 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier and Sangeetha give 54.8 × 61.5 × 168.5 cm (W × D × H); no door swing or clearances are published",
+      "specs": [
+        ["Total capacity", "268 L"],
+        ["Type", "Frost free, top-mount double door"],
+        ["Convertible", "5 in 1 convertible modes"],
+        ["Energy rating", "2 star, 275 units a year"],
+        ["Features", "Turbo Icing, Twin Energy Saving Mode"],
+        ["Voltage", "Works without a stabilizer from 110 to 300 V"],
+        ["Shelves", "Toughened glass"],
+        ["Storage", "Fruit case, vegetable case, egg tray"],
+        ["Light", "LED"],
+        ["Door", "Flat steel door with recess handle"],
+        ["Refrigerant", "R600a"],
+        ["Weight", "56 kg"],
+        ["Warranty", "2 years on the product, 10 years on the compressor"]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/hrf-3182ibns-p-2-star-nickel-steel-finish-top-mount-frost-free-refrigerator.shtml",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-268l-frost-free-double-door-refrigerator-or-flat-door-or-nickel-steel-or-2-star-hrf-3182ibns-p/21526",
+      "hotspots": [
+        {
+          "title": "5 in 1 Convertible",
+          "text": "Switch between fridge and freezer modes as you need: 5 flexible options.",
+          "pos": [0.213, 1.2258, 0.3085],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Separate Fruit Box",
+          "text": "Store fruits separately, with no mixing of smells.",
+          "pos": [0, 0.431, 0.1335],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo icing technology accelerates the time needed to freeze products in the freezer section.",
+          "pos": [-0.157, 1.273, 0.1385],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Stabilizer free operation",
+          "text": "Can withstand voltage fluctuations from 110–300 V.",
+          "pos": [-0.12, 0.75, 0.308],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ]
+    }
+  ]
+}

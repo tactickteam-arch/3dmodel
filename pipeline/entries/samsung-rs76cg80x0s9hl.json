@@ -1,0 +1,162 @@
+{
+  "products": [
+    {
+      "id": "samsung-rs76cg80x0s9hl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RS76CG80X0S9HL",
+      "name": "Samsung 653 L side-by-side refrigerator, Refined Inox",
+      "shortName": "653 L side-by-side refrigerator",
+      "summary": "Open the freezer and the fridge side by side, pull out the freezer drawers and the fridge trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rs76cg80x0s9hl.glb",
+      "thumb": "/photos/samsung-rs76cg80x0s9hl/0.jpg",
+      "photos": ["/photos/samsung-rs76cg80x0s9hl/0.jpg", "/photos/samsung-rs76cg80x0s9hl/1.jpg", "/photos/samsung-rs76cg80x0s9hl/2.jpg", "/photos/samsung-rs76cg80x0s9hl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Refined Inox",
+          "swatchColor": "#7e8186",
+          "usdz": "/models/usdz/samsung-rs76cg80x0s9hl-refined-inox.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -165,
+          "zone": {
+            "closed": [
+              [-0.456, 0.04, 0.146],
+              [-0.064, 1.746, 0.358]
+            ],
+            "open": [
+              [-0.811, 0.04, 0.258],
+              [-0.408, 1.746, 0.553]
+            ]
+          }
+        },
+        {
+          "key": "drawers",
+          "label": "drawers",
+          "text": ["Pull out drawers", "Push drawers in"],
+          "node": "FreezerDrawers",
+          "slide": [0, 0, 0.3],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.402, 0.102, -0.292],
+              [-0.095, 0.638, 0.136]
+            ],
+            "open": [
+              [-0.402, 0.102, 0.008],
+              [-0.095, 0.638, 0.436]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 170,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.06, 0.04, 0.136],
+              [0.456, 1.746, 0.359]
+            ],
+            "open": [
+              [0.411, 0.04, 0.259],
+              [0.929, 1.746, 0.56]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.56],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.031, 0.102, -0.294],
+              [0.404, 1.572, 0.126]
+            ],
+            "open": [
+              [-0.031, 0.102, 0.266],
+              [0.404, 1.572, 0.686]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "91.2 cm",
+        "h": "178 cm",
+        "d": "71.6 cm"
+      },
+      "sizeNote": "Samsung gives 91.2 × 71.6 × 178 cm (W × D × H) with the hinge covers: 174.6 cm to the top without them and 61.0 cm deep without the doors. The freezer door opens to 165° and the fridge door to 170°",
+      "fit": {
+        "front": 45,
+        "sides": 5,
+        "top": 10,
+        "back": 5,
+        "note": "From Samsung's user manual for this model: 116.5 cm of depth in total with the doors open at 90°, at least 5 cm at each side and behind it, and 10 cm above it."
+      },
+      "specs": [
+        ["Total capacity", "653 L (freezer 244 L, fridge 409 L)"],
+        ["Type", "Side by side, Twin Cooling Plus"],
+        ["Convertible", "5-in-1 Smart Conversion"],
+        ["Energy rating", "2 star, 590 units a year"],
+        ["Compressor", "Digital Inverter Compressor"],
+        ["Cooling", "Power Cool and Power Freeze"],
+        ["Fridge", "4 tempered-glass shelves, 5 door pockets, 1 vegetable and fruit drawer, top LED"],
+        ["Freezer", "4 shelves, 5 door pockets, 2 drawers, ice tray, top LED"],
+        ["Display", "Internal (Ice Blue)"],
+        ["Door", "Recess handles, Refined Inox"],
+        ["Features", "Door alarm, vacation mode"],
+        ["Refrigerant", "R600a"],
+        ["Noise", "37 dBA"],
+        ["Weight", "98.34 kg"],
+        ["Warranty", "1 year product, 10 years compressor"]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/side-by-side/rs8000cch-side-by-side-smart-conversion-653l-silver-rs76cg80x0s9hl/",
+      "hotspots": [
+        {
+          "title": "Convertible 5-in-1",
+          "text": "Using Twin Cooling technology, you can switch between 5 modes. Simply convert your freezer into a fridge to store more fresh food, or switch the fridge or freezer off to save energy.",
+          "pos": [-0.26, 1.2, 0.3585],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Twin Cooling Plus",
+          "text": "Optimizes the temperature and humidity in the fridge and freezer using independent cooling in each compartment, and protects food's natural flavour by preventing odours from mixing.",
+          "pos": [0.187, 1.505, -0.2855],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Power Cool / Power Freeze",
+          "text": "At the touch of a button, Power Cool blows intensely cold air into the fridge to quickly cool your groceries or drinks. Power Freeze delivers a fast blast of cold air into the freezer.",
+          "pos": [0.4075, 1.26, 0.17],
+          "normal": [-1, 0, 0],
+          "show": "fridge"
+        },
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "Automatically adjusts its speed in response to cooling demand, so it is quiet, uses power efficiently and keeps working for long, with a 10 year warranty on the compressor.",
+          "pos": [0.2, 0.62, 0.3585],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ]
+    }
+  ]
+}

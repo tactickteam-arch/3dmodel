@@ -1,0 +1,167 @@
+{
+  "products": [
+    {
+      "id": "haier-hrf-3782bnsa-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-3782BNSA-P",
+      "name": "Haier 328 L double-door refrigerator, Nickel Steel",
+      "shortName": "328 L Nickel Steel refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-3782bnsa-p.glb",
+      "thumb": "/photos/haier-hrf-3782bnsa-p/0.jpg",
+      "photos": ["/photos/haier-hrf-3782bnsa-p/0.jpg", "/photos/haier-hrf-3782bnsa-p/1.jpg", "/photos/haier-hrf-3782bnsa-p/2.jpg", "/photos/haier-hrf-3782bnsa-p/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Nickel Steel",
+          "swatchColor": "#b8babc",
+          "usdz": "/models/usdz/haier-hrf-3782bnsa-p-nickel-steel.usdz",
+          "variant": "Nickel Steel",
+          "code": "HRF-3782BNSA-P"
+        },
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#474e5f",
+          "usdz": "/models/usdz/haier-hrf-3782bnsa-p-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HRF-3782BGK-P"
+        },
+        {
+          "name": "GE Black",
+          "swatchColor": "#474747",
+          "usdz": "/models/usdz/haier-hrf-3782bnsa-p-ge-black.usdz",
+          "variant": "GE Black",
+          "code": "HRF-3782BGB-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [-0.309, 1.115, 0.176],
+              [0.311, 1.64, 0.333]
+            ],
+            "open": [
+              [0.291, 1.115, 0.218],
+              [0.829, 1.64, 0.704]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.241, 1.156, -0.049],
+              [-0.09, 1.267, 0.16]
+            ],
+            "open": [
+              [-0.241, 1.156, 0.071],
+              [-0.09, 1.267, 0.28]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.309, 0.025, 0.151],
+              [0.311, 1.111, 0.333]
+            ],
+            "open": [
+              [0.275, 0.025, 0.218],
+              [0.829, 1.111, 0.723]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.01, 0, 0.5],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.271, 0.074, -0.28],
+              [0.271, 1.023, 0.145]
+            ],
+            "open": [
+              [-0.281, 0.074, 0.22],
+              [0.261, 1.023, 0.645]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "62.3 cm",
+        "h": "164 cm",
+        "d": "66.5 cm"
+      },
+      "sizeNote": "Haier gives 62.3 × 66.5 × 164 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "328 L"],
+        ["Type", "Frost free, top-mount double door"],
+        ["Convertible", "10 in 1 (Magic Convertible series)"],
+        ["Energy rating", "2 star, 282 units a year"],
+        ["Compressor", "Inverter (Triple Inverter and Dual Fan Tech)"],
+        ["Features", "Magic Cooling, 1 Hour Icing, movable ice maker"],
+        ["Shelves", "Toughened glass (refrigerator)"],
+        ["Storage", "Vegetable case, egg tray"],
+        ["Light", "LED"],
+        ["Door", "Steel finish, Nickel Steel, recess handle"],
+        ["Refrigerant", "R600a"],
+        ["Weight", "62 kg"]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/328-litres-frost-free-inverter-top-mount-refrigerator-hrf-3782bns-p.shtml",
+      "hotspots": [
+        {
+          "title": "Magic Convertible",
+          "text": "Set the freezer to suit what you keep: −24 °C Super Freezer and Turbo Icing, −12 °C energy saving mode for ice cream and chocolate, 0 °C for beverages, 2 °C for milk and curd, 5 °C for fruit and vegetables.",
+          "pos": [0.2325, 1.1304, 0.334],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Movable ice maker",
+          "text": "When you need ice, you get it faster than you imagined, and when you need space, you can detach it to make more space.",
+          "pos": [-0.1655, 1.253, 0.154],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Toughened glass shelves",
+          "text": "The shelves are made with toughened glass that holds and withstands heavy pots and pans for considerable time.",
+          "pos": [0.17, 0.684, 0.145],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "LED Light",
+          "text": "The LED lighting that is slim, bright and energy-efficient.",
+          "pos": [0, 1.0755, 0.146],
+          "normal": [0, -0.5, 0.866],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}

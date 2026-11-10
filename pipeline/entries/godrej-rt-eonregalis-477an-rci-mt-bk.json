@@ -1,0 +1,161 @@
+{
+  "products": [
+    {
+      "id": "godrej-rt-eonregalis-477an-rci-mt-bk",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Refrigerator",
+      "model": "RT EONREGALIS 477AN RCI MT BK",
+      "name": "Godrej Eon Regalis 436 L double-door refrigerator",
+      "shortName": "436 L Eon Regalis refrigerator",
+      "summary": "Open the freezer and the fridge, slide the ice maker and the trays out, pick a colour, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/godrej-rt-eonregalis-477an-rci-mt-bk.glb",
+      "thumb": "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/0.jpg",
+      "photos": ["/photos/godrej-rt-eonregalis-477an-rci-mt-bk/0.jpg", "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/1.jpg", "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/2.jpg", "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Matt Black",
+          "swatchColor": "#36373c",
+          "usdz": "/models/usdz/godrej-rt-eonregalis-477an-rci-mt-bk-matt-black.usdz",
+          "variant": "Matt Black",
+          "code": "RT EONREGALIS 477AN RCI MT BK"
+        },
+        {
+          "name": "Champagne Gold",
+          "swatchColor": "#c4bfbe",
+          "usdz": "/models/usdz/godrej-rt-eonregalis-477an-rci-mt-bk-champagne-gold.usdz",
+          "variant": "Champagne Gold",
+          "code": "RT EONREGALIS 477AN RCI CH GD"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.369, 1.22, 0.205],
+              [0.369, 1.73, 0.37]
+            ],
+            "open": [
+              [0.29, 1.22, 0.292],
+              [0.675, 1.73, 1.003]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.011, 1.256, -0.015],
+              [0.275, 1.4, 0.194]
+            ],
+            "open": [
+              [-0.011, 1.256, 0.105],
+              [0.275, 1.4, 0.314]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.369, 0.037, 0.185],
+              [0.369, 1.208, 0.369]
+            ],
+            "open": [
+              [0.28, 0.037, 0.287],
+              [0.732, 1.208, 0.978]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.03, 0, 0.68],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.316, 0.104, -0.32],
+              [0.316, 0.997, 0.184]
+            ],
+            "open": [
+              [-0.346, 0.104, 0.36],
+              [0.286, 0.997, 0.864]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "73.75 cm",
+        "h": "173 cm",
+        "d": "73.9 cm"
+      },
+      "sizeNote": "Godrej lists 1.73m X 73.75cm X 73.9cm (H x W x D) and publishes no clearances or open-door depth for this model",
+      "specs": [
+        ["Total capacity", "436 L"],
+        ["Type", "Frost free, double door"],
+        ["Energy rating", "1 star"],
+        ["Compressor", "Inverter, powered by AI"],
+        ["Refrigerant", "R600a"],
+        ["Shelves", "3, toughened glass, one an Easy Slide Shelf"],
+        ["Cooling", "Patented Cool Shower Technology, Cool Balance Technology"],
+        ["Vegetable tray", "38 litres"],
+        ["Extras", "Movable Ice Maker, Nano Shield Technology, Vacuum Ease Technology, Bright LED Prism Lens"],
+        ["Cooling retention", "Up to 12 hours"],
+        ["Colours", "Matt Black, Champagne Gold"],
+        ["Weight", "67 kg"],
+        ["Compressor warranty", "10 years"]
+      ],
+      "source": "https://www.godrejenterprises.com/home-appliances/refrigerators/double-door-frost-free/p/rt-eonregalis-477-an-rci-mt-bk",
+      "hotspots": [
+        {
+          "title": "Nano shield technology",
+          "text": "Healthier and safer food with 95%+ food surface disinfection.",
+          "pos": [0.02, 1.446, 0.37],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Powered by AI Tech",
+          "text": "Automatically optimises cooling and energy consumption based ambient weather, food load in refrigerator and door openings. Defrosts smartly to minimise thermal shock, preserving food freshness.",
+          "pos": [-0.19, 0.95, 0.37],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Easy slide shelf",
+          "text": "Reach items at the back easily using smooth, easy-slide shelf.",
+          "pos": [0.17, 0.896, 0.19],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Patented Cool Shower Technology",
+          "text": "Inbuilt air vents above shelves for uniform 360° cooling",
+          "pos": [0, 1, -0.312],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}

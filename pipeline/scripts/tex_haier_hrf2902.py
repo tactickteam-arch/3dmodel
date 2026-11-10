@@ -42,7 +42,7 @@ X0, X1 = 443, 755                  # print columns [X0, X1)
 FZ = (147, 422)                    # freezer print rows [a, b)
 FR = (455, 1008)                   # fridge print rows [a, b)
 UP = 3                             # enlargement, for filtering only
-# the viewer's light lifts textures about a quarter (BENCHMARK 7, PLAYBOOK 5.1): the print is held at SHADE of the photo,
+# the viewer's light lifts textures about a quarter (BENCHMARK 7): the print is held at SHADE of the photo,
 # tuned by comparing the render with Haier's front (NOTES.md)
 SHADE = 0.86
 # words on the freezer door, measured on the same photo (padded 2 px): the Haier wordmark x 582-615, rows 187-197;

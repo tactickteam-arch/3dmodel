@@ -8,16 +8,11 @@
       "model": "GLT4626TMPZ",
       "name": "LG 466 L double-door refrigerator with Hygiene Fresh and Door Cooling+",
       "shortName": "466 L double-door refrigerator",
-      "summary": "Open the freezer, slide the ice tray out and open the fridge, look inside, then stand it in your kitchen at its real size.",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
       "arTip": "Tap a door to open it",
       "glb": "/models/lg-glt4626tmpz.glb",
       "thumb": "/photos/lg-glt4626tmpz/0.jpg",
-      "photos": [
-        "/photos/lg-glt4626tmpz/0.jpg",
-        "/photos/lg-glt4626tmpz/1.jpg",
-        "/photos/lg-glt4626tmpz/2.jpg",
-        "/photos/lg-glt4626tmpz/3.jpg"
-      ],
+      "photos": ["/photos/lg-glt4626tmpz/0.jpg", "/photos/lg-glt4626tmpz/1.jpg", "/photos/lg-glt4626tmpz/2.jpg", "/photos/lg-glt4626tmpz/3.jpg"],
       "placement": "floor",
       "arLabel": "View in your kitchen",
       "orbit": "-28deg 78deg 140%",
@@ -37,28 +32,12 @@
           "angle": 135,
           "zone": {
             "closed": [
-              [
-                -0.346,
-                1.32,
-                0.247
-              ],
-              [
-                0.35,
-                1.845,
-                0.363
-              ]
+              [-0.346, 1.306, 0.237],
+              [0.35, 1.845, 0.363]
             ],
             "open": [
-              [
-                0.336,
-                1.32,
-                0.286
-              ],
-              [
-                0.874,
-                1.845,
-                0.824
-              ]
+              [0.329, 1.306, 0.286],
+              [0.874, 1.845, 0.831]
             ]
           }
         },
@@ -66,36 +45,16 @@
           "key": "icemaker",
           "label": "ice tray",
           "node": "IceMaker",
-          "slide": [
-            0,
-            0,
-            0.16
-          ],
+          "slide": [0, 0, 0.16],
           "needs": "freezer",
           "zone": {
             "closed": [
-              [
-                -0.194,
-                1.387,
-                0.077
-              ],
-              [
-                -0.013,
-                1.531,
-                0.286
-              ]
+              [-0.194, 1.394, 0.022],
+              [-0.013, 1.538, 0.231]
             ],
             "open": [
-              [
-                -0.194,
-                1.387,
-                0.237
-              ],
-              [
-                -0.013,
-                1.531,
-                0.446
-              ]
+              [-0.194, 1.394, 0.182],
+              [-0.013, 1.538, 0.391]
             ]
           }
         },
@@ -108,28 +67,30 @@
           "hint": true,
           "zone": {
             "closed": [
-              [
-                -0.346,
-                0.045,
-                0.221
-              ],
-              [
-                0.35,
-                1.312,
-                0.363
-              ]
+              [-0.346, 0.027, 0.212],
+              [0.35, 1.301, 0.363]
             ],
             "open": [
-              [
-                0.325,
-                0.045,
-                0.286
-              ],
-              [
-                0.874,
-                1.312,
-                0.834
-              ]
+              [0.318, 0.027, 0.286],
+              [0.874, 1.301, 0.841]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.62],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.31, 0.103, -0.291],
+              [0.31, 1.236, 0.207]
+            ],
+            "open": [
+              [-0.31, 0.103, 0.329],
+              [0.31, 1.236, 0.827]
             ]
           }
         }
@@ -141,132 +102,52 @@
       },
       "sizeNote": "Both doors open to about 135 degrees",
       "specs": [
-        [
-          "Total capacity",
-          "466 L (freezer 103 L, fridge 363 L)"
-        ],
-        [
-          "Type",
-          "Frost free, top-mount double door"
-        ],
-        [
-          "Convertible",
-          "Yes"
-        ],
-        [
-          "Energy rating",
-          "2 star, 261 units a year"
-        ],
-        [
-          "Compressor",
-          "Smart Inverter (BLDC), 10 years on the compressor"
-        ],
-        [
-          "Cooling",
-          "Door Cooling+, Multi Air Flow"
-        ],
-        [
-          "Fresh zones",
-          "Fresh 0 Zone pull-out tray and a Fresh Zone drawer"
-        ],
-        [
-          "Freshness",
-          "Hygiene Fresh"
-        ],
-        [
-          "Shelves",
-          "3 tempered glass (fridge), 1 (freezer)"
-        ],
-        [
-          "Door baskets",
-          "2 in the freezer, 4 in the fridge, transparent"
-        ],
-        [
-          "Ice maker",
-          "Manual, 1 lever and 2 trays, a moving ice tray"
-        ],
-        [
-          "Control",
-          "External LED display, Express Freeze, door alarm"
-        ],
-        [
-          "Handle",
-          "Horizontal pocket"
-        ],
-        [
-          "Light",
-          "Top LED"
-        ],
-        [
-          "Smart",
-          "ThinQ (Wi-Fi), Smart Diagnosis"
-        ],
-        [
-          "Weight",
-          "80 kg"
-        ]
+        ["Total capacity", "466 L (freezer 103 L, fridge 363 L)"],
+        ["Type", "Frost free, top-mount double door"],
+        ["Convertible", "Yes"],
+        ["Energy rating", "2 star, 261 units a year"],
+        ["Compressor", "Smart Inverter (BLDC), 10 years on the compressor"],
+        ["Cooling", "Door Cooling+, Multi Air Flow"],
+        ["Fresh zones", "Fresh 0 Zone pull-out tray and a Fresh Zone drawer"],
+        ["Freshness", "Hygiene Fresh"],
+        ["Shelves", "3 tempered glass (fridge), 1 (freezer)"],
+        ["Door baskets", "2 in the freezer, 4 in the fridge, transparent"],
+        ["Ice maker", "Manual, 1 lever and 2 trays, a moving ice tray"],
+        ["Control", "External LED display, Express Freeze, door alarm"],
+        ["Handle", "Horizontal pocket"],
+        ["Light", "Top LED"],
+        ["Smart", "ThinQ (Wi-Fi), Smart Diagnosis"],
+        ["Weight", "80 kg"]
       ],
-      "sangeethaUrl": null,
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-466l-double-door-refrigerator-with-hygiene-fresh-doorcooling-smart-inverter-compressor-2-star-or-shiny-steel-glt4626tmpz-dpzzebn/21041",
       "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt4626tmpz/",
       "hotspots": [
         {
           "title": "Convertible",
           "text": "Convert a section of the freezer to more refrigeration as needed to keep foods fresher for longer.",
-          "pos": [
-            0.015,
-            1.608,
-            -0.29
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [0.015, 1.61, -0.2895],
+          "normal": [0, 0, 1],
           "show": "freezer"
         },
         {
           "title": "Moving Ice Tray",
           "text": "The sliding ice tray can be moved to the left or right to position it in your preferred location.",
-          "pos": [
-            -0.104,
-            1.5,
-            0.2805
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [-0.104, 1.508, 0.2325],
+          "normal": [0, 0, 1],
           "show": "freezer"
         },
         {
           "title": "Hygiene Fresh",
           "text": "Up to 99.99% reduction in activity of bacteria, to keep your food fresher in a cleaner environment.",
-          "pos": [
-            0.015,
-            0.98,
-            -0.29
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [0.015, 0.98, -0.2895],
+          "normal": [0, 0, 1],
           "show": "fridge"
         },
         {
           "title": "Door Cooling+",
           "text": "Food stays fresh and drinks get ice cold on any shelf with even and faster cooling.",
-          "pos": [
-            0,
-            0.8,
-            0.3625
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [0, 0.8, 0.3625],
+          "normal": [0, 0, 1],
           "show": "!fridge"
         }
       ],

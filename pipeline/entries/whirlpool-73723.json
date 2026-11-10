@@ -1,0 +1,141 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-73723",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "73723",
+      "name": "Whirlpool Icemagic Pro 207 L single-door refrigerator, Wine Silk",
+      "shortName": "207 L Icemagic Pro refrigerator",
+      "summary": "Open the door and the freezer box, slide out the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/whirlpool-73723.glb",
+      "thumb": "/photos/whirlpool-73723/0.jpg",
+      "photos": ["/photos/whirlpool-73723/0.jpg", "/photos/whirlpool-73723/1.jpg", "/photos/whirlpool-73723/2.jpg", "/photos/whirlpool-73723/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Wine Silk",
+          "swatchColor": "#5a0a1c",
+          "usdz": "/models/usdz/whirlpool-73723-wine-silk.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 120,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.266, 0.043, 0.121],
+              [0.268, 1.333, 0.328]
+            ],
+            "open": [
+              [0.197, 0.043, 0.207],
+              [0.592, 1.333, 0.707]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": -100,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.195, 1.045, 0.047],
+              [0.15, 1.221, 0.06]
+            ],
+            "open": [
+              [-0.266, 1.045, 0.046],
+              [-0.195, 1.221, 0.387]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.26],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.225, 0.082, -0.28],
+              [0.225, 1.005, 0.114]
+            ],
+            "open": [
+              [-0.225, 0.082, -0.02],
+              [0.225, 1.005, 0.374]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "53.6 cm",
+        "h": "133.3 cm",
+        "d": "65.5 cm"
+      },
+      "sizeNote": "Whirlpool gives 53.6 × 133.3 × 65.5 cm (W × H × D) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "207 L"],
+        ["Type", "Direct cool, single door"],
+        ["Defrost", "Manual"],
+        ["Energy rating", "3 star, 152 units a year (BEE label 2026-28)"],
+        ["Compressor", "Non-inverter, auto-connects to a home inverter"],
+        ["Cooling", "Insulated Capillary Technology, laminar air flow"],
+        ["Controls", "Knob next to the freezer"],
+        ["Shelves", "Toughened glass: 3 in the fridge, 1 in the freezer"],
+        ["Door storage", "4 door pockets, egg tray"],
+        ["Storage", "Magic Chiller tray, large vegetable crisper with moisture control"],
+        ["Light", "Bulb"],
+        ["Handle", "Breathe Arc handle, lock and key"],
+        ["Voltage", "130-300 V, no stabiliser needed"],
+        ["In the box", "1 egg tray, 2 ice trays, manual, key"],
+        ["Model on the energy label", "DAS20743ITAUC"],
+        ["Colour", "Wine Silk"],
+        ["Weight", "38.4 kg"],
+        ["Warranty", "1 year on the product, 10 years on the compressor"]
+      ],
+      "source": "https://india.whirlpool.in/icemagic-pro-207l-3-star-single-door-refrigerator-silk-y/p",
+      "hotspots": [
+        {
+          "title": "Crescent door design and Breathe Arc handle",
+          "text": "Built with utmost precision & craftsmanship, it is designed to be a timeless centrepiece in every household.",
+          "pos": [-0.193, 1.034, 0.3275],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Number 1 in ice-making",
+          "text": "The advanced Insulated Capillary Technology and powerful compressor in Whirlpool refrigerators makes ice faster than any other products in its class - so that you are never short of ice.",
+          "pos": [0, 1.15, 0.05],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Magic Chiller",
+          "text": "The all new magic chiller with easy slide action, that chills your bottles quickly.",
+          "pos": [0, 0.95, 0.06],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Stabilizer free operation",
+          "text": "Whirlpool Refrigerators can stably operate even in high fluctuation of voltage (130V-300V) and do not require a separate stabilizer.",
+          "pos": [0.1, 0.45, 0.2835],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ]
+    }
+  ]
+}

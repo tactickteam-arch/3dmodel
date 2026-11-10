@@ -310,7 +310,7 @@
       "model": "GLT2526XWPZ",
       "name": "LG 251 L double-door refrigerator with Smart Inverter Compressor",
       "shortName": "251 L double-door refrigerator",
-      "summary": "Open the freezer, pull out the ice tray and open the fridge, look inside, then stand it in your kitchen at its real size.",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
       "arTip": "Tap a door to open it",
       "glb": "/models/lg-glt2526xwpz.glb",
       "thumb": "/photos/lg-glt2526xwpz/0.jpg",
@@ -341,8 +341,8 @@
             "closed": [
               [
                 -0.273,
-                1.092,
-                0.203
+                1.089,
+                0.193
               ],
               [
                 0.277,
@@ -352,14 +352,14 @@
             ],
             "open": [
               [
-                0.263,
-                1.092,
+                0.256,
+                1.089,
                 0.242
               ],
               [
                 0.699,
                 1.573,
-                0.677
+                0.684
               ]
             ]
           }
@@ -377,26 +377,26 @@
           "zone": {
             "closed": [
               [
-                0,
-                1.174,
-                0.033
+                0.025,
+                1.179,
+                -0.022
               ],
               [
-                0.176,
-                1.318,
-                0.242
+                0.201,
+                1.323,
+                0.187
               ]
             ],
             "open": [
               [
-                0,
-                1.174,
-                0.193
+                0.025,
+                1.179,
+                0.138
               ],
               [
-                0.176,
-                1.318,
-                0.402
+                0.201,
+                1.323,
+                0.347
               ]
             ]
           }
@@ -412,25 +412,66 @@
             "closed": [
               [
                 -0.274,
-                0.028,
-                0.177
+                0.032,
+                0.168
               ],
               [
                 0.278,
-                1.085,
+                1.082,
                 0.319
               ]
             ],
             "open": [
               [
                 0.246,
-                0.028,
+                0.032,
                 0.242
               ],
               [
                 0.699,
-                1.085,
+                1.082,
                 0.695
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.52
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.238,
+                0.083,
+                -0.247
+              ],
+              [
+                0.238,
+                1.011,
+                0.166
+              ]
+            ],
+            "open": [
+              [
+                -0.238,
+                0.083,
+                0.273
+              ],
+              [
+                0.238,
+                1.011,
+                0.686
               ]
             ]
           }
@@ -504,15 +545,16 @@
           "48 kg"
         ]
       ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-251l-double-door-refrigerator-smart-inverter-compressor-smart-mode-or-shiny-steel-or-2-star-glt2526xwpz/21329",
       "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt2526xwpz/",
       "hotspots": [
         {
           "title": "Convertible",
           "text": "Convert the freezer into a fridge with a dedicated dairy mode.",
           "pos": [
-            -0.12,
-            1.36,
-            -0.244
+            0,
+            1.43,
+            -0.2455
           ],
           "normal": [
             0,
@@ -541,8 +583,8 @@
           "text": "Multiple cooling air vents circulate cool air to every corner of the refrigerator, so every food item is properly cooled.",
           "pos": [
             0.085,
-            1.14,
-            -0.2475
+            1.163,
+            -0.2403
           ],
           "normal": [
             0,
@@ -556,8 +598,8 @@
           "text": "A spacious 25.3 L compartment with 20% more room to keep fruits and vegetables fresh and crisp.",
           "pos": [
             0,
-            0.145,
-            0.2345
+            0.1525,
+            0.1637
           ],
           "normal": [
             0,
@@ -571,8 +613,7 @@
         "front": 36,
         "back": 5,
         "note": "From LG's owner's manual: keep at least 5 cm between the back and the wall. The manual gives 99.9 cm total depth with a door open, which is 36 cm in front of the fridge."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "lg-glt3426snpz",
@@ -898,7 +939,7 @@
       "model": "GLT4626TMPZ",
       "name": "LG 466 L double-door refrigerator with Hygiene Fresh and Door Cooling+",
       "shortName": "466 L double-door refrigerator",
-      "summary": "Open the freezer, slide the ice tray out and open the fridge, look inside, then stand it in your kitchen at its real size.",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
       "arTip": "Tap a door to open it",
       "glb": "/models/lg-glt4626tmpz.glb",
       "thumb": "/photos/lg-glt4626tmpz/0.jpg",
@@ -929,8 +970,8 @@
             "closed": [
               [
                 -0.346,
-                1.32,
-                0.247
+                1.306,
+                0.237
               ],
               [
                 0.35,
@@ -940,14 +981,14 @@
             ],
             "open": [
               [
-                0.336,
-                1.32,
+                0.329,
+                1.306,
                 0.286
               ],
               [
                 0.874,
                 1.845,
-                0.824
+                0.831
               ]
             ]
           }
@@ -966,25 +1007,25 @@
             "closed": [
               [
                 -0.194,
-                1.387,
-                0.077
+                1.394,
+                0.022
               ],
               [
                 -0.013,
-                1.531,
-                0.286
+                1.538,
+                0.231
               ]
             ],
             "open": [
               [
                 -0.194,
-                1.387,
-                0.237
+                1.394,
+                0.182
               ],
               [
                 -0.013,
-                1.531,
-                0.446
+                1.538,
+                0.391
               ]
             ]
           }
@@ -1000,25 +1041,66 @@
             "closed": [
               [
                 -0.346,
-                0.045,
-                0.221
+                0.027,
+                0.212
               ],
               [
                 0.35,
-                1.312,
+                1.301,
                 0.363
               ]
             ],
             "open": [
               [
-                0.325,
-                0.045,
+                0.318,
+                0.027,
                 0.286
               ],
               [
                 0.874,
-                1.312,
-                0.834
+                1.301,
+                0.841
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.62
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.31,
+                0.103,
+                -0.291
+              ],
+              [
+                0.31,
+                1.236,
+                0.207
+              ]
+            ],
+            "open": [
+              [
+                -0.31,
+                0.103,
+                0.329
+              ],
+              [
+                0.31,
+                1.236,
+                0.827
               ]
             ]
           }
@@ -1096,7 +1178,7 @@
           "80 kg"
         ]
       ],
-      "sangeethaUrl": null,
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-466l-double-door-refrigerator-with-hygiene-fresh-doorcooling-smart-inverter-compressor-2-star-or-shiny-steel-glt4626tmpz-dpzzebn/21041",
       "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt4626tmpz/",
       "hotspots": [
         {
@@ -1104,8 +1186,8 @@
           "text": "Convert a section of the freezer to more refrigeration as needed to keep foods fresher for longer.",
           "pos": [
             0.015,
-            1.608,
-            -0.29
+            1.61,
+            -0.2895
           ],
           "normal": [
             0,
@@ -1119,8 +1201,8 @@
           "text": "The sliding ice tray can be moved to the left or right to position it in your preferred location.",
           "pos": [
             -0.104,
-            1.5,
-            0.2805
+            1.508,
+            0.2325
           ],
           "normal": [
             0,
@@ -1135,7 +1217,7 @@
           "pos": [
             0.015,
             0.98,
-            -0.29
+            -0.2895
           ],
           "normal": [
             0,
@@ -1163,8 +1245,7 @@
       "fit": {
         "back": 5,
         "note": "From LG's owner's manual for its double-door range: keep at least 5 cm between the back and the wall. The 466 L model's own door swing is not published; the doors open about 135 degrees in this model."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "haier-hrf-2902icmc-p",
@@ -2389,6 +2470,4670 @@
       }
     },
     {
+      "id": "whirlpool-73723",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "73723",
+      "name": "Whirlpool Icemagic Pro 207 L single-door refrigerator, Wine Silk",
+      "shortName": "207 L Icemagic Pro refrigerator",
+      "summary": "Open the door and the freezer box, slide out the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/whirlpool-73723.glb",
+      "thumb": "/photos/whirlpool-73723/0.jpg",
+      "photos": [
+        "/photos/whirlpool-73723/0.jpg",
+        "/photos/whirlpool-73723/1.jpg",
+        "/photos/whirlpool-73723/2.jpg",
+        "/photos/whirlpool-73723/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Wine Silk",
+          "swatchColor": "#5a0a1c",
+          "usdz": "/models/usdz/whirlpool-73723-wine-silk.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 120,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.266,
+                0.043,
+                0.121
+              ],
+              [
+                0.268,
+                1.333,
+                0.328
+              ]
+            ],
+            "open": [
+              [
+                0.197,
+                0.043,
+                0.207
+              ],
+              [
+                0.592,
+                1.333,
+                0.707
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": -100,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.195,
+                1.045,
+                0.047
+              ],
+              [
+                0.15,
+                1.221,
+                0.06
+              ]
+            ],
+            "open": [
+              [
+                -0.266,
+                1.045,
+                0.046
+              ],
+              [
+                -0.195,
+                1.221,
+                0.387
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.26
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.225,
+                0.082,
+                -0.28
+              ],
+              [
+                0.225,
+                1.005,
+                0.114
+              ]
+            ],
+            "open": [
+              [
+                -0.225,
+                0.082,
+                -0.02
+              ],
+              [
+                0.225,
+                1.005,
+                0.374
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "53.6 cm",
+        "h": "133.3 cm",
+        "d": "65.5 cm"
+      },
+      "sizeNote": "Whirlpool gives 53.6 × 133.3 × 65.5 cm (W × H × D) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "207 L"
+        ],
+        [
+          "Type",
+          "Direct cool, single door"
+        ],
+        [
+          "Defrost",
+          "Manual"
+        ],
+        [
+          "Energy rating",
+          "3 star, 152 units a year (BEE label 2026-28)"
+        ],
+        [
+          "Compressor",
+          "Non-inverter, auto-connects to a home inverter"
+        ],
+        [
+          "Cooling",
+          "Insulated Capillary Technology, laminar air flow"
+        ],
+        [
+          "Controls",
+          "Knob next to the freezer"
+        ],
+        [
+          "Shelves",
+          "Toughened glass: 3 in the fridge, 1 in the freezer"
+        ],
+        [
+          "Door storage",
+          "4 door pockets, egg tray"
+        ],
+        [
+          "Storage",
+          "Magic Chiller tray, large vegetable crisper with moisture control"
+        ],
+        [
+          "Light",
+          "Bulb"
+        ],
+        [
+          "Handle",
+          "Breathe Arc handle, lock and key"
+        ],
+        [
+          "Voltage",
+          "130-300 V, no stabiliser needed"
+        ],
+        [
+          "In the box",
+          "1 egg tray, 2 ice trays, manual, key"
+        ],
+        [
+          "Model on the energy label",
+          "DAS20743ITAUC"
+        ],
+        [
+          "Colour",
+          "Wine Silk"
+        ],
+        [
+          "Weight",
+          "38.4 kg"
+        ],
+        [
+          "Warranty",
+          "1 year on the product, 10 years on the compressor"
+        ]
+      ],
+      "source": "https://india.whirlpool.in/icemagic-pro-207l-3-star-single-door-refrigerator-silk-y/p",
+      "hotspots": [
+        {
+          "title": "Crescent door design and Breathe Arc handle",
+          "text": "Built with utmost precision & craftsmanship, it is designed to be a timeless centrepiece in every household.",
+          "pos": [
+            -0.193,
+            1.034,
+            0.3275
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Number 1 in ice-making",
+          "text": "The advanced Insulated Capillary Technology and powerful compressor in Whirlpool refrigerators makes ice faster than any other products in its class - so that you are never short of ice.",
+          "pos": [
+            0,
+            1.15,
+            0.05
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Magic Chiller",
+          "text": "The all new magic chiller with easy slide action, that chills your bottles quickly.",
+          "pos": [
+            0,
+            0.95,
+            0.06
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Stabilizer free operation",
+          "text": "Whirlpool Refrigerators can stably operate even in high fluctuation of voltage (130V-300V) and do not require a separate stabilizer.",
+          "pos": [
+            0.1,
+            0.45,
+            0.2835
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
+      "id": "samsung-rs76cg80x0s9hl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RS76CG80X0S9HL",
+      "name": "Samsung 653 L side-by-side refrigerator, Refined Inox",
+      "shortName": "653 L side-by-side refrigerator",
+      "summary": "Open the freezer and the fridge side by side, pull out the freezer drawers and the fridge trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rs76cg80x0s9hl.glb",
+      "thumb": "/photos/samsung-rs76cg80x0s9hl/0.jpg",
+      "photos": [
+        "/photos/samsung-rs76cg80x0s9hl/0.jpg",
+        "/photos/samsung-rs76cg80x0s9hl/1.jpg",
+        "/photos/samsung-rs76cg80x0s9hl/2.jpg",
+        "/photos/samsung-rs76cg80x0s9hl/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Refined Inox",
+          "swatchColor": "#7e8186",
+          "usdz": "/models/usdz/samsung-rs76cg80x0s9hl-refined-inox.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -165,
+          "zone": {
+            "closed": [
+              [
+                -0.456,
+                0.04,
+                0.146
+              ],
+              [
+                -0.064,
+                1.746,
+                0.358
+              ]
+            ],
+            "open": [
+              [
+                -0.811,
+                0.04,
+                0.258
+              ],
+              [
+                -0.408,
+                1.746,
+                0.553
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawers",
+          "label": "drawers",
+          "text": [
+            "Pull out drawers",
+            "Push drawers in"
+          ],
+          "node": "FreezerDrawers",
+          "slide": [
+            0,
+            0,
+            0.3
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.402,
+                0.102,
+                -0.292
+              ],
+              [
+                -0.095,
+                0.638,
+                0.136
+              ]
+            ],
+            "open": [
+              [
+                -0.402,
+                0.102,
+                0.008
+              ],
+              [
+                -0.095,
+                0.638,
+                0.436
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 170,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.06,
+                0.04,
+                0.136
+              ],
+              [
+                0.456,
+                1.746,
+                0.359
+              ]
+            ],
+            "open": [
+              [
+                0.411,
+                0.04,
+                0.259
+              ],
+              [
+                0.929,
+                1.746,
+                0.56
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.56
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.031,
+                0.102,
+                -0.294
+              ],
+              [
+                0.404,
+                1.572,
+                0.126
+              ]
+            ],
+            "open": [
+              [
+                -0.031,
+                0.102,
+                0.266
+              ],
+              [
+                0.404,
+                1.572,
+                0.686
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "91.2 cm",
+        "h": "178 cm",
+        "d": "71.6 cm"
+      },
+      "sizeNote": "Samsung gives 91.2 × 71.6 × 178 cm (W × D × H) with the hinge covers: 174.6 cm to the top without them and 61.0 cm deep without the doors. The freezer door opens to 165° and the fridge door to 170°",
+      "fit": {
+        "front": 45,
+        "sides": 5,
+        "top": 10,
+        "back": 5,
+        "note": "From Samsung's user manual for this model: 116.5 cm of depth in total with the doors open at 90°, at least 5 cm at each side and behind it, and 10 cm above it."
+      },
+      "specs": [
+        [
+          "Total capacity",
+          "653 L (freezer 244 L, fridge 409 L)"
+        ],
+        [
+          "Type",
+          "Side by side, Twin Cooling Plus"
+        ],
+        [
+          "Convertible",
+          "5-in-1 Smart Conversion"
+        ],
+        [
+          "Energy rating",
+          "2 star, 590 units a year"
+        ],
+        [
+          "Compressor",
+          "Digital Inverter Compressor"
+        ],
+        [
+          "Cooling",
+          "Power Cool and Power Freeze"
+        ],
+        [
+          "Fridge",
+          "4 tempered-glass shelves, 5 door pockets, 1 vegetable and fruit drawer, top LED"
+        ],
+        [
+          "Freezer",
+          "4 shelves, 5 door pockets, 2 drawers, ice tray, top LED"
+        ],
+        [
+          "Display",
+          "Internal (Ice Blue)"
+        ],
+        [
+          "Door",
+          "Recess handles, Refined Inox"
+        ],
+        [
+          "Features",
+          "Door alarm, vacation mode"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Noise",
+          "37 dBA"
+        ],
+        [
+          "Weight",
+          "98.34 kg"
+        ],
+        [
+          "Warranty",
+          "1 year product, 10 years compressor"
+        ]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/side-by-side/rs8000cch-side-by-side-smart-conversion-653l-silver-rs76cg80x0s9hl/",
+      "hotspots": [
+        {
+          "title": "Convertible 5-in-1",
+          "text": "Using Twin Cooling technology, you can switch between 5 modes. Simply convert your freezer into a fridge to store more fresh food, or switch the fridge or freezer off to save energy.",
+          "pos": [
+            -0.26,
+            1.2,
+            0.3585
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Twin Cooling Plus",
+          "text": "Optimizes the temperature and humidity in the fridge and freezer using independent cooling in each compartment, and protects food's natural flavour by preventing odours from mixing.",
+          "pos": [
+            0.187,
+            1.505,
+            -0.2855
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Power Cool / Power Freeze",
+          "text": "At the touch of a button, Power Cool blows intensely cold air into the fridge to quickly cool your groceries or drinks. Power Freeze delivers a fast blast of cold air into the freezer.",
+          "pos": [
+            0.4075,
+            1.26,
+            0.17
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "Automatically adjusts its speed in response to cooling demand, so it is quiet, uses power efficiently and keeps working for long, with a 10 year warranty on the compressor.",
+          "pos": [
+            0.2,
+            0.62,
+            0.3585
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
+      "id": "haier-hes-690gk",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HES-690GK",
+      "name": "Haier 596 L side-by-side refrigerator with Expert Inverter Technology",
+      "shortName": "596 L side-by-side refrigerator",
+      "summary": "Open the freezer and its drawers, open the fridge and take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hes-690gk.glb",
+      "thumb": "/photos/haier-hes-690gk/0.jpg",
+      "photos": [
+        "/photos/haier-hes-690gk/0.jpg",
+        "/photos/haier-hes-690gk/1.jpg",
+        "/photos/haier-hes-690gk/2.jpg",
+        "/photos/haier-hes-690gk/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#42475a",
+          "usdz": "/models/usdz/haier-hes-690gk-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HES-690GK",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-596l-side-by-side-frost-free-refrigerator-or-graphite-black-finish-hes-690gk/21330"
+        },
+        {
+          "name": "Shiny Silver",
+          "swatchColor": "#c9cbce",
+          "usdz": "/models/usdz/haier-hes-690gk-shiny-silver.usdz",
+          "variant": "Shiny Silver",
+          "code": "HES-690SS"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -120,
+          "zone": {
+            "closed": [
+              [
+                -0.453,
+                0.016,
+                0.155
+              ],
+              [
+                -0.06,
+                1.745,
+                0.349
+              ]
+            ],
+            "open": [
+              [
+                -0.676,
+                0.016,
+                0.26
+              ],
+              [
+                -0.346,
+                1.745,
+                0.652
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezerDrawer",
+          "label": "freezer drawers",
+          "node": "FreezerDrawer",
+          "slide": [
+            0,
+            0,
+            0.24
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.396,
+                0.094,
+                -0.271
+              ],
+              [
+                -0.101,
+                0.6,
+                0.149
+              ]
+            ],
+            "open": [
+              [
+                -0.396,
+                0.094,
+                -0.031
+              ],
+              [
+                -0.101,
+                0.6,
+                0.389
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 120,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.066,
+                0.016,
+                0.151
+              ],
+              [
+                0.453,
+                1.745,
+                0.349
+              ]
+            ],
+            "open": [
+              [
+                0.342,
+                0.016,
+                0.26
+              ],
+              [
+                0.715,
+                1.745,
+                0.779
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.24
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.044,
+                0.104,
+                -0.271
+              ],
+              [
+                0.398,
+                1.538,
+                0.145
+              ]
+            ],
+            "open": [
+              [
+                -0.044,
+                0.104,
+                -0.031
+              ],
+              [
+                0.398,
+                1.538,
+                0.385
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "90.5 cm",
+        "h": "177.5 cm",
+        "d": "69.7 cm"
+      },
+      "sizeNote": "Haier gives 90.5 × 69.7 × 177.5 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "596 L"
+        ],
+        [
+          "Type",
+          "Side by side, convertible (100% Fridge)"
+        ],
+        [
+          "Energy rating",
+          "3 star"
+        ],
+        [
+          "Compressor",
+          "Inverter (Expert Inverter Technology)"
+        ],
+        [
+          "Cooling",
+          "Frost free, fan, Deo Fresh Technology"
+        ],
+        [
+          "Control",
+          "Digital control panel on the door"
+        ],
+        [
+          "Shelves",
+          "Toughened glass in the fridge and the freezer"
+        ],
+        [
+          "Fridge",
+          "Fruit case, vegetable case, egg tray, LED light"
+        ],
+        [
+          "Ice",
+          "Twist ice maker"
+        ],
+        [
+          "Door",
+          "Steel, recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Warranty",
+          "2 years on the product, 10 years on the compressor"
+        ],
+        [
+          "Weight",
+          "94 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-596l-side-by-side-frost-free-refrigerator-or-graphite-black-finish-hes-690gk/21330",
+      "source": "https://www.haier.com/in/refrigerators/side-by-side-refrigerator-596-litres-hes-690gk.shtml",
+      "hotspots": [
+        {
+          "title": "Digital Control Panel",
+          "text": "Perfect temperature adjustment with a touch.",
+          "pos": [
+            -0.036,
+            1.5,
+            0.326
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Expert Inverter Technology",
+          "text": "Advanced technology for a better and efficient cooling experience.",
+          "pos": [
+            -0.26,
+            0.6,
+            0.3485
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "100% Fridge",
+          "text": "More than enough space for your food items.",
+          "pos": [
+            -0.248,
+            1.2,
+            -0.2828
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Deo Fresh Technology",
+          "text": "Ensures odor-free, hygienic food storage.",
+          "pos": [
+            0.177,
+            1.562,
+            -0.2313
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
+      "id": "haier-hrb-3752bnsa-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRB-3752BNSA-P",
+      "name": "Haier 325 L bottom-mount refrigerator",
+      "shortName": "325 L bottom-mount refrigerator",
+      "summary": "Open the fridge on top and the freezer below, take out the trays and the freezer drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrb-3752bnsa-p.glb",
+      "thumb": "/photos/haier-hrb-3752bnsa-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrb-3752bnsa-p/0.jpg",
+        "/photos/haier-hrb-3752bnsa-p/1.jpg",
+        "/photos/haier-hrb-3752bnsa-p/2.jpg",
+        "/photos/haier-hrb-3752bnsa-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-325l-2-star-nickel-steel-double-door-bottom-mount-refrigerator-or-hrb-3752bnsa-p-hrb-3752bnsa-p/20623",
+      "finishes": [
+        {
+          "name": "Nickel Steel",
+          "swatchColor": "#b9b9bb",
+          "usdz": "/models/usdz/haier-hrb-3752bnsa-p-nickel-steel.usdz",
+          "variant": "Nickel Steel",
+          "code": "HRB-3752BNSA-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-325l-2-star-nickel-steel-double-door-bottom-mount-refrigerator-or-hrb-3752bnsa-p-hrb-3752bnsa-p/20623"
+        },
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#414859",
+          "usdz": "/models/usdz/haier-hrb-3752bnsa-p-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HRB-3752BGKA-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.309,
+                0.637,
+                0.14
+              ],
+              [
+                0.312,
+                1.64,
+                0.334
+              ]
+            ],
+            "open": [
+              [
+                0.272,
+                0.637,
+                0.207
+              ],
+              [
+                0.833,
+                1.64,
+                0.721
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.015,
+            0,
+            0.45
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.271,
+                0.657,
+                -0.281
+              ],
+              [
+                0.271,
+                1.514,
+                0.134
+              ]
+            ],
+            "open": [
+              [
+                -0.286,
+                0.657,
+                0.169
+              ],
+              [
+                0.256,
+                1.514,
+                0.584
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [
+                -0.309,
+                0.025,
+                0.206
+              ],
+              [
+                0.311,
+                0.633,
+                0.333
+              ]
+            ],
+            "open": [
+              [
+                0.306,
+                0.025,
+                0.207
+              ],
+              [
+                0.833,
+                0.633,
+                0.671
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "freezer drawer",
+          "node": "FreezerDrawer",
+          "slide": [
+            0,
+            0,
+            0.3
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.271,
+                0.104,
+                -0.273
+              ],
+              [
+                0.271,
+                0.335,
+                0.203
+              ]
+            ],
+            "open": [
+              [
+                -0.271,
+                0.104,
+                0.027
+              ],
+              [
+                0.271,
+                0.335,
+                0.503
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "62.3 cm",
+        "h": "164 cm",
+        "d": "66.5 cm"
+      },
+      "sizeNote": "Haier gives 62.3 × 66.5 × 164 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "325 L"
+        ],
+        [
+          "Type",
+          "Frost free, bottom-mount double door"
+        ],
+        [
+          "Convertible",
+          "14 in 1 (Magic Convertible series)"
+        ],
+        [
+          "Energy rating",
+          "2 star, 245 units a year"
+        ],
+        [
+          "Compressor",
+          "Inverter (Triple Inverter and Dual Fan Tech)"
+        ],
+        [
+          "Features",
+          "Magic Cooling, 1 Hour Icing, movable ice maker"
+        ],
+        [
+          "Shelves",
+          "Toughened glass (refrigerator)"
+        ],
+        [
+          "Storage",
+          "Vegetable case (2X BIG Box), egg tray, 2 L bottle guard"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Steel finish, Nickel Steel or Graphite Black, recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "65 kg"
+        ]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/haier-325l-2-star-nickel-steel-finish-bottom-mounted-frost-free-refrigerator-hrb-3752bnsa-p.shtml",
+      "hotspots": [
+        {
+          "title": "Magic Convertible",
+          "text": "14 in 1 convertible modes. Set the freezer to suit what you keep: −24 °C Super Freezer and Turbo Icing, −12 °C energy saving mode for ice cream and chocolate, 0 °C for beverages, 2 °C for milk and curd, 5 °C for fruit and vegetables.",
+          "pos": [
+            0.003,
+            1.3745,
+            0.334
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Jhukna Mat",
+          "text": "The fridge on top, the freezer below: Haier's bottom-mounted refrigerator helps reduce the bending of the back up to 90% as compared to other conventional refrigerators.",
+          "pos": [
+            -0.17,
+            1,
+            0.3335
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "2X BIG Box",
+          "text": "This 2x veg box enables the storage space for lots of vegetables at one single place.",
+          "pos": [
+            0.17,
+            0.74,
+            0.1315
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Movable Ice Maker",
+          "text": "When you need ice, you get it faster than you imagined, and when you need space, you can detach it to make more space.",
+          "pos": [
+            -0.1515,
+            0.462,
+            0.1935
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        }
+      ]
+    },
+    {
+      "id": "lg-glt2216wyro",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GLT2216WYRO",
+      "name": "LG 225 L double-door refrigerator with Smart Inverter Compressor",
+      "shortName": "225 L double-door refrigerator",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-glt2216wyro.glb",
+      "thumb": "/photos/lg-glt2216wyro/0.jpg",
+      "photos": [
+        "/photos/lg-glt2216wyro/0.jpg",
+        "/photos/lg-glt2216wyro/1.jpg",
+        "/photos/lg-glt2216wyro/2.jpg",
+        "/photos/lg-glt2216wyro/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Radiant Onyx",
+          "swatchColor": "#141318",
+          "variant": "Radiant Onyx",
+          "code": "GLT2216WYRO",
+          "usdz": "/models/usdz/lg-glt2216wyro-radiant-onyx.usdz"
+        },
+        {
+          "name": "Radiant Inox",
+          "swatchColor": "#b9babb",
+          "variant": "Radiant Inox",
+          "code": "GLT2216WYRI",
+          "usdz": "/models/usdz/lg-glt2216wyro-radiant-inox.usdz"
+        },
+        {
+          "name": "Onyx Black",
+          "swatchColor": "#0b0b0d",
+          "variant": "Onyx Black",
+          "code": "GLT2216WYOB",
+          "usdz": "/models/usdz/lg-glt2216wyro-onyx-black.usdz"
+        },
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#a9aaab",
+          "variant": "Shiny Steel",
+          "code": "GLT2216WYPZ",
+          "usdz": "/models/usdz/lg-glt2216wyro-shiny-steel.usdz"
+        },
+        {
+          "name": "Dazzle Steel",
+          "swatchColor": "#8b8c8d",
+          "variant": "Dazzle Steel",
+          "code": "GLT2216WYDS",
+          "usdz": "/models/usdz/lg-glt2216wyro-dazzle-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [
+                -0.273,
+                0.958,
+                0.193
+              ],
+              [
+                0.277,
+                1.445,
+                0.32
+              ]
+            ],
+            "open": [
+              [
+                0.256,
+                0.958,
+                0.241
+              ],
+              [
+                0.699,
+                1.445,
+                0.684
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.16
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.195,
+                1.048,
+                -0.022
+              ],
+              [
+                -0.019,
+                1.192,
+                0.187
+              ]
+            ],
+            "open": [
+              [
+                -0.195,
+                1.048,
+                0.138
+              ],
+              [
+                -0.019,
+                1.192,
+                0.347
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.274,
+                0.037,
+                0.168
+              ],
+              [
+                0.278,
+                0.942,
+                0.319
+              ]
+            ],
+            "open": [
+              [
+                0.246,
+                0.037,
+                0.241
+              ],
+              [
+                0.699,
+                0.942,
+                0.695
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.52
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.236,
+                0.09,
+                -0.244
+              ],
+              [
+                0.236,
+                0.867,
+                0.166
+              ]
+            ],
+            "open": [
+              [
+                -0.236,
+                0.09,
+                0.276
+              ],
+              [
+                0.236,
+                0.867,
+                0.686
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55.5 cm",
+        "h": "144.5 cm",
+        "d": "63.7 cm"
+      },
+      "sizeNote": "LG's manual lists 99.9 cm total depth and 95.3 cm total width with a door open",
+      "specs": [
+        [
+          "Total capacity",
+          "225 L (freezer 59 L, fridge 166 L)"
+        ],
+        [
+          "Type",
+          "Frost free, double door"
+        ],
+        [
+          "Cooling",
+          "Smart Mode, Multi Air Flow"
+        ],
+        [
+          "Energy rating",
+          "1 star, 264 units a year"
+        ],
+        [
+          "Compressor",
+          "Smart Inverter (BLDC), 10 years on the compressor"
+        ],
+        [
+          "Fresh Zone",
+          "25.3 L vegetable drawer"
+        ],
+        [
+          "Shelves",
+          "2 tempered glass (fridge)"
+        ],
+        [
+          "Door baskets",
+          "2 in the freezer, 3 in the fridge, transparent; 2 L bottles fit"
+        ],
+        [
+          "Ice maker",
+          "Manual, Movable Twist Ice Maker"
+        ],
+        [
+          "Control",
+          "Knob dial, Express Freeze"
+        ],
+        [
+          "Handle",
+          "Golden Pocket Handle"
+        ],
+        [
+          "Door",
+          "PET, five colours"
+        ],
+        [
+          "Light",
+          "Top LED"
+        ],
+        [
+          "Power cuts",
+          "Auto Smart Connect (inverter-compatible)"
+        ],
+        [
+          "Weight",
+          "40 kg"
+        ]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt2216wyro/",
+      "hotspots": [
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Delivers higher energy efficiency, long-lasting performance with a 10-year warranty, and whisper-quiet operation.",
+          "pos": [
+            0,
+            0.6,
+            0.3185
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Golden Pocket Handle",
+          "text": "Adds elegance to the refrigerator with a sleek, premium design.",
+          "pos": [
+            -0.08,
+            0.926,
+            0.3185
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Multiple cooling air vents distribute and circulate cool air to every corner of the refrigerator, ensuring that each and every food item is properly cooled.",
+          "pos": [
+            0.105,
+            1.372,
+            -0.2383
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Fresh Zone",
+          "text": "A spacious 25.3 L compartment offering 20% more room than LG's 224 L refrigerator, to keep fruits and vegetables fresh and crisp.",
+          "pos": [
+            0,
+            0.167,
+            0.1637
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 36,
+        "back": 5,
+        "note": "From LG's owner's manual: keep at least 5 cm between the back and the wall. The manual gives 99.9 cm total depth with a door open, which is 36 cm in front of the fridge."
+      }
+    },
+    {
+      "id": "godrej-rt-eonregalis-477an-rci-mt-bk",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Refrigerator",
+      "model": "RT EONREGALIS 477AN RCI MT BK",
+      "name": "Godrej Eon Regalis 436 L double-door refrigerator",
+      "shortName": "436 L Eon Regalis refrigerator",
+      "summary": "Open the freezer and the fridge, slide the ice maker and the trays out, pick a colour, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/godrej-rt-eonregalis-477an-rci-mt-bk.glb",
+      "thumb": "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/0.jpg",
+      "photos": [
+        "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/0.jpg",
+        "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/1.jpg",
+        "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/2.jpg",
+        "/photos/godrej-rt-eonregalis-477an-rci-mt-bk/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Matt Black",
+          "swatchColor": "#36373c",
+          "usdz": "/models/usdz/godrej-rt-eonregalis-477an-rci-mt-bk-matt-black.usdz",
+          "variant": "Matt Black",
+          "code": "RT EONREGALIS 477AN RCI MT BK"
+        },
+        {
+          "name": "Champagne Gold",
+          "swatchColor": "#c4bfbe",
+          "usdz": "/models/usdz/godrej-rt-eonregalis-477an-rci-mt-bk-champagne-gold.usdz",
+          "variant": "Champagne Gold",
+          "code": "RT EONREGALIS 477AN RCI CH GD"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [
+                -0.369,
+                1.22,
+                0.205
+              ],
+              [
+                0.369,
+                1.73,
+                0.37
+              ]
+            ],
+            "open": [
+              [
+                0.29,
+                1.22,
+                0.292
+              ],
+              [
+                0.675,
+                1.73,
+                1.003
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.011,
+                1.256,
+                -0.015
+              ],
+              [
+                0.275,
+                1.4,
+                0.194
+              ]
+            ],
+            "open": [
+              [
+                -0.011,
+                1.256,
+                0.105
+              ],
+              [
+                0.275,
+                1.4,
+                0.314
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.369,
+                0.037,
+                0.185
+              ],
+              [
+                0.369,
+                1.208,
+                0.369
+              ]
+            ],
+            "open": [
+              [
+                0.28,
+                0.037,
+                0.287
+              ],
+              [
+                0.732,
+                1.208,
+                0.978
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.03,
+            0,
+            0.68
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.316,
+                0.104,
+                -0.32
+              ],
+              [
+                0.316,
+                0.997,
+                0.184
+              ]
+            ],
+            "open": [
+              [
+                -0.346,
+                0.104,
+                0.36
+              ],
+              [
+                0.286,
+                0.997,
+                0.864
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "73.75 cm",
+        "h": "173 cm",
+        "d": "73.9 cm"
+      },
+      "sizeNote": "Godrej lists 1.73m X 73.75cm X 73.9cm (H x W x D) and publishes no clearances or open-door depth for this model",
+      "specs": [
+        [
+          "Total capacity",
+          "436 L"
+        ],
+        [
+          "Type",
+          "Frost free, double door"
+        ],
+        [
+          "Energy rating",
+          "1 star"
+        ],
+        [
+          "Compressor",
+          "Inverter, powered by AI"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Shelves",
+          "3, toughened glass, one an Easy Slide Shelf"
+        ],
+        [
+          "Cooling",
+          "Patented Cool Shower Technology, Cool Balance Technology"
+        ],
+        [
+          "Vegetable tray",
+          "38 litres"
+        ],
+        [
+          "Extras",
+          "Movable Ice Maker, Nano Shield Technology, Vacuum Ease Technology, Bright LED Prism Lens"
+        ],
+        [
+          "Cooling retention",
+          "Up to 12 hours"
+        ],
+        [
+          "Colours",
+          "Matt Black, Champagne Gold"
+        ],
+        [
+          "Weight",
+          "67 kg"
+        ],
+        [
+          "Compressor warranty",
+          "10 years"
+        ]
+      ],
+      "source": "https://www.godrejenterprises.com/home-appliances/refrigerators/double-door-frost-free/p/rt-eonregalis-477-an-rci-mt-bk",
+      "hotspots": [
+        {
+          "title": "Nano shield technology",
+          "text": "Healthier and safer food with 95%+ food surface disinfection.",
+          "pos": [
+            0.02,
+            1.446,
+            0.37
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Powered by AI Tech",
+          "text": "Automatically optimises cooling and energy consumption based ambient weather, food load in refrigerator and door openings. Defrosts smartly to minimise thermal shock, preserving food freshness.",
+          "pos": [
+            -0.19,
+            0.95,
+            0.37
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Easy slide shelf",
+          "text": "Reach items at the back easily using smooth, easy-slide shelf.",
+          "pos": [
+            0.17,
+            0.896,
+            0.19
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Patented Cool Shower Technology",
+          "text": "Inbuilt air vents above shelves for uniform 360° cooling",
+          "pos": [
+            0,
+            1,
+            -0.312
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
+      "id": "lg-glt4416cces",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GLT4416CCES",
+      "name": "LG 446 L convertible double-door refrigerator with Door Cooling+",
+      "shortName": "446 L double-door refrigerator",
+      "summary": "Open the freezer, slide the ice tray out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-glt4416cces.glb",
+      "thumb": "/photos/lg-glt4416cces/0.jpg",
+      "photos": [
+        "/photos/lg-glt4416cces/0.jpg",
+        "/photos/lg-glt4416cces/1.jpg",
+        "/photos/lg-glt4416cces/2.jpg",
+        "/photos/lg-glt4416cces/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 140%",
+      "finishes": [
+        {
+          "name": "Ebony Sheen",
+          "swatchColor": "#141416",
+          "usdz": "/models/usdz/lg-glt4416cces-ebony-sheen.usdz",
+          "variant": "Ebony Sheen",
+          "code": "GLT4416CCES"
+        },
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#b4b5b7",
+          "usdz": "/models/usdz/lg-glt4416cces-shiny-steel.usdz",
+          "variant": "Shiny Steel",
+          "code": "GLT4416CCPZ"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [
+                -0.346,
+                1.221,
+                0.24
+              ],
+              [
+                0.35,
+                1.78,
+                0.366
+              ]
+            ],
+            "open": [
+              [
+                0.329,
+                1.221,
+                0.288
+              ],
+              [
+                0.874,
+                1.78,
+                0.833
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.16
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.239,
+                1.301,
+                0.029
+              ],
+              [
+                -0.058,
+                1.457,
+                0.231
+              ]
+            ],
+            "open": [
+              [
+                -0.239,
+                1.301,
+                0.189
+              ],
+              [
+                -0.058,
+                1.457,
+                0.391
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.346,
+                0.031,
+                0.215
+              ],
+              [
+                0.35,
+                1.214,
+                0.365
+              ]
+            ],
+            "open": [
+              [
+                0.318,
+                0.031,
+                0.288
+              ],
+              [
+                0.874,
+                1.214,
+                0.844
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.6
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.31,
+                0.102,
+                -0.266
+              ],
+              [
+                0.31,
+                1.144,
+                0.209
+              ]
+            ],
+            "open": [
+              [
+                -0.31,
+                0.102,
+                0.334
+              ],
+              [
+                0.31,
+                1.144,
+                0.809
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "70 cm",
+        "h": "178 cm",
+        "d": "73 cm"
+      },
+      "sizeNote": "73 cm deep with the rear spacers, from LG's manual (LG's page gives 70 cm); the doors open to about 135 degrees",
+      "specs": [
+        [
+          "Total capacity",
+          "446 L (freezer 114 L, fridge 332 L)"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Convertible",
+          "Yes"
+        ],
+        [
+          "Energy rating",
+          "1 star, 297 units a year"
+        ],
+        [
+          "Compressor",
+          "Smart Inverter (BLDC), 10 years on the compressor (part only)"
+        ],
+        [
+          "Cooling",
+          "Door Cooling+, Multi Air Flow"
+        ],
+        [
+          "Fridge",
+          "3 tempered glass shelves, 1 vegetable box, top LED"
+        ],
+        [
+          "Freezer",
+          "1 tempered glass shelf, top LED"
+        ],
+        [
+          "Door baskets",
+          "2 in the freezer; 2 full and 5 half in the fridge, transparent"
+        ],
+        [
+          "Ice maker",
+          "Manual, 1 lever and 2 trays, a moving ice tray"
+        ],
+        [
+          "Control",
+          "Inside the fridge, inner dot display; Express Freeze, door alarm"
+        ],
+        [
+          "Doors",
+          "PET, Ebony Sheen or Shiny Steel"
+        ],
+        [
+          "Handle",
+          "Horizontal pocket"
+        ],
+        [
+          "Smart",
+          "Smart Diagnosis"
+        ],
+        [
+          "Weight",
+          "75 kg"
+        ],
+        [
+          "Made in",
+          "India"
+        ]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt4416cces/",
+      "hotspots": [
+        {
+          "title": "Convertible",
+          "text": "Convert a section of the freezer to more refrigeration as needed to keep foods fresher for longer.",
+          "pos": [
+            0.01,
+            1.51,
+            -0.2524
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Moving Ice Tray",
+          "text": "Shifts out of the way automatically, freeing up freezer space when you need it most.",
+          "pos": [
+            -0.089,
+            1.447,
+            0.2251
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Circulates cool air evenly through multiple vents, keeping food fresher for longer.",
+          "pos": [
+            0,
+            0.975,
+            -0.2548
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Door Cooling+",
+          "text": "Food stays fresh and drinks get ice cold on any shelf with even and faster cooling performance.",
+          "pos": [
+            0,
+            0.8,
+            0.3655
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ],
+      "fit": {
+        "front": 60,
+        "back": 5,
+        "note": "From LG's owner's manual for this range (GLT44***): allow over 5 cm between the back and the wall. The manual gives 133.1 cm of depth with the fridge door open, which is 60 cm in front of the fridge, and 123.2 cm across with it open."
+      }
+    },
+    {
+      "id": "whirlpool-22439",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "22439",
+      "name": "Whirlpool Intellifresh 431 L convertible double-door refrigerator",
+      "shortName": "431 L Intellifresh refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, slide out the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/whirlpool-22439.glb",
+      "thumb": "/photos/whirlpool-22439/0.jpg",
+      "photos": [
+        "/photos/whirlpool-22439/0.jpg",
+        "/photos/whirlpool-22439/1.jpg",
+        "/photos/whirlpool-22439/2.jpg",
+        "/photos/whirlpool-22439/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Alpha Steel",
+          "swatchColor": "#a8aaad",
+          "usdz": "/models/usdz/whirlpool-22439-alpha-steel.usdz",
+          "variant": "Alpha Steel",
+          "code": "22439"
+        },
+        {
+          "name": "Illusia Steel",
+          "swatchColor": "#989a9c",
+          "usdz": "/models/usdz/whirlpool-22439-illusia-steel.usdz",
+          "variant": "Illusia Steel",
+          "code": "22440"
+        },
+        {
+          "name": "Gravity Black",
+          "swatchColor": "#333437",
+          "usdz": "/models/usdz/whirlpool-22439-gravity-black.usdz",
+          "variant": "Gravity Black",
+          "code": "22441",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-intellifresh-431l-2-star-inverter-convertible-frost-free-double-door-refrigerator-or-gravity-black-22441/21158"
+        },
+        {
+          "name": "Platina Illusia Steel",
+          "swatchColor": "#9a9b9e",
+          "usdz": "/models/usdz/whirlpool-22439-platina-illusia-steel.usdz",
+          "variant": "Platina Illusia Steel",
+          "code": "22442"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [
+                -0.349,
+                1.177,
+                0.207
+              ],
+              [
+                0.35,
+                1.69,
+                0.384
+              ]
+            ],
+            "open": [
+              [
+                0.317,
+                1.177,
+                0.247
+              ],
+              [
+                0.9,
+                1.69,
+                0.83
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.349,
+                0.047,
+                0.187
+              ],
+              [
+                0.35,
+                1.164,
+                0.383
+              ]
+            ],
+            "open": [
+              [
+                0.303,
+                0.047,
+                0.247
+              ],
+              [
+                0.9,
+                1.164,
+                0.844
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.2
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.315,
+                0.078,
+                -0.331
+              ],
+              [
+                0.315,
+                1.105,
+                0.181
+              ]
+            ],
+            "open": [
+              [
+                -0.315,
+                0.078,
+                -0.131
+              ],
+              [
+                0.315,
+                1.105,
+                0.381
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "70 cm",
+        "h": "169 cm",
+        "d": "76.7 cm"
+      },
+      "sizeNote": "Whirlpool gives 70 × 169 × 76.7 cm (W × H × D) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "431 L"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Convertible",
+          "5-in-1: Deep Freeze, Dessert, Party, Chef, Energy Saver"
+        ],
+        [
+          "Energy rating",
+          "2 star, 248 units a year (BEE label 2026-28)"
+        ],
+        [
+          "Compressor",
+          "Inverter, auto-connects to a home inverter"
+        ],
+        [
+          "Controls",
+          "External touch panel on the freezer door"
+        ],
+        [
+          "Shelves",
+          "Toughened glass"
+        ],
+        [
+          "Storage",
+          "Twin Seal crispers, fruit crisper, egg tray, portable ice twister"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Handle",
+          "Side pocket handle"
+        ],
+        [
+          "Voltage",
+          "160-300 V"
+        ],
+        [
+          "Power",
+          "180 W"
+        ],
+        [
+          "Model on the energy label",
+          "NFT43127IRM1C1TE"
+        ],
+        [
+          "Colour",
+          "Alpha Steel, Illusia Steel, Gravity Black or Platina Illusia Steel"
+        ],
+        [
+          "Warranty",
+          "1 year comprehensive, 9 more years on the compressor"
+        ]
+      ],
+      "source": "https://india.whirlpool.in/intellifresh-431l-2-star-inverter-convertible-frost-free-three-door-refrigerator-alpha-steel/p",
+      "hotspots": [
+        {
+          "title": "5-in-1 Convertible Modes",
+          "text": "Now convert your refrigerator at the touch of a button with 5-in-1 convertible modes.",
+          "pos": [
+            0,
+            1.58,
+            0.3843
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Portable Ice Tray",
+          "text": "Quickly make and access ice with ease, a handy, portable solution right in your freezer for all your cooling needs.",
+          "pos": [
+            -0.127,
+            1.25,
+            0.186
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Freshflow Air Tower",
+          "text": "Scientifically designed air tower lets out cool and fresh air into different sections of the refrigerator providing uniform cooling for long-lasting freshness.",
+          "pos": [
+            0.007,
+            0.72,
+            -0.322
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Twin Seal Crispers",
+          "text": "A unique two-crisper design with an advanced humidity control system lets you store vegetables with different moisture needs in separate compartments.",
+          "pos": [
+            0.15,
+            0.2,
+            0.178
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
+      "id": "haier-hrf-3182ibns-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-3182IBNS-P",
+      "name": "Haier 268 L double-door refrigerator, Nickel Steel",
+      "shortName": "268 L Nickel Steel refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-3182ibns-p.glb",
+      "thumb": "/photos/haier-hrf-3182ibns-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrf-3182ibns-p/0.jpg",
+        "/photos/haier-hrf-3182ibns-p/1.jpg",
+        "/photos/haier-hrf-3182ibns-p/2.jpg",
+        "/photos/haier-hrf-3182ibns-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Nickel Steel",
+          "swatchColor": "#b8babc",
+          "usdz": "/models/usdz/haier-hrf-3182ibns-p-nickel-steel.usdz",
+          "variant": "Nickel Steel",
+          "code": "HRF-3182IBNS-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-268l-frost-free-double-door-refrigerator-or-flat-door-or-nickel-steel-or-2-star-hrf-3182ibns-p/21526"
+        },
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#454b5d",
+          "usdz": "/models/usdz/haier-hrf-3182ibns-p-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HRF-3182IBGK-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                1.207,
+                0.161
+              ],
+              [
+                0.274,
+                1.685,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.254,
+                1.207,
+                0.21
+              ],
+              [
+                0.728,
+                1.685,
+                0.641
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icebox",
+          "label": "ice box",
+          "node": "IceBox",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.232,
+                1.232,
+                -0.064
+              ],
+              [
+                -0.082,
+                1.303,
+                0.137
+              ]
+            ],
+            "open": [
+              [
+                -0.232,
+                1.232,
+                0.056
+              ],
+              [
+                -0.082,
+                1.303,
+                0.257
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                0.043,
+                0.141
+              ],
+              [
+                0.274,
+                1.203,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.241,
+                0.043,
+                0.21
+              ],
+              [
+                0.728,
+                1.203,
+                0.656
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.01,
+            0,
+            0.5
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.239,
+                0.109,
+                -0.258
+              ],
+              [
+                0.239,
+                1.152,
+                0.134
+              ]
+            ],
+            "open": [
+              [
+                -0.249,
+                0.109,
+                0.242
+              ],
+              [
+                0.229,
+                1.152,
+                0.634
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "168.5 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier and Sangeetha give 54.8 × 61.5 × 168.5 cm (W × D × H); no door swing or clearances are published",
+      "specs": [
+        [
+          "Total capacity",
+          "268 L"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Convertible",
+          "5 in 1 convertible modes"
+        ],
+        [
+          "Energy rating",
+          "2 star, 275 units a year"
+        ],
+        [
+          "Features",
+          "Turbo Icing, Twin Energy Saving Mode"
+        ],
+        [
+          "Voltage",
+          "Works without a stabilizer from 110 to 300 V"
+        ],
+        [
+          "Shelves",
+          "Toughened glass"
+        ],
+        [
+          "Storage",
+          "Fruit case, vegetable case, egg tray"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Flat steel door with recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "56 kg"
+        ],
+        [
+          "Warranty",
+          "2 years on the product, 10 years on the compressor"
+        ]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/hrf-3182ibns-p-2-star-nickel-steel-finish-top-mount-frost-free-refrigerator.shtml",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-268l-frost-free-double-door-refrigerator-or-flat-door-or-nickel-steel-or-2-star-hrf-3182ibns-p/21526",
+      "hotspots": [
+        {
+          "title": "5 in 1 Convertible",
+          "text": "Switch between fridge and freezer modes as you need: 5 flexible options.",
+          "pos": [
+            0.213,
+            1.2258,
+            0.3085
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Separate Fruit Box",
+          "text": "Store fruits separately, with no mixing of smells.",
+          "pos": [
+            0,
+            0.431,
+            0.1335
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo icing technology accelerates the time needed to freeze products in the freezer section.",
+          "pos": [
+            -0.157,
+            1.273,
+            0.1385
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Stabilizer free operation",
+          "text": "Can withstand voltage fluctuations from 110–300 V.",
+          "pos": [
+            -0.12,
+            0.75,
+            0.308
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
+      "id": "godrej-rt-eonvibe-366bn-rcit-mt-bk",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Refrigerator",
+      "model": "RT EONVIBE 366BN RCIT MT BK",
+      "name": "Godrej Eon Vibe 330 L double-door convertible refrigerator",
+      "shortName": "330 L Eon Vibe convertible refrigerator",
+      "summary": "Open the freezer and the fridge, slide the ice maker and the trays out, pick a colour, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/godrej-rt-eonvibe-366bn-rcit-mt-bk.glb",
+      "thumb": "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/0.jpg",
+      "photos": [
+        "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/0.jpg",
+        "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/1.jpg",
+        "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/2.jpg",
+        "/photos/godrej-rt-eonvibe-366bn-rcit-mt-bk/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Matt Black",
+          "swatchColor": "#26272c",
+          "usdz": "/models/usdz/godrej-rt-eonvibe-366bn-rcit-mt-bk-matt-black.usdz",
+          "variant": "Matt Black",
+          "code": "RT EONVIBE 366BN RCIT MT BK"
+        },
+        {
+          "name": "Champagne Gold",
+          "swatchColor": "#b9b4b0",
+          "usdz": "/models/usdz/godrej-rt-eonvibe-366bn-rcit-mt-bk-champagne-gold.usdz",
+          "variant": "Champagne Gold",
+          "code": "RT EONVIBE 366BN RCIT CH GD"
+        },
+        {
+          "name": "Steel Rush",
+          "swatchColor": "#b7b6b2",
+          "usdz": "/models/usdz/godrej-rt-eonvibe-366bn-rcit-mt-bk-steel-rush.usdz",
+          "variant": "Steel Rush",
+          "code": "RT EONVIBE 366BN RCIT ST RH"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [
+                -0.327,
+                1.264,
+                0.179
+              ],
+              [
+                0.326,
+                1.75,
+                0.339
+              ]
+            ],
+            "open": [
+              [
+                0.252,
+                1.264,
+                0.26
+              ],
+              [
+                0.603,
+                1.75,
+                0.891
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.215,
+                1.436,
+                -0.041
+              ],
+              [
+                -0.045,
+                1.569,
+                0.167
+              ]
+            ],
+            "open": [
+              [
+                -0.215,
+                1.436,
+                0.079
+              ],
+              [
+                -0.045,
+                1.569,
+                0.287
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.327,
+                0.034,
+                0.164
+              ],
+              [
+                0.326,
+                1.252,
+                0.338
+              ]
+            ],
+            "open": [
+              [
+                0.246,
+                0.034,
+                0.255
+              ],
+              [
+                0.653,
+                1.252,
+                0.869
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.03,
+            0,
+            0.62
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.273,
+                0.105,
+                -0.289
+              ],
+              [
+                0.273,
+                1.026,
+                0.156
+              ]
+            ],
+            "open": [
+              [
+                -0.303,
+                0.105,
+                0.331
+              ],
+              [
+                0.243,
+                1.026,
+                0.776
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "65.2 cm",
+        "h": "175 cm",
+        "d": "67.6 cm"
+      },
+      "sizeNote": "Godrej lists 1.75 m x 65.20 cm x 67.60 cm (H x W x D) and publishes no clearances or open-door depth for this model",
+      "specs": [
+        [
+          "Total capacity",
+          "330 L"
+        ],
+        [
+          "Type",
+          "Frost free, double door"
+        ],
+        [
+          "Convertible",
+          "4 in 1 Convertible Technology"
+        ],
+        [
+          "Energy rating",
+          "2 star, 230 kWh energy consumption"
+        ],
+        [
+          "Compressor",
+          "Inverter, powered by AI"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Shelves",
+          "3, toughened glass"
+        ],
+        [
+          "Cooling",
+          "Patented Cool Shower Technology"
+        ],
+        [
+          "Vegetable tray",
+          "33 litres"
+        ],
+        [
+          "Extras",
+          "Movable Ice Maker, Nano Shield Technology, Bright LED Prism Lens"
+        ],
+        [
+          "Cooling retention",
+          "Up to 12 hours"
+        ],
+        [
+          "Colours",
+          "Matt Black, Champagne Gold, Steel Rush"
+        ],
+        [
+          "Weight",
+          "64 kg"
+        ],
+        [
+          "Warranty",
+          "1 year comprehensive, 10 years compressor"
+        ]
+      ],
+      "source": "https://www.godrejenterprises.com/home-appliances/refrigerators/double-door-frost-free/p/rt-eonvibe-366-bn-rcit-mt-bk",
+      "hotspots": [
+        {
+          "title": "4 in 1 Convertible Technology",
+          "text": "Transform your freezer into extra fridge space or switch off the main compartment and use the freezer as a fridge to minimise energy consumption.",
+          "pos": [
+            -0.17,
+            1.5,
+            0.338
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Powered by AI Tech",
+          "text": "Automatically optimizes cooling and energy consumption based on food load in refrigerator and door openings.",
+          "pos": [
+            -0.17,
+            0.95,
+            0.338
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Advanced control panel",
+          "text": "Easily adjust settings with sleek display control panel.",
+          "pos": [
+            0.06,
+            1.727,
+            0.281
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Patented Cool Shower Technology",
+          "text": "Inbuilt air vents above shelves for uniform 360° cooling.",
+          "pos": [
+            0,
+            1,
+            -0.275
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
+      "id": "haier-hrf-3782bnsa-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-3782BNSA-P",
+      "name": "Haier 328 L double-door refrigerator, Nickel Steel",
+      "shortName": "328 L Nickel Steel refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-3782bnsa-p.glb",
+      "thumb": "/photos/haier-hrf-3782bnsa-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrf-3782bnsa-p/0.jpg",
+        "/photos/haier-hrf-3782bnsa-p/1.jpg",
+        "/photos/haier-hrf-3782bnsa-p/2.jpg",
+        "/photos/haier-hrf-3782bnsa-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Nickel Steel",
+          "swatchColor": "#b8babc",
+          "usdz": "/models/usdz/haier-hrf-3782bnsa-p-nickel-steel.usdz",
+          "variant": "Nickel Steel",
+          "code": "HRF-3782BNSA-P"
+        },
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#474e5f",
+          "usdz": "/models/usdz/haier-hrf-3782bnsa-p-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HRF-3782BGK-P"
+        },
+        {
+          "name": "GE Black",
+          "swatchColor": "#474747",
+          "usdz": "/models/usdz/haier-hrf-3782bnsa-p-ge-black.usdz",
+          "variant": "GE Black",
+          "code": "HRF-3782BGB-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [
+                -0.309,
+                1.115,
+                0.176
+              ],
+              [
+                0.311,
+                1.64,
+                0.333
+              ]
+            ],
+            "open": [
+              [
+                0.291,
+                1.115,
+                0.218
+              ],
+              [
+                0.829,
+                1.64,
+                0.704
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.241,
+                1.156,
+                -0.049
+              ],
+              [
+                -0.09,
+                1.267,
+                0.16
+              ]
+            ],
+            "open": [
+              [
+                -0.241,
+                1.156,
+                0.071
+              ],
+              [
+                -0.09,
+                1.267,
+                0.28
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.309,
+                0.025,
+                0.151
+              ],
+              [
+                0.311,
+                1.111,
+                0.333
+              ]
+            ],
+            "open": [
+              [
+                0.275,
+                0.025,
+                0.218
+              ],
+              [
+                0.829,
+                1.111,
+                0.723
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.01,
+            0,
+            0.5
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.271,
+                0.074,
+                -0.28
+              ],
+              [
+                0.271,
+                1.023,
+                0.145
+              ]
+            ],
+            "open": [
+              [
+                -0.281,
+                0.074,
+                0.22
+              ],
+              [
+                0.261,
+                1.023,
+                0.645
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "62.3 cm",
+        "h": "164 cm",
+        "d": "66.5 cm"
+      },
+      "sizeNote": "Haier gives 62.3 × 66.5 × 164 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "328 L"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Convertible",
+          "10 in 1 (Magic Convertible series)"
+        ],
+        [
+          "Energy rating",
+          "2 star, 282 units a year"
+        ],
+        [
+          "Compressor",
+          "Inverter (Triple Inverter and Dual Fan Tech)"
+        ],
+        [
+          "Features",
+          "Magic Cooling, 1 Hour Icing, movable ice maker"
+        ],
+        [
+          "Shelves",
+          "Toughened glass (refrigerator)"
+        ],
+        [
+          "Storage",
+          "Vegetable case, egg tray"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Steel finish, Nickel Steel, recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "62 kg"
+        ]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/328-litres-frost-free-inverter-top-mount-refrigerator-hrf-3782bns-p.shtml",
+      "hotspots": [
+        {
+          "title": "Magic Convertible",
+          "text": "Set the freezer to suit what you keep: −24 °C Super Freezer and Turbo Icing, −12 °C energy saving mode for ice cream and chocolate, 0 °C for beverages, 2 °C for milk and curd, 5 °C for fruit and vegetables.",
+          "pos": [
+            0.2325,
+            1.1304,
+            0.334
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Movable ice maker",
+          "text": "When you need ice, you get it faster than you imagined, and when you need space, you can detach it to make more space.",
+          "pos": [
+            -0.1655,
+            1.253,
+            0.154
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Toughened glass shelves",
+          "text": "The shelves are made with toughened glass that holds and withstands heavy pots and pans for considerable time.",
+          "pos": [
+            0.17,
+            0.684,
+            0.145
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "LED Light",
+          "text": "The LED lighting that is slim, bright and energy-efficient.",
+          "pos": [
+            0,
+            1.0755,
+            0.146
+          ],
+          "normal": [
+            0,
+            -0.5,
+            0.866
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
+      "id": "samsung-rs76cg8113slhl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RS76CG8113SLHL",
+      "name": "Samsung 653 L side-by-side refrigerator with Bespoke AI",
+      "shortName": "653 L side-by-side refrigerator",
+      "summary": "Open the freezer and the fridge side by side, pull out the freezer drawers and the fridge trays with the wine rack, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rs76cg8113slhl.glb",
+      "thumb": "/photos/samsung-rs76cg8113slhl/0.jpg",
+      "photos": [
+        "/photos/samsung-rs76cg8113slhl/0.jpg",
+        "/photos/samsung-rs76cg8113slhl/1.jpg",
+        "/photos/samsung-rs76cg8113slhl/2.jpg",
+        "/photos/samsung-rs76cg8113slhl/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "EZ Clean Steel",
+          "code": "RS76CG8113SLHL",
+          "swatchColor": "#7e8186",
+          "variant": "EZ Clean Steel",
+          "usdz": "/models/usdz/samsung-rs76cg8113slhl-ez-clean-steel.usdz"
+        },
+        {
+          "name": "Black DOI",
+          "code": "RS76CG8113B1HL",
+          "swatchColor": "#2f3034",
+          "variant": "Black DOI",
+          "usdz": "/models/usdz/samsung-rs76cg8113slhl-black-doi.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -165,
+          "zone": {
+            "closed": [
+              [
+                -0.456,
+                0.04,
+                0.146
+              ],
+              [
+                -0.064,
+                1.746,
+                0.358
+              ]
+            ],
+            "open": [
+              [
+                -0.811,
+                0.04,
+                0.258
+              ],
+              [
+                -0.408,
+                1.746,
+                0.553
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawers",
+          "label": "drawers",
+          "text": [
+            "Pull out drawers",
+            "Push drawers in"
+          ],
+          "node": "FreezerDrawers",
+          "slide": [
+            0,
+            0,
+            0.3
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.402,
+                0.102,
+                -0.292
+              ],
+              [
+                -0.095,
+                0.638,
+                0.136
+              ]
+            ],
+            "open": [
+              [
+                -0.402,
+                0.102,
+                0.008
+              ],
+              [
+                -0.095,
+                0.638,
+                0.436
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 170,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.06,
+                0.04,
+                0.136
+              ],
+              [
+                0.456,
+                1.746,
+                0.359
+              ]
+            ],
+            "open": [
+              [
+                0.411,
+                0.04,
+                0.259
+              ],
+              [
+                0.929,
+                1.746,
+                0.56
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.56
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.031,
+                0.102,
+                -0.294
+              ],
+              [
+                0.404,
+                1.572,
+                0.126
+              ]
+            ],
+            "open": [
+              [
+                -0.031,
+                0.102,
+                0.266
+              ],
+              [
+                0.404,
+                1.572,
+                0.686
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "91.2 cm",
+        "h": "178 cm",
+        "d": "71.6 cm"
+      },
+      "sizeNote": "Samsung gives 91.2 × 71.6 × 178 cm (W × D × H) with the hinge covers: 174.6 cm to the top without them and 61.0 cm deep without the doors. The freezer door opens to 165° and the fridge door to 170°",
+      "fit": {
+        "front": 45,
+        "sides": 5,
+        "top": 10,
+        "back": 5,
+        "note": "From Samsung's user manual for this model: 116.5 cm of depth in total with the doors open at 90°, at least 5 cm at each side and behind it, and 10 cm above it."
+      },
+      "specs": [
+        [
+          "Total capacity",
+          "653 L (freezer 244 L, fridge 409 L)"
+        ],
+        [
+          "Type",
+          "Side by side, Twin Cooling Plus"
+        ],
+        [
+          "Convertible",
+          "5-in-1 Smart Conversion"
+        ],
+        [
+          "Energy rating",
+          "3 star, 547 units a year"
+        ],
+        [
+          "Compressor",
+          "Digital Inverter Compressor"
+        ],
+        [
+          "Smart",
+          "Wi-Fi embedded, SmartThings AI Energy Mode"
+        ],
+        [
+          "Cooling",
+          "Power Cool and Power Freeze"
+        ],
+        [
+          "Fridge",
+          "4 tempered-glass shelves, wine rack, 5 door pockets, 2 vegetable and fruit drawers, top LED"
+        ],
+        [
+          "Freezer",
+          "4 shelves, 5 door pockets, 2 drawers, manual twist ice maker, top LED"
+        ],
+        [
+          "Display",
+          "Internal (Ice Blue)"
+        ],
+        [
+          "Door",
+          "Recess handles"
+        ],
+        [
+          "Features",
+          "Door alarm, vacation mode"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Noise",
+          "37 dBA"
+        ],
+        [
+          "Weight",
+          "100 kg"
+        ],
+        [
+          "Warranty",
+          "1 year product, 10 years compressor"
+        ]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/side-by-side/rs8000cch-side-by-side-smart-conversion-696l-silver-rs76cg8113slhl/",
+      "hotspots": [
+        {
+          "title": "Convertible 5in1",
+          "text": "Using Twin Cooling technology, you can switch between 5 modes. Simply convert your freezer into a fridge to store more fresh food, or switch the fridge or freezer off to save energy.",
+          "pos": [
+            -0.26,
+            1.2,
+            0.3585
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "SmartThings AI Energy Mode",
+          "text": "AI Energy Mode analyses your refrigerator usage patterns and estimates power consumption. If the estimated electric bill exceeds your preset target, it recommends the saving mode to reduce energy use by up to 10%.",
+          "pos": [
+            0.4075,
+            1.26,
+            0.17
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Rack & Shelf",
+          "text": "Its wider design can store not only standard sized but also thicker wine bottles, like champagne, and its flatter shape can hold other food, such as pizzas and egg boxes.",
+          "pos": [
+            0.12,
+            1.33,
+            0.111
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "Automatically adjusts its speed in response to cooling demand, so it is quiet, uses power efficiently and keeps working for long, with a 10 year warranty on the compressor.",
+          "pos": [
+            0.2,
+            0.62,
+            0.3585
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
+      "id": "haier-hrb-4052busa-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRB-4052BUSA-P",
+      "name": "Haier 355 L bottom-mount refrigerator",
+      "shortName": "355 L bottom-mount refrigerator",
+      "summary": "Open the fridge on top and the freezer below, take out the trays and the freezer drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrb-4052busa-p.glb",
+      "thumb": "/photos/haier-hrb-4052busa-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrb-4052busa-p/0.jpg",
+        "/photos/haier-hrb-4052busa-p/1.jpg",
+        "/photos/haier-hrb-4052busa-p/2.jpg",
+        "/photos/haier-hrb-4052busa-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 124%",
+      "finishes": [
+        {
+          "name": "Ultramarine Steel",
+          "swatchColor": "#3a4256",
+          "usdz": "/models/usdz/haier-hrb-4052busa-p-ultramarine-steel.usdz",
+          "variant": "Ultramarine Steel",
+          "code": "HRB-4052BUSA-P"
+        },
+        {
+          "name": "Graphite Black",
+          "swatchColor": "#3a4256",
+          "usdz": "/models/usdz/haier-hrb-4052busa-p-graphite-black.usdz",
+          "variant": "Graphite Black",
+          "code": "HRB-4052BGKA-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-355l-bottom-mount-refrigerator-graphite-black-3-star-hrb-4052bgka-p-new/21342"
+        },
+        {
+          "name": "Inox Steel",
+          "swatchColor": "#a9a9aa",
+          "usdz": "/models/usdz/haier-hrb-4052busa-p-inox-steel.usdz",
+          "variant": "Inox Steel",
+          "code": "HRB-4052BISA-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.309,
+                0.636,
+                0.14
+              ],
+              [
+                0.312,
+                1.73,
+                0.334
+              ]
+            ],
+            "open": [
+              [
+                0.272,
+                0.636,
+                0.207
+              ],
+              [
+                0.833,
+                1.73,
+                0.721
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.015,
+            0,
+            0.45
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.271,
+                0.657,
+                -0.281
+              ],
+              [
+                0.271,
+                1.577,
+                0.134
+              ]
+            ],
+            "open": [
+              [
+                -0.286,
+                0.657,
+                0.169
+              ],
+              [
+                0.256,
+                1.577,
+                0.584
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [
+                -0.309,
+                0.028,
+                0.206
+              ],
+              [
+                0.311,
+                0.632,
+                0.333
+              ]
+            ],
+            "open": [
+              [
+                0.306,
+                0.028,
+                0.207
+              ],
+              [
+                0.833,
+                0.632,
+                0.671
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "freezer drawer",
+          "node": "FreezerDrawer",
+          "slide": [
+            0,
+            0,
+            0.3
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.271,
+                0.104,
+                -0.273
+              ],
+              [
+                0.271,
+                0.335,
+                0.203
+              ]
+            ],
+            "open": [
+              [
+                -0.271,
+                0.104,
+                0.027
+              ],
+              [
+                0.271,
+                0.335,
+                0.503
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "62.3 cm",
+        "h": "173 cm",
+        "d": "66.5 cm"
+      },
+      "sizeNote": "Haier gives 62.3 × 66.5 × 173 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "355 L (refrigerator 270 L, freezer 85 L)"
+        ],
+        [
+          "Type",
+          "Frost free, bottom-mount double door"
+        ],
+        [
+          "Convertible",
+          "14 in 1 (Magic Convertible series)"
+        ],
+        [
+          "Energy rating",
+          "2 star, 255 units a year"
+        ],
+        [
+          "Compressor",
+          "Inverter (Triple Inverter and Dual Fan Tech)"
+        ],
+        [
+          "Features",
+          "Magic Cooling, 1 Hour Icing, movable ice maker"
+        ],
+        [
+          "Shelves",
+          "Toughened glass (refrigerator)"
+        ],
+        [
+          "Storage",
+          "Vegetable case (2X BIG Box), egg tray, 2 L bottle guard"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Steel finish, Ultramarine Steel, Graphite Black or Inox Steel, recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "67 kg"
+        ]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/355-litres-frost-free-bottom-mounted-refrigerator-hrb-4052busa-pultramarinesteel.shtml",
+      "hotspots": [
+        {
+          "title": "Magic Convertible",
+          "text": "14 in 1 convertible modes. Set the freezer to suit what you keep: −24 °C Super Freezer and Turbo Icing, −12 °C energy saving mode for ice cream and chocolate, 0 °C for beverages, 2 °C for milk and curd, 5 °C for fruit and vegetables.",
+          "pos": [
+            -0.002,
+            1.4365,
+            0.334
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Jhukna Mat",
+          "text": "The fridge on top, the freezer below: Haier's bottom-mounted refrigerator helps reduce the bending of the back up to 90% as compared to other conventional refrigerators.",
+          "pos": [
+            -0.17,
+            1,
+            0.3335
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "2X BIG Box",
+          "text": "This 2x veg box enables the storage space for lots of vegetables at one single place.",
+          "pos": [
+            0.17,
+            0.74,
+            0.1315
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Movable Ice Maker",
+          "text": "When you need ice, you get it faster than you imagined, and when you need space, you can detach it to make more space.",
+          "pos": [
+            -0.1515,
+            0.462,
+            0.1935
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        }
+      ]
+    },
+    {
+      "id": "samsung-rt80h51c2fhl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT80H51C2FHL",
+      "name": "Samsung 467 L double-door refrigerator with Bespoke AI",
+      "shortName": "467 L Bespoke AI refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt80h51c2fhl.glb",
+      "thumb": "/photos/samsung-rt80h51c2fhl/0.jpg",
+      "photos": [
+        "/photos/samsung-rt80h51c2fhl/0.jpg",
+        "/photos/samsung-rt80h51c2fhl/1.jpg",
+        "/photos/samsung-rt80h51c2fhl/2.jpg",
+        "/photos/samsung-rt80h51c2fhl/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Black DOI",
+          "swatchColor": "#313235",
+          "usdz": "/models/usdz/samsung-rt80h51c2fhl-black-doi.usdz",
+          "variant": "Black DOI",
+          "code": "RT80H51C2FHL"
+        },
+        {
+          "name": "EZ Clean Steel",
+          "swatchColor": "#8f9296",
+          "usdz": "/models/usdz/samsung-rt80h51c2fhl-ez-clean-steel.usdz",
+          "variant": "EZ Clean Steel",
+          "code": "RT80H51C2SHL"
+        },
+        {
+          "name": "Black Glass",
+          "swatchColor": "#15131d",
+          "usdz": "/models/usdz/samsung-rt80h51c2fhl-black-glass.usdz",
+          "variant": "Black Glass",
+          "code": "RT80H51C2BHL"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [
+                -0.35,
+                1.245,
+                0.246
+              ],
+              [
+                0.35,
+                1.82,
+                0.398
+              ]
+            ],
+            "open": [
+              [
+                0.277,
+                1.245,
+                0.33
+              ],
+              [
+                0.636,
+                1.82,
+                1.003
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.264,
+                1.295,
+                0.001
+              ],
+              [
+                -0.088,
+                1.465,
+                0.209
+              ]
+            ],
+            "open": [
+              [
+                -0.264,
+                1.295,
+                0.121
+              ],
+              [
+                -0.088,
+                1.465,
+                0.329
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.35,
+                0.037,
+                0.231
+              ],
+              [
+                0.35,
+                1.238,
+                0.398
+              ]
+            ],
+            "open": [
+              [
+                0.272,
+                0.037,
+                0.326
+              ],
+              [
+                0.69,
+                1.238,
+                0.98
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.03,
+            0,
+            0.72
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.31,
+                0.082,
+                -0.361
+              ],
+              [
+                0.31,
+                0.989,
+                0.228
+              ]
+            ],
+            "open": [
+              [
+                -0.34,
+                0.082,
+                0.359
+              ],
+              [
+                0.28,
+                0.989,
+                0.948
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "70 cm",
+        "h": "182 cm",
+        "d": "79.4 cm"
+      },
+      "sizeNote": "Samsung's user manual (its RT80F51* column) lists 140.3 cm total depth and 102.6 cm total width with the doors open",
+      "specs": [
+        [
+          "Total capacity",
+          "467 L (fridge 360 L, freezer 107 L)"
+        ],
+        [
+          "Type",
+          "Frost free, double door"
+        ],
+        [
+          "Convertible",
+          "5-in-1"
+        ],
+        [
+          "Energy rating",
+          "2 star, 258 units a year"
+        ],
+        [
+          "Compressor",
+          "Digital Inverter"
+        ],
+        [
+          "Cooling",
+          "Twin Cooling Plus, Multi Flow"
+        ],
+        [
+          "Smart features",
+          "Wi-Fi, SmartThings, AI Energy Mode"
+        ],
+        [
+          "Shelves",
+          "3 tempered glass (fridge), 1 plastic (freezer)"
+        ],
+        [
+          "Extras",
+          "Twist Ice Maker, Active Fresh Filter+, Fresh Room"
+        ],
+        [
+          "Handle",
+          "Recessed"
+        ],
+        [
+          "Colours",
+          "Black DOI, EZ Clean Steel, Black Glass"
+        ],
+        [
+          "Weight",
+          "73.5 kg (Black Glass 79.5 kg)"
+        ],
+        [
+          "Warranty",
+          "1 year product, 10 years compressor"
+        ]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/double-door/refrigerator-tmf-convertible-5in1-bespoke-ai-double-door-refrigerator-467l-black-rt80h51c2fhl/",
+      "hotspots": [
+        {
+          "title": "Convertible 5-in-1",
+          "text": "Using Twin Cooling technology, the Convertible 5-in-1 feature lets you switch between 5 smart modes, so the freezer can become a fridge.",
+          "pos": [
+            -0.18,
+            1.62,
+            0.397
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "AI Energy Mode",
+          "text": "Reduce your energy use by up to 10% with AI Energy mode in SmartThings Energy, which adjusts the compressor speed and defrost cycle to how you use it.",
+          "pos": [
+            -0.18,
+            0.95,
+            0.397
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Twin Cooling Plus",
+          "text": "Independent evaporators, fans and vents in the fridge and freezer keep food moist and stop odours mixing between them.",
+          "pos": [
+            -0.005,
+            1.656,
+            -0.351
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Active Fresh Filter+",
+          "text": "Built into the middle of the fridge, it removes 99.99% of certain bacteria: air passes through an activated carbon filter and an anti-bacterial mesh.",
+          "pos": [
+            -0.006,
+            0.636,
+            -0.3355
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 61,
+        "sides": 5,
+        "back": 5,
+        "note": "From Samsung's user manual for this model: at least 5 cm at each side, more than 5 cm behind it, and 140.3 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
+      }
+    },
+    {
+      "id": "whirlpool-22343",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "22343",
+      "name": "Whirlpool Intellifresh Pro 235 L convertible double-door refrigerator, Illusia Steel",
+      "shortName": "235 L Intellifresh Pro refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, slide out the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/whirlpool-22343.glb",
+      "thumb": "/photos/whirlpool-22343/0.jpg",
+      "photos": [
+        "/photos/whirlpool-22343/0.jpg",
+        "/photos/whirlpool-22343/1.jpg",
+        "/photos/whirlpool-22343/2.jpg",
+        "/photos/whirlpool-22343/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Illusia Steel",
+          "swatchColor": "#9a9ca0",
+          "usdz": "/models/usdz/whirlpool-22343-illusia-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 120,
+          "zone": {
+            "closed": [
+              [
+                -0.281,
+                1.133,
+                0.186
+              ],
+              [
+                0.282,
+                1.587,
+                0.328
+              ]
+            ],
+            "open": [
+              [
+                0.228,
+                1.133,
+                0.253
+              ],
+              [
+                0.606,
+                1.587,
+                0.767
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 120,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.281,
+                0.031,
+                0.161
+              ],
+              [
+                0.282,
+                1.12,
+                0.328
+              ]
+            ],
+            "open": [
+              [
+                0.207,
+                0.031,
+                0.253
+              ],
+              [
+                0.606,
+                1.12,
+                0.779
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.3
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.235,
+                0.109,
+                -0.266
+              ],
+              [
+                0.235,
+                1.049,
+                0.154
+              ]
+            ],
+            "open": [
+              [
+                -0.235,
+                0.109,
+                0.034
+              ],
+              [
+                0.235,
+                1.049,
+                0.454
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "56.4 cm",
+        "h": "158.7 cm",
+        "d": "65.5 cm"
+      },
+      "sizeNote": "Whirlpool gives 56.4 × 158.7 × 65.5 cm (W × H × D) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "235 L"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Convertible",
+          "10-in-1: All Season, Grocery Day, Beverages, Deep Freeze, Energy Saver, Fast Ice, Party, Vacation, Chef, Mini Ref"
+        ],
+        [
+          "Energy rating",
+          "2 star, 230 units a year (BEE label 2026-28)"
+        ],
+        [
+          "Compressor",
+          "IntelliSense inverter, auto-connects to a home inverter"
+        ],
+        [
+          "Controls",
+          "External touch panel on the freezer door"
+        ],
+        [
+          "Shelves",
+          "Toughened glass: 4 in the fridge, 1 in the freezer"
+        ],
+        [
+          "Door storage",
+          "4 fridge door pockets, 2 freezer door pockets, egg tray"
+        ],
+        [
+          "Storage",
+          "Vegetable and fruit drawer, ice bank"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Handle",
+          "Side pocket handle"
+        ],
+        [
+          "Voltage",
+          "160-300 V, no stabiliser needed"
+        ],
+        [
+          "Model on the energy label",
+          "NDT23533IAQMC2PE"
+        ],
+        [
+          "Colour",
+          "Illusia Steel"
+        ],
+        [
+          "Weight",
+          "47 kg"
+        ],
+        [
+          "Warranty",
+          "1 year comprehensive, 10 years on the compressor"
+        ]
+      ],
+      "source": "https://india.whirlpool.in/intellifresh-pro-235l-2-star-convertible-frost-free-double-door-refrigerator-t/p",
+      "hotspots": [
+        {
+          "title": "Convertible 10-in-1 Modes",
+          "text": "Now convert your refrigerator at the touch of a button with 10-in-1 convertible modes.",
+          "pos": [
+            0,
+            1.47,
+            0.3285
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Convert freezer to fridge in 10 min",
+          "text": "Now convert your freezer to fridge according to your needs in the fastest time of 10 mins.",
+          "pos": [
+            0,
+            1.25,
+            -0.25
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Up to 240 kg weight bearing capacity",
+          "text": "The toughened glass end to end shelves can bear up to 240kg of load, allowing you to keep large pots and utensils inside without any fear of breakage.",
+          "pos": [
+            0.15,
+            0.695,
+            0.15
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Up to 15 days of extended freshness in both fridge and freezer",
+          "text": "Get up to 15 days of extended freshness in the fridge and freezer both. Now store vegetables in your freezer as well, without worrying about spoilage.",
+          "pos": [
+            -0.12,
+            0.6,
+            0.3275
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
       "id": "lg-fhp1412z9b",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",
@@ -3163,24 +7908,24 @@
             "closed": [
               [
                 -0.3,
-                0.761,
+                0.729,
                 0.043
               ],
               [
                 -0.088,
-                0.85,
+                0.818,
                 0.275
               ]
             ],
             "open": [
               [
                 -0.3,
-                0.761,
+                0.729,
                 0.243
               ],
               [
                 -0.088,
-                0.85,
+                0.818,
                 0.475
               ]
             ]
@@ -3191,31 +7936,31 @@
           "label": "door",
           "node": "Door",
           "axis": "y",
-          "angle": -100,
+          "angle": -140,
           "hint": true,
           "zone": {
             "closed": [
               [
-                -0.248,
-                0.244,
-                0.207
+                -0.247,
+                0.208,
+                0.222
               ],
               [
-                0.248,
-                0.74,
+                0.249,
+                0.704,
                 0.315
               ]
             ],
             "open": [
               [
-                -0.389,
-                0.244,
-                0.246
+                -0.623,
+                0.208,
+                0.278
               ],
               [
-                -0.215,
-                0.74,
-                0.739
+                -0.221,
+                0.704,
+                0.622
               ]
             ]
           }
@@ -3229,26 +7974,26 @@
           "zone": {
             "closed": [
               [
-                0.121,
-                0.072,
-                0.275
+                0.12,
+                0.037,
+                0.272
               ],
               [
                 0.265,
-                0.17,
-                0.281
+                0.137,
+                0.276
               ]
             ],
             "open": [
               [
-                0.121,
-                0.059,
-                0.275
+                0.12,
+                0.025,
+                0.271
               ],
               [
                 0.265,
-                0.072,
-                0.373
+                0.037,
+                0.371
               ]
             ]
           }
@@ -3336,9 +8081,9 @@
           "title": "6 Motion Direct Drive",
           "text": "Six wash motions, each made for a different fabric, for a better wash with less vibration and less noise.",
           "pos": [
-            -0.13,
-            0.67,
-            0.33
+            -0.12,
+            0.62,
+            0.312
           ],
           "normal": [
             0,
@@ -3351,9 +8096,9 @@
           "title": "Inverter Direct Drive",
           "text": "The motor drives the drum directly. LG gives a 10 year warranty on the motor.",
           "pos": [
-            0.249,
-            0.746,
-            0.277
+            0.262,
+            0.714,
+            0.2765
           ],
           "normal": [
             0,
@@ -3366,9 +8111,9 @@
           "title": "Steam with Allergy Care",
           "text": "Steam cycles reduce germs and allergens; the Allergy Care programme is approved by the British Allergy Foundation.",
           "pos": [
-            -0.043,
-            0.7863,
-            0.277
+            -0.05,
+            0.7525,
+            0.2765
           ],
           "normal": [
             0,
@@ -3381,9 +8126,9 @@
           "title": "Smart Diagnosis",
           "text": "Quickly troubleshoot the machine with Smart Diagnosis.",
           "pos": [
-            0.249,
-            0.8,
-            0.277
+            0.248,
+            0.766,
+            0.2765
           ],
           "normal": [
             0,
@@ -3392,8 +8137,7 @@
           ],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "samsung-wa80f08s2ctl",
