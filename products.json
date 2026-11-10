@@ -9171,6 +9171,329 @@
       ]
     },
     {
+      "id": "lg-gv-b23ffgmb",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GV-B23FFGMB",
+      "name": "LG 574 L French door refrigerator with glass doors, Wi-Fi Convertible and Hygiene Fresh+",
+      "shortName": "574 L French door refrigerator, glass doors",
+      "summary": "Open either fridge door and slide out the vegetable box, open the freezer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-gv-b23ffgmb.glb",
+      "thumb": "/photos/lg-gv-b23ffgmb/0.jpg",
+      "photos": [
+        "/photos/lg-gv-b23ffgmb/0.jpg",
+        "/photos/lg-gv-b23ffgmb/1.jpg",
+        "/photos/lg-gv-b23ffgmb/2.jpg",
+        "/photos/lg-gv-b23ffgmb/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-20deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Black Mirror",
+          "swatchColor": "#161618",
+          "usdz": "/models/usdz/lg-gv-b23ffgmb-black-mirror.usdz",
+          "variant": "Black Mirror",
+          "code": "GV-B23FFGMB"
+        },
+        {
+          "name": "Prime Silver",
+          "swatchColor": "#b9babb",
+          "usdz": "/models/usdz/lg-gv-b23ffgmb-prime-silver.usdz",
+          "variant": "Prime Silver",
+          "code": "GV-B23FFLMB"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridgeL",
+          "label": "left fridge door",
+          "node": "FridgeDoorL",
+          "axis": "y",
+          "angle": -115,
+          "zone": {
+            "closed": [
+              [
+                -0.418,
+                0.685,
+                0.143
+              ],
+              [
+                0,
+                1.777,
+                0.369
+              ]
+            ],
+            "open": [
+              [
+                -0.645,
+                0.685,
+                0.275
+              ],
+              [
+                -0.296,
+                1.777,
+                0.7
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "right fridge door",
+          "node": "FridgeDoorR",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                0.001,
+                0.685,
+                0.143
+              ],
+              [
+                0.418,
+                1.777,
+                0.369
+              ]
+            ],
+            "open": [
+              [
+                0.294,
+                0.685,
+                0.275
+              ],
+              [
+                0.645,
+                1.777,
+                0.707
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "vegetable box",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.25
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                0.006,
+                0.861,
+                -0.282
+              ],
+              [
+                0.352,
+                0.995,
+                0.137
+              ]
+            ],
+            "open": [
+              [
+                0.006,
+                0.861,
+                -0.032
+              ],
+              [
+                0.352,
+                0.995,
+                0.387
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer doors",
+          "node": "FreezerDoorL",
+          "axis": "y",
+          "angle": -115,
+          "also": [
+            {
+              "node": "FreezerDoorR",
+              "angle": 115
+            }
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.418,
+                0.028,
+                0.249
+              ],
+              [
+                0.418,
+                0.664,
+                0.368
+              ]
+            ],
+            "open": [
+              [
+                -0.645,
+                0.028,
+                0.275
+              ],
+              [
+                0.645,
+                0.664,
+                0.691
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "83.5 cm",
+        "h": "177.7 cm",
+        "d": "73.6 cm"
+      },
+      "sizeNote": "With all four doors open, LG's manual gives 129 cm across and 105.7 cm deep",
+      "specs": [
+        [
+          "Total capacity",
+          "574 L (fridge 401 L, freezer 173 L)"
+        ],
+        [
+          "Type",
+          "French door (LG: Multi Door): two fridge doors over two freezer doors, no handles"
+        ],
+        [
+          "Energy rating",
+          "3 star, 510 units a year"
+        ],
+        [
+          "Compressor",
+          "Smart Inverter (BLDC); 1 year on the product, 9 more years on the compressor"
+        ],
+        [
+          "Cooling",
+          "Door Cooling+, LINEAR Cooling, Hygiene Fresh+"
+        ],
+        [
+          "Fresh Converter+",
+          "Select Meat, Fish or Vegetables on the control panel and it adjusts the temperature"
+        ],
+        [
+          "Shelves",
+          "2 tempered glass in the fridge"
+        ],
+        [
+          "Boxes",
+          "2 separate vegetable boxes in the fridge"
+        ],
+        [
+          "Door baskets",
+          "6 in the fridge, transparent; none in the freezer"
+        ],
+        [
+          "Ice",
+          "Normal ice tray; no dispenser, no automatic ice maker"
+        ],
+        [
+          "Control",
+          "Internal LED display, Express Freeze, door alarm"
+        ],
+        [
+          "Door",
+          "Glass in Black Mirror; steel in Prime Silver"
+        ],
+        [
+          "Light",
+          "Top LED in the fridge and the freezer"
+        ],
+        [
+          "Smart",
+          "ThinQ (Wi-Fi), Smart Learner, Smart Diagnosis"
+        ],
+        [
+          "Weight",
+          "111 kg (Prime Silver 104 kg)"
+        ]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/french-door-refrigerators/gv-b23ffgmb/",
+      "hotspots": [
+        {
+          "title": "Door Cooling+",
+          "text": "Delivers faster and even cooling to areas where cold air is easily lost, helping keep food fresher for longer.",
+          "pos": [
+            0.15,
+            1.686,
+            0.1995
+          ],
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Fresh Converter+",
+          "text": "Using the I-Micom control panel, simply select Meat, Fish, or Vegetables, and it intelligently adjusts the temperature to suit each ingredient, keeping them fresh, tasty, and ready to cook.",
+          "pos": [
+            0.15,
+            0.79,
+            0.2337
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "2 Separate Boxes",
+          "text": "Store ingredients into two different boxes for longer shelf life and easier access.",
+          "pos": [
+            -0.18,
+            0.93,
+            0.1337
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridgeL"
+        },
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Smart Inverter Compressor technology for enhanced energy efficiency and bigger savings. Enjoy ultra-quiet performance backed by a 10-year warranty.",
+          "pos": [
+            -0.2,
+            0.35,
+            0.368
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        }
+      ],
+      "fit": {
+        "front": 32.1,
+        "back": 5,
+        "note": "From LG's owner's manual: allow over 5 cm between the back and the wall. The manual gives 105.7 cm of depth with the doors open, which is 32.1 cm in front of the fridge, and 129 cm across with the doors open."
+      }
+    },
+    {
       "id": "lg-fhp1412z9b",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",

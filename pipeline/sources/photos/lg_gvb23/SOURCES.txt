@@ -1,0 +1,7 @@
+LG India gallery images (fetched 10 Nov 2026):
+bm_* = GV-B23FFGMB (Black Mirror): https://www.lg.com/content/dam/channel/wcms/in/images/refrigerators/new/gv-b23ffgmb/GV-B23FFGMB-<name>.jpg
+  bm_front = 2010x1334-1-v, bm_energy_label = 2010x1334-2-v, bm_open = DZ-2, bm_open_fridge = DZ-6, bm_open_lower = DZ-7,
+  bm_side = DZ-12, bm_34_right = DZ-10, bm_34_left = DZ-8
+ps_* = GV-B23FFLMB (Prime Silver): https://www.lg.com/content/dam/channel/wcms/in/images/refrigerators/new/gv-b23fflmb/new/GV-B23FFLMB-<name>.jpg
+  ps_front = 2010x1334-1-v, ps_energy_label = 2010x1334-2-v, ps_34_right = DZ-10, ps_side = DZ-12, ps_open = DZ-2
+Product pages: https://www.lg.com/in/refrigerators/french-door-refrigerators/gv-b23ffgmb/ and .../gv-b23fflmb/
