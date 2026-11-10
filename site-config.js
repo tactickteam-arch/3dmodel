@@ -6,7 +6,7 @@
 // With every list empty, the site behaves exactly as it did before this file existed.
 export const SITE = {
   // the address people are sent to: link previews, canonical links, QR codes and every link people share
-  publicOrigin: "https://3dmodelssangeetha.vercel.app",
+  publicOrigin: "https://3dmodel-chi-nine.vercel.app",
 
   // other addresses that serve this same site, such as the store app's old AR address once its DNS points here.
   // Pages keep working on them; links shared from them point at publicOrigin.
