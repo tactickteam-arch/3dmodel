@@ -1,0 +1,39 @@
+{
+ "note": "u from the crop's left edge (the fridge's right side, +x, seen from behind), v from the top; the plate spans the crop",
+ "crop_px": [
+  766,
+  119,
+  1238,
+  1130
+ ],
+ "cord": [
+  [
+   0.1483,
+   0.8991
+  ],
+  [
+   0.1229,
+   0.8912
+  ],
+  [
+   0.0975,
+   0.8843
+  ],
+  [
+   0.072,
+   0.8793
+  ],
+  [
+   0.0508,
+   0.8764
+  ],
+  [
+   0.0297,
+   0.8754
+  ],
+  [
+   0.0042,
+   0.8754
+  ]
+ ]
+}

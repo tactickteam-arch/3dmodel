@@ -1,0 +1,158 @@
+{
+ "edge_highlight_taken_out": [
+  [
+   87.3,
+   76.6
+  ],
+  [
+   154.5,
+   147.1
+  ],
+  [
+   119.4,
+   142.0
+  ],
+  [
+   125.9,
+   132.0
+  ]
+ ],
+ "streak_contrast": 2.7,
+ "door_photo_median": {
+  "shiny_steel": [
+   172,
+   172,
+   170
+  ],
+  "wine_spring": [
+   67,
+   33,
+   35
+  ],
+  "royal_spring": [
+   31,
+   38,
+   60
+  ],
+  "blue_waterlily": [
+   42,
+   60,
+   91
+  ]
+ },
+ "stand_front_median": {
+  "shiny_steel": [
+   88,
+   88,
+   88
+  ],
+  "wine_spring": [
+   46,
+   21,
+   24
+  ],
+  "royal_spring": [
+   20,
+   21,
+   48
+  ],
+  "blue_waterlily": [
+   21,
+   23,
+   43
+  ]
+ },
+ "stand_mark": {
+  "shiny_steel": {
+   "col": [
+    68,
+    68,
+    68
+   ],
+   "cx": 0.493,
+   "cy": 0.5547,
+   "h": 0.3906
+  },
+  "wine_spring": {
+   "col": [
+    38,
+    21,
+    24
+   ],
+   "cx": 0.5,
+   "cy": 0.5469,
+   "h": 0.4219
+  },
+  "royal_spring": {
+   "col": [
+    15,
+    16,
+    31
+   ],
+   "cx": 0.4906,
+   "cy": 0.5234,
+   "h": 0.3906
+  },
+  "blue_waterlily": {
+   "col": [
+    21,
+    22,
+    35
+   ],
+   "cx": 0.5086,
+   "cy": 0.5352,
+   "h": 0.3984
+  }
+ },
+ "mark_photo": {
+  "shiny_steel": [
+   142,
+   142,
+   140
+  ],
+  "wine_spring": [
+   102,
+   90,
+   89
+  ],
+  "royal_spring": [
+   124,
+   131,
+   135
+  ],
+  "blue_waterlily": [
+   92,
+   108,
+   134
+  ]
+ },
+ "label_white_photo": {
+  "shiny_steel": [
+   255,
+   255,
+   241
+  ],
+  "wine_spring": [
+   255,
+   255,
+   240
+  ],
+  "royal_spring": [
+   255,
+   255,
+   239
+  ],
+  "blue_waterlily": [
+   255,
+   255,
+   242
+  ]
+ },
+ "label_aspect": 0.5349,
+ "dial_fig": {
+  "cx": 0.4983,
+  "cy": 0.5275,
+  "knob_r": 0.301,
+  "aspect": 1.0209
+ }
+}

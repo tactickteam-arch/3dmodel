@@ -1,0 +1,183 @@
+{
+  "products": [
+    {
+      "id": "lg-gld2356zapz",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GLD2356ZAPZ",
+      "name": "LG 224 L single-door refrigerator with Base Stand Drawer, Smart Inverter Compressor",
+      "shortName": "224 L single-door refrigerator",
+      "summary": "Open the door and the freezer box, slide out the trays and the base drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/lg-gld2356zapz.glb",
+      "thumb": "/photos/lg-gld2356zapz/0.jpg",
+      "photos": ["/photos/lg-gld2356zapz/0.jpg", "/photos/lg-gld2356zapz/1.jpg", "/photos/lg-gld2356zapz/2.jpg", "/photos/lg-gld2356zapz/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#a9aaab",
+          "variant": "Shiny Steel",
+          "code": "GLD2356ZAPZ",
+          "usdz": "/models/usdz/lg-gld2356zapz-shiny-steel.usdz"
+        },
+        {
+          "name": "Wine Spring",
+          "swatchColor": "#4a1a22",
+          "variant": "Wine Spring",
+          "code": "GLD2356ZAWS",
+          "usdz": "/models/usdz/lg-gld2356zapz-wine-spring.usdz"
+        },
+        {
+          "name": "Royal Spring",
+          "swatchColor": "#141a3c",
+          "variant": "Royal Spring",
+          "code": "GLD2356ZARS",
+          "usdz": "/models/usdz/lg-gld2356zapz-royal-spring.usdz"
+        },
+        {
+          "name": "Blue Waterlily",
+          "swatchColor": "#24406e",
+          "variant": "Blue Waterlily",
+          "code": "GLD2356ZABW",
+          "usdz": "/models/usdz/lg-gld2356zapz-blue-waterlily.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 130,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.293, 0.143, 0.079],
+              [0.295, 1.392, 0.305]
+            ],
+            "open": [
+              [0.249, 0.143, 0.137],
+              [0.738, 1.392, 0.667]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": 90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.23, 1.066, 0.085],
+              [0.157, 1.281, 0.101]
+            ],
+            "open": [
+              [0.156, 1.066, 0.085],
+              [0.173, 1.281, 0.471]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.2],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.241, 0.186, -0.233],
+              [0.241, 1.052, 0.091]
+            ],
+            "open": [
+              [-0.241, 0.186, -0.033],
+              [0.241, 1.052, 0.291]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "base drawer",
+          "node": "BaseDrawer",
+          "slide": [0, 0, 0.25],
+          "zone": {
+            "closed": [
+              [-0.293, 0.006, -0.22],
+              [0.293, 0.136, 0.281]
+            ],
+            "open": [
+              [-0.293, 0.006, 0.03],
+              [0.293, 0.136, 0.531]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.1 cm",
+        "h": "139.2 cm",
+        "d": "61 cm"
+      },
+      "sizeNote": "LG gives 591 × 1392 × 610 mm (W × H × D), base stand included, and publishes no door swing; its manual asks for over 50 mm behind",
+      "fit": {
+        "back": 5,
+        "note": "LG's manual: allow over 50 mm between the back of the fridge and the wall"
+      },
+      "specs": [
+        ["Total capacity", "224 L (fridge 197 L, freezer 27 L)"],
+        ["Type", "Direct cool, single door"],
+        ["Energy rating", "5 star, 118 units a year"],
+        ["Compressor", "Smart Inverter Compressor (BLDC)"],
+        ["Power cuts", "Smart Connect to a home inverter; runs without a stabiliser"],
+        ["Controls", "Knob dial"],
+        ["Shelves", "3 toughened glass"],
+        ["Door storage", "6 transparent door baskets, room for 2 L bottles"],
+        ["Vegetable box", "1, Moist 'N' Fresh cover"],
+        ["Chiller", "Fit Max Chiller Tray"],
+        ["Base stand drawer", "For onions and potatoes"],
+        ["Ice", "Normal ice tray, Fast Ice Making"],
+        ["Light", "Bulb"],
+        ["Handle", "Ariana, with door lock"],
+        ["Door", "PET, Shiny Steel"],
+        ["Colours", "Shiny Steel, Wine Spring, Royal Spring, Blue Waterlily"],
+        ["Weight", "40 kg"],
+        ["Warranty", "1 year on the product, 10 years on the compressor"]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/single-door-refrigerators/gld2356zapz/",
+      "hotspots": [
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Unmatched performance, great savings and super silent operation; the New Smart Inverter Compressor is thoughtfully designed to provide added convenience to you.",
+          "pos": [-0.1, 0.62, 0.2745],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Base Stand Drawer",
+          "text": "Thoughtfully designed with a base drawer to maximise storage and minimise clutter.",
+          "pos": [0.15, 0.07, 0.2775],
+          "normal": [0, 0, 1]
+        },
+        {
+          "title": "Fit Max Chiller Tray",
+          "text": "A dedicated lower-temperature zone designed to keep milk, dairy products, and beverages perfectly chilled and fresh for longer.",
+          "pos": [0.1, 1, 0.0915],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Toughened Glass Shelves",
+          "text": "Holds heavier loads without cracking, so you can store more with confidence.",
+          "pos": [0, 0.662, 0.0735],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}
