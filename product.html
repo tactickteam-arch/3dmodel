@@ -852,7 +852,7 @@ const stateKey = () => parts.map((p) => (state[p.key] ? 1 : 0)).join("");
 // a part that swings 90 degrees or more (side doors, a top-loader's lid) reaches well outside the closed
 // outline, so the camera steps back while it is open
 const swingsWide = parts.some((p) => p.axis && Math.abs(p.angle) >= 90);
-let busy = false, movedAt = 0;
+let busy = false;
 // model-viewer cross-fades from a clip still running, and setting currentTime rewinds that fade too: the new
 // clip stays hidden behind the old one and a door the state calls open is drawn shut or half-open. So a clip
 // starts from a paused element, once the last one has ended (or cut short, for a jump to the end).
@@ -891,7 +891,6 @@ async function togglePart(key, { instant = false } = {}) {
   await mv.updateComplete;
   mv.currentTime = instant ? mv.duration : 0;
   mv.play({ repetitions: 1 });
-  movedAt = performance.now();
   if (swingsWide && anyBefore !== anyAfter && !instant && !arActive) {
     const o = mv.getCameraOrbit();
     mv.cameraOrbit = `${o.theta}rad ${o.phi}rad ${anyAfter ? o.radius * 1.3 : o.radius / 1.3}m`;
@@ -1809,7 +1808,8 @@ renderShare();
 // test hook for automated checks
 window.__demo = { product, state, togglePart, applyFinish, chooseFinish, openHeadset, openGuide, showFeature, closeFeature, fitCheck: () => fitResult,
   // nothing moving or waiting to move: no part, no chain of parts, no Fill or Empty, and the last clip has ended
-  idle: () => !busy && !chaining && !pressing.size && !window.__organise?.openingDoors?.() && !window.__organise?.running?.() && (mv.paused || performance.now() - movedAt > 1300),
+  // mv.paused turns true only on a frame that drew the clip's last pose, so a busy machine that skips frames can't read early
+  idle: () => !busy && !chaining && !pressing.size && !window.__organise?.openingDoors?.() && !window.__organise?.running?.() && mv.paused,
   caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR } };
 </script>
 </body>
