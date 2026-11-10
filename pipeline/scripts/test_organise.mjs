@@ -48,7 +48,10 @@ for (const id of targets) {
   if (!ready) continue;
   await b.evalJS(restAt);
   const empty = JSON.parse(await b.evalJS(`JSON.stringify(${snap})`));
-  check(empty.length > 60, `${empty.length} stock items found`);
+  // a full-size fridge holds more than 60 items; one under 150 L (a mini bar) about one per 4 L, as the makers' stocked photos show
+  const litres = await b.evalJS(`+(((window.__demo.product.specs || []).find(([k]) => /capacity/i.test(k)) || [])[1] || "").match(/(\\d+)\\s*L/)?.[1] || 0`);
+  const least = litres && litres < 150 ? Math.ceil(litres / 4) : 61;
+  check(empty.length >= least, `${empty.length} stock items found (at least ${least}${litres ? ` for ${litres} L` : ""})`);
   check(empty.every((r) => r[0] === 0), "starts empty: every item hidden");
   check(await b.evalJS("document.getElementById('part-organise').textContent.includes('Fill')"), "the button says Fill the fridge");
 
