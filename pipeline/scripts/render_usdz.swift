@@ -34,6 +34,8 @@ let size = max(maxB.x - minB.x, maxB.y - minB.y, maxB.z - minB.z)
 let cam = SCNNode()
 cam.camera = SCNCamera()
 cam.camera!.fieldOfView = 30
+// SceneKit hides anything nearer than 1 m by default, which cut the near corner off a 55 cm mini bar
+cam.camera!.zNear = 0.01
 let dist = Double(size) * 2.4
 let rad = yaw * .pi / 180
 cam.position = SCNVector3(Double(center.x) + sin(rad) * dist, Double(center.y) + Double(size) * 0.25, Double(center.z) + cos(rad) * dist)
