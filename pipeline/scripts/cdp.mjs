@@ -30,7 +30,14 @@ export async function launch({ port = 9444, profile, flags = [] } = {}) {
     if (m.method === "Log.entryAdded" && m.params.entry.level === "error") logs.push("LOG " + m.params.entry.text + " " + (m.params.entry.url || ""));
   };
   await new Promise((r) => (ws.onopen = r));
-  const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+  // a reply that never comes (a screenshot on a Mac swapping hard) fails the test after 5 minutes instead of hanging the gate
+  const send = (method, params = {}) => new Promise((r, j) => {
+    const i = ++id;
+    const t = setTimeout(() => { pending.delete(i); j(new Error(`${method} got no reply in 300 s`)); }, 300000);
+    t.unref?.();
+    pending.set(i, (m) => { clearTimeout(t); r(m); });
+    ws.send(JSON.stringify({ id: i, method, params }));
+  });
   await send("Runtime.enable");
   await send("Page.enable");
   await send("Log.enable");
