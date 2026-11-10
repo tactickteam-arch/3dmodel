@@ -30,3 +30,5 @@ tools/
 
 # client presentations with prices: never commit
 /presentations/
+.vercel
+.env*
