@@ -1,0 +1,189 @@
+{
+  "products": [
+    {
+      "id": "samsung-rt40h28u2phl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT40H28U2PHL",
+      "name": "Samsung 236 L double-door refrigerator with Convertible Freezer, Elegant Inox",
+      "shortName": "236 L Convertible Freezer refrigerator",
+      "summary": "Pick one of its five colours, open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt40h28u2phl.glb",
+      "thumb": "/photos/samsung-rt40h28u2phl/0.jpg",
+      "photos": ["/photos/samsung-rt40h28u2phl/0.jpg", "/photos/samsung-rt40h28u2phl/1.jpg", "/photos/samsung-rt40h28u2phl/2.jpg", "/photos/samsung-rt40h28u2phl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#7a7b7f",
+          "usdz": "/models/usdz/samsung-rt40h28u2phl-elegant-inox.usdz",
+          "variant": "Elegant Inox",
+          "code": "RT40H28U2PHL"
+        },
+        {
+          "name": "Black DOI",
+          "swatchColor": "#37383c",
+          "usdz": "/models/usdz/samsung-rt40h28u2phl-black-doi.usdz",
+          "variant": "Black DOI",
+          "code": "RT40H28U2FHL"
+        },
+        {
+          "name": "Hydrangea Blue",
+          "swatchColor": "#070a4d",
+          "usdz": "/models/usdz/samsung-rt40h28u2phl-hydrangea-blue.usdz",
+          "variant": "Hydrangea Blue",
+          "code": "RT40H28U2HSHL"
+        },
+        {
+          "name": "Paradise Bloom Blue",
+          "swatchColor": "#122a3e",
+          "usdz": "/models/usdz/samsung-rt40h28u2phl-paradise-bloom-blue.usdz",
+          "variant": "Paradise Bloom Blue",
+          "code": "RT40H28U2PBHL"
+        },
+        {
+          "name": "Paradise Bloom Purple",
+          "swatchColor": "#2f1f3a",
+          "usdz": "/models/usdz/samsung-rt40h28u2phl-paradise-bloom-purple.usdz",
+          "variant": "Paradise Bloom Purple",
+          "code": "RT40H28U2PRHL"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.277, 1.023, 0.151],
+              [0.277, 1.535, 0.33]
+            ],
+            "open": [
+              [0.208, 1.023, 0.214],
+              [0.548, 1.535, 0.755]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.197, 1.066, -0.054],
+              [-0.02, 1.238, 0.133]
+            ],
+            "open": [
+              [-0.197, 1.066, 0.066],
+              [-0.02, 1.238, 0.253]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.277, 0.051, 0.136],
+              [0.277, 1.011, 0.33]
+            ],
+            "open": [
+              [0.202, 0.051, 0.207],
+              [0.589, 1.011, 0.745]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.02, 0, 0.5],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.243, 0.078, -0.293],
+              [0.243, 0.988, 0.129]
+            ],
+            "open": [
+              [-0.263, 0.078, 0.207],
+              [0.223, 0.988, 0.629]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55.5 cm",
+        "h": "154.5 cm",
+        "d": "65.7 cm"
+      },
+      "sizeNote": "Samsung's manual lists 114.5 cm total depth and 81 cm total width with the doors open; Samsung's page rounds the height to 1.54 m",
+      "specs": [
+        ["Total capacity", "236 L (fridge 183 L, freezer 53 L)"],
+        ["Type", "Frost free, double door"],
+        ["Energy rating", "2 star, 229 units a year"],
+        ["Convertible", "2-in-1 Smart Conversion"],
+        ["Compressor", "Digital Inverter"],
+        ["Cooling", "All-Around Cooling, Power Cool, Power Freeze"],
+        ["Stabilizer free", "100-300 V"],
+        ["Shelves", "3 glass (fridge), 1 Cool Pack (freezer)"],
+        ["Extras", "Twist Ice Maker, Cool Pack, top LED light"],
+        ["Controls", "Internal display"],
+        ["Door", "Flat door, recessed handles"],
+        ["Colours", "Elegant Inox, Black DOI, Hydrangea Blue, Paradise Bloom Blue, Paradise Bloom Purple"],
+        ["Weight", "50 kg"],
+        ["Warranty", "1 year product, 10 years compressor"]
+      ],
+      "source": "https://www.samsung.com/in/refrigerators/double-door/convertible-double-door-refrigerator-236l-silver-rt40h28u2phl/",
+      "hotspots": [
+        {
+          "title": "Sleek & Modern Design",
+          "text": "Flat doors with a premium silver deco around the edge and recessed handles that don't protrude, so it fits seamlessly with your kitchen.",
+          "pos": [-0.16, 0.75, 0.3285],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "2-in-1 Smart Conversion",
+          "text": "Convert the freezer into a fridge to create up to 88 liters of space, so there's room for the fresh food you need for different seasons or occasions.",
+          "pos": [0, 1.4, -0.282],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Cool Pack",
+          "text": "A Cool Pack in the freezer stops food from defrosting if the power supply is cut, keeping it frozen for up to 12 hours.",
+          "pos": [0.12, 1.314, 0.142],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Power Cool / Power Freeze",
+          "text": "At the touch of a button, Power Cool blows intensely cold air into the fridge to quickly cool groceries or drinks; Power Freeze delivers a fast blast of cold air into the freezer.",
+          "pos": [0.2425, 0.73, 0.1185],
+          "normal": [-1, 0, 0],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 49,
+        "sides": 5,
+        "back": 5,
+        "note": "From Samsung's user manual for the RT40H28 series: at least 5 cm at each side, more than 5 cm behind it, and 114.5 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
+      }
+    }
+  ]
+}
