@@ -1,6 +1,7 @@
 // Static server for the demo site with the same rewrites as vercel.json: /p/<id> is p/<id>.html when
 // make_pages.mjs has written one (Vercel serves a file before it rewrites), otherwise product.html; an old link
-// under /ar-experience/, /id/ or /embed/ with no page of its own is the catalogue.
+// under /ar-experience/, /id/ or /embed/ with no page of its own is the catalogue; /compare and /showroom are
+// their pages (cleanUrls), and so is any address under them (/showroom/<id> opens with that product in front).
 // usage: node serve.mjs <siteDir> <port> [extraDir mounted at /__test]
 import http from "node:http";
 import fs from "node:fs";
@@ -18,6 +19,7 @@ http.createServer((req, res) => {
   if (extra && p.startsWith("/__test/")) { base = extra; p = p.slice(7); }
   else if (/^\/p\/[^/]+\/?$/.test(p)) { const own = `/p/${p.split("/")[2]}.html`; p = fs.existsSync(path.join(root, own)) ? own : "/product.html"; }
   else if (p === "/") p = "/index.html";
+  else if (/^\/(compare|showroom)\/[^.]*$/.test(p)) p = `/${p.split("/")[1]}.html`;
   else if (!path.extname(p) && fs.existsSync(path.join(root, p + ".html"))) p += ".html";
   else if (/^\/(ar-experience|id|embed)(\/|$)/.test(p) && !p.endsWith(".html")) p = "/index.html";
   const file = path.join(base, path.normalize(p));

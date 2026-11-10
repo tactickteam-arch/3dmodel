@@ -206,8 +206,8 @@ const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const AR = svg('<path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>');
 const TICK = svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>');
-// the compare and showroom pages aren't built yet: their entry points stay off until they are
-const READY = { compare: false, showroom: false };
+// the entry points to the compare page (/compare) and the 3D showroom (/showroom): false hides one
+const READY = { compare: true, showroom: true };
 $("roomText").textContent = `All ${products.length} products in one room. Open any door on your phone, or step inside on Meta Quest or Vision Pro.`;
 if (!READY.showroom) $("roomLink").remove();
 

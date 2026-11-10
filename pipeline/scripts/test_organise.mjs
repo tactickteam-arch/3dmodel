@@ -40,7 +40,9 @@ for (const id of targets) {
   console.log(`\n[${id}]`);
   await b.go(`${base}/p/${id}`);
   await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 60000);
-  await sleep(2500);
+  // waits until nothing is moving and the condition holds, instead of a fixed time, so a busy machine doesn't fail a check
+  const settle = (cond = "true", ms = 60000) => b.waitFor(`window.__demo.idle() && (${cond})`, ms);
+  await settle("!!window.__organise?.ready?.()", 30000);
   const ready = await b.evalJS("!!window.__organise?.ready?.()");
   check(ready, "the model has stock items and the Fill button is ready");
   if (!ready) continue;
@@ -51,7 +53,7 @@ for (const id of targets) {
   check(await b.evalJS("document.getElementById('part-organise').textContent.includes('Fill')"), "the button says Fill the fridge");
 
   await b.evalJS("document.getElementById('part-organise').click()");
-  await sleep(11000);
+  await settle("window.__organise.isFull()");
   const full1 = JSON.parse(await b.evalJS(`JSON.stringify(${snap})`));
   check(full1.every((r) => r[0] === 1), "after Fill: every item is visible");
   check(maxDiff(empty, full1) < 1e-5, `after Fill: every item is exactly in its place (max drift ${maxDiff(empty, full1).toExponential(1)} m)`);
@@ -62,20 +64,20 @@ for (const id of targets) {
   check(d.every((x) => x[2]), `after Fill: every part drawn as the page says (${d.map((x) => `${x[0]} ${Math.round(x[1] * 100)}%`).join(", ")})`);
 
   await b.evalJS("document.getElementById('part-organise').click()");
-  await sleep(9000);
+  await settle("!window.__organise.isFull()");
   const emptied = JSON.parse(await b.evalJS(`JSON.stringify(${snap})`));
   check(emptied.every((r) => r[0] === 0), "after Empty: every item hidden again");
   check(maxDiff(empty, emptied) < 1e-5, "after Empty: positions restored");
 
   await b.evalJS("document.getElementById('part-organise').click()");
-  await sleep(11000);
+  await settle("window.__organise.isFull()");
   const full2 = JSON.parse(await b.evalJS(`JSON.stringify(${snap})`));
   check(full2.every((r) => r[0] === 1) && maxDiff(empty, full2) < 1e-5, "second Fill gives the same result");
 
   // close and reopen the doors while full: the stock stays put
   for (const p of ["freezer", "fridge"]) {
-    await b.evalJS(`window.__demo.togglePart('${p}')`); await sleep(2200);
-    await b.evalJS(`window.__demo.togglePart('${p}')`); await sleep(2200);
+    await b.evalJS(`window.__demo.togglePart('${p}')`); await settle(`!('${p}' in window.__demo.state) || !window.__demo.state['${p}']`);
+    await b.evalJS(`window.__demo.togglePart('${p}')`); await settle(`!('${p}' in window.__demo.state) || window.__demo.state['${p}']`);
   }
   const full3 = JSON.parse(await b.evalJS(`JSON.stringify(${snap})`));
   check(full3.every((r) => r[0] === 1) && maxDiff(empty, full3) < 1e-5, "stock unchanged after closing and reopening the doors");

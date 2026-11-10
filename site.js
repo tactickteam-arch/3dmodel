@@ -10,6 +10,14 @@ export const CATEGORIES = [
   ["Air conditioner", "Air conditioners"],
 ];
 
+// A finish's address name, for ?finish=<slug>: "White and gold" -> "white-and-gold". make_pages.mjs and
+// pipeline/integration/make_links.mjs use it too, so a link they write opens the colour the page shows.
+export const finishSlug = (name) => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+// the finish a ?finish= value names, or the first one when it names none
+export const finishIndexOf = (product, slug) => Math.max(0, slug ? product.finishes.findIndex((f) => finishSlug(f.name) === finishSlug(slug)) : 0);
+// Sangeetha's Product ID at the end of a sangeetha.com address, or null
+export const productIdOf = (url) => String(url || "").match(/\/(\d+)\/?$/)?.[1] || null;
+
 // Each part carries its bounding box closed and open (`zone`, written by the builders).
 // A tap inside a box picks that part; where boxes overlap the smallest wins (a flap
 // inside a door). A tap just off every box picks the nearest; a tap on the cabinet's

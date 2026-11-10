@@ -129,5 +129,5 @@ export function initOrganise({ mv, product, state, togglePart, bar, toast }) {
   // in AR the fridge is shown full
   mv.addEventListener("ar-status", (e) => { if (items && e.detail?.status === "session-started" && !full) setFull(true); });
   if (mv.loaded) setup(); else mv.addEventListener("load", setup, { once: true });
-  return { fill: () => run(true), empty: () => run(false), isFull: () => full, ready: () => !!items, openingDoors: () => doors };
+  return { fill: () => run(true), empty: () => run(false), isFull: () => full, ready: () => !!items, openingDoors: () => doors, running: () => running };
 }

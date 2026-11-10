@@ -624,10 +624,11 @@ export function initRoom({ product, model, parts, onWall, toast, openButton }) {
     // a part inside another (the trays behind the fridge door): open the outer one first, and close the inner one before the outer
     const self = parts.find((x) => x.key === key);
     const outer = self?.needs && !S.open[key] && !S.open[self.needs] ? self.needs : null;
-    const inner = S.open[key] ? parts.find((x) => x.needs === key && S.open[x.key])?.key : null;
-    if (outer || inner) {
+    // every open part inside it shuts first (one door can hold both a freezer box's flap and the trays)
+    const first = outer ? [outer] : S.open[key] ? parts.filter((x) => x.needs === key && S.open[x.key]).map((x) => x.key) : [];
+    if (first.length) {
       S.chaining = true;
-      try { await togglePart(outer || inner); await new Promise((r) => setTimeout(r, 950)); } finally { if (S) S.chaining = false; }
+      try { for (const k of first) { if (!S) break; await togglePart(k); await new Promise((r) => setTimeout(r, 950)); } } finally { if (S) S.chaining = false; }
       if (!S || S.busy) return;
     }
     S.busy = true;

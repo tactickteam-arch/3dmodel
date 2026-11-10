@@ -50,9 +50,12 @@ for (const ev of ["Target.targetCreated", "Target.targetInfoChanged"]) b.on(ev, 
 await b.send("Target.setDiscoverTargets", { discover: true });
 await b.viewport(1366, 900, false);
 await b.go(host);
-await sleep(1500);
-const tree = await b.send("Page.getFrameTree");
-const child = tree.result.frameTree.childFrames?.[0]?.frame;
+// the frame can take a while to attach on a busy machine
+let child;
+for (let t = 0; t < 60 && !child?.url?.includes("/p/"); t++) {
+  child = (await b.send("Page.getFrameTree")).result.frameTree.childFrames?.[0]?.frame;
+  if (!child?.url?.includes("/p/")) await sleep(500);
+}
 check(!!child && child.url.includes(`/p/${id}?embed`) && new URL(child.url).origin !== new URL(host).origin, `the frame is on another origin (${child?.url})`);
 const world = await b.send("Page.createIsolatedWorld", { frameId: child.id, worldName: "t" });
 const ctx = world.result.executionContextId;

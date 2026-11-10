@@ -24,6 +24,14 @@
     {
       "source": "/embed/:path*",
       "destination": "/"
+    },
+    {
+      "source": "/showroom/:path+",
+      "destination": "/showroom"
+    },
+    {
+      "source": "/compare/:path+",
+      "destination": "/compare"
     }
   ],
   "headers": [
