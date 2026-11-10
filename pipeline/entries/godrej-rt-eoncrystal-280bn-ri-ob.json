@@ -1,0 +1,152 @@
+{
+  "products": [
+    {
+      "id": "godrej-rt-eoncrystal-280bn-ri-ob",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Refrigerator",
+      "model": "RT EONCRYSTAL 280BN RI OB",
+      "name": "Godrej Eon Crystal 244 L double-door refrigerator, Onyx Black glass",
+      "shortName": "244 L Eon Crystal glass-door refrigerator",
+      "summary": "Open the freezer and the fridge, slide the ice maker and the trays out, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/godrej-rt-eoncrystal-280bn-ri-ob.glb",
+      "thumb": "/photos/godrej-rt-eoncrystal-280bn-ri-ob/0.jpg",
+      "photos": ["/photos/godrej-rt-eoncrystal-280bn-ri-ob/0.jpg", "/photos/godrej-rt-eoncrystal-280bn-ri-ob/1.jpg", "/photos/godrej-rt-eoncrystal-280bn-ri-ob/2.jpg", "/photos/godrej-rt-eoncrystal-280bn-ri-ob/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-21deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Onyx Black",
+          "swatchColor": "#121315",
+          "usdz": "/models/usdz/godrej-rt-eoncrystal-280bn-ri-ob-onyx-black.usdz",
+          "code": "RT EONCRYSTAL 280BN RI OB"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.302, 1.101, 0.165],
+              [0.304, 1.57, 0.323]
+            ],
+            "open": [
+              [0.234, 1.101, 0.241],
+              [0.567, 1.57, 0.83]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [0.052, 1.277, -0.055],
+              [0.238, 1.42, 0.153]
+            ],
+            "open": [
+              [0.052, 1.277, 0.065],
+              [0.238, 1.42, 0.273]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.304, 0.042, 0.145],
+              [0.304, 1.087, 0.322]
+            ],
+            "open": [
+              [0.224, 0.042, 0.236],
+              [0.614, 1.087, 0.81]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.03, 0, 0.55],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.254, 0.115, -0.272],
+              [0.254, 1.003, 0.137]
+            ],
+            "open": [
+              [-0.284, 0.115, 0.278],
+              [0.224, 1.003, 0.687]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60.7 cm",
+        "h": "157 cm",
+        "d": "64.24 cm"
+      },
+      "sizeNote": "Godrej lists 1.57 m x 60.70 cm x 64.24 cm (H x W x D) and publishes no clearances or open-door depth for this model",
+      "specs": [
+        ["Total capacity", "244 L"],
+        ["Type", "Frost free, double door"],
+        ["Doors", "Toughened glass, Onyx Black"],
+        ["Energy rating", "2 star, 230 kWh energy consumption"],
+        ["Compressor", "Inverter, powered by AI"],
+        ["Refrigerant", "R600a"],
+        ["Shelves", "3, toughened glass"],
+        ["Cooling", "Patented Cool Shower Technology, Cool Balance Technology"],
+        ["Vegetable tray", "27 litres"],
+        ["Extras", "Movable Ice Maker, Nano Shield Technology, Wide Storage Shelf, Bright LED Prism Lens"],
+        ["Weight", "56 kg"],
+        ["Warranty", "1 year comprehensive, 10 years on the compressor"]
+      ],
+      "source": "https://www.godrejenterprises.com/home-appliances/refrigerators/double-door-frost-free/p/rt-eoncrystal-280-bn-ri-ob",
+      "hotspots": [
+        {
+          "title": "Powered by AI Tech",
+          "text": "Automatically optimizes cooling and energy consumption based on food load in refrigerator and door openings.",
+          "pos": [-0.17, 1.4, 0.3218],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Toughened glass door",
+          "text": "Presenting a modern and aesthetic design with an attractive toughened glass to elevate the look to your kitchen.",
+          "pos": [-0.17, 0.75, 0.3218],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Patented Cool Shower Technology",
+          "text": "Inbuilt air vents above shelves for uniform 360° cooling.",
+          "pos": [0, 0.99, -0.231],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "27 litre large vegetable tray",
+          "text": "This 27 litres large vegetable tray not only accommodates all your veggies, but also keeps it farm fresh for longer.",
+          "pos": [0.15, 0.24, 0.135],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}
