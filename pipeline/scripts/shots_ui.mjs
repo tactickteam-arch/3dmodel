@@ -15,7 +15,7 @@ await b.send("Page.addScriptToEvaluateOnNewDocument", { source: `
     DOMTokenList.prototype.supports = function (t) { return t === 'ar' ? true : orig.call(this, t); };
     HTMLAnchorElement.prototype.click = function () { if (this.rel === 'ar') window.__quickLook = this.href; };
   }` });
-const id = process.argv[4] || "godrej-rt-eonvogue-280c";
+const id = process.argv[4] || "lg-glt3426snpz";
 for (const [name, w, h, mobile] of [["iphone", 390, 844, true], ["android", 390, 844, true], ["desktop", 1440, 900, false]]) {
   await b.viewport(w, h, mobile, UA[name]);
   await b.go(`${base}/p/${id}`);

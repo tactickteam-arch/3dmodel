@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import { launch, sleep } from "./cdp.mjs";
 
-const [base, out, iwerPath, productId = "godrej-rt-eonvogue-280c"] = process.argv.slice(2);
+const [base, out, iwerPath, productId = "lg-glt3426snpz"] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
 const QUEST_UA = "Mozilla/5.0 (X11; Linux x86_64; Quest 3) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/35.2.0.4.53 SamsungBrowser/4.0 Chrome/128.0.6613.137 VR Safari/537.36";
 const report = [];

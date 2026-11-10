@@ -3,7 +3,7 @@ import { launch, sleep } from "./cdp.mjs";
 const [base, out] = process.argv.slice(2);
 const b = await launch({ profile: `${out}/prof2`, port: 9456 });
 await b.viewport(390, 844, true, "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36");
-for (const id of ["godrej-rt-eonvogue-280c", "godrej-sic-18vtc3-wyb"]) {
+for (const id of ["lg-glt3426snpz", "haier-hso52kucai3nb"]) {
   await b.go(`${base}/p/${id}`);
   await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 40000);
   await sleep(1200);
