@@ -23,7 +23,7 @@ import { THREE, mat, mesh, box, group, flipV, stateClips, exportGLB, productPart
 import { Food } from "./food.mjs";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "whirlpool-22461";
@@ -56,7 +56,9 @@ const fzFront = zDoor - dykeL - bDep - 0.01;   // the freezer's trays and drawer
 const HAIR = 0.1;                  // the hairline normal map's tile: 100 mm (lib.mjs GRAIN)
 const FZL = { x0: -xIn, x1: -div }, FZR = { x0: div, x1: xIn };
 // the finishes (tuned on the gate's renders against Whirlpool's photos, NOTES.md): glass is a deep base under a glass coat
-// (clear coat 1.0 at 0.05); Duo Noir's lower doors are dark brushed steel (no coat, rough 0.75)
+// (clear coat 1.0 at 0.05), the base with no reflection of its own (KHR_materials_specular 0: paint behind glass hardly
+// reflects; its soft reflection had lifted black glass from 9 to 44 straight on, Whirlpool's reads 5-17; the Apple files
+// do not carry it); Duo Noir's lower doors are dark brushed steel (no coat, rough 0.75)
 const GLASS = { metal: 0, rough: 0.6, coat: [1, 0.05] };
 const DARKSTEEL = { metal: 0.38, rough: 0.75 };
 
@@ -767,7 +769,9 @@ const FINISHES = [
   const lin = (c) => ((c / 255) <= 0.04045 ? c / 255 / 12.92 : Math.pow((c / 255 + 0.055) / 1.055, 2.4));
   const vs = FINISHES.map(([n]) => ext.createVariant(n));
   const cc = doc.createExtension(KHRMaterialsClearcoat);
-  const coat = (m, [f, r]) => m.setExtension("KHR_materials_clearcoat", cc.createClearcoat().setClearcoatFactor(f).setClearcoatRoughnessFactor(r));
+  const sp = doc.createExtension(KHRMaterialsSpecular);
+  const coat = (m, [f, r]) => m.setExtension("KHR_materials_clearcoat", cc.createClearcoat().setClearcoatFactor(f).setClearcoatRoughnessFactor(r))
+    .setExtension("KHR_materials_specular", sp.createSpecular().setSpecularFactor(0));
   coat(doc.getRoot().listMaterials().find((m) => m.getName() === "DoorUpper"), GLASS.coat);
   const mats = doc.getRoot().listMaterials(), alt = {}, texCache = new Map();
   const texOf = (file) => {

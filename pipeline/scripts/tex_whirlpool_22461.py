@@ -12,8 +12,8 @@ Writes pipeline/tex/whirlpool_22461/:
                                      the gold swoosh as Whirlpool's photos show it
   mark_6th.png, mark_6th_ai.png      the 6th Sense mark at the left fridge door's top left; Verde Cristallo and Nero Bianco
                                      carry it with the "AI" badge (their size pictures)
-  ui.jpg                             the Door UI display on the left fridge door's free edge, redrawn at 7.2 px/mm from
-                                     Whirlpool's close-up ("100+ customisable modes")
+  ui.jpg                             the Door UI display on the left fridge door's free edge, redrawn at 14.4 px/mm from
+                                     Whirlpool's close-up ("100+ customisable modes"), no chroma subsampling
   panel360_white.jpg, panel360_steel.jpg   the 360 Triple Cooling panel on the back wall: white (Duo Noir, Nero Quartz),
                                      brushed steel (Verde Cristallo, Nero Bianco)
   print_crisper.png, print_fzdrawer.png, print_arctic.png  the drawer prints from the open view
@@ -337,6 +337,7 @@ def mark_6th(ai):
 # 1385 to 1633 mm; the close-up gives its layout). Positions in mm from the display's top left. Every word is legible
 # on the close-up; the item at the display's foot in the open view (about 224 mm down) cannot be read and is left out ──
 UI_W, UI_H = 60, 248
+UI_PX_MM = 14.4     # twice the other prints: the mode words are 2.1 mm capitals, 30 px tall here (7.2 px/mm left them soft close up)
 WHITE = (236, 236, 240)
 DIM = (150, 150, 156)
 BG = (9, 9, 10)
@@ -372,12 +373,12 @@ class Canvas:
     def line(self, pts, width=0.35, colour=WHITE):
         self.d.line([(x * self.k, y * self.k) for x, y in pts], fill=colour, width=max(1, int(width * self.k)))
 
-    def save(self, name, final_k=PX_MM, q=90):
+    def save(self, name, final_k=PX_MM, q=90, sub=-1):
         im = self.img.resize((int(self.img.width * final_k / self.k), int(self.img.height * final_k / self.k)), Image.LANCZOS)
         if name.endswith(".png"):
             im.save(os.path.join(OUT, name), optimize=True)
         else:
-            im.save(os.path.join(OUT, name), quality=q, optimize=True)
+            im.save(os.path.join(OUT, name), quality=q, optimize=True, subsampling=sub)
         print(name, im.width, "x", im.height)
 
 
@@ -399,7 +400,7 @@ def seg7(c, x, y, w, h, digits):
 def door_ui():
     # the close-up's layout (its print is 235 px across for the display's width and 440 px from "Auto Mode" to the foot of
     # "-22", which the open view gives as 123 mm): 0.255 mm per px across, 0.28 down, "Auto Mode" 31 mm from the top
-    c = Canvas(UI_W, UI_H)
+    c = Canvas(UI_W, UI_H, k=UI_PX_MM * 3)
     sx, sy = 60 / 235, 0.28
     X = lambda px: (px - 215) * sx
     Y = lambda py: 31 + (py - 211) * sy
@@ -447,7 +448,7 @@ def door_ui():
     c.text("TEMP.", DEMI, 2.1, X(384), Y(578))
     c.text("CONTROL", DEMI, 2.1, X(384), Y(593))
     seg7(c, X(246), Y(598), 5.2, 13.0, "-22")
-    c.save("ui.jpg")
+    c.save("ui.jpg", final_k=UI_PX_MM, q=92, sub=0)
 
 
 # ── the 360 Triple Cooling panel: 351 x 619 mm; "360°" 62 x 32 mm, 63 mm down; "TRIPLE COOLING" 179 mm wide, 5 mm
