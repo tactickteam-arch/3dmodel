@@ -13,7 +13,7 @@
 import fs from "node:fs";
 import { THREE, mat, mesh, box, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { Food } from "./food.mjs";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { mergeGeometries, mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS, KHRMaterialsVariants } from "@gltf-transform/extensions";
 
@@ -53,8 +53,9 @@ const BINS = {
   FridgeDoor: { d: 0.095, at: [[1.606, 0.07], [1.297, 0.1], [0.925, 0.1], [0.556, 0.1], [0.179, 0.1]] },
 };
 const fzFront = linerFace - BINS.FreezerDoor.d - 0.01, frFront = linerFace - BINS.FridgeDoor.d - 0.01;
-// the grip slots: 345 to 1000 mm up (three-quarter photos), 15 mm wide, 22 mm deep
-const slotY = [0.345 - yD0, 1.0 - yD0], slotZ = [zF - 0.022, zF - 0.007], slotD = 0.022;
+// the grip slots, with rounded ends: 494 to 1091 mm up (both three-quarter photos at the doors' front corners, 0.57 px per
+// mm: rows 476-817 of g05 and 472-812 of g02 between door tops at 105/98 and bottoms at 1088/1085), 15 mm wide, 22 mm deep
+const slotY = [0.494 - yD0, 1.091 - yD0], slotZ = [zF - 0.022, zF - 0.007], slotD = 0.022;
 // the display: a black glass panel on the step, from the door's top down to 1319 mm at its left and 1263 mm at its right
 const dispL = 1.319, dispR = 1.263;
 
@@ -161,26 +162,48 @@ for (const s of [-1, 1]) {
   const [bx0, bx1] = rp.topbox;
   cab.add(span("TopBox", bx0, bx1, yTop, H - 0.003, zBack + 0.004, zBack + 0.16, boxM));
   cab.add(span("TopBoxLid", bx0 + 0.004, bx1 - 0.004, H - 0.003, H, zBack + 0.008, zBack + 0.156, boxM));
-  // the cord leaves the box's top and lies in a loop on it (rear photo: x +18 to +77 mm); from there it runs forward over the
-  // box's front edge to the plug on the top (ESTIMATED: Haier shows no more of it)
-  const cx = rp.cord_exit, cf = rp.cord_far, px = -0.06, pz = zBack + 0.2;
-  // (sunk 2 mm into the lid, so that RealityKit's height stays within 3.5 mm of Haier's 1775)
-  const yc = H - 0.002, pts = [[cx, H - 0.007, zBack + 0.02], [cx + 0.006, yc, zBack + 0.016], [(cx + cf) / 2, yc, zBack + 0.012], [cf, yc, zBack + 0.024],
-    [cf - 0.014, yc, zBack + 0.042], [cx + 0.01, yc, zBack + 0.065], [cx - 0.02, yc, zBack + 0.1], [-0.03, yc, zBack + 0.142],
-    [-0.042, H - 0.008, zBack + 0.165], [-0.05, yTop + 0.012, zBack + 0.176], [px + 0.035, yTop + 0.004, pz - 0.032], [px, yTop + 0.006, pz - 0.024]].map(([x, y, z]) => new THREE.Vector3(x, y, z));
-  cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), 80, 0.004, 6, false), cordM));
-  // India's three-pin plug (45 x 42 x 16 mm, pins 5.2 mm) lying on its back, pins up
+  // the cord: Haier's rear photo shows it leaving the box at x +23 mm and lying in a loop on the box's top to x +77 mm.
+  // Lying there it showed over the box in the front and three-quarter views (the page's camera is above the top), which our
+  // rule for cords rules out, so (as on Haier's HRT-683) it leaves the back panel by a white grommet 12 mm under the cabinet's
+  // top at x +23 mm, runs along the back to x +77 mm 1.5 mm off the panel, drops, and swings in to a three-pin plug hung flat
+  // on the back near the centre line, 0.95 m up (ESTIMATED: Haier shows nothing past the box). Below the top and near the
+  // centre, the cord (9.5 mm proud) and the plug (17 mm) stay hidden behind the cabinet in the side views.
+  const cx = rp.cord_exit, cf = rp.cord_far, cr = 0.004, yc = yTop - 0.012, zc = zBack - cr - 0.0015;
+  const grom = cyl("Grommet", 0.007, 0.007, 0.003, white, cx, yc, zBack - 0.0013, 12);
+  grom.rotation.x = Math.PI / 2;
+  cab.add(grom);
+  const px = 0.04, py = 0.95, zPlate = zBack - 0.0002;
+  const pts = [[cx, yc, zBack + 0.004], [cx, yc, zBack - 0.002], [cx + 0.02, yc, zc], [cf - 0.012, yc, zc],
+    [cf, yc - 0.025, zc], [cf, yTop - 0.12, zc], [cf - 0.004, 1.32, zc], [cf - 0.02, 1.14, zc], [px + 0.02, py + 0.10, zc],
+    [px + 0.004, py + 0.045, zc], [px, py + 0.024, zc]].map(([x, y, z]) => new THREE.Vector3(x, y, z));
+  cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), 90, cr, 6, false), cordM));
+  // India's three-pin plug (45 x 42 x 16 mm, pins 5.2 mm) hung flat on the back, the cord into its top, its pins at (0, +10.5)
+  // and (+-9.5, -6.5) mm turned to the panel: pointing out, they stood 33 mm off the back and showed past the cabinet in the
+  // side view; this way the plug stands 17 mm off, within what the cabinet hides
   const s = new THREE.Shape(), w = 0.045, h = 0.042, r = 0.012;
   s.moveTo(-w / 2 + r, -h / 2); s.lineTo(w / 2 - r, -h / 2); s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
   s.lineTo(w / 2, h / 2 - r); s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2); s.lineTo(-w / 2 + r, h / 2);
   s.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); s.lineTo(-w / 2, -h / 2 + r); s.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
-  const plugG = new THREE.ExtrudeGeometry(s, { depth: 0.016, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002, bevelSegments: 2, curveSegments: 8 }).rotateX(-Math.PI / 2);
-  cab.add(mesh("Plug", plugG, plugM, px, yTop + 0.0021, pz));
-  for (const [dx, dy] of [[0, 0.0105], [-0.0095, -0.0065], [0.0095, -0.0065]]) cab.add(cyl("PlugPin", 0.0026, 0.0026, 0.016, pinM, px + dx, yTop + 0.0021 + 0.018 + 0.008, pz - dy, 10));
+  const plugG = new THREE.ExtrudeGeometry(s, { depth: 0.013, bevelEnabled: true, bevelSize: 0.0015, bevelThickness: 0.0015, bevelSegments: 2, curveSegments: 8 });
+  const plug = mesh("Plug", plugG, plugM, px, py, zPlate - 0.0015);
+  plug.rotation.y = Math.PI;
+  cab.add(plug);
+  for (const [dx, dy] of [[0, 0.0105], [-0.0095, -0.0065], [0.0095, -0.0065]]) cab.add(cyl("PlugPin", 0.0026, 0.0026, 0.016, pinM, px + dx, py + dy, zPlate + 0.007, 10).rotateX(Math.PI / 2));
 }
 // hinges: silver moulded covers on the top's outer front corners (3/4 photos), black feet at the front, rollers behind
 for (const s of [-1, 1]) {
-  cab.add(span("HingeCover", s > 0 ? xo - 0.085 : -xo + 0.002, s > 0 ? xo - 0.002 : -xo + 0.085, yTop, 1.764, zCab - 0.075, zDb - 0.002, hingeM));
+  // the cover's side profile as the 3/4 photos show it: a rounded hump falling away to the back, with the hinge pin's cap a
+  // small upright tab at its inner front corner (shape ESTIMATED from g02/g05; height 1764 mm as before)
+  {
+    const zf = zDb - 0.002, zb = zCab - 0.075, yT = 1.764, u = (z) => -z, hc = new THREE.Shape();
+    hc.moveTo(u(zf), yTop); hc.lineTo(u(zf), yT - 0.004); hc.quadraticCurveTo(u(zf), yT, u(zf) + 0.004, yT);
+    hc.lineTo(u(zf) + 0.022, yT); hc.bezierCurveTo(u(zf) + 0.05, yT, u(zb) - 0.004, yTop + 0.016, u(zb), yTop + 0.006);
+    hc.lineTo(u(zb), yTop); hc.lineTo(u(zf), yTop);
+    const xa = s > 0 ? xo - 0.085 : -xo + 0.002;
+    cab.add(mesh("HingeCover", new THREE.ExtrudeGeometry(hc, { depth: 0.083, bevelEnabled: false, curveSegments: 10 }).rotateY(Math.PI / 2).translate(xa, 0, 0), hingeM));
+    const xt = s > 0 ? xo - 0.085 : -xo + 0.075;
+    cab.add(span("HingeCap", xt, xt + 0.01, yT - 0.004, yD1 + 0.024, zf - 0.012, zf - 0.003, hingeM));
+  }
   cab.add(span("HingeLow", s > 0 ? xo - 0.06 : -xo + 0.004, s > 0 ? xo - 0.004 : -xo + 0.06, 0.008, yD0 - 0.002, zCab - 0.03, zPiv + 0.012, footM));
   cab.add(cyl("FootFront", 0.017, 0.018, yBot, footM, s * (xo - 0.045), yBot / 2, zCab - 0.04, 16));
   cab.add(cyl("Roller", 0.0115, 0.0115, 0.016, footM, s * (xo - 0.04), 0.0115, zBack + 0.07, 14).rotateZ(Math.PI / 2));
@@ -525,22 +548,65 @@ const at = (o, x, z) => { o.position.x = x; o.position.z = z; return o; };
 }
 
 // ── doors: the freezer hinged on the left, the fridge on the right ──
+// a non-indexed geometry's triangles sorted into material groups by pick(group, centroid) -> material index
+function regroup(geo, pick) {
+  const src = geo.attributes, n = src.position.count / 3, groups = geo.groups.length ? geo.groups : [{ start: 0, count: n * 3, materialIndex: 0 }];
+  const tri = [];
+  for (const gr of groups) for (let t = gr.start / 3; t < (gr.start + gr.count) / 3; t++) {
+    const c = new THREE.Vector3();
+    for (let k = 0; k < 3; k++) c.add(new THREE.Vector3().fromBufferAttribute(src.position, 3 * t + k));
+    tri.push([pick(gr.materialIndex, c.multiplyScalar(1 / 3)), t]);
+  }
+  tri.sort((a, b) => a[0] - b[0]);
+  const out = new THREE.BufferGeometry();
+  for (const [k, a] of Object.entries(src)) {
+    const arr = new a.array.constructor(a.array.length);
+    tri.forEach(([, t], i) => arr.set(a.array.subarray(3 * t * a.itemSize, 3 * (t + 1) * a.itemSize), 3 * i * a.itemSize));
+    out.setAttribute(k, new THREE.BufferAttribute(arr, a.itemSize));
+  }
+  let s = 0;
+  while (s < tri.length) { let e = s; while (e < tri.length && tri[e][0] === tri[s][0]) e++; out.addGroup(3 * s, 3 * (e - s), tri[s][0]); s = e; }
+  return out;
+}
 // a door body from x0 to x1 (door space), with a grip slot in its x1 side (sx 1) or x0 side (sx -1); the photo on its front
-// spans u0 to u1 and the door's height
+// spans u0 to u1 and the door's height. The face is one 5 mm skin across the whole door, so no joint runs down it (a joint
+// between two boxes on the face showed the dark slot walls through it as a 1-pixel line); behind it the body and the side
+// strip, the strip cut through by the slot (a hole with rounded ends, as both 3/4 photos show), its walls dark
 function body(g, name, x0, x1, sx, F, u0, u1) {
-  const [ys0, ys1] = slotY, [zs0, zs1] = slotZ, h = doorH, E = doorEdge, R = recess, Bk = doorBack;
+  const [ys0, ys1] = slotY, [zs0, zs1] = slotZ, h = doorH, E = doorEdge, R = recess, Bk = doorBack, tS = 0.005;
   const xs = sx > 0 ? x1 - slotD : x0 + slotD;
-  const [mx0, mx1] = sx > 0 ? [x0, xs] : [xs, x1];
-  const [ex0, ex1] = sx > 0 ? [xs, x1] : [x0, xs];
-  const lr = (outer, inner) => (sx > 0 ? [outer, inner] : [inner, outer]);
-  const pieces = [
-    span(name + "Body", mx0, mx1, 0, h, zB, zF, [...(sx > 0 ? [R, E] : [E, R]), E, E, F, Bk]),
-    span(name + "EdgeLow", ex0, ex1, 0, ys0, zB, zF, [...lr(E, R), R, E, F, Bk]),
-    span(name + "EdgeHigh", ex0, ex1, ys1, h, zB, zF, [...lr(E, R), E, R, F, Bk]),
-    span(name + "EdgeFront", ex0, ex1, ys0, ys1, zs1, zF, [...lr(E, R), R, R, F, R]),
-    span(name + "EdgeBack", ex0, ex1, ys0, ys1, zB, zs0, [...lr(E, R), R, R, R, Bk]),
-  ];
-  for (const m of pieces) g.add(frontUV(m, u0, u1, h, 0));
+  const [bx0, bx1] = sx > 0 ? [x0, xs] : [xs, x1];
+  const ex0 = sx > 0 ? xs : x0;
+  g.add(frontUV(span(name + "Face", x0, x1, 0, h, zF - tS, zF, [E, E, E, E, F, E]), u0, u1, h, 0));
+  // (its face to the strip is DoorEdge too, the slot's floor: headless Chrome's software renderer lets edge-on faces behind a
+  // closed door win a sample, and a dark face there drew a dark line down the door)
+  g.add(span(name + "Body", bx0, bx1, 0, h, zB, zF - tS, [E, E, E, E, E, Bk]));
+  // the strip's outline in (u = -z, y), the slot a hole in it, extruded across x
+  const r = (zs1 - zs0) / 2, uA = -zs1, uB = -zs0, uc = (uA + uB) / 2;
+  const sh = new THREE.Shape();
+  sh.moveTo(-(zF - tS), 0); sh.lineTo(-zB, 0); sh.lineTo(-zB, h); sh.lineTo(-(zF - tS), h); sh.lineTo(-(zF - tS), 0);
+  const hole = new THREE.Path();
+  hole.moveTo(uA, ys0 + r); hole.lineTo(uA, ys1 - r); hole.absarc(uc, ys1 - r, r, Math.PI, 0, true);
+  hole.lineTo(uB, ys0 + r); hole.absarc(uc, ys0 + r, r, 0, Math.PI, true);
+  sh.holes.push(hole);
+  let geo = new THREE.ExtrudeGeometry(sh, { depth: slotD, bevelEnabled: false, curveSegments: 10 }).rotateY(Math.PI / 2).translate(ex0, 0, 0);
+  // caps (the side face and the inner face) DoorEdge; walls: the back DoorLiner, the slot Recess, the rest DoorEdge
+  geo = regroup(geo, (gi, c) => (gi === 0 ? 0 : Math.abs(c.z - zB) < 1e-5 ? 1 : c.z > zs0 - 1e-4 && c.z < zs1 + 1e-4 && c.y > ys0 - 1e-4 && c.y < ys1 + 1e-4 ? 2 : 0));
+  g.add(mesh(name + "SlotSide", geo, [E, Bk, R]));
+}
+// a door's moulded liner block, x0..x1, y0..y1 at the door's back (zb), its face at zl inset by d on every side (a moulding's
+// draft, as the HRT-683): square sides sat edge-on to the straight-on camera, and headless Chrome's software renderer let some
+// of their samples through the closed door as thin light lines
+function linerBlock(name, x0, x1, y0, y1, zl, zb, d, m) {
+  const A = [[x0 + d, y0 + d, zl], [x1 - d, y0 + d, zl], [x1 - d, y1 - d, zl], [x0 + d, y1 - d, zl]], Bq = [[x0, y0, zb], [x1, y0, zb], [x1, y1, zb], [x0, y1, zb]];
+  const quads = [[A[1], A[0], A[3], A[2]], [A[0], A[1], Bq[1], Bq[0]], [A[1], A[2], Bq[2], Bq[1]], [A[2], A[3], Bq[3], Bq[2]], [A[3], A[0], Bq[0], Bq[3]]];
+  const pos = [];
+  for (const [a, b, c, e] of quads) pos.push(...a, ...b, ...c, ...a, ...c, ...e);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute("uv", new THREE.Float32BufferAttribute(new Array((pos.length / 3) * 2).fill(0), 2));
+  geo.computeVertexNormals();
+  return mesh(name, geo, m);
 }
 // the gasket round the opening, the liner block inside it and the bins standing on the liner's face (door space)
 function doorInside(g, name, c) {
@@ -550,7 +616,7 @@ function doorInside(g, name, c) {
   g.add(span(name + "GasketB", ox0, ox1, oy0, y0, zg0, zB, gasket));
   g.add(span(name + "GasketL", ox0, L(c.x0), y0, y1, zg0, zB, gasket));
   g.add(span(name + "GasketR", L(c.x1), ox1, y0, y1, zg0, zB, gasket));
-  g.add(span(name + "Liner", L(c.x0) + 0.004, L(c.x1) - 0.004, y0 + 0.004, y1 - 0.004, zl, zB, doorBack));
+  g.add(linerBlock(name + "Liner", L(c.x0) + 0.004, L(c.x1) - 0.004, y0 + 0.004, y1 - 0.004, zl, zB, 0.008, doorBack));
   const B = BINS[name], bx0 = L(c.x0) + 0.016, bx1 = L(c.x1) - 0.016, out = [];
   B.at.forEach(([fy, h], i) => {
     const f = fy - yD0, za = zl, zb = zl - B.d;
@@ -595,7 +661,8 @@ const fridgeDoor = group("FridgeDoor", pivX, yD0, zPiv);
   fridgeDoor.add(mesh("DisplayGlass", new THREE.ExtrudeGeometry(sh, { depth: 0.002, bevelEnabled: false, curveSegments: 1 }), [dispM, dispM], 0, 0, zStep));
   fridgeDoor.add(plane("DisplayPrint", 0.043, 0.216, printDisp, (a + b) / 2, doorH - 0.248, zStep + 0.0027));
   // the Haier wordmark top right (front photo: 78 mm wide, centred 367 mm right of the middle and 1675 mm up)
-  fridgeDoor.add(plane("HaierMarkDecal", 0.078, 0.078 / 3.249, logoM, L(0.3667), 1.6748 - yD0, zF + 0.0007));
+  // (logo.png carries 6 clear pixels round the 562 x 173 px ink, so the plane is that much larger)
+  fridgeDoor.add(plane("HaierMarkDecal", 0.078 * 574 / 562, 0.078 / 3.249 * 185 / 173, logoM, L(0.3667), 1.6748 - yD0, zF + 0.0007));
   const bins = doorInside(fridgeDoor, "FridgeDoor", FR);
   row(fridgeDoor, bins[0], [eggTray("EggTray", 8)]);
   row(fridgeDoor, bins[1], [brandJar("MothersPickle", "mothers_mango_pickle", 0.036, 0.07, K.jarGreen, K.goldLid), brandJar("MothersPickle2", "mothers_mango_pickle", 0.036, 0.07, K.jarGreen, K.goldLid),
@@ -609,6 +676,16 @@ const fridgeDoor = group("FridgeDoor", pivX, yD0, zPiv);
 }
 root.add(freezerDoor, fridgeDoor);
 
+// every mesh written without an index (the extruded and stock shapes) gets one, its repeated corners shared: the same
+// triangles, normals and texture places, in less of the file (as the Samsung RS76CG8113)
+{
+  const done = new Map();
+  root.traverse((o) => {
+    if (!o.isMesh || o.geometry.index) return;
+    if (!done.has(o.geometry)) done.set(o.geometry, mergeVertices(o.geometry, 1e-6));
+    o.geometry = done.get(o.geometry);
+  });
+}
 const parts = productParts(PRODUCTS, ID);
 // what a slide may travel with its door open (the LG 650 L's check): points 1 cm apart through every mesh of the open door,
 // tested against each sliding mesh's box

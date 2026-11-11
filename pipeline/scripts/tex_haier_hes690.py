@@ -141,6 +141,10 @@ def logo():
     al = al.resize((w, round(al.height * w / al.width)), Image.LANCZOS)
     out = Image.new("RGBA", al.size, (240, 242, 246, 0))
     out.putalpha(al)
+    # 6 clear pixels round the ink: with the ink on the image's edge, the texture's wrap pulled the H's stem in next to the r
+    pad = Image.new("RGBA", (out.width + 12, out.height + 12), (240, 242, 246, 0))
+    pad.paste(out, (6, 6))
+    out = pad
     save(out, "logo.png")
     print("logo aspect", round(al.width / al.height, 3))
 

@@ -123,10 +123,14 @@ for (const id of ids) {
   await sleep(800);
   if (await b.evalJS("Object.values(window.__demo.state).some(Boolean)")) await b.evalJS("document.querySelectorAll('#parts button').forEach((x) => x.textContent.startsWith('Close') && x.click())");
   await reset(); await sleep(800); // find the spots from the view the double-clicks start from
-  const pts = JSON.parse(await b.evalJS(`(() => { const mv = document.querySelector('model-viewer'); const r = mv.getBoundingClientRect(), c = mv.getBoundingBoxCenter(), out = {};
+  // as closeUp() in product.html, a spot counts as the front or a side only within 8 cm of the box's own face, so
+  // a side-facing step inside a door near the middle (Haier HES-690GK) isn't taken for the side
+  const pts = JSON.parse(await b.evalJS(`(() => { const mv = document.querySelector('model-viewer'); const r = mv.getBoundingClientRect(), c = mv.getBoundingBoxCenter(), d = mv.getDimensions(), out = {};
     for (let fy = 0.2; fy < 0.85; fy += 0.025) for (let fx = 0.2; fx < 0.8; fx += 0.0125) {
       const x = r.x + r.width * fx, y = r.y + r.height * fy, h = mv.positionAndNormalFromPoint(x, y); if (!h) continue;
       const k = h.normal.z > 0.97 ? 'front' : Math.abs(h.normal.x) > 0.97 ? 'side' : null; if (!k) continue;
+      const ax = k === 'front' ? 'z' : 'x';
+      if (Math.abs(h.position[ax] - (c[ax] + Math.sign(h.normal[ax]) * d[ax] / 2)) >= 0.08) continue;
       const score = Math.abs(h.position.y - c.y);
       if (!out[k] || score < out[k].score) out[k] = { x, y, score, nx: h.normal.x };
     } return JSON.stringify(out); })()`));
