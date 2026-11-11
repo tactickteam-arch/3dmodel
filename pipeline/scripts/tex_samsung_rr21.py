@@ -63,10 +63,20 @@ DOOR_W, DOOR_BOT, DOOR_TOP = 565.0, 155.0, 1320.0
 DOOR_H = DOOR_TOP - DOOR_BOT
 DW, DH = 512, 1056
 # features, in mm from the door's left edge (u) and down from its top (v), measured on the nine fronts at 1.0 px per mm
-HANDLE = (0, 222, 565, 287)     # the H-bar: its chrome face rows 388-417 and the dark underside to row 436, with margin
+HANDLE = (0, 222, 565, 280)     # the H-bar: its chrome face rows 388-417 and the dark underside to row 436 (276 mm), with
+                                # margin; to 287 mm it cut through Midnight Blossom Blue's petal tip, and the inpaint drew
+                                # that tip up as a light streak under the handle
 LOCK = (50.0, 488.0, 11.0, 28.0)  # the key lock: centre u, v; half width, half height (17 x 50 mm pill, rows 624-673)
 MARK = (240, 88, 326, 110)      # SAMSUNG: ink x 990-1062, rows 251-263 (72 mm wide, middle 98 mm below the top)
-BADGE = (425, 30, 548, 135)     # the warranty sticker (Camellia Purple and Camelia Blue fronts only)
+# Midnight Blossom Blue's wordmark sits higher: ink rows 1271-1280 at 1.0 px per mm (49-58 mm down, middle 53.5 mm) on its
+# front and on its label photo alike; the builder puts its decal there
+MARK_AT = {"midnight_blossom_blue": 53.5}
+def mark_box(slug):
+    d = MARK_AT.get(slug, 98.0) - 98.0
+    return (MARK[0], MARK[1] + d, MARK[2], MARK[3] + d)
+BADGE = (448, 14, 536, 84)      # the warranty sticker (Camellia Purple and Camelia Blue fronts only): its black ink
+                                # spans x 1203-1260, rows 198-244 (u 463-521, v 25-72 mm); the old box started 5 mm
+                                # under its top edge, and the inpaint carried that black down into a smudge
 EDGE = 30                       # the door's rounded sides: the photo's highlight bands over the outer 30 mm
 TOPBAND = 45                    # and the crown's over the top 45 mm
 # the viewer's light lifts the print: each door is saved at SHADE of its photo, tuned so the door against
@@ -74,6 +84,7 @@ TOPBAND = 45                    # and the crown's over the top 45 mm
 SHADE = {"begonia_red": 0.851, "begonia_blue": 0.877, "camellia_purple": 0.797, "camelia_blue": 0.813,
          "paradise_bloom_blue": 0.793, "midnight_blossom_blue": 0.826, "hydrangea_blue": 0.753, "hydrangea_plum": 0.714,
          "paradise_bloom_purple": 0.832, "wild_lily_blue": 0.856, "elegant_inox": 0.90}
+STAND_SHADE = 0.80
 colours = {}
 
 
@@ -185,11 +196,17 @@ def doors():
         r0, r1 = int(round(rows_mm(g, DOOR_TOP))), int(round(rows_mm(g, DOOR_BOT)))
         c = a[r0:r1, g["x0"]:g["x1"] + 1]
         c = cv2.resize(c, (DW, DH), interpolation=cv2.INTER_AREA)
-        # the rounded top corners: the photo's white there is filled from the door beside it
+        # the rounded top corners (50 mm in the front view, as the builder's door): what lies outside the arc, 5 mm
+        # in (the photo's dark rim round the corner), is filled from the door beside it. A "whiter than 200" test took in the Elegant Inox's own light steel
+        # by the corner and painted a white wedge there.
         corner = np.zeros((DH, DW), bool)
-        k = int(70 / DOOR_H * DH)
-        corner[:k] = c[:k].min(2) > 200
-        out = corner | mm_box(HANDLE) | lock_mask() | mm_box((MARK[0] - 4, MARK[1] - 4, MARK[2] + 4, MARK[3] + 4))
+        rc, sx, sy = 50.0, DOOR_W / DW, DOOR_H / DH
+        yy, xx = np.mgrid[0:DH, 0:DW].astype(np.float32)
+        um, vm = (xx + 0.5) * sx, (yy + 0.5) * sy
+        for cxm, side in ((rc, um < rc), (DOOR_W - rc, um > DOOR_W - rc)):
+            corner |= side & (vm < rc) & (np.hypot(um - cxm, vm - rc) > rc - 5.0)
+        MK = mark_box(slug)
+        out = corner | mm_box(HANDLE) | lock_mask() | mm_box((MK[0] - 4, MK[1] - 4, MK[2] + 4, MK[3] + 4))
         if suf in ("cr", "cu"):
             out |= mm_box(BADGE)
         keep = ~cv2.dilate(out.astype(np.uint8), np.ones((9, 9), np.uint8)).astype(bool)
@@ -211,9 +228,11 @@ def doors():
         s = cv2.resize(a[s0:s1, g["x0"]:g["x1"] + 1], (DW, 128), interpolation=cv2.INTER_AREA)
         sm = np.median(s[80:120].reshape(-1, 3), 0)
         colours.setdefault("stand", {})[slug] = "#%02x%02x%02x" % tuple(int(v) for v in sm)
-        save(Image.fromarray(np.clip(s, 0, 255).astype(np.uint8)), f"stand_{slug}.jpg", 84)
+        # the stand's front is a photo too, so the viewer's light lifts it as it lifts the door: saved unshaded it read
+        # 1.32-1.34 x the photo straight on (the door 1.06-1.22), so it takes STAND_SHADE
+        save(Image.fromarray(np.clip(s * STAND_SHADE, 0, 255).astype(np.uint8)), f"stand_{slug}.jpg", 84)
         # the SAMSUNG mark's ink: the brightest (prints) or darkest (steel) tenth of its box on the photo
-        mb = a[int(rows_mm(g, DOOR_TOP - MARK[1])):int(rows_mm(g, DOOR_TOP - MARK[3])), int(cols_mm(g, MARK[0])):int(cols_mm(g, MARK[2]))].reshape(-1, 3)
+        mb = a[int(rows_mm(g, DOOR_TOP - MK[1])):int(rows_mm(g, DOOR_TOP - MK[3])), int(cols_mm(g, MK[0])):int(cols_mm(g, MK[2]))].reshape(-1, 3)
         L = mb.mean(1)
         light = slug != "elegant_inox"
         ink = mb[L >= np.percentile(L, 92)] if light else mb[L <= np.percentile(L, 8)]
@@ -232,7 +251,9 @@ def mark():
     a = np.asarray(lg).astype(float)
     inks = colours["mark_ink"]
     light = np.mean([v for k, v in inks.items() if k != "elegant_inox"], 0)
-    for name, col in (("light", light), ("dark", inks["elegant_inox"])):
+    # the dark ink is the photo's darkest tenth, but the viewer's light lifts a dark decal on bright steel: at the photo's
+    # own ink the mark read 0.79 of the steel round it (4 deg close-up) against the photo's 0.57, so it is laid at 0.7
+    for name, col in (("light", light), ("dark", [v * 0.7 for v in inks["elegant_inox"]])):
         col = tuple(int(round(v)) for v in col)
         out = np.zeros(a.shape, np.uint8)
         out[..., :3] = col
@@ -275,8 +296,9 @@ def label():
     CODE = (196, 1008, 430, 1052)
     cream = np.median(rgb[960:1000, 120:600].reshape(-1, 3), 0)
     rgb[CODE[1]:CODE[3], CODE[0]:CODE[2]] = cream
-    # at 4.5 px per mm (93 mm wide: 420 px) as a 63-colour palette with a clear margin
-    out_w = 420
+    # at the photo's own 7.3 px per mm (93 mm wide: 681 px) as a 63-colour palette with a clear margin; at 4.5 px per
+    # mm (420 px, the first build) the small print was soft at the page's 4 degree close-up
+    out_w = w
     out_h = round(out_w * h / w)
     rgb_s = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8)).resize((out_w, out_h), Image.LANCZOS)
     al = Image.fromarray(alpha).resize((out_w, out_h), Image.LANCZOS)
@@ -302,7 +324,7 @@ def label():
         ys, xs = np.where(b.min(2) < 225)
         ox, oy = xs.min() - 2, ys.min() - 2
         strip = s.crop((ox + CODE[0], oy + CODE[1], ox + CODE[2], oy + CODE[3]))
-        sw = round((CODE[2] - CODE[0]) * sc * 2)
+        sw = round((CODE[2] - CODE[0]) * sc)   # at the label's own scale (the photo's pixels, not enlarged)
         strip = strip.resize((sw, round(sw * strip.height / strip.width)), Image.LANCZOS)
         save(strip, f"model_{slug}.jpg", q=88)
 
@@ -344,8 +366,11 @@ def panel():
 doors()
 mark()
 label()
+# a fully clear image: the material of a decal a colour doesn't show (the builder's ALT)
+Image.new("RGBA", (4, 4), (0, 0, 0, 0)).save(os.path.join(D, "clear.png"))
 side_colours()
 rear()
 panel()
+colours["mark_at"] = MARK_AT
 json.dump(colours, open(os.path.join(D, "colours.json"), "w"), indent=1)
 print(json.dumps(colours, indent=None)[:1500])

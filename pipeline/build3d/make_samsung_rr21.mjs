@@ -184,9 +184,22 @@ root.add(cab);
 
 // ── cabinet shell ──
 const shellH = cabTop - standTop, shellMid = standTop + shellH / 2, Dc = zFront - zB, zMid = (zFront + zB) / 2;
-cab.add(faced("SideLeft", wall, shellH, Dc, [linerSide, sidePaint, topPaint, standM, sidePaint, dark], -W / 2 + wall / 2, shellMid, zMid));
-cab.add(faced("SideRight", wall, shellH, Dc, [sidePaint, linerSide, topPaint, standM, sidePaint, dark], W / 2 - wall / 2, shellMid, zMid));
-cab.add(faced("Top", inW, cabTop - ceil, Dc, [liner, liner, topPaint, liner, sidePaint, dark], 0, (cabTop + ceil) / 2, zMid));
+// each side wall is one box (a side made of two boxes drew a line across it); its four upright faces are split at the
+// cavity's ceiling in the one mesh, and the inner face above it, hidden inside the top's joint, takes the top's paint:
+// as white liner, the headless renderer let it through the joint with the top as a dashed white line front to back
+function sideWall(name, mats, inner, x) {
+  const g = new THREE.BoxGeometry(wall, shellH, Dc, 1, 2, 1), q = g.attributes.position, cut = ceil - shellMid;
+  for (let i = 0; i < q.count; i++) if (Math.abs(q.getY(i)) < 1e-9) q.setY(i, cut);
+  const k = g.groups[inner];
+  g.groups.splice(inner, 1, { start: k.start, count: 6, materialIndex: 6 }, { start: k.start + 6, count: 6, materialIndex: k.materialIndex });
+  return mesh(name, g, [...mats, topPaint], x, shellMid, zMid);
+}
+cab.add(sideWall("SideLeft", [linerSide, sidePaint, topPaint, standM, sidePaint, dark], 0, -W / 2 + wall / 2));
+cab.add(sideWall("SideRight", [sidePaint, linerSide, topPaint, standM, sidePaint, dark], 1, W / 2 - wall / 2));
+cab.add(faced("Top", inW, cabTop - ceil, Dc, [topPaint, topPaint, topPaint, liner, sidePaint, dark], 0, (cabTop + ceil) / 2, zMid));
+// the top meets each side wall in a joint; the top's own end faces there (never seen from inside: they face the side
+// walls) were the white liner, and from above (the page's 78 deg view) the headless renderer let them through the joint as a
+// dashed white line front to back, 25 mm in from each side. They take the top's paint, so the joint reads as one top.
 // the base in front of the bay; the bay's ceiling; the back wall over the hump and the hump itself
 cab.add(faced("Base", inW, floorIn - standTop, zFront - stepZ, [liner, liner, liner, standM, sidePaint, dark], 0, standTop + (floorIn - standTop) / 2, (zFront + stepZ) / 2));
 cab.add(faced("BackWall", inW, ceil - stepTop, zIn - zB - 0.003, [liner, liner, liner, liner, liner, dark], 0, (ceil + stepTop) / 2, (zIn + zB + 0.003) / 2));
@@ -565,11 +578,18 @@ const fridgeDoor = group("FridgeDoor", W / 2, doorBot, zDoor);
   // (Samsung's Begonia Red front with the label, 0.883 px per mm), with each colour's own code on a strip over it
   const mk = C.mark.light, mw = 0.072 * mk.size[0] / mk.ink_w, mh = mw * mk.size[1] / mk.size[0];
   const MK = [-mw / 2, dh - 0.098 - mh / 2, mw / 2, dh - 0.098 + mh / 2];
+  // Midnight Blossom Blue's wordmark sits 53.5 mm below the top (its front and its label photo: ink rows 49-58 mm)
+  const MKHI = [-mw / 2, dh - 0.0535 - mh / 2, mw / 2, dh - 0.0535 + mh / 2];
   const L = C.label, lw = 0.093 * L.size[0] / L.ink[0], lh = lw * L.size[1] / L.size[0];
   const lx1 = pw / 2 - 0.043 + (lw - 0.093) / 2, lx0 = lx1 - lw, lt1 = dh - 0.041 + (lh - 0.093 * L.ink[1] / L.ink[0]) / 2, lt0 = lt1 - lh;
   const [cu0, cv0, cu1, cv1] = L.code_box;
   const LB = [lx0, lt0, lx1, lt1], ST = [lx0 + cu0 * lw, lt1 - cv1 * lh, lx0 + cu1 * lw, lt1 - cv0 * lh];
-  const { geo, ring } = doorSkin(pw, dh, [MK, LB, ST].flatMap((r) => [r[0], r[2]]), [MK, LB, ST].flatMap((r) => [r[1], r[3]]));
+  // Camellia Purple's and Camelia Blue's label photos put it at the top left, mirrored: its cream 56-60 mm in from the
+  // left edge, 51 mm down, against Hydrangea Blue's 56 mm in from the right edge, 51 mm down (0.89 px per mm)
+  const lxl0 = -lx1, lxl1 = -lx0;
+  const LBL = [lxl0, lt0, lxl1, lt1], STL = [lxl0 + cu0 * lw, lt1 - cv1 * lh, lxl0 + cu1 * lw, lt1 - cv0 * lh];
+  const DEC = [MK, MKHI, LB, ST, LBL, STL];
+  const { geo, ring } = doorSkin(pw, dh, DEC.flatMap((r) => [r[0], r[2]]), DEC.flatMap((r) => [r[1], r[3]]));
   geo.translate(-pw / 2, 0, 0);
   fridgeDoor.add(mesh("DoorFaceSkin", geo, doorFace));
   const { band, cap } = doorBand(ring, dh);
@@ -579,6 +599,10 @@ const fridgeDoor = group("FridgeDoor", W / 2, doorBot, zDoor);
   fridgeDoor.add(decal("SamsungMarkDecal", markM, ...MK, 0.0008));
   fridgeDoor.add(decal("BeeLabelDecal", labelM, ...LB, 0.0008));
   fridgeDoor.add(decal("LabelModelStrip", modelM, ...ST, 0.0016));
+  // the same decals where two colours' photos put them; the colours swap which set shows (ALT below)
+  fridgeDoor.add(decal("SamsungMarkDecalAlt", markM, ...MKHI, 0.0008));
+  fridgeDoor.add(decal("BeeLabelDecalAlt", labelM, ...LBL, 0.0008));
+  fridgeDoor.add(decal("LabelModelStripAlt", modelM, ...STL, 0.0016));
   // the key lock: a pill 17 x 50 mm at 50 mm from the left edge, 488 mm below the top (fronts: x 786-802, rows 624-673)
   {
     const lx = -pw / 2 + 0.050, ly = dh - 0.488, z = faceZ(lx, ly);
@@ -719,15 +743,29 @@ await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
     return out;
   });
   const variants = FIN.map((f) => varExt.createVariant(f.variant));
+  // where a colour's photos put the decals elsewhere: the wordmark of Midnight Blossom Blue (53.5 mm down, not 98) and the
+  // label with its model line of Camellia Purple and Camelia Blue (top left, not top right) show on the "...Alt" meshes; the
+  // set a colour doesn't use takes a clear material (a fully transparent image: the Apple file cuts it away entirely)
+  const ALT = { SamsungMarkDecal: ["midnight_blossom_blue"], BeeLabelDecal: ["camellia_purple", "camelia_blue"], LabelModelStrip: ["camellia_purple", "camelia_blue"] };
+  const off = doc.createMaterial("DecalOff").setAlphaMode("BLEND").setMetallicFactor(0).setRoughnessFactor(1)
+    .setBaseColorTexture(image(`${T}/clear.png`, "DecalOff"));
   let mapped = 0;
-  for (const me of R.listMeshes()) for (const p of me.listPrimitives()) {
-    const n = VARY.find((k) => p.getMaterial() === base[k]);
-    if (!n) continue;
-    if (n === "DoorFace") p.setMaterial(mats[0].DoorFace);   // the default look is the first colour's (no grain on its print)
-    const list = varExt.createMappingList();
-    FIN.forEach((f, i) => list.addMapping(varExt.createMapping().setMaterial(mats[i][n]).addVariant(variants[i])));
-    p.setExtension("KHR_materials_variants", list);
-    mapped++;
+  for (const node of R.listNodes()) {
+    const me = node.getMesh();
+    if (!me) continue;
+    const nm = node.getName(), alt = nm.endsWith("Alt"), key = Object.keys(ALT).find((k) => nm === k || nm === k + "Alt");
+    for (const p of me.listPrimitives()) {
+      const n = VARY.find((k) => p.getMaterial() === base[k]);
+      if (!n && !key) continue;
+      if (n === "DoorFace") p.setMaterial(mats[0].DoorFace);   // the default look is the first colour's (no grain on its print)
+      const own = p.getMaterial();
+      const shows = (f) => !key || ALT[key].includes(f.slug) === alt;
+      if (!shows(FIN[0])) p.setMaterial(off);
+      const list = varExt.createMappingList();
+      FIN.forEach((f, i) => list.addMapping(varExt.createMapping().setMaterial(shows(f) ? (n ? mats[i][n] : own) : off).addVariant(variants[i])));
+      p.setExtension("KHR_materials_variants", list);
+      mapped++;
+    }
   }
   base.DoorFace.dispose();
   for (const t of R.listTextures()) if (!t.listParents().some((p) => p.propertyType === "Material")) t.dispose();

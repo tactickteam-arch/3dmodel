@@ -1,69 +1,69 @@
 {
  "light_taken_out": {
   "begonia_red": [
-   122.6,
-   23.0
+   121.7,
+   43.7
   ],
   "begonia_blue": [
-   137.4,
-   49.5
+   136.6,
+   67.6
   ],
   "camellia_purple": [
    133.0,
-   0.0
+   1.9
   ],
   "camelia_blue": [
    132.6,
-   0.0
+   2.3
   ],
   "paradise_bloom_blue": [
    126.1,
-   31.9
+   41.9
   ],
   "midnight_blossom_blue": [
-   64.7,
-   40.6
+   64.6,
+   47.1
   ],
   "hydrangea_blue": [
-   61.6,
-   52.7
+   61.3,
+   50.0
   ],
   "hydrangea_plum": [
-   64.5,
-   55.5
+   64.0,
+   59.1
   ],
   "paradise_bloom_purple": [
    126.6,
-   31.8
+   39.3
   ],
   "wild_lily_blue": [
-   110.7,
-   18.5
+   110.9,
+   19.4
   ],
   "elegant_inox": [
    78.0,
-   22.3
+   13.2
   ]
  },
  "door_photo_median": {
   "begonia_red": [
-   131,
-   73,
-   64
+   132,
+   74,
+   65
   ],
   "begonia_blue": [
-   92,
-   71,
+   93,
+   72,
    90
   ],
   "camellia_purple": [
-   64,
+   63,
    26,
    73
   ],
   "camelia_blue": [
    26,
-   51,
+   50,
    98
   ],
   "paradise_bloom_blue": [
@@ -73,13 +73,13 @@
   ],
   "midnight_blossom_blue": [
    25,
-   45,
+   44,
    79
   ],
   "hydrangea_blue": [
    23,
    32,
-   92
+   93
   ],
   "hydrangea_plum": [
    80,
@@ -93,26 +93,26 @@
   ],
   "wild_lily_blue": [
    126,
-   70,
-   124
+   71,
+   125
   ],
   "elegant_inox": [
-   138,
-   140,
-   147
+   139,
+   141,
+   148
   ]
  },
  "edge": {
   "begonia_red": "#33090b",
-  "begonia_blue": "#090d1e",
-  "camellia_purple": "#220a2c",
-  "camelia_blue": "#0b1941",
+  "begonia_blue": "#090d1f",
+  "camellia_purple": "#22092c",
+  "camelia_blue": "#0a1941",
   "paradise_bloom_blue": "#082841",
-  "midnight_blossom_blue": "#091024",
+  "midnight_blossom_blue": "#090f24",
   "hydrangea_blue": "#060930",
   "hydrangea_plum": "#250406",
   "paradise_bloom_purple": "#2e1836",
-  "wild_lily_blue": "#41213c",
+  "wild_lily_blue": "#42213d",
   "elegant_inox": "#5e5e65"
  },
  "stand": {
@@ -155,9 +155,9 @@
    237
   ],
   "midnight_blossom_blue": [
-   20,
-   24,
-   49
+   254,
+   253,
+   255
   ],
   "hydrangea_blue": [
    254,
@@ -188,9 +188,9 @@
  "mark": {
   "light": {
    "ink": [
-    215,
-    211,
-    221
+    239,
+    234,
+    241
    ],
    "size": [
     500,
@@ -200,9 +200,9 @@
   },
   "dark": {
    "ink": [
-    90,
-    91,
-    94
+    63,
+    64,
+    66
    ],
    "size": [
     500,
@@ -213,22 +213,22 @@
  },
  "label": {
   "size": [
-   440,
-   785
+   700,
+   1258
   ],
   "ink": [
-   420,
-   765
+   680,
+   1238
   ],
   "mm": [
    93,
    169.3
   ],
   "code_box": [
-   0.2979,
-   0.8058,
-   0.6263,
-   0.8405
+   0.2943,
+   0.8092,
+   0.6286,
+   0.8442
   ]
  },
  "side_measured": {
@@ -240,5 +240,8 @@
   "top_mm": 1258,
   "bay_top_mm": 412,
   "stand_back_mm": 118
+ },
+ "mark_at": {
+  "midnight_blossom_blue": 53.5
  }
 }
