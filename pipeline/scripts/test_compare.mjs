@@ -20,9 +20,11 @@ const IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebK
 const products = (await (await fetch(`${base}/products.json`)).json()).products.filter((p) => !p.hidden);
 // a tall one and a short one with parts, so "same scale" means something
 const withParts = (cat) => products.find((p) => p.category === cat && p.parts?.some((x) => x.zone && !x.needs));
-const A = products.find((p) => p.id === aArg) || withParts("Refrigerator");
-const B = products.find((p) => p.id === bArg) || withParts("Washing machine");
 const cmH = (p) => parseFloat(p.size.h) / 100;
+const A = products.find((p) => p.id === aArg) || withParts("Refrigerator");
+// with no washer on show, the shortest other product with parts
+const B = products.find((p) => p.id === bArg) || withParts("Washing machine")
+  || products.filter((p) => p !== A && p.parts?.some((x) => x.zone && !x.needs)).sort((x, y) => cmH(x) - cmH(y))[0];
 // as compare.html: the product most like p (same category, nearest in size)
 const gap = (p, q) => ["w", "h", "d"].reduce((t, k) => t + Math.abs(parseFloat(p.size[k]) - parseFloat(q.size[k])), 0);
 const nearest = (p) => products.filter((q) => q !== p && q.category === p.category).sort((x, y) => gap(p, x) - gap(p, y))[0];
@@ -142,8 +144,10 @@ const F2 = products.find((p) => p.category === A.category && p !== A);
 await choose("b", F2.id);
 check(await ids() === `?a=${A.id}&b=${F2.id} ${A.id} ${F2.id}`, `choosing ${F2.id} (a ${F2.category}) on the right keeps ${A.id} on the left`);
 const C = products.find((p) => p.category === "Air conditioner") || products.find((p) => p.category !== A.category);
-await choose("b", C.id);
-check(await ids() === `?a=${nearest(C).id}&b=${C.id} ${nearest(C).id} ${C.id}`, `choosing ${C.id} (another category) brings the left along: ${await ids()}`);
+if (C) {
+  await choose("b", C.id);
+  check(await ids() === `?a=${nearest(C).id}&b=${C.id} ${nearest(C).id} ${C.id}`, `choosing ${C.id} (another category) brings the left along: ${await ids()}`);
+} else console.log(`  (not checked: every product on show is a ${A.category}, so there is no other category to choose)`);
 
 console.log("\n[which two, when the address doesn't say]");
 const firstFridge = products.find((p) => p.category === "Refrigerator");

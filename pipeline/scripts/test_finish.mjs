@@ -31,10 +31,13 @@ const read = (f) => fs.readFileSync(path.join(root, f), "utf8");
 // ── the scratch catalogue ──
 const real = read("products.json");
 const cat = JSON.parse(real);
+// a product on show, or, when none fits (whole lists can be hidden), a hidden one put on show in the scratch copy
+const pick = (fn) => cat.products.find((p) => !p.hidden && fn(p)) || cat.products.find(fn);
+const F = pick((p) => /\/\d+$/.test(p.sangeethaUrl || "") && p.finishes.length === 1 && p.parts?.length);
+const G = pick((p) => p !== F && p.finishes.length === 1 && p.finishes[0].usdz !== F.finishes[0].usdz);
+const W = pick((p) => p !== F && p !== G && p.category !== F.category) || pick((p) => p !== F && p !== G);
+for (const p of [F, G, W]) delete p.hidden;
 const shown = cat.products.filter((p) => !p.hidden);
-const F = shown.find((p) => /\/\d+$/.test(p.sangeethaUrl || "") && p.finishes.length === 1 && p.parts?.length);
-const G = shown.find((p) => p !== F && p.finishes.length === 1 && p.finishes[0].usdz !== F.finishes[0].usdz);
-const W = shown.find((p) => p !== F && p !== G && p.category !== F.category) || shown.find((p) => p !== F && p !== G);
 const PID = "990001", OWN = F.sangeethaUrl.match(/(\d+)$/)[1];
 const gold = { name: "Gold, Matt White", swatchColor: "#d9c9a0", usdz: G.finishes[0].usdz, variant: "test-gold", code: "TEST-GMW", sangeethaUrl: `https://www.sangeetha.com/product-details/test-colour/${PID}` };
 F.finishes.push(gold);
