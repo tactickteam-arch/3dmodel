@@ -407,6 +407,15 @@ const fridgeDoor = group("FridgeDoor", W / 2, frBot, zFront);
   }
   doorInside(fridgeDoor, "FridgeDoor", h);
 }
+// the 4 mm gap between the doors: the white mullion behind it showed through as a bright line from eye level (on Haier's
+// front it reads dark, in the doors' shadow). Each door carries a dark fin into the gap, the fridge door's at the back and
+// the freezer door's in front of it, overlapping 1.2 mm in height and clearing the other door by 1.4 mm, so no straight
+// line of sight reaches the mullion; each fin is set 1 mm into its own door and stops 2 mm short of the doors' sides
+{
+  const gap = yFreezer - frTop, ov = 0.0012, rise = (gap + ov) / 2, fw = pw - 0.004;
+  fridgeDoor.add(box("SeamFinFridge", fw, rise + 0.001, 0.008, doorEdge, -pw / 2, frTop - frBot + (rise - 0.001) / 2, 0.006));
+  freezerDoor.add(box("SeamFinFreezer", fw, rise + 0.001, 0.008, doorEdge, -pw / 2, -(rise - 0.001) / 2, 0.016));
+}
 { // what sits in the door bins, so it swings out with the door
   const F = BINS.FridgeDoor, Z = BINS.FreezerDoor;
   stock.doorFridge(fridgeDoor, { fit: true, eggY: F[2].f, eggX: EGGS, eggDY: 0, eggTurn: Math.PI / 2, jarY: F[1].f, botY: F[0].f, canY: null, deps: { egg: F[2].d, jar: F[1].d, bottle: F[0].d }, inside });

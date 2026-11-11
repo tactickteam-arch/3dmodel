@@ -61,6 +61,8 @@ FRONT_X, FRONT_ROWS = (434, 768), (640, 1000)        # ibns_front.jpg: the body'
 # Graphite Black: the IBGK-P's front reads (67, 73, 90) over both doors where the IBNS-P's reads 174; held at the same
 # 154 / 177 of the photo, less 5 % more because its first render read 7 to 10 % over the photo (the silver's 4 to 7 %)
 GK = tuple(round(c * 154 / 177 * 0.95) for c in (67, 73, 90))
+GK_X, GK_ROWS = (417, 793), (500, 1000)             # ibgk_front.jpg: the body's columns, rows across the fridge door
+BANDS_GK = 0.9
 
 
 def save(img, name, q=88):
@@ -140,10 +142,11 @@ def with_icons(word, n, size_mm, gap_mm, col):
     return pad(out)
 
 
-def band_profile(w):
+def band_profile(w, photo="ibns_front.jpg", cols=None, rows=None):
     """the straight front's brightness across the doors, w samples left to right, as a share of its mean"""
-    g = np.asarray(Image.open(os.path.join(PHOTOS, SLUG, "ibns_front.jpg")).convert("L")).astype(np.float32)
-    p = g[FRONT_ROWS[0]:FRONT_ROWS[1], FRONT_X[0]:FRONT_X[1] + 1].mean(0)
+    cols, rows = cols or FRONT_X, rows or FRONT_ROWS
+    g = np.asarray(Image.open(os.path.join(PHOTOS, SLUG, photo)).convert("L")).astype(np.float32)
+    p = g[rows[0]:rows[1], cols[0]:cols[1] + 1].mean(0)
     e = round(len(p) * 0.02)                          # the outermost columns are the doors' dark edges
     p[:e], p[-e:] = p[e], p[-e - 1]
     k = np.exp(-0.5 * (np.arange(-30, 31) / 9.0) ** 2); k /= k.sum()
@@ -154,14 +157,18 @@ def band_profile(w):
 
 def doors():
     # the freezer door 478 mm tall, the fridge door's steel face 1098 mm, both 548 mm wide; about 0.93 px per mm (the
-    # hairline grain map carries the fine detail). The Nickel Steel carries the front photo's bands; the Graphite Black is
-    # flat (its front matches flat)
+    # hairline grain map carries the fine detail). Each colour carries its own front photo's bands
     shade = 1 + BANDS * (band_profile(512) - 1)
     for name, h in (("door_freezer", 448), ("door_fridge", 1024)):
         a = np.asarray(steel(512, h)).astype(float) * shade[None, :, None]
         save(Image.fromarray(a.clip(0, 255).astype(np.uint8)), name + ".jpg", 86)
-    save(steel(512, 448, GK), "door_freezer_gk.jpg", 86)
-    save(steel(512, 1024, GK), "door_fridge_gk.jpg", 86)
+    # the Graphite Black's front shows the same kind of soft upright bands, deeper (p95 - p5 over the mean 0.67, against the
+    # Nickel Steel's 0.47; 0.60 of its mean at the edges to 1.29 in the middle, every row the same): baked in as on the
+    # Nickel Steel (BANDS_GK of the depth, tuned on renders at the front and both 16 degree views; NOTES.md, finesse pass)
+    shade = 1 + BANDS_GK * (band_profile(512, "ibgk_front.jpg", GK_X, GK_ROWS) - 1)
+    for name, h in (("door_freezer_gk", 448), ("door_fridge_gk", 1024)):
+        a = np.asarray(steel(512, h, GK)).astype(float) * shade[None, :, None]
+        save(Image.fromarray(a.clip(0, 255).astype(np.uint8)), name + ".jpg", 86)
 
 
 def channel():
