@@ -35,7 +35,7 @@ D = os.path.join(OUT, "lg_gvb23")
 os.makedirs(D, exist_ok=True)
 rng = np.random.default_rng(2323)
 LEVEL_PS = 146
-LEVEL_BM = 16
+LEVEL_BM = 40
 PT = "/System/Library/Fonts/Supplemental/PTSans.ttc"
 
 
@@ -229,7 +229,9 @@ def panel():
         dr.text((W * S * 0.68, yy + 0.4 * S), "°C", font=pt(2.6 * S / 0.72), fill=seg, anchor="lt")
     text("Fridge", 0.322, 2.2)
     text("Freezer", 0.426, 2.2)
-    dr.line((W * S * 0.33, H * S * 0.447, W * S * 0.67, H * S * 0.447), fill=ink, width=2)
+    # the dotted rule under "Freezer" only (the drawing's, x 0.38-0.61 at row 0.442), clear of "*Convertible" below it
+    for k in range(round(W * S * 0.38), round(W * S * 0.61), 6):
+        dr.line((k, H * S * 0.442, k + 2, H * S * 0.442), fill=ink, width=2)
     text("*Convertible", 0.457, 2.2)
     text("*Lock", 0.53, 2.2)
     text("Express Freeze", 0.633, 2.0)
@@ -256,9 +258,11 @@ def panel():
 def main():
     r_bm, r_ps = ratios("bm"), ratios("ps")
     # ── doors: one tile per colour ──
-    # Black Mirror: GV-B23FFGMB's straight front reads 0.14 to 0.19 of the label's white (mean 0.159). A deep black
-    # (level 16) under the builder's glass coat (1.0 at roughness 0.05) renders 0.17 to 0.19 straight on; the coat's
-    # reflection is the sheen, so nothing is baked in (NOTES.md)
+    # Black Mirror: GV-B23FFGMB's straight front reads 0.14 to 0.19 of the label's white (mean 0.159), and its 3/4 view
+    # 41 to 43 away from the light band. The paint behind the glass has no reflection of its own in the builder
+    # (specular 0, under a glass coat of 1.0 at roughness 0.05), so its own colour carries that level: level 40 renders
+    # 0.156 to 0.158 straight on and 38 to 41 at the page's 3/4 (level 16 had needed the paint's grey haze to get there).
+    # The coat's reflection is the sheen, so nothing is baked in (NOTES.md)
     save(plain((LEVEL_BM, LEVEL_BM, LEVEL_BM + 1)), "door_bm.jpg", 92)
     # Prime Silver: neutral grey (R = G = B on LG's photos) times LG's own light on its straight front (light_field: p10
     # to p90 printed). Level LEVEL_PS is tuned until the gate's straight front and 3/4 match the photo (NOTES.md)

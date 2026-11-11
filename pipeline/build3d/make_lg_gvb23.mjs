@@ -19,7 +19,7 @@ import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, prod
 import { Food } from "./food.mjs";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "lg-gv-b23ffgmb";
@@ -81,6 +81,9 @@ const linerSide = mat("LinerSide", 0xe4e8ec, { rough: 0.65 });
 const linerGrey = mat("LinerGrey", 0xd3d7dc, { rough: 0.6 });
 const gasket = mat("Gasket", 0x34363a, { rough: 0.85 });
 const ventBlack = mat("VentBlack", 0x1c1d20, { rough: 0.7 });
+// the fins in the door seams: a deep matt black with no reflection of its own (KHR_materials_specular 0, set below), so
+// the seam reads as the dark line LG's photos show (22 to 28 against doors of 35 to 40 on the straight front)
+const seamM = mat("SeamFin", 0x0b0c0d, { rough: 0.9 });
 const clear = mat("ClearPlastic", 0xc3d0da, { rough: 0.12, opacity: 0.5, side: THREE.DoubleSide });
 const clearLight = mat("ClearPlasticLight", 0xdfe7ee, { rough: 0.12, opacity: 0.26, side: THREE.DoubleSide });
 const clearRib = mat("ClearRib", 0xeef3f7, { rough: 0.3 });
@@ -575,12 +578,15 @@ function door(name, s, sec, y1, build) {
   const ls = (nm, x0, x1, ya, yb, z0, z1, m) => { const o = lean(span(nm, x0 - xH, x1 - xH, ya, yb, z0 - zPiv, z1 - zPiv, m), s); g.add(o); return o; };
   const xa = s > 0 ? 0.0015 : -xOut, xb = s > 0 ? xOut : -0.0015;
   g.add(body(name + "Body", sec, xa - xH, xb - xH, [doorM, trimM, doorEdge], xH));
-  // a dark fin in the seam, level with the hinge axis, where the door neither gains nor loses ground on the other as it
-  // swings: the left door's to 0.5 mm right of the middle, the right door's (4 mm further forward) from 0.7 mm. Rigid
-  // doors cannot overlap across the seam without striking each other, so 0.2 mm stays open (0.1 px on the gate's front),
-  // and the inside's white no longer shows down the seam (LG's photos: a dark line). Clearances: NOTES.md
-  const fin = s < 0 ? [-0.0017, 0.0005, zPiv - 0.003, zPiv + 0.003] : [0.0007, 0.0017, zPiv + 0.004, zPiv + 0.008];
-  g.add(span(name + "SeamFin", fin[0] - xH, fin[1] - xH, y0Of(sec), y1, fin[2] - zPiv, fin[3] - zPiv, ventBlack));
+  // a dark fin in the seam on each door, so the inside's white never shows down the 3 mm seam (LG's photos: a dark line).
+  // Each fin starts 1.5 mm inside its own door, and the two fins overlap across the seam by 0.4 mm at different depths,
+  // so no straight line runs through the shut seam at any angle (the old fins left a 0.2 mm slit, a 1 px white line at
+  // the page's 4 degree close-up). Both sit well in front of the hinge axis, where a free edge swings away from the other
+  // door as it opens: the left door's 36 to 40 mm in front of it, the right door's 47 to 51 mm (behind the grip's bevel),
+  // so the left fin, moving forward into the right one's depth, has first moved 0.7 mm aside (swing check: NOTES.md).
+  // Their ends stop 0.5 mm short of the door's top and bottom (no faces shared with the door)
+  const fin = s < 0 ? [-0.003, 0.0005, zPiv + 0.036, zPiv + 0.040] : [0.0001, 0.003, zPiv + 0.047, zPiv + 0.051];
+  g.add(span(name + "SeamFin", fin[0] - xH, fin[1] - xH, y0Of(sec) + 0.0005, y1 - 0.0005, fin[2] - zPiv, fin[3] - zPiv, seamM));
   build(g, { xH, ls, X: (x) => x - xH, Z: (z) => z - zPiv });
   return g;
 }
@@ -741,6 +747,7 @@ const FINISHES = [
   const vs = FINISHES.map(([n]) => ext.createVariant(n));
   const cc = doc.createExtension(KHRMaterialsClearcoat);
   const coat = (m, [f, r]) => m.setExtension("KHR_materials_clearcoat", cc.createClearcoat().setClearcoatFactor(f).setClearcoatRoughnessFactor(r));
+  const sp = doc.createExtension(KHRMaterialsSpecular);
   // Black Mirror's glass coat on the base material
   coat(doc.getRoot().listMaterials().find((m) => m.getName() === "DoorFront"), BM.coat);
   const mats = doc.getRoot().listMaterials(), alt = {}, texCache = new Map();
@@ -765,6 +772,11 @@ const FINISHES = [
       return m;
     });
   }
+  // the glass's black paint has no reflection of its own (KHR_materials_specular 0): paint behind glass hardly reflects,
+  // and its soft reflection laid a grey haze over the doors under the page's studio light; the glass coat alone carries
+  // the reflection. Set on Black Mirror's base only, after Prime Silver's steel was cloned from it (the Apple files do not
+  // carry this setting: their renders are checked on their own, NOTES.md)
+  for (const n of ["DoorFront", "SeamFin"]) mats.find((m) => m.getName() === n).setExtension("KHR_materials_specular", sp.createSpecular().setSpecularFactor(0));
   for (const m of doc.getRoot().listMeshes()) for (const p of m.listPrimitives()) {
     const list0 = alt[p.getMaterial()?.getName()];
     if (!list0) continue;
