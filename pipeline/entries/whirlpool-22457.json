@@ -1,0 +1,168 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-22457",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "22457",
+      "name": "Whirlpool Luxuriem 654 L four-door French door refrigerator in steel, convertible, 360° Triple Cooling",
+      "shortName": "654 L Luxuriem four-door refrigerator, steel",
+      "summary": "Open both fridge doors and slide out the crispers, open the freezer and the convertible, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/whirlpool-22457.glb",
+      "thumb": "/photos/whirlpool-22457/0.jpg",
+      "photos": ["/photos/whirlpool-22457/0.jpg", "/photos/whirlpool-22457/1.jpg", "/photos/whirlpool-22457/2.jpg", "/photos/whirlpool-22457/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Rhodium Steel",
+          "swatchColor": "#8e8f90",
+          "usdz": "/models/usdz/whirlpool-22457-rhodium-steel.usdz",
+          "variant": "Rhodium Steel",
+          "code": "22457"
+        },
+        {
+          "name": "Cosmos Black",
+          "swatchColor": "#38393a",
+          "usdz": "/models/usdz/whirlpool-22457-cosmos-black.usdz",
+          "variant": "Cosmos Black",
+          "code": "22458"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge doors",
+          "node": "FridgeDoorL",
+          "axis": "y",
+          "angle": -115,
+          "also": [
+            {
+              "node": "FridgeDoorR",
+              "angle": 115
+            }
+          ],
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.455, 0.856, 0.152],
+              [0.455, 1.863, 0.375]
+            ],
+            "open": [
+              [-0.694, 0.856, 0.285],
+              [0.694, 1.863, 0.755]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "crispers",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.27],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.375, 0.861, -0.292],
+              [0.375, 1.065, 0.144]
+            ],
+            "open": [
+              [-0.375, 0.861, -0.022],
+              [0.375, 1.065, 0.414]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer door",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -115,
+          "zone": {
+            "closed": [
+              [-0.455, 0.035, 0.167],
+              [0, 0.842, 0.374]
+            ],
+            "open": [
+              [-0.694, 0.035, 0.285],
+              [-0.36, 0.842, 0.739]
+            ]
+          }
+        },
+        {
+          "key": "convertible",
+          "label": "convertible door",
+          "node": "ConvertibleDoor",
+          "axis": "y",
+          "angle": 115,
+          "zone": {
+            "closed": [
+              [0.001, 0.035, 0.167],
+              [0.455, 0.842, 0.374]
+            ],
+            "open": [
+              [0.36, 0.035, 0.285],
+              [0.694, 0.842, 0.739]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "90.9 cm",
+        "h": "186.25 cm",
+        "d": "74.85 cm"
+      },
+      "sizeNote": "Whirlpool gives 90.9 × 186.25 × 74.85 cm (W × H × D, without the box); its size picture marks 900 mm across, 1862.5 mm high and 748.5 mm deep. Whirlpool publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "654 L (refrigerator 424 L, freezer 115 L, convertible 115 L)"],
+        ["Type", "Four-door French door: two steel fridge doors over the freezer and the convertible compartment"],
+        ["Energy rating", "3 star, 532 units a year"],
+        ["Compressor", "Inverter; 1 year on the product, 9 more years on the compressor"],
+        ["Cooling", "360° Triple Cooling, frost free"],
+        ["Convertible", "Converts from freezer to fridge in under 30 minutes; -22 °C to +10 °C"],
+        ["Modes", "100+ customisable modes, set on the door display"],
+        ["Shelves", "3 toughened glass in the fridge, 6 in the freezer and convertible"],
+        ["Door pockets", "7 in the fridge, 6 in the freezer and convertible"],
+        ["Ice and eggs", "Ice twister, ice bank and egg tray"],
+        ["Light", "LED, with dedicated freezer lights"],
+        ["Body", "Steel, stainless steel handles; Rhodium Steel or Cosmos Black"],
+        ["Power", "Stabilizer-free, connects to a home inverter, 230 V"],
+        ["Weight", "111 kg"]
+      ],
+      "source": "https://india.whirlpool.in/luxuriem-654l-4-door-french-door-refrigerator-3-star-convertible-inverter-compressor-360-triple-cooling-4/p",
+      "hotspots": [
+        {
+          "title": "India's Fastest Convertible",
+          "text": "Converts from freezer to fridge in under 30 minutes for quick flexibility to create the ideal storage space for every occasion.",
+          "pos": [0.22, 0.5, 0.3746],
+          "normal": [0, 0, 1],
+          "show": "!convertible"
+        },
+        {
+          "title": "No Odour Transfer",
+          "text": "Prevents odours from travelling across compartments, ensuring foods retain their natural aroma and taste.",
+          "pos": [0.09, 1.55, -0.2835],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Humidity Lock",
+          "text": "Maintains precise humidity levels ensuring fruits and vegetables stay naturally crisp and crunchy for a longer period.",
+          "pos": [-0.2, 1, 0.143],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Thoughtfully Designed Freezer space",
+          "text": "Spacious storage and dedicated lighting make every item easier to organise and access.",
+          "pos": [-0.2, 0.47, 0.158],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        }
+      ]
+    }
+  ]
+}
