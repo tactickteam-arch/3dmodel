@@ -543,9 +543,11 @@ function door(name, s, sec, yf0, yf1, front, edgeM, build) {
   build(g, { xH, ls });
   return g;
 }
-// the seam: dark fins in it, so the inside's white never shows down the 8 mm gap (Whirlpool's photos: a dark line). The
-// fins of two doors sit at different depths, so they never meet as the doors swing (each door's free edge moves at most
-// 0.5 mm toward the other on its way open)
+// the seam: dark fins in it, so the inside's white never shows down the 8 mm gap (Whirlpool's photos: a dark line). Each
+// fin starts 1.5 mm inside its own door, and the two doors' fins overlap across the gap at different depths, so no
+// straight line runs through the shut seam at any angle (a 0.1 to 0.3 mm slit lets the white divider through as a fine
+// light line, plainest on Cosmos Black). Their ends stop 0.5 mm short of the door's top and bottom (no shared faces).
+// Swept in plan view: the lower doors' fins never meet, either door alone or both; the fridge doors open together
 function fin(g, xH, name, x0, x1, y0, y1, z0, z1) { g.add(span(name, x0 - xH, x1 - xH, y0, y1, z0 - zPiv, z1 - zPiv, frameM)); }
 // the gasket: a ring 16 mm wide round the opening, from the door's back to just short of the cabinet's front
 function gaskets(ls, xs0, xs1, xh0, xh1, yb0, yt1) {
@@ -580,7 +582,7 @@ const fridgeDoorL = door("FridgeDoorL", -1, secU, yUf, H, doorL, lipM, (g, { xH,
   ls("DoorLinerPlate", -0.424, -0.026, yU0 + 0.012, yTop - 0.02, zDoor - 0.002, zDoor - 0.0002, doorBack);
   ls("FrDoorDykeL", -0.37, -0.03, yDy0, yDy1, zDoor - dykeU, zDoor - 0.002, doorBack);
   // the seam's fin at the back of the gap (the display panel fills the rest of the door's inner edge)
-  fin(g, xH, "SeamFin", -seam + 0.0001, -0.0008, yU0, H, zDoor + 0.001, zDoor + 0.007);
+  fin(g, xH, "SeamFin", -seam - 0.0015, -0.0008, yU0 + 0.0005, H - 0.0005, zDoor + 0.001, zDoor + 0.007);
   // the door display on the inner edge (64 x 250 mm, 1386 to 1636 mm: open photos), hidden while the doors are shut
   g.add(mesh("DoorDisplay", flipV(new THREE.PlaneGeometry(0.064, 0.25)), panelM, -seam + 0.0007 - xH, 1.511, zF0 - 0.009 - 0.032 - zPiv).rotateY(Math.PI / 2));
   // the 6th Sense mark at the top left (3/4 photos: 20 x 25 mm, its middle 27 mm in from the edge, 53 mm under the top)
@@ -600,7 +602,7 @@ const fridgeDoorR = door("FridgeDoorR", 1, secU, yUf, H, doorR, lipM, (g, { xH, 
   ls("DoorLinerPlate", 0.026, 0.424, yU0 + 0.012, yTop - 0.02, zDoor - 0.002, zDoor - 0.0002, doorBack);
   ls("FrDoorDykeR", 0.03, 0.37, yDy0, yDy1, zDoor - dykeU, zDoor - 0.002, doorBack);
   // its fin at the hinges' depth, across the middle of the seam
-  fin(g, xH, "SeamFin", -0.0018, seam - 0.0001, yU0, H, zPiv - 0.003, zPiv + 0.003);
+  fin(g, xH, "SeamFin", -0.0018, seam + 0.0015, yU0 + 0.0005, H - 0.0005, zPiv - 0.003, zPiv + 0.003);
   // the Whirlpool mark at the top right (front photo: 69 mm wide, its middle 366 mm right of centre, at 1793 mm)
   g.add(plane("WhirlpoolMarkDecal", 0.069, 0.023, logoM, 0.3667 - xH, 1.793, zF0 + 0.0007 - zPiv));
   const bs = BIN_R.map(([y, h], i) => basket(g, xH, `FrBinR${i + 1}`, 0.04, 0.365, y, bDep, h, dykeU));
@@ -619,9 +621,11 @@ function lowerDoor(name, s, fill) {
     gaskets(ls, ...m(0.010, 0.026), ...m(0.424, 0.44), yLoFloor - 0.04, yRail0 + 0.02);
     ls("DoorLinerPlate", ...m(0.026, 0.424), yL0 + 0.02, yL1 - 0.015, zDoor - 0.002, zDoor - 0.0002, doorBack);
     ls("LoDoorDyke", ...m(0.045, 0.355), 0.06, 0.805, zDoor - dykeL, zDoor - 0.002, doorBack);
-    // the seam's fins: the left door's at the hinges' depth, the right one's 4 mm in front of it (they open apart)
-    if (s < 0) fin(g, xH, "SeamFin", -seam + 0.0001, 0.0005, yL0, yL1, zPiv - 0.003, zPiv + 0.003);
-    else fin(g, xH, "SeamFin", 0.0007, seam - 0.0001, yL0, yL1, zPiv + 0.004, zPiv + 0.008);
+    // the seam's fins, near the front where a free edge swings away from the other door as it opens: the left door's
+    // across the gap 20 to 26 mm deep, the right one's 12 to 16 mm deep, overlapping it by 0.2 mm (the left door alone
+    // still clears it by 0.16 mm on its way open)
+    if (s < 0) fin(g, xH, "SeamFin", -seam - 0.0015, 0.0027, yL0 + 0.0005, yL1 - 0.0005, zPiv + 0.034, zPiv + 0.040);
+    else fin(g, xH, "SeamFin", 0.0025, seam + 0.0015, yL0 + 0.0005, yL1 - 0.0005, zPiv + 0.044, zPiv + 0.048);
     const bs = BIN_LO.map(([y, h], i) => basket(g, xH, `${name}Bin${i + 1}`, ...m(0.05, 0.35), y, bDepL, h, dykeL));
     fill(g, bs);
   });
