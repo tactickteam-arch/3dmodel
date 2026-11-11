@@ -376,9 +376,16 @@
     .hint { max-width: 40%; } /* in the corner, clear of the product */
   }
 
+  /* /p/<id>?preview=1: a product not on the catalogue yet, opened by staff to test it (the admin's Testing pages) */
+  .preview-bar { display: none; }
+  .preview .preview-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 10px; min-height: 40px; padding: 8px 16px; background: #FBBF24; color: var(--navy); font-size: 14px; line-height: 1.35; text-align: center; }
+  .preview .preview-bar b { font-weight: 700; }
+  .preview main { height: calc(100vh - 104px); }
+  @media (max-width: 900px) { .preview main { height: auto; } }
+
   /* /p/<id>?embed: the viewer alone, filling the frame a retailer's page puts it in */
   .embed-open { display: none; }
-  .embed header, .embed aside { display: none !important; }
+  .embed header, .embed aside, .embed .preview-bar { display: none !important; }
   .embed main { display: block; height: 100vh; min-height: 0; }
   .embed .stage { height: 100vh; min-height: 0; }
   .embed .embed-open { display: inline-flex; text-decoration: none; background: var(--navy); color: var(--paper); box-shadow: var(--shadow); }
@@ -398,6 +405,7 @@
     <span class="pill">3D &amp; AR</span>
   </div>
 </header>
+<div class="preview-bar" role="note"><b>Preview: not on the catalogue yet.</b><span>Shoppers can’t find it until the team approves it.</span></div>
 
 <main id="main">
   <section class="stage" id="stage">
@@ -575,6 +583,7 @@
 
 <script type="module">
 import { esc, cm, partAt, hotspotShown, fitCheck, finishSlug, finishIndexOf } from "/site.js";
+import { loadCatalogue } from "/live.js";
 import { initRoom } from "/room.js";
 import { initOrganise } from "/organise.js";
 import { SITE } from "/site-config.js";
@@ -622,8 +631,18 @@ const I = {
 
 // ── which product: /p/<id>, or ?id=<id> ──
 const id = decodeURIComponent((location.pathname.match(/\/p\/([^/]+)/) || [])[1] || new URLSearchParams(location.search).get("id") || "").toLowerCase();
-const catalogue = await fetch("/products.json").then((r) => r.json());
-const product = catalogue.products.find((p) => p.id === id && !p.hidden); // hidden products are not shown (see products.json)
+// on show: products.json's "hidden" flag, unless the team approved or declined the product in the admin (live.js).
+// ?preview=1 opens any product, on show or not, for staff to test it on their phones and headsets before it goes live.
+const PREVIEW = new URLSearchParams(location.search).get("preview") === "1";
+const catalogue = await loadCatalogue();
+const product = catalogue.products.find((p) => p.id === id && (PREVIEW || catalogue.isShown(p)));
+if (PREVIEW) {
+  const robots = document.createElement("meta");
+  robots.name = "robots";
+  robots.content = "noindex, nofollow";
+  document.head.appendChild(robots);
+  if (product && !catalogue.isShown(product)) document.documentElement.classList.add("preview");
+}
 if (!product) {
   $("main").outerHTML = `<div class="missing"><h1>We couldn’t find that product</h1><p class="blurb">The link may be old, or the model isn’t in the catalogue yet.</p><a href="/">See all products</a></div>`;
   document.title = "Product not found";
@@ -677,8 +696,8 @@ const platform = hasQuickLook ? (isVisionPro ? "visionos" : "ios")
   : isApple ? "ios-inapp"
   : /Android/i.test(ua) ? "android"
   : "desktop";
-// usage counts for the admin (/track.js: fire and forget, off on localhost)
-const track = (kind, detail) => window.s3dTrack?.(kind, product.id, detail);
+// usage counts for the admin (/track.js: fire and forget, off on localhost); staff testing a preview aren't counted
+const track = (kind, detail) => (PREVIEW ? undefined : window.s3dTrack?.(kind, product.id, detail));
 track("VIEW");
 if (document.documentElement.classList.contains("embed")) track("EMBED", (() => { try { return new URL(document.referrer).hostname; } catch { return ""; } })());
 

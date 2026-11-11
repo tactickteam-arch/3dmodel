@@ -1,0 +1,23 @@
+<!doctype html>
+<!-- /review: the short address of the admin's review queue (/admin#/review, or #/review/<id> from /review?id=<id>).
+     It keeps the query string, so /review?demo=1 opens the demo. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Review queue · 3D Catalogue Admin</title>
+<script>
+  (() => {
+    const q = new URLSearchParams(location.search);
+    const id = (q.get("id") || "").toLowerCase().replace(/[^a-z0-9-]/g, "");
+    q.delete("id");
+    const rest = q.toString();
+    location.replace(`/admin${rest ? `?${rest}` : ""}#/review${id ? `/${id}` : ""}`);
+  })();
+</script>
+</head>
+<body style="background:#0B0B0C;color:#A1A1AA;font:15px Outfit,-apple-system,Arial,sans-serif">
+<p style="padding:24px"><a href="/admin#/review" style="color:#F58A29">Open the review queue</a></p>
+</body>
+</html>

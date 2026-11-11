@@ -11,8 +11,9 @@
 --
 -- Who can do what (enforced by row level security and the functions below, not by the page):
 --   admin    everything: users, invites, roles, audit log, stores, devices, analytics
---   manager  stores and devices (create, edit, delete), analytics, dashboard
+--   manager  stores and devices (create, edit, delete), analytics, dashboard; approves or declines products
 --   viewer   read-only: dashboard, analytics, products, stores, devices
+-- Every active staff member, viewers too, can test a product: give feedback (with photos) and fill its checklist.
 -- A signed-in account counts as staff only while its profile is active and its own password is set.
 --
 -- The first admin is named by hand, straight after the first run, in the same SQL editor (put your own email in;
@@ -23,7 +24,10 @@
 --
 -- The catalogue (anon key) writes only through three security definer functions that check their inputs:
 -- s3d_track (usage events), s3d_pair (link a shop device to a store) and s3d_login_failed (audit a failed login).
--- anon has no direct access to any table.
+-- It reads one thing, the team's product decisions, through s3d_live (live.js). anon has no direct access to any table.
+--
+-- Feedback photos go in the private Storage bucket s3d-feedback, made at the end of this file. Its two policies on
+-- storage.objects apply to that bucket only; other apps' buckets are not touched.
 
 begin;
 
@@ -134,12 +138,62 @@ create table if not exists public.s3d_audit (
 create index if not exists s3d_audit_at on public.s3d_audit (at desc);
 create index if not exists s3d_audit_action_at on public.s3d_audit (action, at);
 
+-- Product review (the admin's Testing pages). Every approve or decline ever made, oldest first: a product's
+-- current decision is its newest row (highest id). Written only by s3d_decide; a decline always has a reason.
+create table if not exists public.s3d_decisions (
+  id bigint generated always as identity primary key,
+  product_id text not null check (product_id ~ '^[a-z0-9][a-z0-9-]{0,79}$'),
+  decision text not null check (decision in ('approved', 'declined')),
+  note text check (note is null or char_length(note) <= 500),
+  label text check (label is null or char_length(label) <= 200),   -- the product's name when it was decided
+  actor uuid,
+  actor_email text,
+  at timestamptz not null default now(),
+  check (decision = 'approved' or char_length(btrim(coalesce(note, ''))) >= 3)
+);
+create index if not exists s3d_decisions_product on public.s3d_decisions (product_id, id desc);
+
+-- What testers saw: text, and optionally the device, colour, area and up to 3 photos (paths in the
+-- s3d-feedback bucket). Admins and managers mark it fixed or open again. Written only by the functions below.
+create table if not exists public.s3d_feedback (
+  id bigint generated always as identity primary key,
+  product_id text not null check (product_id ~ '^[a-z0-9][a-z0-9-]{0,79}$'),
+  body text not null check (char_length(btrim(body)) between 1 and 2000),
+  device text check (device is null or device in ('iphone', 'android', 'headset', 'computer')),
+  finish text check (finish is null or char_length(finish) <= 80),
+  area text check (area is null or char_length(area) <= 80),
+  photos text[] not null default '{}' check (cardinality(photos) <= 3),
+  author uuid,
+  author_email text,
+  at timestamptz not null default now(),
+  status text not null default 'open' check (status in ('open', 'fixed')),
+  status_by uuid,
+  status_email text,
+  status_at timestamptz
+);
+create index if not exists s3d_feedback_product on public.s3d_feedback (product_id, id desc);
+
+-- The test checklist: one row per product, check, device type and tester. "Not tested" is no row.
+create table if not exists public.s3d_checks (
+  product_id text not null check (product_id ~ '^[a-z0-9][a-z0-9-]{0,79}$'),
+  item text not null check (item ~ '^[a-z][a-z0-9_]{1,39}$'),
+  device text not null check (device in ('iphone', 'android', 'headset', 'computer')),
+  tester uuid not null,
+  tester_email text,
+  result text not null check (result in ('pass', 'fail')),
+  at timestamptz not null default now(),
+  primary key (product_id, item, device, tester)
+);
+
 alter table public.s3d_stores enable row level security;
 alter table public.s3d_profiles enable row level security;
 alter table public.s3d_invites enable row level security;
 alter table public.s3d_devices enable row level security;
 alter table public.s3d_events enable row level security;
 alter table public.s3d_audit enable row level security;
+alter table public.s3d_decisions enable row level security;
+alter table public.s3d_feedback enable row level security;
+alter table public.s3d_checks enable row level security;
 
 -- ── helpers ──────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -589,6 +643,180 @@ begin
   return r;
 end $$;
 
+-- ── product review: approve, decline, feedback and the checklist (the admin's Testing pages) ─────────────
+-- Until the team decides on a product, products.json says whether it is on show ("hidden": true keeps it off).
+-- Once an admin or manager approves or declines it, the decision wins: every catalogue page reads the decisions
+-- through s3d_live (live.js), so an approved product is on show at once and a declined one is off at once.
+-- pipeline/scripts/sync_reviews.mjs later writes the decisions into products.json.
+
+-- The catalogue's one read (anon key): each decided product's current decision, and nothing else.
+create or replace function public.s3d_live() returns table (product_id text, decision text)
+language sql stable security definer set search_path = public as $$
+  select distinct on (d.product_id) d.product_id, d.decision
+  from public.s3d_decisions d
+  order by d.product_id, d.id desc
+$$;
+
+-- Approve or decline a product (admins and managers). A decline needs a reason; an approval takes an optional
+-- note. A decision can be changed any time: each one is a new row, and each goes in the audit log too.
+create or replace function public.s3d_decide(p_product text, p_decision text, p_note text default null, p_label text default null)
+returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  n text := nullif(btrim(coalesce(p_note, '')), '');
+  prev text;
+  r public.s3d_decisions;
+begin
+  if coalesce(public.s3d_role(), '') not in ('admin', 'manager') then
+    raise exception 'Not allowed' using errcode = '42501';
+  end if;
+  if p_product is null or p_product !~ '^[a-z0-9][a-z0-9-]{0,79}$' then raise exception 'No such product' using errcode = '22023'; end if;
+  if p_decision is null or p_decision not in ('approved', 'declined') then
+    raise exception 'The decision must be approved or declined' using errcode = '22023';
+  end if;
+  if p_decision = 'declined' and char_length(coalesce(n, '')) < 3 then
+    raise exception 'Say why it is declined' using errcode = '22023';
+  end if;
+  if char_length(coalesce(n, '')) > 500 then raise exception 'The note is too long: 500 characters at most' using errcode = '22023'; end if;
+  perform pg_advisory_xact_lock(hashtext('s3d_decide:' || p_product));   -- two people deciding at once: one after the other
+  select d.decision into prev from public.s3d_decisions d where d.product_id = p_product order by d.id desc limit 1;
+  insert into public.s3d_decisions (product_id, decision, note, label, actor, actor_email)
+    values (p_product, p_decision, n, left(nullif(btrim(coalesce(p_label, '')), ''), 200), auth.uid(),
+            (select email from public.s3d_profiles where user_id = auth.uid()))
+    returning * into r;
+  perform public.s3d_audit_write('product_' || p_decision, 'product', p_product, coalesce(r.label, p_product),
+    jsonb_build_object('decision', jsonb_build_object('from', prev, 'to', p_decision))
+      || case when n is null then '{}'::jsonb else jsonb_build_object('note', n) end);
+  return json_build_object('product_id', r.product_id, 'decision', r.decision, 'note', r.note, 'by', r.actor_email, 'at', r.at);
+end $$;
+
+-- Feedback from any active staff member. Photos are uploaded to the s3d-feedback bucket first, into the
+-- product's own folder (<product id>/<random uuid>.jpg); this takes their paths.
+create or replace function public.s3d_feedback_add(
+  p_product text, p_body text, p_device text default null, p_finish text default null, p_area text default null, p_photos text[] default '{}'
+) returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  b text := btrim(coalesce(p_body, ''));
+  ph text[] := coalesce(p_photos, '{}');
+  x text;
+  r public.s3d_feedback;
+begin
+  if public.s3d_role() is null then raise exception 'Not allowed' using errcode = '42501'; end if;
+  if p_product is null or p_product !~ '^[a-z0-9][a-z0-9-]{0,79}$' then raise exception 'No such product' using errcode = '22023'; end if;
+  if b = '' then raise exception 'Write what you saw' using errcode = '22023'; end if;
+  if char_length(b) > 2000 then raise exception 'The feedback is too long: 2000 characters at most' using errcode = '22023'; end if;
+  if p_device is not null and p_device not in ('iphone', 'android', 'headset', 'computer') then
+    raise exception 'Unknown device' using errcode = '22023';
+  end if;
+  if cardinality(ph) > 3 then raise exception 'Up to 3 photos' using errcode = '22023'; end if;
+  foreach x in array ph loop
+    if x is null or x !~ ('^' || p_product || '/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpg$') then
+      raise exception 'A photo isn''t in this product''s folder' using errcode = '22023';
+    end if;
+  end loop;
+  insert into public.s3d_feedback (product_id, body, device, finish, area, photos, author, author_email)
+    values (p_product, b, p_device, left(nullif(btrim(coalesce(p_finish, '')), ''), 80), left(nullif(btrim(coalesce(p_area, '')), ''), 80),
+            ph, auth.uid(), (select email from public.s3d_profiles where user_id = auth.uid()))
+    returning * into r;
+  return json_build_object('id', r.id, 'at', r.at);
+end $$;
+
+-- Mark feedback fixed, or open it again (admins and managers).
+create or replace function public.s3d_feedback_set(p_id bigint, p_status text) returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  r public.s3d_feedback;
+begin
+  if coalesce(public.s3d_role(), '') not in ('admin', 'manager') then
+    raise exception 'Not allowed' using errcode = '42501';
+  end if;
+  if p_status is null or p_status not in ('open', 'fixed') then raise exception 'The status must be open or fixed' using errcode = '22023'; end if;
+  update public.s3d_feedback
+    set status = p_status, status_by = auth.uid(), status_at = now(),
+        status_email = (select email from public.s3d_profiles where user_id = auth.uid())
+    where id = p_id returning * into r;
+  if not found then raise exception 'No such feedback' using errcode = 'P0002'; end if;
+  return json_build_object('id', r.id, 'status', r.status, 'status_by', r.status_email, 'status_at', r.status_at);
+end $$;
+
+-- One check of the test checklist, for the signed-in tester on one device type: pass, fail or untested
+-- (untested removes their mark). Any active staff member.
+create or replace function public.s3d_check_set(p_product text, p_item text, p_device text, p_result text) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if public.s3d_role() is null then raise exception 'Not allowed' using errcode = '42501'; end if;
+  if p_product is null or p_product !~ '^[a-z0-9][a-z0-9-]{0,79}$' then raise exception 'No such product' using errcode = '22023'; end if;
+  if p_item is null or p_item !~ '^[a-z][a-z0-9_]{1,39}$' then raise exception 'No such check' using errcode = '22023'; end if;
+  if p_device is null or p_device not in ('iphone', 'android', 'headset', 'computer') then raise exception 'Unknown device' using errcode = '22023'; end if;
+  if p_result is null or p_result not in ('pass', 'fail', 'untested') then
+    raise exception 'The result must be pass, fail or untested' using errcode = '22023';
+  end if;
+  if p_result = 'untested' then
+    delete from public.s3d_checks where product_id = p_product and item = p_item and device = p_device and tester = uid;
+  else
+    insert into public.s3d_checks (product_id, item, device, tester, tester_email, result)
+      values (p_product, p_item, p_device, uid, (select email from public.s3d_profiles where user_id = uid), p_result)
+      on conflict (product_id, item, device, tester) do update set result = excluded.result, tester_email = excluded.tester_email, at = now();
+  end if;
+end $$;
+
+-- The review queue (any active staff): per product that has a decision, feedback or a check, its current
+-- decision, open and total feedback, passes and fails, and when anything last happened.
+create or replace function public.s3d_review_queue() returns json
+language plpgsql stable security definer set search_path = public as $$
+declare
+  r json;
+begin
+  if public.s3d_role() is null then raise exception 'Not allowed' using errcode = '42501'; end if;
+  with
+    d as (select distinct on (x.product_id) x.product_id, x.decision, x.note, x.actor_email, x.at
+          from public.s3d_decisions x order by x.product_id, x.id desc),
+    f as (select x.product_id, count(*) filter (where x.status = 'open') as open, count(*) as total,
+            max(greatest(x.at, x.status_at)) as last
+          from public.s3d_feedback x group by x.product_id),
+    c as (select x.product_id, count(*) filter (where x.result = 'pass') as pass, count(*) filter (where x.result = 'fail') as fail,
+            max(x.at) as last
+          from public.s3d_checks x group by x.product_id),
+    ids as (select product_id from d union select product_id from f union select product_id from c)
+  select coalesce(json_agg(json_build_object(
+      'product_id', ids.product_id, 'decision', d.decision, 'note', d.note, 'decided_by', d.actor_email, 'decided_at', d.at,
+      'open_feedback', coalesce(f.open, 0), 'feedback', coalesce(f.total, 0),
+      'checks_pass', coalesce(c.pass, 0), 'checks_fail', coalesce(c.fail, 0),
+      'last_at', greatest(d.at, f.last, c.last)) order by ids.product_id), '[]'::json)
+    into r
+    from ids left join d on d.product_id = ids.product_id left join f on f.product_id = ids.product_id
+      left join c on c.product_id = ids.product_id;
+  return r;
+end $$;
+
+-- One product's review (any active staff): its decisions newest first, its feedback newest first, and every
+-- tester's checklist marks ("mine" marks the signed-in tester's own).
+create or replace function public.s3d_review(p_product text) returns json
+language plpgsql stable security definer set search_path = public as $$
+declare
+  r json;
+begin
+  if public.s3d_role() is null then raise exception 'Not allowed' using errcode = '42501'; end if;
+  select json_build_object(
+    'history', coalesce((select json_agg(json_build_object(
+        'id', d.id, 'decision', d.decision, 'note', d.note, 'by', d.actor_email, 'name', p.full_name, 'at', d.at) order by d.id desc)
+      from public.s3d_decisions d left join public.s3d_profiles p on p.user_id = d.actor where d.product_id = p_product), '[]'::json),
+    'feedback', coalesce((select json_agg(json_build_object(
+        'id', f.id, 'body', f.body, 'device', f.device, 'finish', f.finish, 'area', f.area, 'photos', f.photos,
+        'by', f.author_email, 'name', p.full_name, 'at', f.at,
+        'status', f.status, 'status_by', f.status_email, 'status_at', f.status_at) order by f.id desc)
+      from public.s3d_feedback f left join public.s3d_profiles p on p.user_id = f.author where f.product_id = p_product), '[]'::json),
+    'checks', coalesce((select json_agg(json_build_object(
+        'item', c.item, 'device', c.device, 'result', c.result, 'by', c.tester_email, 'name', p.full_name,
+        'mine', c.tester = auth.uid(), 'at', c.at) order by c.at)
+      from public.s3d_checks c left join public.s3d_profiles p on p.user_id = c.tester where c.product_id = p_product), '[]'::json)
+  ) into r;
+  return r;
+end $$;
+
 -- ── row level security ───────────────────────────────────────────────────────────────────────────────────
 
 drop policy if exists s3d_stores_read on public.s3d_stores;
@@ -643,12 +871,25 @@ create policy s3d_audit_read on public.s3d_audit for select to authenticated
 
 -- s3d_events has no policies: nobody reads or writes it directly (s3d_track writes, the read-outs read).
 
+-- the review tables: active staff read them; every write goes through the review functions above
+drop policy if exists s3d_decisions_read on public.s3d_decisions;
+create policy s3d_decisions_read on public.s3d_decisions for select to authenticated
+  using ((select public.s3d_role()) is not null);
+drop policy if exists s3d_feedback_read on public.s3d_feedback;
+create policy s3d_feedback_read on public.s3d_feedback for select to authenticated
+  using ((select public.s3d_role()) is not null);
+drop policy if exists s3d_checks_read on public.s3d_checks;
+create policy s3d_checks_read on public.s3d_checks for select to authenticated
+  using ((select public.s3d_role()) is not null);
+
 -- ── grants: exactly these, every run ─────────────────────────────────────────────────────────────────────
 
 revoke all on table public.s3d_stores, public.s3d_profiles, public.s3d_invites,
-  public.s3d_devices, public.s3d_events, public.s3d_audit from public, anon, authenticated;
+  public.s3d_devices, public.s3d_events, public.s3d_audit,
+  public.s3d_decisions, public.s3d_feedback, public.s3d_checks from public, anon, authenticated;
 grant select, insert, update, delete on table public.s3d_stores, public.s3d_profiles, public.s3d_invites,
-  public.s3d_devices, public.s3d_events, public.s3d_audit to service_role;
+  public.s3d_devices, public.s3d_events, public.s3d_audit,
+  public.s3d_decisions, public.s3d_feedback, public.s3d_checks to service_role;
 
 grant select, insert (name, code, city, address), update (name, code, city, address), delete
   on public.s3d_stores to authenticated;
@@ -659,6 +900,8 @@ grant select (id, name, store_id, notes, pair_code, paired_at, platform, last_se
 grant select, update (role, store_id, status, full_name) on public.s3d_profiles to authenticated;
 grant select, insert (email, role, store_id), delete on public.s3d_invites to authenticated;
 grant select on public.s3d_audit to authenticated;
+-- read-only for staff (the policies above); written only by the review functions. Identity ids: no sequence grants.
+grant select on public.s3d_decisions, public.s3d_feedback, public.s3d_checks to authenticated;
 
 revoke all on function public.s3d_new_code() from public, anon, authenticated;
 revoke all on function public.s3d_role() from public, anon, authenticated;
@@ -675,11 +918,19 @@ revoke all on function public.s3d_device_reset(bigint) from public, anon, authen
 revoke all on function public.s3d_snapshot(text) from public, anon, authenticated;
 revoke all on function public.s3d_activity(timestamptz, timestamptz, text, text) from public, anon, authenticated;
 revoke all on function public.s3d_analytics(timestamptz, timestamptz, bigint, text, text) from public, anon, authenticated;
+revoke all on function public.s3d_live() from public, anon, authenticated;
+revoke all on function public.s3d_decide(text, text, text, text) from public, anon, authenticated;
+revoke all on function public.s3d_feedback_add(text, text, text, text, text, text[]) from public, anon, authenticated;
+revoke all on function public.s3d_feedback_set(bigint, text) from public, anon, authenticated;
+revoke all on function public.s3d_check_set(text, text, text, text) from public, anon, authenticated;
+revoke all on function public.s3d_review_queue() from public, anon, authenticated;
+revoke all on function public.s3d_review(text) from public, anon, authenticated;
 
 -- the catalogue and the sign-in page (anon key)
 grant execute on function public.s3d_track(text, text, text, text, uuid, text) to anon, authenticated, service_role;
 grant execute on function public.s3d_pair(text, text) to anon, authenticated, service_role;
 grant execute on function public.s3d_login_failed(text) to anon, authenticated, service_role;
+grant execute on function public.s3d_live() to anon, authenticated, service_role;
 -- signed-in staff (each function checks the role itself)
 grant execute on function public.s3d_new_code() to authenticated, service_role;   -- the devices.pair_code default
 grant execute on function public.s3d_role() to authenticated, service_role;       -- used by the policies
@@ -689,6 +940,29 @@ grant execute on function public.s3d_device_reset(bigint) to authenticated, serv
 grant execute on function public.s3d_snapshot(text) to authenticated, service_role;
 grant execute on function public.s3d_activity(timestamptz, timestamptz, text, text) to authenticated, service_role;
 grant execute on function public.s3d_analytics(timestamptz, timestamptz, bigint, text, text) to authenticated, service_role;
+grant execute on function public.s3d_decide(text, text, text, text) to authenticated, service_role;
+grant execute on function public.s3d_feedback_add(text, text, text, text, text, text[]) to authenticated, service_role;
+grant execute on function public.s3d_feedback_set(bigint, text) to authenticated, service_role;
+grant execute on function public.s3d_check_set(text, text, text, text) to authenticated, service_role;
+grant execute on function public.s3d_review_queue() to authenticated, service_role;
+grant execute on function public.s3d_review(text) to authenticated, service_role;
+
+-- ── feedback photos: the private Storage bucket s3d-feedback ─────────────────────────────────────────────
+-- Not public: a photo is read through a short-lived signed link, which only active staff can make. Up to 5 MB,
+-- JPEG only (the admin shrinks every photo to a JPEG in the browser before it uploads it). Active staff upload,
+-- into a product's folder: <product id>/<random uuid>.jpg. Nobody changes or deletes a photo from the browser.
+-- These policies are on Storage's own table, storage.objects, so they name the bucket: other apps' buckets on
+-- this shared project are not affected.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+  values ('s3d-feedback', 's3d-feedback', false, 5242880, array['image/jpeg'])
+  on conflict (id) do update set public = false, file_size_limit = 5242880, allowed_mime_types = array['image/jpeg'];
+drop policy if exists s3d_feedback_photos_read on storage.objects;
+create policy s3d_feedback_photos_read on storage.objects for select to authenticated
+  using (bucket_id = 's3d-feedback' and (select public.s3d_role()) is not null);
+drop policy if exists s3d_feedback_photos_add on storage.objects;
+create policy s3d_feedback_photos_add on storage.objects for insert to authenticated
+  with check (bucket_id = 's3d-feedback' and (select public.s3d_role()) is not null
+    and name ~ '^[a-z0-9][a-z0-9-]{0,79}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpg$');
 
 commit;
 

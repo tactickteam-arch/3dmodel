@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Showcase · Sangeetha 3D and AR</title>
+<meta name="description" content="A store screen that plays a playlist of products in 3D, one after another.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E0E0F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js" integrity="sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k" crossorigin="anonymous"></script>
+<script src="/track.js" defer></script>
+<!--
+  /kiosk: a store TV or tablet plays a playlist full screen, one product after another, each in 3D for the
+  playlist's seconds: turning slowly, opening its doors, showing its features, or just standing there.
+    /kiosk?list=<id>                 a playlist saved in the admin (Playlists), read with s3d_playlist_get
+    /kiosk?items=<id>~<colour>,<id>  a list in the address (the admin's demo mode), with &seconds=, &show=, &name=
+    &idle=<seconds>                  how long after the last touch it carries on by itself (default 60)
+  Each product is the product page (/p/<id>?embed) in a frame, driven through its test hooks (window.__demo). There
+  is only ever one frame: the next product's frame replaces the last one, so it can run for days. A touch pauses
+  it, so a shopper can turn the product and open its doors; it carries on with the next product after a minute
+  without a touch. A small QR code in the corner opens the product on the shopper's phone. The playlist is read
+  again every 5 minutes, so changes in the admin reach the screen without anyone touching it, and the page reloads
+  itself every 4 hours.
+-->
+<style>
+  :root {
+    --navy: #0E0E0F;
+    --paper: #F4F4F5;
+    --stage: #E7E7EA;
+    --copper: #F58A29;
+    --slate: #5E6066;
+    --sans: Outfit, -apple-system, Arial, sans-serif;
+    --shadow: 0 8px 24px rgba(18,34,58,.14);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--paper); color: var(--navy); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  /* the product page fills the stage; our own words and the QR code sit in a rail beside it (on a tall or narrow
+     screen, a bar above it), so they never cover the page's buttons, feature cards or doors */
+  body { display: grid; grid-template-columns: clamp(220px, 19vw, 320px) minmax(0, 1fr); }
+  #rail { display: flex; flex-direction: column; gap: 18px; padding: 28px 22px 22px; min-width: 0; min-height: 0; background: var(--paper); border-right: 1px solid #E3E3E6; }
+  #rail .brandbar { margin: -28px -22px 4px; padding: 18px 22px; background: var(--navy); }   /* the logo is white, as on the catalogue's header */
+  #rail .brandbar img { display: block; height: 30px; width: auto; }
+  #name { display: grid; gap: 6px; min-width: 0; }
+  #name img { height: 24px; width: auto; align-self: start; justify-self: start; }
+  #name b { font-size: clamp(19px, 1.6vw, 26px); font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+  #name span { color: var(--slate); font-size: 15px; overflow-wrap: anywhere; }
+  #name .of { font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+  #qr { margin-top: auto; display: grid; gap: 10px; justify-items: center; text-align: center; padding: 14px; background: #fff; border-radius: 16px; box-shadow: var(--shadow); }
+  #qr .code { width: 100%; max-width: 170px; aspect-ratio: 1; }
+  #qr .code svg { display: block; width: 100%; height: 100%; }
+  #qr p { margin: 0; font-size: 15px; line-height: 1.25; font-weight: 600; }
+  #qr p span { display: block; color: var(--slate); font-weight: 400; font-size: 13px; margin-top: 3px; }
+  #fs { height: 44px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 999px; background: var(--navy); color: #fff; font: 600 14px var(--sans); cursor: pointer; transition: opacity .4s; flex: none; }
+  #fs svg { width: 18px; height: 18px; color: var(--copper); }
+  #fs.gone { opacity: 0; pointer-events: none; }
+  #fs:focus-visible { outline: 3px solid var(--copper); outline-offset: 3px; opacity: 1; pointer-events: auto; }
+  #stage { position: relative; min-width: 0; min-height: 0; background: var(--stage); }
+  #stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--stage); }
+  #paused { position: absolute; z-index: 5; left: 50%; top: 20px; transform: translateX(-50%); padding: 10px 16px; font-size: 14px; display: flex; gap: 8px; align-items: center; width: max-content; max-width: calc(100% - 32px); background: rgba(255,255,255,.95); border-radius: 999px; box-shadow: var(--shadow); }
+  #paused svg { width: 18px; height: 18px; color: var(--copper); flex: none; }
+  .hide { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* between two products: the next one's photo and name, while its 3D model loads */
+  #card { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: var(--paper); padding: 24px; }
+  #card.gone { opacity: 0; pointer-events: none; transition: opacity .5s; }   /* in at once, out gently */
+  #card .in { display: grid; justify-items: center; gap: 14px; text-align: center; max-width: min(720px, 100%); }
+  #card img.ph { width: min(36vh, 70vw); height: min(36vh, 70vw); object-fit: contain; mix-blend-mode: multiply; }
+  #card img.lg { height: 30px; width: auto; }
+  #card h1 { margin: 0; font-size: clamp(24px, 4.2vw, 46px); font-weight: 600; line-height: 1.15; text-wrap: balance; }
+  #card p { margin: 0; color: var(--slate); font-size: clamp(15px, 1.8vw, 20px); }
+  #card .count { font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* nothing to play, or the playlist can't be read */
+  #empty { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: var(--navy); color: #fff; text-align: center; padding: 24px; }
+  #empty .in { display: grid; gap: 14px; justify-items: center; max-width: 560px; }
+  #empty img { height: 40px; width: auto; }
+  #empty h1 { margin: 0; font-size: clamp(24px, 3.4vw, 36px); font-weight: 600; }
+  #empty p { margin: 0; color: #B4B4BB; font-size: 17px; line-height: 1.5; }
+
+  /* a tall screen or a phone: the bar above the 3D */
+  @media (max-aspect-ratio: 1/1), (max-width: 700px) {
+    body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    #rail { flex-direction: row; align-items: center; gap: 14px; padding: 12px 16px; border-right: 0; border-bottom: 1px solid #E3E3E6; }
+    #rail .brandbar, #name img, #name .of { display: none; }
+    #name { flex: 1; gap: 2px; }
+    #name b { font-size: 17px; }
+    #name span { font-size: 13px; }
+    #qr { margin: 0; padding: 6px; box-shadow: none; border: 1px solid #E3E3E6; border-radius: 12px; order: 2; }
+    #qr .code { width: 76px; }
+    #qr p { display: none; }
+    #fs { width: 44px; padding: 0; order: 3; }
+    #fs span { display: none; }
+  }
+</style>
+</head>
+<body>
+<aside id="rail">
+  <div class="brandbar"><img src="/logos/sangeetha.png" alt="Sangeetha" width="93" height="30"></div>
+  <div id="name" class="hide" aria-live="polite"><img alt=""><b></b><span class="sub"></span><span class="of"></span></div>
+  <div id="qr" class="hide"><div class="code" role="img" aria-label="QR code: open this product on your phone"></div><p>See it in your room<span>Scan with your phone’s camera</span></p></div>
+  <button id="fs" type="button" class="gone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
+</aside>
+<main id="stage"><div id="paused" class="hide" role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 4H6v16h4zM18 4h-4v16h4z"/></svg><span>Paused while you look. The showcase carries on by itself.</span></div></main>
+<div id="card" aria-hidden="true"><div class="in"><img class="lg hide" alt=""><img class="ph hide" alt=""><h1></h1><p class="sub"></p><p class="count"></p></div></div>
+<div id="empty" class="hide" role="status"><div class="in"><img src="/logos/sangeetha.png" alt="Sangeetha"><h1></h1><p></p></div></div>
+
+<script type="module">
+import { finishSlug, finishIndexOf } from "/site.js";
+import { loadCatalogue } from "/live.js";
+import { SUPABASE_URL, SUPABASE_ANON_KEY, siteOrigin } from "/admin-app/config.js";
+
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const q = new URLSearchParams(location.search);
+const clamp = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) && v !== null && v !== "" ? Math.min(hi, Math.max(lo, n)) : d; };
+const SHOWS = ["turn", "doors", "features", "still"];
+const LIST = /^[0-9]{1,18}$/.test(q.get("list") || "") ? q.get("list") : null;
+const IDLE_MS = clamp(q.get("idle"), 10, 600, 60) * 1000;
+const REFRESH_MS = 5 * 60e3, RELOAD_MS = 4 * 3600e3, LOAD_MS = 30e3;
+const started = Date.now();
+
+// ── the playlist: saved in the admin (?list=), or in the address (?items=) ──
+let list = null;      // { name, seconds, show, items: [{ product, finish }] }
+let products = [];    // products.json, with whether each is on show
+async function readList() {
+  if (LIST) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/s3d_playlist_get`, {
+      method: "POST",
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_id: Number(LIST) }),
+      credentials: "omit",
+    });
+    if (!r.ok) throw new Error(`playlist ${r.status}`);
+    const text = await r.text();
+    const j = text ? JSON.parse(text) : null;
+    if (!j || !Array.isArray(j.items)) return null;   // deleted, or never there
+    return { name: String(j.name || ""), seconds: clamp(j.seconds, 8, 600, 20), show: SHOWS.includes(j.show) ? j.show : "turn",
+      items: j.items.filter((x) => x && typeof x.product === "string").map((x) => ({ product: x.product, finish: typeof x.finish === "string" ? x.finish : null })) };
+  }
+  const items = (q.get("items") || "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 60)
+    .map((s) => { const [product, finish] = s.split("~"); return { product: product.toLowerCase(), finish: finish || null }; });
+  return { name: q.get("name") || "", seconds: clamp(q.get("seconds"), 8, 600, 20), show: SHOWS.includes(q.get("show")) ? q.get("show") : "turn", items };
+}
+async function readAll() {
+  const [l, cat] = await Promise.all([readList(), loadCatalogue()]);
+  products = cat.products.map((p) => ({ ...p, onShow: cat.isShown(p) }));
+  list = l;
+  if (list?.name) document.title = `${list.name} · Showcase`;
+}
+// the products it can play: on show in the catalogue (the product page shows nothing for any other)
+const playable = () => (list?.items || []).map((x) => ({ ...x, p: products.find((p) => p.id === x.product && p.onShow) })).filter((x) => x.p);
+
+// ── the screens around the 3D ──
+function empty(title, text) {
+  $("empty").querySelector("h1").textContent = title;
+  $("empty").querySelector("p").textContent = text;
+  $("empty").classList.remove("hide");
+  for (const id of ["name", "qr", "paused"]) $(id).classList.add("hide");
+  dropFrame();
+}
+const filled = () => $("empty").classList.add("hide");
+function titleCard(x, n, of) {
+  const c = $("card"), fin = x.p.finishes[finishIndexOf(x.p, x.finish)];
+  const ph = c.querySelector("img.ph"), lg = c.querySelector("img.lg");
+  const photo = x.p.thumb || x.p.photos?.[0];
+  ph.classList.toggle("hide", !photo);
+  if (photo) { ph.src = photo; ph.alt = ""; }
+  lg.classList.toggle("hide", !x.p.brandLogo);
+  if (x.p.brandLogo) lg.src = x.p.brandLogo;
+  c.querySelector("h1").textContent = `${x.p.brand} ${x.p.shortName || x.p.name}`;
+  c.querySelector(".sub").textContent = [fin?.code || x.p.model, x.p.finishes.length > 1 ? fin?.name : null].filter(Boolean).join(" · ");
+  c.querySelector(".count").textContent = of > 1 ? `${n} of ${of}` : "";
+  c.classList.remove("gone");
+}
+function corner(x, n, of) {
+  const fin = x.p.finishes[finishIndexOf(x.p, x.finish)];
+  const nm = $("name"), lg = nm.querySelector("img");
+  lg.classList.toggle("hide", !x.p.brandLogo);
+  if (x.p.brandLogo) { lg.src = x.p.brandLogo; lg.alt = x.p.brand; }
+  nm.querySelector("b").textContent = `${x.p.brand} ${x.p.shortName || x.p.name}`;
+  nm.querySelector(".sub").textContent = [fin?.code || x.p.model, x.p.finishes.length > 1 ? fin?.name : null].filter(Boolean).join(" · ");
+  nm.querySelector(".of").textContent = of > 1 ? `${n} of ${of}` : "";
+  nm.classList.remove("hide");
+  // the code opens the product's page (in this colour) on the shopper's phone, where they can place it in their room
+  const url = `${siteOrigin()}/p/${x.p.id}${x.finish && fin && finishIndexOf(x.p, x.finish) > 0 ? `?finish=${finishSlug(fin.name)}` : ""}`;
+  $("qr").dataset.url = url;
+  if (window.qrcode) {
+    const code = window.qrcode(0, "M");
+    code.addData(url);
+    code.make();
+    $("qr").querySelector(".code").innerHTML = code.createSvgTag({ cellSize: 3, margin: 0, scalable: true });
+    $("qr").classList.remove("hide");
+  } else $("qr").classList.add("hide");
+}
+
+// ── one frame, replaced for every product ──
+let frame = null;
+function dropFrame() {
+  if (!frame) return;
+  // emptied before it goes, so the last product's 3D model and its memory go with it
+  try { frame.src = "about:blank"; } catch {}
+  frame.remove();
+  frame = null;
+}
+function newFrame(x) {
+  dropFrame();
+  const f = document.createElement("iframe");
+  const u = new URLSearchParams({ embed: "", kiosk: "1" });
+  const fin = x.p.finishes[finishIndexOf(x.p, x.finish)];
+  if (x.finish && finishIndexOf(x.p, x.finish) > 0) u.set("finish", finishSlug(fin.name));
+  f.src = `/p/${encodeURIComponent(x.p.id)}?${u.toString().replace("embed=&", "embed&")}`;
+  f.title = `${x.p.brand} ${x.p.shortName || x.p.name} in 3D`;
+  f.setAttribute("allow", "fullscreen");
+  $("stage").appendChild(f);
+  frame = f;
+  return f;
+}
+// the product page, once its 3D model is on screen; null for a page with no product, or after 30 s
+async function ready(f, g) {
+  for (const t0 = Date.now(); Date.now() - t0 < LOAD_MS; await sleep(150)) {
+    if (g !== gen || f !== frame) return null;
+    try {
+      const w = f.contentWindow, doc = f.contentDocument;
+      if (doc?.querySelector(".missing")) return null;
+      const mv = doc?.getElementById("viewer");
+      if (w?.__demo?.product && mv?.loaded) return { w, doc, mv, d: w.__demo };
+    } catch { return null; }
+  }
+  return null;
+}
+function dress(page) {
+  // the page's own "View in your room" opens another tab and its first-visit hint talks to one person: neither suits a shop screen
+  const st = page.doc.createElement("style");
+  st.textContent = ".embed-open, #embedOpen, .hint { display: none !important; }";
+  page.doc.head.appendChild(st);
+  // a touch in the product pauses the showcase, as one outside it does
+  for (const type of ["pointerdown", "keydown", "wheel"]) page.w.addEventListener(type, touched, { capture: true, passive: true });
+}
+
+// ── playing ──
+let gen = 0;            // which run is current: a touch or a new list stops the run in progress
+let at = -1, items = [], paused = false, idleTimer = 0, skipped = 0, page = null, playing = null;
+const wait = async (ms, g) => { const end = Date.now() + ms; while (Date.now() < end) { if (g !== gen) return false; await sleep(Math.min(250, end - Date.now())); } return g === gen; };
+const settled = async (d, g, ms = 8000) => { for (const end = Date.now() + ms; Date.now() < end; await sleep(100)) { if (g !== gen) return false; if (d.idle()) return true; } return g === gen; };
+function turn(mv, on) { try { mv.autoRotateDelay = 0; mv.rotationPerSecond = "12deg"; mv.autoRotate = on; } catch {} }
+
+async function show(pg, mode, ms, g) {
+  const { d, mv } = pg;
+  const end = Date.now() + ms;
+  const top = (d.product.parts || []).filter((p) => !p.needs).map((p) => p.key);
+  const feats = d.product.hotspots || [];
+  if (mode === "doors" && top.length) {
+    turn(mv, true);
+    if (!(await wait(1200, g))) return;
+    for (const k of top) { await d.togglePart(k); if (!(await settled(d, g)) || !(await wait(500, g))) return; }
+    // hold them open, then close them in turn, last first, in time for the next product
+    if (!(await wait(Math.max(1500, end - Date.now() - top.length * 1400), g))) return;
+    for (const k of [...top].reverse()) { if (d.state[k]) await d.togglePart(k); if (!(await settled(d, g))) return; }
+  } else if (mode === "features" && feats.length) {
+    turn(mv, false);
+    const each = Math.max(4000, ms / Math.min(feats.length, 6));
+    for (let i = 0; i < feats.length && (i === 0 || Date.now() + each <= end + 1000); i++) {
+      await d.showFeature(i, { tour: true });
+      if (!(await wait(each, g))) return;
+    }
+    d.closeFeature();
+  } else if (mode !== "still") turn(mv, true);
+  await wait(Math.max(0, end - Date.now()), g);
+}
+
+async function playOne(x, n, of, g) {
+  titleCard(x, n, of);
+  $("name").classList.add("hide");
+  $("qr").classList.add("hide");
+  const shownAt = Date.now();
+  const f = newFrame(x);
+  const pg = await ready(f, g);
+  if (g !== gen) return true;
+  if (!pg) { dropFrame(); return false; }
+  page = pg;
+  dress(pg);
+  playing = x.p.id;
+  // the photo stays at least a moment, so a quick load doesn't flash
+  if (!(await wait(Math.max(0, 1600 - (Date.now() - shownAt)), g))) return true;
+  $("card").classList.add("gone");
+  corner(x, n, of);
+  await show(pg, list.show, list.seconds * 1000, g);
+  return true;
+}
+
+async function run() {
+  const g = ++gen;
+  while (g === gen) {
+    items = playable();
+    if (!items.length) {
+      empty(list ? "Nothing to play yet" : "This showcase isn’t there",
+        list ? "None of this playlist’s products are on show in the catalogue. Add some on the admin’s Playlists page; this screen checks again every few minutes."
+          : "The playlist may have been deleted, or the link is wrong. Ask your admin for the showcase link from the admin’s Playlists page.");
+      $("card").classList.add("gone");
+      return;
+    }
+    filled();
+    at = (at + 1) % items.length;
+    const ok = await playOne(items[at], at + 1, items.length, g);
+    if (g !== gen) return;
+    skipped = ok ? 0 : skipped + 1;
+    if (skipped >= items.length) {
+      // not one product would open (offline, or the site is being updated): rest a minute, then try again
+      empty("Showing again in a minute", "The products couldn’t be opened just now.");
+      if (!(await wait(60e3, g))) return;
+      skipped = 0;
+    }
+    // every 4 hours, between two products, a fresh start (when there is a connection to start again with)
+    if (Date.now() - started > RELOAD_MS && navigator.onLine) { location.reload(); return; }
+  }
+}
+
+// ── a touch pauses it; a minute without one, and it carries on with the next product ──
+function touched(e) {
+  if (e?.target?.closest?.("#fs")) return;
+  revealFs();
+  if (!items.length || !frame) return;
+  if (!paused) {
+    paused = true;
+    gen++;   // stops the run: the product stays as it is, for the shopper to turn and open
+    $("card").classList.add("gone");
+    $("paused").classList.remove("hide");
+    try { page?.d.closeFeature(); } catch {}
+    try { if (page) turn(page.mv, false); } catch {}
+  }
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(resume, IDLE_MS);
+}
+function resume() {
+  clearTimeout(idleTimer);
+  paused = false;
+  $("paused").classList.add("hide");
+  run();
+}
+for (const type of ["pointerdown", "keydown", "wheel"]) addEventListener(type, touched, { capture: true, passive: true });
+
+// ── full screen (needs a press), and keeping the screen awake ──
+let fsTimer = 0;
+function revealFs() {
+  if (!document.fullscreenEnabled || document.fullscreenElement) return void $("fs").classList.add("gone");
+  $("fs").classList.remove("gone");
+  clearTimeout(fsTimer);
+  fsTimer = setTimeout(() => $("fs").classList.add("gone"), 6000);
+}
+$("fs").addEventListener("click", () => { document.documentElement.requestFullscreen?.().catch(() => {}); $("fs").classList.add("gone"); });
+addEventListener("mousemove", revealFs, { passive: true });
+document.addEventListener("fullscreenchange", revealFs);
+let lock = null;
+async function awake() {
+  try { if (document.visibilityState === "visible" && !lock && navigator.wakeLock) { lock = await navigator.wakeLock.request("screen"); lock.addEventListener("release", () => (lock = null)); } } catch {}
+}
+document.addEventListener("visibilitychange", awake);
+
+// ── start, and read the playlist again every 5 minutes ──
+async function refresh() {
+  const before = JSON.stringify(list);
+  try { await readAll(); }
+  catch { if (!list) { empty("Can’t reach the showcase list", "No connection just now. This screen tries again every few minutes."); } return; }
+  if (JSON.stringify(list) === before && items.length) return;
+  // a changed list starts from its first product, unless someone is looking at the current one
+  at = -1;
+  if (!paused) run();
+}
+setInterval(refresh, REFRESH_MS);
+await refresh();
+awake();
+revealFs();
+
+// test hooks for automated checks
+window.__kiosk = {
+  get list() { return list; },
+  state: () => ({ at, playing, paused, gen, count: items.length, frames: document.querySelectorAll("#stage iframe").length, src: frame?.getAttribute("src") || null, qr: $("qr").dataset.url || null, empty: !$("empty").classList.contains("hide") }),
+  next: () => { paused = false; $("paused").classList.add("hide"); clearTimeout(idleTimer); run(); },
+  refresh,
+};
+</script>
+</body>
+</html>

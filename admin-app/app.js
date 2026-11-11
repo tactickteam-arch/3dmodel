@@ -3,6 +3,8 @@
 import { esc, icon, toast, destroyCharts, errorBox } from "./ui.js";
 import { COMPANY } from "./config.js";
 import * as pages from "./pages.js";
+import { reviewPage } from "./review.js";
+import * as tools from "./tools.js";   // requests, playlists, profile, and what each device shows
 
 const params = new URLSearchParams(location.search);
 const DEMO = params.get("demo") === "1";
@@ -10,6 +12,7 @@ const root = document.getElementById("app");
 const ROLES = { admin: "Admin", manager: "Manager", viewer: "Viewer" };
 
 const PAGES = [
+  { id: "review", group: "Testing", label: "Review queue", ic: "checkCircle", run: reviewPage },   // #/review and #/review/<product id>
   { id: "dashboard", group: "Overview", label: "Dashboard", ic: "gauge", run: pages.dashboard },
   { id: "analytics", group: "Overview", label: "Analytics", ic: "chart", run: pages.analytics },
   { id: "stores", group: "Business operations", label: "Stores", ic: "store", run: pages.storesPage },
@@ -19,6 +22,9 @@ const PAGES = [
   { id: "users", group: "Access management", label: "Users", ic: "users", run: pages.usersPage, roles: ["admin"] },
   { id: "roles", group: "Access management", label: "Roles", ic: "shield", run: pages.rolesPage },
   { id: "audit", group: "Access management", label: "Audit logs", ic: "history", run: pages.auditPage, roles: ["admin"] },
+  { id: "requests", group: "Business operations", label: "Requests", ic: "plus", run: tools.requestsPage },
+  { id: "playlists", group: "Business operations", label: "Playlists", ic: "tablet", run: tools.playlistsPage },
+  { id: "profile", group: "Account", label: "Your profile", ic: "userCheck", run: tools.profilePage },
 ];
 
 let api = null;
@@ -165,6 +171,7 @@ function buildShell() {
         <button class="btn ghost icon" id="userBtn" aria-label="Account menu" aria-haspopup="menu" aria-expanded="false">${icon("more")}</button>
         <div class="menu hide" id="userMenu" role="menu">
           <div class="role">${esc(ROLES[profile.role] || profile.role)}${profile.store ? ` · ${esc(profile.store)}` : ""}</div>
+          <a href="#/profile" role="menuitem">${icon("userCheck")}Your profile</a>
           <a href="/" target="_blank" rel="noopener" role="menuitem">${icon("external")}Open the catalogue</a>
           <button id="pwBtn" role="menuitem">${icon("key")}Change password</button>
           <button id="outBtn" role="menuitem">${icon("logout")}Sign out</button>
@@ -201,8 +208,8 @@ function buildShell() {
 let token = 0;
 async function route() {
   if (!profile || !shellBuilt) return;
-  const want = (location.hash.match(/^#\/([a-z]+)/) || [])[1];
-  const page = PAGES.find((p) => p.id === want && allowed(p)) || PAGES[0];
+  const [, want, sub] = location.hash.match(/^#\/([a-z]+)(?:\/([^?#]+))?/) || [];
+  const page = PAGES.find((p) => p.id === want && allowed(p)) || PAGES.find((p) => p.id === "dashboard");
   if (want !== page.id) history.replaceState(history.state, "", `${location.pathname}${location.search}#/${page.id}`);
   const my = ++token;
   destroyCharts();
@@ -216,9 +223,10 @@ async function route() {
   scrollTo(0, 0);
   const role = profile.role;
   const ctx = { el, api, profile, alive: () => my === token, can: { write: role === "admin" || role === "manager", admin: role === "admin" } };
+  if (page.id === want && sub) Object.assign(ctx, { sub, crumb: (text) => (root.querySelector("#crumb").textContent = text) });   // #/review/<id>
   try { await page.run(ctx); }
   catch (e) { if (my === token) el.innerHTML = errorBox(e); }
-  if (my === token) el.dataset.ready = page.id;   // for the tests
+  if (my === token) el.dataset.ready = ctx.sub ? `${page.id}/${ctx.sub}` : page.id;   // for the tests
 }
 addEventListener("hashchange", route);
 

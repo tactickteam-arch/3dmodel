@@ -1,6 +1,7 @@
-// Runs schema.sql in PGlite (Postgres 17 in WebAssembly) behind a small stand-in for Supabase's auth schema
-// and roles, twice (it must be re-runnable), then walks through the sign-in, invite, pairing, tracking and
-// permission cases as anon, admin, manager, viewer and a pending account. Nothing touches Supabase.
+// Runs schema.sql in PGlite (Postgres 17 in WebAssembly) behind a small stand-in for Supabase's auth schema,
+// roles and Storage tables, twice (it must be re-runnable), then walks through the sign-in, invite, pairing,
+// tracking, product review (approve, decline, feedback, checklist, s3d_live, the photo bucket) and permission
+// cases as anon, admin, manager, viewer and a pending account. Nothing touches Supabase.
 // setup once: cd .work/admin && npm i @electric-sql/pglite      (the work folder is gitignored)
 // usage: node pipeline/admin/test_schema.mjs [schema.sql]
 import fs from "node:fs";
@@ -27,6 +28,17 @@ await db.exec(`
   -- what Supabase used to do for every new table and function: the schema must take these away again
   alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
   alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+  -- Supabase Storage's two tables, as far as schema.sql uses them. Supabase grants every role all of
+  -- storage.objects and leaves the rest to row level security; another app's bucket is there too.
+  create schema storage;
+  create table storage.buckets (id text primary key, name text not null, public boolean default false,
+    file_size_limit bigint, allowed_mime_types text[], created_at timestamptz default now());
+  create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text references storage.buckets (id),
+    name text, owner uuid default auth.uid(), created_at timestamptz default now());
+  alter table storage.objects enable row level security;
+  grant usage on schema storage to anon, authenticated, service_role;
+  grant all on storage.objects, storage.buckets to anon, authenticated, service_role;
+  insert into storage.buckets (id, name, public) values ('other-app', 'other-app', true);
 `);
 await db.exec(sql);
 check(true, "schema.sql ran (first time)");
@@ -204,12 +216,181 @@ await db.exec("commit");
 const fl = (await db.query("select count(*)::int n from public.s3d_events where session_id = 'flood-12345678'")).rows[0].n;
 check(fl === 300, "one tab is capped at 300 events in 10 minutes", `${fl}`);
 
+// ── product review: decisions, feedback, the checklist, s3d_live and the photo bucket ──
+const E = "00000000-0000-4000-8000-00000000000e";
+const P1 = "lg-glt3426snpz", P2 = "haier-hes-690gk";
+const photo = (p, u = "0f8fad5b-d9cb-469f-a165-70867728950e") => `'${p}/${u}.jpg'`;
+r = await as("anon", null, "select * from public.s3d_live()");
+check(!r.error && r.rows.length === 0, "anon calls s3d_live (no decisions yet)", r.error);
+for (const [q, what] of [
+  [`select public.s3d_decide('${P1}', 'approved')`, "approve (s3d_decide)"],
+  ["select public.s3d_review_queue()", "read the review queue"],
+  [`select public.s3d_review('${P1}')`, "read a product's review"],
+  [`select public.s3d_feedback_add('${P1}', 'Looks wrong')`, "give feedback"],
+  ["select public.s3d_feedback_set(1, 'fixed')", "mark feedback fixed"],
+  [`select public.s3d_check_set('${P1}', 'doors', 'iphone', 'pass')`, "fill the checklist"],
+  ["select * from public.s3d_decisions", "read s3d_decisions"],
+  ["select * from public.s3d_feedback", "read s3d_feedback"],
+  ["select * from public.s3d_checks", "read s3d_checks"],
+  [`insert into public.s3d_decisions (product_id, decision) values ('${P1}', 'approved')`, "write s3d_decisions"],
+]) {
+  r = await as("anon", null, q);
+  check(/permission denied/.test(r.error || ""), `anon can't ${what}`, r.error);
+}
+const FNS = ["s3d_live()", "s3d_decide(text,text,text,text)", "s3d_feedback_add(text,text,text,text,text,text[])", "s3d_feedback_set(bigint,text)",
+  "s3d_check_set(text,text,text,text)", "s3d_review_queue()", "s3d_review(text)"];
+const fnRights = (await db.query(`select f, has_function_privilege('anon', 'public.' || f, 'execute') a, has_function_privilege('authenticated', 'public.' || f, 'execute') u
+  from unnest($1::text[]) f`, [FNS])).rows;
+check(fnRights.filter((x) => x.a).map((x) => x.f).join() === "s3d_live()", "of the review functions anon may call only s3d_live", JSON.stringify(fnRights));
+check(fnRights.every((x) => x.u), "signed-in users may call every review function (each checks the role itself)");
+
+// a viewer, invited by the admin
+await as("authenticated", A, "insert into public.s3d_invites (email, role) values ('viewer@example.com', 'viewer')");
+await db.query("insert into auth.users (id, email, created_at) values ($1, 'viewer@example.com', now() + interval '2 seconds')", [E]);
+await as("authenticated", E, "select public.s3d_login(true)");
+await as("authenticated", E, "select public.s3d_password_set()");
+r = await one("authenticated", E, "select public.s3d_login(false) as j");
+check(r.j?.role === "viewer" && r.j?.status === "active" && r.j?.password_set === true, "an active viewer for the review tests", JSON.stringify(r));
+r = await as("authenticated", E, `select public.s3d_decide('${P1}', 'approved')`);
+check(/Not allowed/.test(r.error || ""), "a viewer can't approve", r.error);
+r = await as("authenticated", E, `select public.s3d_decide('${P1}', 'declined', 'The handle is the wrong colour')`);
+check(/Not allowed/.test(r.error || ""), "a viewer can't decline", r.error);
+r = await one("authenticated", E, `select public.s3d_feedback_add('${P1}', '  The handle looks lighter than in the shop  ', 'iphone', 'Shiny Steel', 'Colours', array[${photo(P1)}]) as j`);
+check(r.j?.id > 0, "a viewer gives feedback with a device, colour, area and a photo", JSON.stringify(r));
+const FB = r.j?.id;
+r = await as("authenticated", E, `select public.s3d_feedback_add('${P1}', 'x', null, null, null, array[${photo(P2)}])`);
+check(/folder/.test(r.error || ""), "a photo from another product's folder is refused", r.error);
+r = await as("authenticated", E, `select public.s3d_feedback_add('${P1}', 'x', null, null, null, array['${P1}/../secret.jpg'])`);
+check(/folder/.test(r.error || ""), "a photo path that isn't <product>/<uuid>.jpg is refused", r.error);
+r = await as("authenticated", E, `select public.s3d_feedback_add('${P1}', 'x', null, null, null, array[${[1, 2, 3, 4].map((i) => photo(P1, `0f8fad5b-d9cb-469f-a165-7086772895${i}e`)).join(",")}])`);
+check(/Up to 3 photos/.test(r.error || ""), "four photos are refused", r.error);
+r = await as("authenticated", E, `select public.s3d_feedback_add('${P1}', '   ')`);
+check(/Write what you saw/.test(r.error || ""), "empty feedback is refused", r.error);
+r = await as("authenticated", E, `select public.s3d_feedback_add('${P1}', 'x', 'tv')`);
+check(/Unknown device/.test(r.error || ""), "an unknown device is refused", r.error);
+r = await as("authenticated", E, `select public.s3d_feedback_add('Bad Id!', 'x')`);
+check(/No such product/.test(r.error || ""), "a bad product id is refused", r.error);
+r = await as("authenticated", E, `select public.s3d_check_set('${P1}', 'doors', 'iphone', 'pass')`);
+check(!r.error, "a viewer marks a check passed", r.error);
+await as("authenticated", E, `select public.s3d_check_set('${P1}', 'colours', 'android', 'fail')`);
+await as("authenticated", E, `select public.s3d_check_set('${P1}', 'doors', 'iphone', 'fail')`);
+await as("authenticated", E, `select public.s3d_check_set('${P1}', 'doors', 'iphone', 'pass')`);
+r = await as("authenticated", E, `select public.s3d_check_set('${P1}', 'colours', 'android', 'maybe')`);
+check(/pass, fail or untested/.test(r.error || ""), "a check is pass, fail or untested", r.error);
+r = await as("authenticated", E, `select public.s3d_check_set('${P1}', 'colours', 'fridge', 'pass')`);
+check(/Unknown device/.test(r.error || ""), "a check's device must be a known type", r.error);
+let ck = (await db.query("select item, device, result from public.s3d_checks order by item")).rows;
+check(ck.length === 2 && ck.find((x) => x.item === "doors")?.result === "pass", "changing a mark keeps one row per tester, check and device", JSON.stringify(ck));
+await as("authenticated", E, `select public.s3d_check_set('${P1}', 'colours', 'android', 'untested')`);
+ck = (await db.query("select item, device, result from public.s3d_checks")).rows;
+check(ck.length === 1 && ck[0].item === "doors", "untested removes the tester's mark", JSON.stringify(ck));
+r = await as("authenticated", E, `select public.s3d_feedback_set(${FB}, 'fixed')`);
+check(/Not allowed/.test(r.error || ""), "a viewer can't mark feedback fixed", r.error);
+r = await as("authenticated", E, "update public.s3d_feedback set status = 'fixed'");
+check(/permission denied/.test(r.error || ""), "nobody changes feedback directly", r.error);
+r = await as("authenticated", E, `insert into public.s3d_decisions (product_id, decision) values ('${P1}', 'approved')`);
+check(/permission denied/.test(r.error || ""), "nobody writes decisions directly", r.error);
+r = await as("authenticated", E, "select body, author_email from public.s3d_feedback");
+check(r.rows?.length === 1 && r.rows[0].body === "The handle looks lighter than in the shop" && r.rows[0].author_email === "viewer@example.com", "staff read feedback (trimmed, with its author)", JSON.stringify(r));
+
+// the manager decides
+r = await as("authenticated", B, `select public.s3d_decide('${P1}', 'declined')`);
+check(/Say why/.test(r.error || ""), "a decline without a reason is refused", r.error);
+r = await as("authenticated", B, `select public.s3d_decide('${P1}', 'declined', ' no ')`);
+check(/Say why/.test(r.error || ""), "a two-letter reason is not a reason", r.error);
+r = await as("authenticated", B, `select public.s3d_decide('${P1}', 'maybe', 'Not sure')`);
+check(/approved or declined/.test(r.error || ""), "the decision must be approved or declined", r.error);
+r = await as("authenticated", B, `select public.s3d_decide('${P1}', 'approved', repeat('a', 501))`);
+check(/too long/.test(r.error || ""), "a note over 500 characters is refused", r.error);
+r = await one("authenticated", B, `select public.s3d_decide('${P1}', 'declined', 'The freezer handle is the wrong colour', 'LG 655 L fridge') as j`);
+check(r.j?.decision === "declined" && r.j?.by === "second@example.com", "a manager declines, with a reason", JSON.stringify(r));
+r = await as("anon", null, "select * from public.s3d_live()");
+check(r.rows?.length === 1 && r.rows[0].product_id === P1 && r.rows[0].decision === "declined" && Object.keys(r.rows[0]).join() === "product_id,decision",
+  "s3d_live gives anon the decline, and only the id and decision", JSON.stringify(r));
+r = await one("authenticated", B, `select public.s3d_decide('${P1}', 'approved', null, 'LG 655 L fridge') as j`);
+check(r.j?.decision === "approved" && r.j?.note === null, "the decision changes to approved, with no note", JSON.stringify(r));
+r = await one("authenticated", A, `select public.s3d_decide('${P2}', 'declined', 'The doors open the wrong way') as j`);
+check(r.j?.decision === "declined", "an admin declines another product", JSON.stringify(r));
+r = await as("anon", null, "select * from public.s3d_live() order by product_id");
+check(r.rows?.length === 2 && r.rows.find((x) => x.product_id === P1)?.decision === "approved" && r.rows.find((x) => x.product_id === P2)?.decision === "declined",
+  "s3d_live: one row per product, its newest decision", JSON.stringify(r.rows));
+r = await one("authenticated", E, `select public.s3d_review('${P1}') as j`);
+const rv = r.j || {};
+check(rv.history?.length === 2 && rv.history[0].decision === "approved" && rv.history[1].decision === "declined" && rv.history[1].note === "The freezer handle is the wrong colour" && rv.history[1].by === "second@example.com",
+  "history: every decision, newest first, with who and why", JSON.stringify(rv.history));
+check(rv.feedback?.length === 1 && rv.feedback[0].photos?.length === 1 && rv.feedback[0].device === "iphone" && rv.feedback[0].finish === "Shiny Steel" && rv.feedback[0].status === "open",
+  "a viewer reads the product's feedback", JSON.stringify(rv.feedback));
+check(rv.checks?.length === 1 && rv.checks[0].mine === true && rv.checks[0].by === "viewer@example.com", "the checklist marks the viewer's own", JSON.stringify(rv.checks));
+r = await one("authenticated", B, `select public.s3d_review('${P1}') as j`);
+check(r.j?.checks?.[0]?.mine === false, "…and not the manager's");
+r = await one("authenticated", E, "select public.s3d_review_queue() as j");
+let qq = r.j || [];
+const q1 = qq.find((x) => x.product_id === P1), q2 = qq.find((x) => x.product_id === P2);
+check(qq.length === 2 && q1?.decision === "approved" && q1.open_feedback === 1 && q1.feedback === 1 && q1.checks_pass === 1 && q1.checks_fail === 0 && !!q1.last_at && q2?.decision === "declined" && q2.open_feedback === 0,
+  "the review queue: decision, open feedback, checks and last activity per product", JSON.stringify(qq));
+r = await one("authenticated", B, `select public.s3d_feedback_set(${FB}, 'fixed') as j`);
+check(r.j?.status === "fixed" && r.j?.status_by === "second@example.com", "a manager marks feedback fixed", JSON.stringify(r));
+r = await one("authenticated", E, "select public.s3d_review_queue() as j");
+check(r.j?.find((x) => x.product_id === P1)?.open_feedback === 0, "fixed feedback no longer counts as open");
+r = await one("authenticated", A, `select public.s3d_feedback_set(${FB}, 'open') as j`);
+check(r.j?.status === "open", "an admin opens it again", JSON.stringify(r));
+r = await as("authenticated", A, "select public.s3d_feedback_set(999999, 'fixed')");
+check(/No such feedback/.test(r.error || ""), "unknown feedback says so", r.error);
+r = await as("authenticated", C, "select public.s3d_review_queue()");
+check(/Not allowed/.test(r.error || ""), "an inactive account can't read the review queue", r.error);
+r = await as("authenticated", C, `select public.s3d_feedback_add('${P1}', 'Looks wrong')`);
+check(/Not allowed/.test(r.error || ""), "an inactive account can't give feedback", r.error);
+r = await as("authenticated", C, "select * from public.s3d_decisions");
+check(!r.error && r.rows.length === 0, "an inactive account reads no decisions", JSON.stringify(r));
+r = await as("authenticated", A, "select action, actor_email, target_id, target_label, detail from public.s3d_audit where action like 'product_%' order by id");
+const pa = r.rows || [];
+check(pa.length === 3 && pa[0].action === "product_declined" && pa[0].detail.note === "The freezer handle is the wrong colour" && pa[0].detail.decision.from === null
+  && pa[1].action === "product_approved" && pa[1].detail.decision.from === "declined" && pa[1].detail.decision.to === "approved" && pa[1].actor_email === "second@example.com" && pa[1].target_label === "LG 655 L fridge"
+  && pa[2].action === "product_declined" && pa[2].actor_email === "first@example.com" && pa[2].target_id === P2,
+  "every decision is in the audit log, with who, the change and the reason", JSON.stringify(pa));
+r = await as("service_role", null, `insert into public.s3d_decisions (product_id, decision) values ('${P1}', 'declined')`);
+check(/check constraint/.test(r.error || ""), "the table itself refuses a decline with no reason", r.error);
+
+// the photo bucket: private, staff upload into a product's folder, staff read; nothing else
+const bk = (await db.query("select public, file_size_limit, allowed_mime_types from storage.buckets where id = 's3d-feedback'")).rows[0];
+check(bk?.public === false && Number(bk.file_size_limit) === 5242880 && bk.allowed_mime_types?.join() === "image/jpeg", "bucket s3d-feedback: private, 5 MB, JPEG only", JSON.stringify(bk));
+const obj = `${P1}/7c9e6679-7425-40de-944b-e07fc1f90ae7.jpg`;
+r = await as("authenticated", E, "insert into storage.objects (bucket_id, name) values ('s3d-feedback', $1)", [obj]);
+check(!r.error, "a viewer uploads a photo into the product's folder", r.error);
+for (const [who, uid, bucket, name, what] of [
+  ["authenticated", E, "s3d-feedback", "notes.txt", "a file outside a product folder"],
+  ["authenticated", E, "s3d-feedback", `${P1}/photo.png`, "a name that isn't <uuid>.jpg"],
+  ["anon", null, "s3d-feedback", `${P1}/1c9e6679-7425-40de-944b-e07fc1f90ae7.jpg`, "anon"],
+  ["authenticated", C, "s3d-feedback", `${P1}/2c9e6679-7425-40de-944b-e07fc1f90ae7.jpg`, "an inactive account"],
+  ["authenticated", E, "other-app", `${P1}/3c9e6679-7425-40de-944b-e07fc1f90ae7.jpg`, "another app's bucket (no policy from this file)"],
+]) {
+  r = await as(who, uid, "insert into storage.objects (bucket_id, name) values ($1, $2)", [bucket, name]);
+  check(/row-level security/.test(r.error || ""), `upload refused: ${what}`, r.error);
+}
+r = await as("authenticated", E, "select name from storage.objects where bucket_id = 's3d-feedback'");
+check(r.rows?.length === 1 && r.rows[0].name === obj, "staff see the bucket's photos (to make signed links)", JSON.stringify(r));
+r = await as("anon", null, "select name from storage.objects");
+check(!r.error && r.rows.length === 0, "anon sees no photos", JSON.stringify(r));
+r = await as("authenticated", C, "select name from storage.objects");
+check(!r.error && r.rows.length === 0, "an inactive account sees no photos", JSON.stringify(r));
+r = await as("authenticated", B, "update storage.objects set name = 'x' where bucket_id = 's3d-feedback'");
+check(!r.error && r.affected === 0, "nobody renames a photo", JSON.stringify(r));
+r = await as("authenticated", A, "delete from storage.objects where bucket_id = 's3d-feedback'");
+check(!r.error && r.affected === 0, "nobody deletes a photo from the browser", JSON.stringify(r));
+const sp = (await db.query("select policyname, roles::text, cmd, coalesce(qual, '') || coalesce(with_check, '') t from pg_policies where schemaname = 'storage' order by 1")).rows;
+check(sp.length === 2 && sp.every((x) => /s3d-feedback/.test(x.t) && x.roles === "{authenticated}"), "the only storage policies are this bucket's two, for signed-in users", JSON.stringify(sp));
+
+// and once more with all this data in it
+await db.exec(sql);
+r = await as("anon", null, "select * from public.s3d_live()");
+check(r.rows?.length === 2, "schema.sql runs again with reviews in it, and keeps them", JSON.stringify(r));
+
 // grants as listed by Postgres
 const g = (await db.query(`select grantee, table_name, string_agg(privilege_type, ',' order by privilege_type) p from information_schema.role_table_grants
   where table_schema='public' and table_name like 's3d_%' and grantee in ('anon','authenticated') group by 1,2 order by 1,2`)).rows;
 console.log("table grants:", g.map((x) => `${x.grantee}:${x.table_name}=${x.p}`).join("  "));
 check(!g.some((x) => x.grantee === "anon"), "anon has no table grants");
 const rls = (await db.query("select relname, relrowsecurity from pg_class where relname like 's3d_%' and relkind='r'")).rows;
-check(rls.length === 6 && rls.every((x) => x.relrowsecurity), "row level security is on for all six tables");
+check(rls.length === 9 && rls.every((x) => x.relrowsecurity), "row level security is on for all nine tables", rls.map((x) => x.relname).join());
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

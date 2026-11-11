@@ -40,6 +40,7 @@ function onePassword() {
 const DEVICE_COLS = "id,name,store_id,notes,pair_code,paired_at,platform,last_seen_at,created_at,updated_at";
 const clean = (rec, keys) => Object.fromEntries(keys.map((k) => [k, rec[k] === "" || rec[k] === undefined ? null : rec[k]]));
 const adminUrl = () => `${location.origin}/admin`;
+const PHOTO_BUCKET = "s3d-feedback";   // feedback photos: private, staff only (schema.sql)
 
 export async function createApi() {
   // What the address says before supabase-js reads and clears it: a sign-in from an email link (confirm the
@@ -70,6 +71,7 @@ export async function createApi() {
 
   return {
     mode: "live",
+    raw: { sb, run, rpc },   // the shared client, for the store tools (tools.js)
 
     async start() {
       const { data, error } = await sb.auth.getSession();
@@ -164,6 +166,41 @@ export async function createApi() {
         const { data, error, count } = await q;
         if (error) throw plain(error);
         return { rows: data, total: count ?? data.length };
+      },
+    },
+    // the Testing pages (review.js): decisions, feedback with photos, the checklist
+    reviews: {
+      async products() {
+        const r = await fetch("/products.json", { cache: "no-store" });
+        if (!r.ok) throw new Error(`products.json answered ${r.status}`);
+        return (await r.json()).products;
+      },
+      queue: () => rpc("s3d_review_queue"),
+      get: (id) => rpc("s3d_review", { p_product: id }),
+      decide: (id, decision, note, label) => rpc("s3d_decide", { p_product: id, p_decision: decision, p_note: note || null, p_label: label || null }),
+      // the photos (JPEGs, already made smaller) go into the private bucket first, then the feedback names them
+      async addFeedback({ product, body, device, finish, area, photos = [] }) {
+        const paths = [];
+        for (const blob of photos) {
+          const path = `${product}/${crypto.randomUUID()}.jpg`;
+          const { error } = await sb.storage.from(PHOTO_BUCKET).upload(path, blob, { contentType: "image/jpeg", upsert: false });
+          if (error) {
+            if (/bucket not found/i.test(error.message)) throw new Error("The photo store isn’t set up yet. Paste pipeline/admin/schema.sql into the Supabase SQL editor and run it.");
+            if (/too large|exceeded|413/i.test(`${error.message} ${error.statusCode}`)) throw new Error("A photo is too big: 5 MB at most.");
+            throw plain(error);
+          }
+          paths.push(path);
+        }
+        return rpc("s3d_feedback_add", { p_product: product, p_body: body, p_device: device || null, p_finish: finish || null, p_area: area || null, p_photos: paths });
+      },
+      setFeedback: (id, status) => rpc("s3d_feedback_set", { p_id: id, p_status: status }),
+      check: (product, item, device, result) => rpc("s3d_check_set", { p_product: product, p_item: item, p_device: device, p_result: result }),
+      // { path: a link to the photo that works for an hour } (the bucket is private)
+      async photoUrls(paths) {
+        if (!paths.length) return {};
+        const { data, error } = await sb.storage.from(PHOTO_BUCKET).createSignedUrls(paths, 3600);
+        if (error) throw plain(error);
+        return Object.fromEntries((data || []).filter((x) => x.signedUrl).map((x) => [x.path, x.signedUrl]));
       },
     },
   };

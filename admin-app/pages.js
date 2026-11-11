@@ -6,6 +6,7 @@ import {
   downloadCsv, fmtNum, fmtPct, fmtBytes, fmtDateTime, fmtDate, fmtAgo, istDay, istStart, addDays, slotLabel,
   hbar, vbar, lines, COLORS,
 } from "./ui.js";
+import { reviewCounts } from "./review.js";
 
 export const KIND_LABEL = { CATALOGUE: "Catalogue visits", VIEW: "Product views", AR: "AR opens", PART: "Part opens", FILL: "Fill", FIT: "Will it fit", FEATURE: "Feature opens", ROOM: "Room photo", HEADSET: "Headset", EMBED: "Embedded views" };
 export const PLATFORM_LABEL = { ios: "iPhone / iPad", android: "Android", quest: "Meta Quest", visionos: "Vision Pro", desktop: "Desktop", other: "Other" };
@@ -16,8 +17,9 @@ export const ACTION_LABEL = {
   user_reactivated: "User reactivated", role_changed: "Role changed", user_store_changed: "User’s store changed", user_updated: "User updated",
   store_created: "Store created", store_updated: "Store updated", store_deleted: "Store deleted",
   device_created: "Device created", device_updated: "Device updated", device_deleted: "Device deleted", device_paired: "Device paired", device_reset: "New pairing code",
+  product_approved: "Product approved", product_declined: "Product declined",
 };
-const actionTone = (a) => (/failed|deleted|deactivated|cancelled/.test(a) ? "red" : /created|approved|reactivated|paired|invited|password_set/.test(a) ? "green" : a === "login" ? "blue" : "amber");
+const actionTone = (a) => (/failed|deleted|deactivated|cancelled|declined/.test(a) ? "red" : /created|approved|reactivated|paired|invited|password_set/.test(a) ? "green" : a === "login" ? "blue" : "amber");
 const catLabel = (value) => CATEGORIES.find(([v]) => v === value)?.[1] || value;
 const storeName = (stores, id) => (id === null || id === undefined ? "—" : stores.find((s) => s.id === id)?.name || "—");
 const keep = { get: (k) => { try { return sessionStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { sessionStorage.setItem(k, v); } catch {} } };
@@ -61,15 +63,20 @@ export async function dashboard(ctx) {
   const $ = (id) => el.querySelector(`#${id}`);
 
   async function loadState() {
-    const [snapR, prodR] = await Promise.allSettled([api.snapshot(), loadProducts(true)]);
+    const [snapR, prodR, revR] = await Promise.allSettled([api.snapshot(), loadProducts(true), Promise.all([api.reviews.products(), api.reviews.queue()])]);
     if (!ctx.alive()) return;
     const snap = snapR.status === "fulfilled" ? snapR.value : null;
     const prods = prodR.status === "fulfilled" ? prodR.value : null;
+    const rev = revR.status === "fulfilled" ? reviewCounts(...revR.value) : null;
+    // the two Testing numbers open the review queue
+    const toQueue = (show, card) => `<a class="stat-link" href="#/review?show=${show}">${card}</a>`;
     const u = snap?.users, d = snap?.devices;
     const shown = prods?.filter((p) => !p.hidden).length, hidden = prods?.filter((p) => p.hidden).length;
     const healthy = !!snap && !!prods;
     const problems = [!snap && "database", !prods && "catalogue"].filter(Boolean);
     $("snap").innerHTML = [
+      toQueue("waiting", statCard({ title: "Waiting for review", value: fmtNum(rev?.waiting), ic: "clock", tone: rev?.waiting ? "amber" : "", sub: rev ? "New products to test and decide on" : "Couldn’t load the review queue" })),
+      toQueue("feedback", statCard({ title: "Open feedback", value: fmtNum(rev?.open), ic: "alert", tone: rev?.open ? "amber" : "", sub: rev ? `Not fixed yet, on ${rev.openProducts} ${rev.openProducts === 1 ? "product" : "products"}` : "Couldn’t load the review queue" })),
       statCard({ title: "Total users", value: fmtNum(u?.total), ic: "users" }),
       statCard({ title: "Active users", value: fmtNum(u?.active), ic: "userCheck", tone: "green" }),
       statCard({ title: "Inactive users", value: fmtNum(u?.inactive), ic: "userX", tone: "red" }),
@@ -227,48 +234,117 @@ function headSize(url) {
   return sizes.get(url);
 }
 const sizeText = (v) => (v === "missing" ? `<span class="err">Missing</span>` : fmtBytes(v));
+const fillSizes = (root) => root.querySelectorAll("[data-size]").forEach(async (c) => { const v = await headSize(c.dataset.size); c.innerHTML = sizeText(v); });
+// Sangeetha's Product ID at the end of a sangeetha.com link (as site.js productIdOf)
+const sangeethaId = (url) => String(url || "").match(/\/(\d+)\/?$/)?.[1] || null;
+const swatch = (f) => `<i class="sw" style="${f.swatch ? `background-image:url(${esc(f.swatch)})` : `background:${esc(f.swatchColor || "#888")}`}" aria-hidden="true"></i>`;
+const fileName = (url) => String(url || "").split("/").pop();
 
 export async function products(ctx) {
   const { el } = ctx;
   let list;
   try { list = await loadProducts(true); } catch (e) { el.innerHTML = head("Products", "") + errorBox(e); return; }
   if (!ctx.alive()) return;
-  let filter = "all", q = "";
+  // filters can come in the address, as the Categories page's links do: #/products?cat=Refrigerator
+  const qs = new URLSearchParams(location.hash.split("?")[1] || "");
+  const f = { status: "all", q: qs.get("q") || "", cat: qs.get("cat") || "", brand: qs.get("brand") || "", colours: qs.get("colours") || "" };
+  const cats = [...new Set([...CATEGORIES.map(([v]) => v), ...list.map((p) => p.category)])];
+  const brands = [...new Set(list.map((p) => p.brand))].sort();
+  const opt = (v, l, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(l)}</option>`;
   el.innerHTML = `
-    ${head("Products", "Every product in the catalogue (/products.json), with its files and the link to give the store app.")}
+    ${head("Products", "Every product in the catalogue (/products.json), with its files and the link to give the store app. Filter by category, brand or colours; Details shows everything about one.")}
     <div class="note">${icon("info")}<div><b>Status is read-only here.</b> A product goes on show or is hidden through the build check (the product gate), which tests its 3D and AR files before it is published.</div></div>
-    <div class="toolbar">
-      <input class="input search" type="search" id="q" placeholder="Search name or model" aria-label="Search products">
+    <div class="toolbar" role="group" aria-label="Filters">
+      <input class="input search" type="search" id="q" placeholder="Search name, model or Product ID" aria-label="Search products" value="${esc(f.q)}">
+      <label><span class="sr">Category</span><select class="select" id="fcat">${opt("", "All categories", f.cat)}${cats.map((c) => opt(c, catLabel(c), f.cat)).join("")}</select></label>
+      <label><span class="sr">Brand</span><select class="select" id="fbrand">${opt("", "All brands", f.brand)}${brands.map((b) => opt(b, b, f.brand)).join("")}</select></label>
+      <label><span class="sr">Colours</span><select class="select" id="fcol">${[["", "Any number of colours"], ["1", "1 colour"], ["2", "2 colours"], ["3", "3 colours"], ["4", "4 or more colours"]].map(([v, l]) => opt(v, l, f.colours)).join("")}</select></label>
       <div class="chips" role="group" aria-label="Status">${[["all", "All"], ["shown", "On show"], ["hidden", "Hidden"]].map(([k, l]) => `<button class="btn sm" data-f="${k}" aria-pressed="${k === "all"}">${l} <span class="dim">${k === "all" ? list.length : list.filter((p) => !p.hidden === (k === "shown")).length}</span></button>`).join("")}</div>
     </div>
-    <div class="table-wrap"><table class="t"><thead><tr><th>Product</th><th>Category</th><th>Status</th><th class="n">3D model</th><th>iPhone AR files</th><th class="n">Actions</th></tr></thead><tbody id="rows"></tbody></table></div>`;
+    <p class="muted" id="count" aria-live="polite" style="margin:-8px 0 0"></p>
+    <div class="table-wrap"><table class="t"><thead><tr><th>Product</th><th>Colours</th><th>Status</th><th class="n">3D model</th><th>iPhone AR files</th><th class="n">Actions</th></tr></thead><tbody id="rows"></tbody></table></div>`;
   const $ = (id) => el.querySelector(`#${id}`);
   const link = (p) => `${siteOrigin()}/p/${p.id}`;
+  const status = (p) => (p.hidden ? `${badge("Hidden", "amber")}${p.awaitingReview ? `<div class="dim" style="font-size:12.5px;margin-top:3px">Waiting for review</div>` : ""}` : badge("On show", "green"));
+  const matches = (p) => {
+    const n = f.q.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const fin = p.finishes?.length || 0;
+    return (f.status === "all" || !p.hidden === (f.status === "shown")) && (!f.cat || p.category === f.cat) && (!f.brand || p.brand === f.brand)
+      && (!f.colours || (f.colours === "4" ? fin >= 4 : fin === Number(f.colours)))
+      && (!n || `${p.brand}${p.name}${p.model}${p.id}${(p.finishes || []).map((x) => `${x.code || ""}${x.name}${sangeethaId(x.sangeethaUrl) || ""}`).join("")}${sangeethaId(p.sangeethaUrl) || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "").includes(n));
+  };
   function render() {
-    const n = q.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const rows = list.filter((p) => (filter === "all" || !p.hidden === (filter === "shown")) && (!n || `${p.brand}${p.name}${p.model}${p.id}`.toLowerCase().replace(/[^a-z0-9]/g, "").includes(n)));
+    const rows = list.filter(matches);
+    $("count").textContent = rows.length === list.length ? `${list.length} products` : `${rows.length} of ${list.length} products`;
     $("rows").innerHTML = rows.length ? rows.map((p) => `<tr data-id="${esc(p.id)}">
-        <td><div class="cell-main"><img src="${esc(p.thumb)}" alt="" loading="lazy"><div><b>${esc(p.brand)} ${esc(p.shortName)}</b><span>${esc(p.model)}</span></div></div></td>
-        <td>${esc(catLabel(p.category))}</td>
-        <td>${p.hidden ? badge("Hidden", "amber") : badge("On show", "green")}</td>
+        <td class="wrap"><div class="cell-main"><img src="${esc(p.thumb)}" alt="" loading="lazy"><div><b>${esc(p.brand)} ${esc(p.shortName)}</b><span>${esc(p.model)} · ${esc(catLabel(p.category))}</span></div></div></td>
+        <td><span class="sws" title="${esc((p.finishes || []).map((x) => x.name).join(", "))}">${(p.finishes || []).slice(0, 6).map(swatch).join("")}</span> <span class="muted">${p.finishes?.length || 0}</span></td>
+        <td>${status(p)}</td>
         <td class="n" data-size="${esc(p.glb)}">…</td>
-        <td>${(p.finishes || []).map((f) => `<div><span class="muted">${esc(f.name)}:</span> <span data-size="${esc(f.usdz)}">…</span></div>`).join("")}</td>
+        <td>${(p.finishes || []).map((x) => `<div><span class="muted">${esc(x.name)}:</span> <span data-size="${esc(x.usdz)}">…</span></div>`).join("")}</td>
         <td><div class="actions">
+          <button class="btn sm" data-detail aria-label="Details of ${esc(p.brand)} ${esc(p.shortName)}">${icon("info")}Details</button>
           <a class="btn sm" href="/p/${esc(p.id)}" target="_blank" rel="noopener" ${p.hidden ? `aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:.45" title="Hidden products aren’t on the site"` : ""}>${icon("external")}Open</a>
-          <button class="btn sm" data-copy ${p.hidden ? "disabled title=\"Hidden products aren’t on the site\"" : ""}>${icon("link")}Copy store-app link</button>
-          <button class="btn sm icon" data-qr aria-label="QR code for ${esc(p.brand)} ${esc(p.shortName)}" ${p.hidden ? "disabled" : ""}>${icon("qr")}</button>
-        </div></td></tr>`).join("") : `<tr><td colspan="6" class="muted">No product matches.</td></tr>`;
-    $("rows").querySelectorAll("[data-size]").forEach(async (c) => { const v = await headSize(c.dataset.size); c.innerHTML = sizeText(v); });
+          <button class="btn sm icon" data-copy aria-label="Copy the store-app link for ${esc(p.brand)} ${esc(p.shortName)}" title="${p.hidden ? "Hidden products aren’t on the site" : "Copy the store-app link"}" ${p.hidden ? "disabled" : ""}>${icon("link")}</button>
+          <button class="btn sm icon" data-qr aria-label="QR code for ${esc(p.brand)} ${esc(p.shortName)}" title="QR code" ${p.hidden ? "disabled" : ""}>${icon("qr")}</button>
+        </div></td></tr>`).join("") : `<tr><td colspan="6">${emptyState("No product matches", "Try another category, brand or search.")}</td></tr>`;
+    fillSizes($("rows"));
   }
+  // the filters stay in the address (without a page reload), so Back and a copied link keep them
+  const remember = () => {
+    const q = new URLSearchParams(Object.entries({ cat: f.cat, brand: f.brand, colours: f.colours, q: f.q }).filter(([, v]) => v));
+    history.replaceState(history.state, "", `${location.pathname}${location.search}#/products${q.size ? `?${q}` : ""}`);
+  };
+  const qr = (p) => qrModal({ title: `${p.brand} ${p.shortName}`, sub: `Model ${p.model}. Scan to open it in 3D and AR.`, url: link(p), file: `qr-${p.id}` });
+
+  // ── one product, everything about it (read-only) ──
+  function detail(p) {
+    const ids = [...new Set([p.sangeethaUrl, ...(p.finishes || []).map((x) => x.sangeethaUrl)].filter(Boolean))].map((u) => [sangeethaId(u), u]).filter(([id]) => id);
+    const d = modal({
+      title: `${p.brand} ${p.shortName}`, sub: `Model ${p.model} · ${catLabel(p.category)}`,
+      body: `<div class="pd-top"><img src="${esc(p.thumb)}" alt="${esc(p.brand)} ${esc(p.model)}">
+          <div><div>${status(p)}</div><p class="muted" style="margin:8px 0 0">${esc(p.name)}</p>
+          <dl class="facts one">
+            <div><dt>Sangeetha Product ID</dt><dd>${ids.length ? ids.map(([id, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(id)}</a>`).join(", ") : `<span class="dim">None in products.json</span>`}</dd></div>
+            <div><dt>Size</dt><dd>${esc(p.size.w)} W × ${esc(p.size.h)} H × ${esc(p.size.d)} D</dd></div>
+            <div><dt>Placed</dt><dd>${p.placement === "wall" ? "On a wall" : "On the floor"}</dd></div>
+            <div><dt>Catalogue id</dt><dd class="mono">${esc(p.id)}</dd></div>
+          </dl></div></div>
+        ${p.sizeNote ? `<p class="muted" style="margin:0">${esc(p.sizeNote)}.</p>` : ""}
+        <h3 class="pd-h">Colours and their iPhone AR files</h3>
+        <div class="table-wrap"><table class="t"><thead><tr><th>Colour</th><th>Model code</th><th>Sangeetha ID</th><th>iPhone AR file</th><th class="n">Size</th></tr></thead><tbody>
+          ${(p.finishes || []).map((x) => `<tr><td><span class="sws">${swatch(x)}</span> ${esc(x.name)}</td><td class="mono">${esc(x.code || p.model)}</td><td>${sangeethaId(x.sangeethaUrl) ? `<a href="${esc(x.sangeethaUrl)}" target="_blank" rel="noopener">${esc(sangeethaId(x.sangeethaUrl))}</a>` : `<span class="dim">—</span>`}</td><td><a href="${esc(x.usdz)}" download>${esc(fileName(x.usdz))}</a></td><td class="n" data-size="${esc(x.usdz)}">…</td></tr>`).join("")}
+        </tbody></table></div>
+        <h3 class="pd-h">3D model</h3>
+        <div class="table-wrap"><table class="t"><tbody><tr><td><a href="${esc(p.glb)}" download>${esc(fileName(p.glb))}</a> <span class="dim">Android, web and headsets</span></td><td class="n" data-size="${esc(p.glb)}">…</td></tr></tbody></table></div>
+        ${(p.parts || []).length ? `<h3 class="pd-h">What opens</h3><p class="muted" style="margin:0">${(p.parts || []).map((x) => esc(x.label)).join(" · ")}</p>` : ""}
+        ${(p.hotspots || []).length ? `<h3 class="pd-h">Features</h3><ul class="pd-list">${p.hotspots.map((h) => `<li><b>${esc(h.title)}</b> <span class="muted">${esc(h.text)}</span></li>`).join("")}</ul>` : ""}
+        <h3 class="pd-h">Specifications</h3>
+        <dl class="facts specs">${(p.specs || []).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+        <h3 class="pd-h">Links</h3>
+        <div class="tools">
+          ${p.hidden ? "" : `<a class="btn sm" href="/p/${esc(p.id)}" target="_blank" rel="noopener">${icon("external")}Product page</a><button class="btn sm" data-copy>${icon("link")}Copy store-app link</button><button class="btn sm" data-qr>${icon("qr")}QR code</button>`}
+          ${p.sangeethaUrl ? `<a class="btn sm" href="${esc(p.sangeethaUrl)}" target="_blank" rel="noopener">${icon("external")}On sangeetha.com</a>` : ""}
+          ${p.source ? `<a class="btn sm" href="${esc(p.source)}" target="_blank" rel="noopener">${icon("external")}${esc(p.brand)}’s page</a>` : ""}
+        </div>`,
+    });
+    d.classList.add("wide");
+    fillSizes(d);
+    d.querySelector("[data-copy]")?.addEventListener("click", () => copyText(link(p), "Store-app link copied."));
+    d.querySelector("[data-qr]")?.addEventListener("click", () => { d.close(); qr(p); });
+  }
+
   $("rows").addEventListener("click", (e) => {
     const tr = e.target.closest("tr[data-id]");
     const p = tr && list.find((x) => x.id === tr.dataset.id);
     if (!p) return;
+    if (e.target.closest("[data-detail]")) detail(p);
     if (e.target.closest("[data-copy]")) copyText(link(p), "Store-app link copied.");
-    if (e.target.closest("[data-qr]")) qrModal({ title: `${p.brand} ${p.shortName}`, sub: `Model ${p.model}. Scan to open it in 3D and AR.`, url: link(p), file: `qr-${p.id}` });
+    if (e.target.closest("[data-qr]")) qr(p);
   });
-  $("q").addEventListener("input", (e) => { q = e.target.value; render(); });
-  el.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.f; el.querySelectorAll("[data-f]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); render(); }));
+  $("q").addEventListener("input", (e) => { f.q = e.target.value; remember(); render(); });
+  for (const [id, k] of [["fcat", "cat"], ["fbrand", "brand"], ["fcol", "colours"]]) $(id).addEventListener("change", (e) => { f[k] = e.target.value; remember(); render(); });
+  el.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { f.status = b.dataset.f; el.querySelectorAll("[data-f]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); render(); }));
   render();
 }
 
@@ -280,15 +356,16 @@ export async function categories(ctx) {
   if (!ctx.alive()) return;
   const cats = [...new Set([...CATEGORIES.map(([v]) => v), ...list.map((p) => p.category)])].map((c) => {
     const ps = list.filter((p) => p.category === c);
-    return { c, label: catLabel(c), total: ps.length, shown: ps.filter((p) => !p.hidden).length, hidden: ps.filter((p) => p.hidden).length };
+    return { c, label: catLabel(c), total: ps.length, shown: ps.filter((p) => !p.hidden).length, hidden: ps.filter((p) => p.hidden).length, brands: [...new Set(ps.map((p) => p.brand))].sort(), colours: ps.reduce((n, p) => n + (p.finishes?.length || 0), 0), site: CATEGORIES.some(([v]) => v === c) };
   });
+  const browse = (c) => `#/products?cat=${encodeURIComponent(c)}`;
   el.innerHTML = `
-    ${head("Categories", "The catalogue’s categories, from site.js and /products.json. The catalogue’s filter chips use the same list.")}
+    ${head("Categories", "The catalogue’s categories, from site.js and /products.json. The catalogue’s filter chips use the same list. Browse one to see its products by brand and colour.")}
     <div class="stats">${cats.map((x) => statCard({ title: x.label, value: fmtNum(x.total), ic: "grid", sub: `${x.shown} on show · ${x.hidden} hidden` })).join("")}</div>
-    <div class="table-wrap"><table class="t"><thead><tr><th>Category</th><th class="n">Products</th><th class="n">On show</th><th class="n">Hidden</th><th>Share on show</th></tr></thead><tbody>
-      ${cats.map((x) => `<tr><td>${esc(x.label)}</td><td class="n">${x.total}</td><td class="n">${x.shown}</td><td class="n">${x.hidden}</td><td style="min-width:180px"><div class="track green"><i style="width:${x.total ? (100 * x.shown) / x.total : 0}%"></i></div></td></tr>`).join("")}
-    </tbody><tfoot><tr><td>All</td><td class="n">${list.length}</td><td class="n">${list.filter((p) => !p.hidden).length}</td><td class="n">${list.filter((p) => p.hidden).length}</td><td></td></tr></tfoot></table></div>
-    <div class="note">${icon("info")}<div><b>Adding a category</b> is a change to site.js and the product pipeline (pipeline/entries/STANDARD.md), so it is made there, not here.</div></div>`;
+    <div class="table-wrap"><table class="t"><thead><tr><th>Category</th><th class="n">Products</th><th class="n">On show</th><th class="n">Hidden</th><th>Brands</th><th class="n">Colours</th><th>Share on show</th><th class="n">Products</th></tr></thead><tbody>
+      ${cats.map((x) => `<tr><td>${esc(x.label)}${x.site ? "" : ` <span class="dim">(not in site.js)</span>`}</td><td class="n">${x.total}</td><td class="n">${x.shown}</td><td class="n">${x.hidden}</td><td class="wrap muted">${esc(x.brands.join(", ") || "—")}</td><td class="n">${x.colours}</td><td style="min-width:180px"><div class="track green"><i style="width:${x.total ? (100 * x.shown) / x.total : 0}%"></i></div></td><td><div class="actions"><a class="btn sm" href="${browse(x.c)}" aria-label="Browse ${esc(x.label)}">${icon("search")}Browse</a></div></td></tr>`).join("")}
+    </tbody><tfoot><tr><td>All</td><td class="n">${list.length}</td><td class="n">${list.filter((p) => !p.hidden).length}</td><td class="n">${list.filter((p) => p.hidden).length}</td><td class="muted">${[...new Set(list.map((p) => p.brand))].length} brands</td><td class="n">${list.reduce((n, p) => n + (p.finishes?.length || 0), 0)}</td><td></td><td></td></tr></tfoot></table></div>
+    <div class="note">${icon("info")}<div><b>Why categories can’t be edited here.</b> They are part of the site itself: site.js names them, and the catalogue’s filter chips, the compare page, the 3D showroom’s aisles and the product build check all read them from there, while each product’s category is written into /products.json when it is built. A change made in this admin couldn’t reach those files, so adding or renaming a category is a change to the site and the product pipeline (pipeline/entries/STANDARD.md).</div></div>`;
 }
 
 // ════════════════════════════════════════════════════════════════════════════ Stores
@@ -397,6 +474,7 @@ export async function devicesPage(ctx) {
   $("fs").addEventListener("change", (e) => { fstore = e.target.value; render(); });
   el.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { fstatus = b.dataset.f; el.querySelectorAll("[data-f]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); render(); }));
   render();
+  await (await import("./tools.js")).deviceScreens(ctx);   // what each paired device shows, and sending it a product or playlist
 }
 
 // ════════════════════════════════════════════════════════════════════════════ Users
@@ -457,7 +535,7 @@ export async function usersPage(ctx) {
       title: `Edit ${u.email}`,
       fields: [
         { name: "full_name", label: "Name", value: u.full_name },
-        { name: "role", label: "Role", type: "select", value: u.role, options: roleOpts, help: "Admin: everything. Manager: stores, devices and analytics. Viewer: read-only." },
+        { name: "role", label: "Role", type: "select", value: u.role, options: roleOpts, help: "Admin: everything. Manager: stores, devices, analytics, and approving products. Viewer: read-only, and can test products." },
         { name: "store_id", label: "Store", type: "select", value: u.store_id ?? "", options: storeOpts() },
       ],
       onSubmit: async (v, d) => { await api.users.update(u.user_id, { full_name: v.full_name || null, role: v.role, store_id: v.store_id ? Number(v.store_id) : null }); d.close(); toast("User saved."); await reload(); },
@@ -501,29 +579,53 @@ export async function usersPage(ctx) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════ Roles
+// What each role can do: the Roles page's table, and "What your role can do" on the Profile page (tools.js).
+// yes: can; view: can only look; no: can't. The database enforces each line (schema.sql and tools.sql).
+const ALL = (v) => ({ admin: v, manager: v, viewer: v });
+const AM = (viewer) => ({ admin: "yes", manager: "yes", viewer });
+export const PERMISSIONS = [
+  { group: "Overview", what: "Dashboard and analytics", cells: ALL("yes") },
+  { group: "Products", what: "Products and categories: browse, filter, details, store-app links and QR codes", cells: ALL("view") },
+  { group: "Products", what: "Testing: give feedback and fill the checklist", cells: ALL("yes") },
+  { group: "Products", what: "Testing: approve or decline a product, mark feedback fixed", cells: AM("no") },
+  { group: "Products", what: "Requests: ask for a new product, comment on any request", cells: ALL("yes") },
+  { group: "Products", what: "Requests: accept, move along, mark live, or say why it isn’t possible", cells: AM("view") },
+  { group: "Stores and screens", what: "Stores: add, edit, delete", cells: AM("view") },
+  { group: "Stores and screens", what: "Devices: add, edit, delete, pair", cells: AM("view") },
+  { group: "Stores and screens", what: "Devices: show a product or play a playlist on a paired device", cells: AM("view") },
+  { group: "Stores and screens", what: "Playlists: make, edit, delete", cells: AM("view") },
+  { group: "Stores and screens", what: "Playlists: play one, copy its showcase link or QR code", cells: ALL("yes") },
+  { group: "Access", what: "Users: invite, approve, deactivate, change role or store", cells: { admin: "yes", manager: "no", viewer: "no" } },
+  { group: "Access", what: "Roles", cells: ALL("view") },
+  { group: "Access", what: "Audit log", cells: { admin: "yes", manager: "no", viewer: "no" } },
+  { group: "Access", what: "Your profile: your name and your password", cells: ALL("yes") },
+];
+
 export async function rolesPage(ctx) {
   const { el, api } = ctx;
   let counts = null;
   try { counts = (await api.snapshot()).roles; } catch {}
   if (!ctx.alive()) return;
   const roles = [
-    ["admin", "orange", "Everything: users, invites, roles, the audit log, stores, devices and analytics."],
-    ["manager", "blue", "Runs the stores: adds, edits and deletes stores and devices, pairs devices, and reads the analytics."],
-    ["viewer", "", "Read-only: the dashboard, analytics, products, categories, stores and devices."],
+    ["admin", "orange", "Everything: users, invites, roles and the audit log, as well as all a manager can do."],
+    ["manager", "blue", "Runs the stores and their screens: stores, devices, playlists and what each device shows. Approves or declines new products, and accepts and moves along product requests. Reads the analytics."],
+    ["viewer", "", "Looks, tests and asks: reads the dashboard, analytics, products, stores and devices; tests new products (feedback and the checklist); asks for new products and comments on requests."],
   ];
-  const Y = `<td class="yes">${icon("check")}</td>`, N = `<td class="no">—</td>`, R = `<td class="part">View</td>`;
-  const rows = [
-    ["Dashboard and analytics", Y, Y, Y], ["Products and categories (read-only for everyone)", R, R, R],
-    ["Stores: add, edit, delete", Y, Y, R], ["Devices: add, edit, delete, pair", Y, Y, R],
-    ["Users: invite, approve, deactivate, change role or store", Y, N, N], ["Roles", R, R, R], ["Audit log", Y, N, N],
-  ];
+  const cell = { yes: `<td class="yes">${icon("check")}<span class="sr">Yes</span></td>`, no: `<td class="no">—<span class="sr">No</span></td>`, view: `<td class="part">View</td>` };
+  const groups = [...new Set(PERMISSIONS.map((p) => p.group))];
   el.innerHTML = `
     ${head("Roles", "Three fixed roles. Change someone’s role on the Users page. The database enforces them, not just this page.")}
-    <div class="roles">${roles.map(([k, tone, text]) => `<div class="card role-card"><h3>${badge(ROLE_LABEL[k], tone, true)}<span class="count">${counts ? `${counts[k] || 0} active` : ""}</span></h3><p>${esc(text)}</p></div>`).join("")}</div>
+    <div class="roles">${roles.map(([k, tone, text]) => `<div class="card role-card"><h3>${badge(ROLE_LABEL[k], tone, true)}<span class="count">${counts ? `${counts[k] || 0} active` : ""}</span></h3><p>${esc(text)}</p><p class="role-more"><button class="btn sm" data-role="${k}">${icon("shield")}What a ${esc(ROLE_LABEL[k].toLowerCase())} can do</button></p></div>`).join("")}</div>
     <div class="table-wrap"><table class="t matrix"><thead><tr><th>What</th><th>Admin</th><th>Manager</th><th>Viewer</th></tr></thead><tbody>
-      ${rows.map(([what, ...cells]) => `<tr><td>${esc(what)}</td>${cells.join("")}</tr>`).join("")}
+      ${groups.map((g) => `<tr class="group"><th colspan="4" scope="colgroup">${esc(g)}</th></tr>${PERMISSIONS.filter((p) => p.group === g).map((p) => `<tr><td class="wrap">${esc(p.what)}</td>${["admin", "manager", "viewer"].map((r) => cell[p.cells[r]]).join("")}</tr>`).join("")}`).join("")}
     </tbody></table></div>
-    <div class="note">${icon("key")}<div><b>Who counts as staff:</b> an account whose profile is active and which has set its own password. The first admin was named in the database setup; anyone signing in without an invite waits for an admin’s approval.</div></div>`;
+    <div class="note">${icon("key")}<div><b>Who counts as staff:</b> an account whose profile is active and which has set its own password. The first admin was named in the database setup; anyone signing in without an invite waits for an admin’s approval.</div></div>
+    <div class="note">${icon("info")}<div><b>No sign-in needed:</b> a playlist’s showcase on a store screen (/kiosk), and the “Tap to view in your room” button on a paired device. They only show products; they can’t change anything.</div></div>`;
+  el.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => {
+    const r = b.dataset.role;
+    const part = (v, title, tone) => { const ps = PERMISSIONS.filter((p) => p.cells[r] === v); return ps.length ? `<h3 class="pd-h">${title}</h3><ul class="can-list ${tone}">${ps.map((p) => `<li class="${v}">${v === "yes" ? icon("check") : v === "view" ? icon("eye") : icon("x")}<span>${esc(p.what)}</span></li>`).join("")}</ul>` : ""; };
+    modal({ title: `${ROLE_LABEL[r]}: what they can do`, sub: roles.find(([k]) => k === r)[2], body: part("yes", "Can", "") + part("view", "Can see, not change", "") + part("no", "Can’t", "") });
+  }));
 }
 
 // ════════════════════════════════════════════════════════════════════════════ Audit logs
@@ -535,7 +637,7 @@ export async function auditPage(ctx) {
   const SIZE = 25;
   const f = { action: "", user: "", from: "", to: "", offset: 0 };
   el.innerHTML = `
-    ${head("Audit logs", "Every sign-in, failed sign-in, password change, invite, approval, role change, and every store and device change. Written by the database itself.", `<button class="btn" id="reload">${icon("refresh")}Refresh</button>`)}
+    ${head("Audit logs", "Every sign-in, failed sign-in, password change, invite, approval, role change, every store and device change, and every product approved or declined. Written by the database itself.", `<button class="btn" id="reload">${icon("refresh")}Refresh</button>`)}
     <div class="toolbar" role="group" aria-label="Filters">
       <label><span class="sr">Action</span><select class="select" id="action"><option value="">All actions</option>${Object.entries(ACTION_LABEL).map(([k, l]) => `<option value="${k}">${esc(l)}</option>`).join("")}</select></label>
       <input class="input search" type="search" id="user" placeholder="User email contains" aria-label="User email contains">

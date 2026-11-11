@@ -8,6 +8,9 @@
 // Off on localhost, 127.0.0.1 and file: (tests, other agents' gates) unless the address has ?track=1.
 // /?pair=<CODE> on any page links this browser to a store's device (s3d_pair), then drops the code
 // from the address. The anon key below is public by design; the database only lets it call these functions.
+// On a paired device it also loads /device.js, which opens what staff send it from the admin's Devices page.
+// A showcase's product pages (/kiosk plays them in a frame, with ?kiosk=1) count nothing: a screen that turns
+// products over for hours isn't people looking at them.
 (() => {
   const API = "https://rjbjlkickdnpsaicynap.supabase.co/rest/v1/rpc/";
   const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqYmpsa2lja2RucHNhaWN5bmFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzAxODYsImV4cCI6MjA4OTkwNjE4Nn0.KPwMXyfKSzKoxn5V1jhb4xKA-1uAlIEJgBOSf6P4Udk";
@@ -25,7 +28,8 @@
   const READY = false;
   const local = location.protocol === "file:" || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   if (params.get("track") === "1") put(tab, "s3d-track", "1"); // stays on for this tab while testing locally
-  const on = (READY && !local) || params.get("track") === "1" || get(tab, "s3d-track") === "1";
+  const kioskFrame = params.get("kiosk") === "1" && window.self !== window.top;
+  const on = !kioskFrame && ((READY && !local) || params.get("track") === "1" || get(tab, "s3d-track") === "1");
 
   const ua = navigator.userAgent || "";
   const platform = /OculusBrowser|Quest|Pico|Wolvic/i.test(ua) ? "quest"
@@ -71,8 +75,23 @@
     } catch {}
   };
 
+  // ── a paired device: what staff send it from the admin (/device.js). Never in a frame, never unpaired ──
+  function screen() {
+    try {
+      if (!on || window.self !== window.top || !device() || document.querySelector("script[data-s3d-screen]")) return;
+      const s = document.createElement("script");
+      s.src = "/device.js";
+      s.async = true;
+      s.dataset.api = API;
+      s.dataset.key = KEY;
+      s.dataset.s3dScreen = "";
+      document.head.appendChild(s);
+    } catch {}
+  }
+
   // ── pairing a shop device: /?pair=<CODE> ──
   const code = params.get("pair");
+  if (code === null) screen();   // with a code, once the pairing has worked
   if (code === null || !(READY || on)) return;
   try {
     const u = new URL(location.href);
@@ -101,6 +120,7 @@
         put(keep, "s3d-device", String(j.device));
         put(keep, "s3d-store", String(j.store || ""));
         note(`This device is now linked to ${j.store || "its store"}.`);
+        screen();
       } else if (j && j.error === "already_paired") note("This pairing link has already been used. Ask your admin for a new one.", true);
       else note("This pairing link didn’t work. Ask your admin for a new one.", true);
     })

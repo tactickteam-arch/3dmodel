@@ -16,7 +16,10 @@ const KINDS = ["CATALOGUE", "VIEW", "AR", "PART", "FILL", "FIT", "FEATURE", "ROO
 const H = 3600e3, D = 24 * H;
 
 export async function createDemoApi({ as } = {}) {
-  const products = (await fetch("/products.json", { cache: "no-store" }).then((r) => r.json())).products.filter((p) => !p.hidden);
+  const catalogue = (await fetch("/products.json", { cache: "no-store" }).then((r) => r.json())).products;
+  // the Testing pages' sample: the last three products on show stand in for new ones waiting for review
+  const WAITING = catalogue.filter((p) => !p.hidden).slice(-3).map((p) => p.id);
+  const products = catalogue.filter((p) => !p.hidden && !WAITING.includes(p.id));
   const r = rng(20261104);
   const now = Date.now();
   const iso = (t) => new Date(t).toISOString();
@@ -89,6 +92,36 @@ export async function createDemoApi({ as } = {}) {
     }
     if (r() < 0.22) { const t = now - d * D - r() * 8 * H; log(t, "login_failed", null, "user", r() < 0.5 ? users[3].email : "unknown.person@example.com"); }
   }
+
+  // ── made-up product reviews (the Testing pages): decisions, feedback and checklist marks, on real product ids ──
+  const labelOf = (id) => { const p = catalogue.find((x) => x.id === id); return p ? `${p.brand} ${p.shortName} (${p.model})` : id; };
+  const decisions = [], feedback = [], checks = [];
+  const latest = (pid) => decisions.filter((d) => d.product_id === pid).at(-1) || null;
+  const decide = (t, pid, decision, note, u) => {
+    const from = latest(pid)?.decision || null;
+    decisions.push({ id: decisions.length + 1, product_id: pid, decision, note: note || null, by: u.email, name: u.full_name, at: iso(t) });
+    log(t, `product_${decision}`, u, "product", labelOf(pid), { decision: { from, to: decision }, ...(note ? { note } : {}) });
+  };
+  const say = (t, pid, u, body, extra = {}) => feedback.push({ id: feedback.length + 1, product_id: pid, body, device: null, finish: null, area: null, photos: [], by: u.email, name: u.full_name, at: iso(t), status: "open", status_by: null, status_at: null, ...extra });
+  const mark = (t, pid, u, item, device, result) => checks.push({ product_id: pid, item, device, result, user_id: u.user_id, by: u.email, name: u.full_name, at: iso(t) });
+  const photoOf = (pid) => { const p = catalogue.find((x) => x.id === pid); return p.photos?.[1] || p.thumb; };
+  const firstColour = (pid) => catalogue.find((x) => x.id === pid).finishes[0].name;
+  const [m1, m2, v1] = [users[1], users[2], users[3]];
+  const [w1, w2] = WAITING;
+  decide(now - 12 * D, products[0].id, "declined", "Sample reason: a door opened the wrong way in AR.", m1);
+  decide(now - 11 * D, products[0].id, "approved", "Sample note: fixed, and checked again on iPhone and Android.", m1);
+  say(now - 12 * D - 2 * H, products[0].id, v1, "Sample feedback: the door opens the wrong way in AR on Android.", { device: "android", area: "Doors and drawers", status: "fixed", status_by: m1.email, status_at: iso(now - 11 * D) });
+  decide(now - 9 * D, products[1].id, "approved", null, me);
+  decide(now - 2 * D, products[3].id, "declined", "Sample reason: the colour looks lighter than the model in the shop.", m2);
+  say(now - 2 * D - 3 * H, products[3].id, v1, "Sample feedback: the colour looks lighter than the model in the shop.", { device: "iphone", finish: firstColour(products[3].id), area: "Colours", photos: [photoOf(products[3].id)] });
+  say(now - 5 * H, w1, v1, "Sample feedback: the handle looks lighter than the one in the shop.", { device: "iphone", finish: firstColour(w1), area: "Colours", photos: [photoOf(w1)] });
+  say(now - 3 * H, w1, m1, "Sample feedback: the freezer drawer stopped halfway on Android. It opened on the second try.", { device: "android", area: "Doors and drawers" });
+  mark(now - 5 * H, w1, v1, "ar_size", "iphone", "pass"); mark(now - 5 * H, w1, v1, "doors", "iphone", "pass"); mark(now - 5 * H, w1, v1, "colours", "iphone", "fail");
+  mark(now - 3 * H, w1, m1, "ar_android", "android", "pass"); mark(now - 3 * H, w1, m1, "doors", "android", "fail");
+  mark(now - 2 * H, w1, me, "doors", "computer", "pass"); mark(now - 2 * H, w1, me, "size", "computer", "pass");
+  say(now - 30 * H, w2, m2, "Sample feedback: the labels are hard to read in the headset.", { device: "headset", area: "Labels and logos" });
+  say(now - 28 * H, w2, v1, "Sample feedback: one shelf seemed to be missing.", { area: "Inside", status: "fixed", status_by: m1.email, status_at: iso(now - 20 * H) });
+  mark(now - 30 * H, w2, m2, "headset", "headset", "pass"); mark(now - 30 * H, w2, m2, "labels", "headset", "fail");
   audit.sort((a, b) => (a.at < b.at ? 1 : -1));
 
   const daysIn = (from, to) => { const out = []; for (let day = istDay(from); istStart(day) < new Date(to); day = addDays(day, 1)) out.push(day); return out; };
@@ -99,6 +132,7 @@ export async function createDemoApi({ as } = {}) {
 
   return {
     mode: "demo",
+    raw: { me, users, stores, devices, write, wait },   // the sample data, for the store tools (tools.js)
     async start() { await wait(); return { profile: { ...me, store: stores.find((s) => s.id === me.store_id)?.name || null } }; },
     async signIn() { await wait(); return { ...me }; },
     async signOut() {},
@@ -232,6 +266,66 @@ export async function createDemoApi({ as } = {}) {
         const rows = audit.filter((a) => (!action || a.action === action) && (!who || (a.actor_email || "").includes(who)) && (!from || a.at >= new Date(from).toISOString()) && (!to || a.at < new Date(to).toISOString()));
         return { rows: rows.slice(offset, offset + limit), total: rows.length };
       },
+    },
+    // the Testing pages, with the same rules as the database's review functions
+    reviews: {
+      async products() { await wait(); return catalogue.map((p) => (WAITING.includes(p.id) ? { ...p, hidden: true, awaitingReview: true } : { ...p })); },
+      async queue() {
+        await wait();
+        const ids = [...new Set([...decisions, ...feedback, ...checks].map((x) => x.product_id))];
+        return ids.map((pid) => {
+          const d = latest(pid), f = feedback.filter((x) => x.product_id === pid), c = checks.filter((x) => x.product_id === pid);
+          const times = [d?.at, ...f.flatMap((x) => [x.at, x.status_at]), ...c.map((x) => x.at)].filter(Boolean).sort();
+          return { product_id: pid, decision: d?.decision || null, note: d?.note || null, decided_by: d?.by || null, decided_at: d?.at || null,
+            open_feedback: f.filter((x) => x.status === "open").length, feedback: f.length,
+            checks_pass: c.filter((x) => x.result === "pass").length, checks_fail: c.filter((x) => x.result === "fail").length, last_at: times.at(-1) || null };
+        });
+      },
+      async get(pid) {
+        await wait();
+        return {
+          history: decisions.filter((d) => d.product_id === pid).reverse().map((d) => ({ ...d })),
+          feedback: feedback.filter((f) => f.product_id === pid).reverse().map((f) => ({ ...f, photos: [...f.photos] })),
+          checks: checks.filter((c) => c.product_id === pid).map(({ user_id, ...c }) => ({ ...c, mine: user_id === me.user_id })),
+        };
+      },
+      async decide(pid, decision, note, label) {
+        await wait();
+        if (role === "viewer") throw new Error("Your role can’t do that.");
+        const n = String(note || "").trim();
+        if (decision === "declined" && n.length < 3) throw new Error("Say why it is declined");
+        const from = latest(pid)?.decision || null;
+        const d = { id: decisions.length + 1, product_id: pid, decision, note: n || null, by: me.email, name: me.full_name, at: iso(Date.now()) };
+        decisions.push(d);
+        await write(`product_${decision}`, "product", label || pid, { decision: { from, to: decision }, ...(n ? { note: n } : {}) });
+        return { ...d };
+      },
+      async addFeedback({ product, body, device, finish, area, photos = [] }) {
+        await wait();
+        if (!String(body || "").trim()) throw new Error("Write what you saw");
+        if (photos.length > 3) throw new Error("Up to 3 photos");
+        if (photos.some((b) => b.size > 5 * 1024 * 1024)) throw new Error("A photo is too big: 5 MB at most.");
+        const f = { id: feedback.length + 1, product_id: product, body: String(body).trim(), device: device || null, finish: finish || null, area: area || null,
+          photos: photos.map((b) => URL.createObjectURL(b)), by: me.email, name: me.full_name, at: iso(Date.now()), status: "open", status_by: null, status_at: null };
+        feedback.push(f);
+        return { id: f.id, at: f.at };
+      },
+      async setFeedback(id, status) {
+        await wait();
+        if (role === "viewer") throw new Error("Your role can’t do that.");
+        const f = feedback.find((x) => x.id === id);
+        if (!f) throw new Error("No such feedback");
+        Object.assign(f, { status, status_by: me.email, status_at: iso(Date.now()) });
+        return { id, status };
+      },
+      async check(pid, item, device, result) {
+        await wait();
+        const i = checks.findIndex((c) => c.product_id === pid && c.item === item && c.device === device && c.user_id === me.user_id);
+        if (i >= 0) checks.splice(i, 1);
+        if (result !== "untested") checks.push({ product_id: pid, item, device, result, user_id: me.user_id, by: me.email, name: me.full_name, at: iso(Date.now()) });
+      },
+      // the sample photos are the products' own photos, and new ones stay in this tab
+      async photoUrls(paths) { return Object.fromEntries(paths.map((x) => [x, x])); },
     },
   };
 }

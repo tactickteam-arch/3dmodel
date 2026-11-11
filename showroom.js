@@ -20,6 +20,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { esc, cm, partAt, CATEGORIES } from "/site.js";
+import { shownProducts } from "/live.js";
 import { radialTexture, roundRect, wrapText, makeTooltip, makeCard } from "/xr.js";
 
 const NAVY = "#0E0E0F", COPPER = "#F58A29", COPPER_DK = "#B85A12", SLATE = "#5E6066", HAIR = "#E3E3E6";
@@ -40,7 +41,7 @@ function toast(text, ms = 3500) {
 }
 
 // ── the catalogue: every product on show, read when the page opens ──
-const products = (await fetch("/products.json").then((r) => r.json())).products.filter((p) => !p.hidden);
+const products = await shownProducts(); // on show: products.json and the team's decisions (live.js)
 const focusId = decodeURIComponent(params.get("focus") || location.pathname.match(/^\/showroom\/([^/?#]+)/)?.[1] || "").toLowerCase();
 const model = (url) => `${url}?v=7`; // the same files and cache key as product.html
 
