@@ -1,0 +1,182 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-22461",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Refrigerator",
+      "model": "22461",
+      "name": "Whirlpool Luxuriem 654 L four-door French door refrigerator, convertible, 360° Triple Cooling",
+      "shortName": "654 L Luxuriem four-door refrigerator",
+      "summary": "Open both fridge doors and slide out the vegetable drawers, open the freezer and the convertible, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/whirlpool-22461.glb",
+      "thumb": "/photos/whirlpool-22461/0.jpg",
+      "photos": ["/photos/whirlpool-22461/0.jpg", "/photos/whirlpool-22461/1.jpg", "/photos/whirlpool-22461/2.jpg", "/photos/whirlpool-22461/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-21deg 78deg 125%",
+      "finishes": [
+        {
+          "name": "Duo Noir",
+          "swatchColor": "#141416",
+          "usdz": "/models/usdz/whirlpool-22461-duo-noir.usdz",
+          "variant": "Duo Noir",
+          "code": "22461"
+        },
+        {
+          "name": "Nero Quartz",
+          "swatchColor": "#0c0c0d",
+          "usdz": "/models/usdz/whirlpool-22461-nero-quartz.usdz",
+          "variant": "Nero Quartz",
+          "code": "22460"
+        },
+        {
+          "name": "Verde Cristallo",
+          "swatchColor": "#2e4a3f",
+          "usdz": "/models/usdz/whirlpool-22461-verde-cristallo.usdz",
+          "variant": "Verde Cristallo",
+          "code": "22463"
+        },
+        {
+          "name": "Nero Bianco",
+          "swatchColor": "#a3a4a3",
+          "usdz": "/models/usdz/whirlpool-22461-nero-bianco.usdz",
+          "variant": "Nero Bianco",
+          "code": "22464"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge doors",
+          "node": "LeftFridgeDoor",
+          "axis": "y",
+          "angle": -115,
+          "also": [
+            {
+              "node": "RightFridgeDoor",
+              "angle": 115
+            }
+          ],
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.454, 0.845, 0.162],
+              [0.454, 1.862, 0.375]
+            ],
+            "open": [
+              [-0.699, 0.845, 0.277],
+              [0.699, 1.862, 0.742]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "vegetable drawers",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.27],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.372, 0.89, -0.292],
+              [0.372, 1.055, 0.155]
+            ],
+            "open": [
+              [-0.372, 0.89, -0.022],
+              [0.372, 1.055, 0.425]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer door",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": -115,
+          "zone": {
+            "closed": [
+              [-0.454, 0.032, 0.172],
+              [0.001, 0.839, 0.377]
+            ],
+            "open": [
+              [-0.701, 0.032, 0.276],
+              [-0.363, 0.839, 0.718]
+            ]
+          }
+        },
+        {
+          "key": "convertible",
+          "label": "convertible door",
+          "node": "ConvertibleDoor",
+          "axis": "y",
+          "angle": 115,
+          "zone": {
+            "closed": [
+              [0.001, 0.032, 0.172],
+              [0.454, 0.839, 0.377]
+            ],
+            "open": [
+              [0.363, 0.032, 0.276],
+              [0.701, 0.839, 0.717]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "90.9 cm",
+        "h": "186.25 cm",
+        "d": "74.85 cm"
+      },
+      "sizeNote": "Whirlpool gives 90.9 × 186.25 × 74.85 cm (W × H × D, without the box); its size picture marks 900 mm across, 1862.5 mm high and 748.5 mm deep. Whirlpool publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "654 L (refrigerator 424 L, freezer 115 L, convertible 115 L)"],
+        ["Type", "Four-door French door: two glass fridge doors over the freezer and the convertible compartment"],
+        ["Energy rating", "3 star, 532 units a year (2023-26 label)"],
+        ["Compressor", "Inverter; 1 year on the product, 9 more years on the compressor"],
+        ["Cooling", "360° Triple Cooling with three evaporators, frost free"],
+        ["Convertible", "Converts from freezer to fridge in under 30 minutes; -22 °C to +10 °C"],
+        ["Modes", "100+ customisable modes, set on the door display"],
+        ["Shelves", "3 toughened glass in the fridge, 6 in the freezer and convertible"],
+        ["Door pockets", "7 in the fridge, 6 in the freezer and convertible"],
+        ["Ice and eggs", "Ice twister, ice bank and egg tray"],
+        ["Light", "LED, with dedicated freezer lights"],
+        ["Doors", "Glass; Duo Noir has glass fridge doors over steel freezer doors"],
+        ["Power", "Stabilizer-free, connects to a home inverter, 230 V"],
+        ["Weight", "115.4 kg (Duo Noir), 120.7 kg (Nero Quartz, Verde Cristallo, Nero Bianco)"]
+      ],
+      "source": "https://india.whirlpool.in/luxuriem-654l-4-door-french-door-refrigerator-3-star-convertible-inverter-compressor-360-triple-cooling/p",
+      "hotspots": [
+        {
+          "title": "India's Fastest Convertible",
+          "text": "Converts from freezer to fridge in under 30 minutes for quick flexibility to create the ideal storage space for every occasion.",
+          "pos": [0.22, 0.55, 0.3773],
+          "normal": [0, 0, 1],
+          "show": "!convertible"
+        },
+        {
+          "title": "360° Triple Cooling",
+          "text": "Engineered by 360° Triple cooling with Triple Evaporator Technology.",
+          "pos": [0.1, 1.6, -0.27],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Humidity Lock",
+          "text": "Maintains precise humidity levels ensuring fruits and vegetables stay naturally crisp and crunchy for a longer period.",
+          "pos": [-0.2, 0.99, 0.158],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Thoughtfully Designed Freezer space",
+          "text": "Spacious storage and dedicated lighting make every item easier to organise and access.",
+          "pos": [-0.2, 0.47, 0.168],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        }
+      ]
+    }
+  ]
+}
