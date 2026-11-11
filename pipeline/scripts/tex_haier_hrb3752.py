@@ -52,7 +52,11 @@ FINISHES = {
     "ns": {"photo": "haier_front.jpg", "base": (134, 134, 136), "grain": 0.5, "field": 1.0,
            "level": {"door_fridge": 1.045, "door_freezer": 1.02},
            "rows": (61.5, 1139.5), "cols": (392, 805.3)},
-    "gb": {"photo": "graphite_front.jpg", "base": (36, 40, 51), "grain": 0.5,
+    # Graphite Black's front shows deep soft upright bands too (p95 - p5 over the mean 0.60 across the fridge door, 0.64
+    # of its mean at the edges to 1.25): its own light field, as the Nickel Steel's. The viewer's clear coat flattens
+    # the bands (0.9 gave 0.37 straight on), hence 1.3; base lifted 8 % so the doors at Haier's 18 deg read as the
+    # photos' (finesse pass, NOTES.md)
+    "gb": {"photo": "graphite_front.jpg", "base": (39, 43, 55), "grain": 0.5, "field": 1.3,
            "level": {"door_fridge": 1.0, "door_freezer": 1.045},
            "rows": (62.5, 1133.5), "cols": (390.5, 804.5)},
 }
