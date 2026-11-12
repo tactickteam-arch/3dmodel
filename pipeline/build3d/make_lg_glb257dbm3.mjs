@@ -17,7 +17,7 @@ import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, prod
 import { Food } from "./food.mjs";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "lg-gl-b257dbm3";
@@ -134,10 +134,16 @@ cab.add(span("Top", -xIn, xIn, 1.728, yTop, zBody, zCab, [topSteel, topSteel, to
 cab.add(span("TopLiner", -xIn, xIn, yCeil, 1.728, zIn1, zCab - 0.002, liner));
 cab.add(span("Base", -xIn, xIn, yBot, yFloor, zBody, zCab, [liner, liner, liner, footM, liner, frameM]));
 cab.add(span("BackWall", -xIn, xIn, yFloor, yCeil, zBody, zIn1, [liner, liner, liner, liner, liner, frameM]));
-cab.add(span("DividerMullion", mul0, mul1, yFloor, yCeil, zIn1, zCab, liner));
-// LG's front photo shows the 4 mm seam between the doors black: the 115 mm deep slot is in shadow, which the viewers don't
-// compute, so the strip of mullion behind the seam is painted dark (6 mm wide; open, it is a thin line on the white mullion)
-cab.add(span("DividerSeamShade", -0.0655, -0.0595, yBot + 0.01, yTop - 0.01, zCab, zCab + 0.001, mat("SeamShade", 0x2a2c30, { rough: 0.85 })));
+// the mullion's front: LG's open photo (dbm3_open) shows a dark strip down it, 19 mm wide (62 against the liner's 217-240,
+// at 1.1 mm/px), here centred on the door seam, in the cabinet frame's colour; either side of it the liner's white
+const mulF0 = -0.072, mulF1 = -0.053;
+cab.add(span("DividerMullion", mul0, mulF0, yFloor, yCeil, zIn1, zCab, liner));
+cab.add(span("DividerMullionFront", mulF0, mulF1, yFloor, yCeil, zIn1, zCab, [liner, liner, liner, liner, frameM, liner]));
+cab.add(span("DividerMullionR", mulF1, mul1, yFloor, yCeil, zIn1, zCab, liner));
+// LG's straight fronts show the 4 mm seam between the doors black on all three colours (0-10 of 255, the doors' edges a
+// thin light line either side): the 115 mm deep slot is in shadow, which the viewers don't compute, so the strip of
+// mullion behind the seam is a matt black with no reflection (6 mm wide; open, a thin line down the dark strip)
+cab.add(span("DividerSeamShade", -0.0655, -0.0595, yBot + 0.01, yTop - 0.01, zCab, zCab + 0.001, mat("SeamShade", 0x08090a, { rough: 0.9 })));
 // low at the back of each side (LG's side photo dbm3_side.jpg at 0.52 px/mm, and the grille on both sides in the 3/4
 // photos): four embossed bars, 1 mm proud, the lower two shortened to 184 mm from the back; behind them the vent grille,
 // a plate 40-169 mm from the back and 75-203 mm up with a 4 x 9 grid of slots (63-148 mm, 98-182 mm), drawn in a small
@@ -739,9 +745,11 @@ await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
 const FINISHES = [
   ["Black Mirror", {}],
   ["Linen White", {
-    // part-metal: the web draws it darker, the Apple file writes it as non-metal (BENCHMARK 12; the tile, texture script)
-    DoorFreezer: { tex: `${T}/door_lw.jpg`, metal: 0.3, rough: 0.14 },
-    DoorFridge: { tex: `${T}/door_lw.jpg`, metal: 0.3, rough: 0.14 },
+    // part-metal: the web draws it darker, the Apple file writes it as non-metal (BENCHMARK 12; the tile, texture script).
+    // 0.36: with the colour layer's own reflection off (specular 0, below) the web drew it 0.955 of the label's white at
+    // 0.3; 0.36 gives 0.911-0.915 straight on against LG's 0.905-0.910
+    DoorFreezer: { tex: `${T}/door_lw.jpg`, metal: 0.36, rough: 0.14 },
+    DoorFridge: { tex: `${T}/door_lw.jpg`, metal: 0.36, rough: 0.14 },
     DoorEdge: { color: [206, 208, 211], metal: 0.1, rough: 0.45 },
     // the pocket's inside is in shadow on LG's photos (the viewers compute none): a darker white
     PocketGrey: { color: [176, 178, 182], metal: 0.05, rough: 0.35 },
@@ -786,11 +794,17 @@ const FINISHES = [
       return m;
     });
   }
-  // the glass's clear coat on every colour's door fronts, each material with its own coat
-  const coatExt = doc.createExtension(KHRMaterialsClearcoat);
+  // the glass's clear coat on every colour's door fronts, each material with its own coat; under it the colour layer has
+  // no reflection of its own (KHR_materials_specular 0: paint behind glass hardly reflects, and its soft reflection laid
+  // a grey haze over the darker colours under the page's studio light; Black Mirror, metal 1 on a near-black tile, had
+  // almost none already). The Apple files don't carry this setting; their renders are checked on their own (NOTES.md).
+  // The seam's black strip on the mullion gets the same
+  const coatExt = doc.createExtension(KHRMaterialsClearcoat), specExt = doc.createExtension(KHRMaterialsSpecular);
   for (const m of doc.getRoot().listMaterials()) if (/^Door(Freezer|Fridge)/.test(m.getName())) {
     m.setExtension("KHR_materials_clearcoat", coatExt.createClearcoat().setClearcoatFactor(GLASS_COAT[0]).setClearcoatRoughnessFactor(GLASS_COAT[1]));
+    m.setExtension("KHR_materials_specular", specExt.createSpecular().setSpecularFactor(0));
   }
+  doc.getRoot().listMaterials().find((m) => m.getName() === "SeamShade").setExtension("KHR_materials_specular", specExt.createSpecular().setSpecularFactor(0));
   for (const m of doc.getRoot().listMeshes()) for (const p of m.listPrimitives()) {
     const list0 = alt[p.getMaterial()?.getName()];
     if (!list0) continue;

@@ -148,7 +148,8 @@ root.add(cab);
 cab.add(bx("SideLeft", -xo, -xi, doorBottom, Hc, zRear + 0.004, zC, [liner, sidePaint, topPaint, baseDark, frame, backPaint], true));
 cab.add(bx("SideRight", xi, xo, doorBottom, Hc, zRear + 0.004, zC, [sidePaint, liner, topPaint, baseDark, frame, backPaint], true));
 cab.add(bx("Top", -xi, xi, ceil, Hc, zRear + 0.004, zC, [liner, liner, topPaint, liner, frame, backPaint]));
-cab.add(bx("Base", -xi, xi, doorBottom, floorIn, zStep - 0.04, zC, [liner, liner, liner, baseDark, liner, bayDark]));
+// the base's front is the frame's dark grey: white, it showed as a light slit in the doors' gap at the bottom (11 Nov)
+cab.add(bx("Base", -xi, xi, doorBottom, floorIn, zStep - 0.04, zC, [liner, liner, liner, baseDark, frame, bayDark]));
 cab.add(bx("DividerMullion", mullL, mullR, floorIn, ceil, zIn, zC, [liner, liner, liner, liner, frame, liner]));
 cab.add(bx("BackWall", -xi, xi, stepTop, ceil, zRear + 0.004, zIn, [liner, liner, liner, liner, liner, backPaint]));
 // the compressor bay at the bottom of the back: inside, a step over it; outside, the bay is dark behind its cover
@@ -174,23 +175,26 @@ cab.add(bx("RearPanel", -xo + 0.002, xo - 0.002, bayTop, Hc - 0.002, zRear, zRea
   // behind the slots: the dark bay (the step's back wall), and its floor
   cab.add(bx("RearBayFloor", -xi, xi, 0.012, 0.016, zRear + 0.004, zStep - 0.04, bayDark));
 }
-{ // the power cord from the control box, round the cover's corner and down the side, to a three-pin plug parked at the bottom
-  // (cord 8 mm; the plug is India's three-pin, 45 x 42 x 16 mm; its spot is where Samsung's photo parks its plug)
-  const [px0, py0, px1, py1] = rp.pcb;
-  const pts = rp.cord.map(([x, y]) => new THREE.Vector3(x, y, (x >= px0 - 0.004 && x <= px1 + 0.004 && y >= py0 - 0.004) ? zBack - 0.0045 : zRear - 0.0045));
-  cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), 160, rp.cord_d / 2, 8, false), cordM));
-  const [px, py] = rp.plug;
+{ // the power cord on Samsung's rear photo's own route: out of the control box's connector, along under its cover, down the
+  // back's edge 24 mm from the side and along the bottom of the compressor cover to the plug parked in its clip (cord 8 mm,
+  // flat on the panel). In the -90deg side view the run down the edge shows as a 1-2 px line on the back edge, as it would
+  // on the real fridge (the product wins over the brief's side-view rule; 11 Nov). The plug is India's three-pin, its pins
+  // down as the photo's plug has them, sunk 4 mm into the compressor cover so it stands 13 mm proud: the +90deg side view
+  // hides 12.6-14.9 mm behind the back across it, so neither plug nor pins show there
+  const [px0, py0, px1, py1] = rp.pcb, cr = rp.cord_d / 2;
+  const pts = [...rp.cord, [rp.plug[0] - 0.022, rp.cord.at(-1)[1] - 0.004]].map(([x, y]) => new THREE.Vector3(x, y, (x >= px0 - 0.004 && x <= px1 + 0.004 && y >= py0 - 0.004) ? zBack - cr - 0.0005 : zRear - cr - 0.0005));
+  cab.add(mesh("PowerCord", new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), 160, cr, 8, false), cordM));
+  const [px, py] = rp.plug, sink = 0.004;
   const sh = new THREE.Shape(), w = 0.045, h = 0.042, r = 0.012;
   sh.moveTo(-w / 2 + r, -h / 2); sh.lineTo(w / 2 - r, -h / 2); sh.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
   sh.lineTo(w / 2, h / 2 - r); sh.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2); sh.lineTo(-w / 2 + r, h / 2);
   sh.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); sh.lineTo(-w / 2, -h / 2 + r); sh.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
-  const plug = mesh("Plug", new THREE.ExtrudeGeometry(sh, { depth: 0.016, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002, bevelSegments: 2, curveSegments: 8 }), plugM, px, py, zRear - 0.0025);
+  // 17 mm thick (14 + two 1.5 mm bevels): its face at zRear + sink, its back 13 mm behind the panel
+  const plug = mesh("Plug", new THREE.ExtrudeGeometry(sh, { depth: 0.014, bevelEnabled: true, bevelSize: 0.0015, bevelThickness: 0.0015, bevelSegments: 2, curveSegments: 8 }), plugM, px, py, zRear + sink - 0.0015);
   plug.rotation.y = Math.PI;
   cab.add(plug);
-  for (const [dx, dy] of [[0, 0.0105], [-0.0095, -0.0065], [0.0095, -0.0065]]) {
-    const pin = mesh("PlugPin", new THREE.CylinderGeometry(0.0026, 0.0026, 0.016, 10), pinM, px + dx, py + dy, zRear - 0.0025 - 0.018 - 0.008);
-    pin.rotation.x = Math.PI / 2; cab.add(pin);
-  }
+  const zMid = zRear + sink - 0.0085;
+  for (const dx of [0, -0.0095, 0.0095]) cab.add(cyl("PlugPin", 0.0026, 0.0026, 0.016, pinM, px + dx, py - h / 2 - 0.008, zMid, 10));
 }
 
 // hinges: the moulded covers on the top's front corners (up to the 1780 mm overall height), the black bottom brackets;
@@ -332,29 +336,32 @@ const VD = drawer(trays, "VegDrawer", FR, lowDrawer, zStep + 0.006, frontFridge,
 // ── doors: the hinge pins inside each door's outer corner; the photo-textured face (EZ Clean Steel, or Black DOI as a variant), the steel wrapping round its
 // edges, the grip slots, the gasket, the liner and five bins ──
 const slotDepth = 0.025;
-// a door body from x0 to x1 (pin space), with a grip slot in its x1 side (sx 1) or x0 side (sx -1)
+// a door body from x0 to x1 (pin space), with a grip slot in its x1 side (sx 1) or x0 side (sx -1). The front is one skin
+// 5 mm thick over the whole face (11 Nov: the face had been the fronts of five boxes, whose joints down the slot's edge
+// and across its ends drew thin lines on the face and broke the grain there); the body and the slot's strips stand behind
+// it, their hidden fronts in the edge's colour
 function body(g, name, x0, x1, zb, zf, h, sx, slot, edgeMats, front) {
   const [ys0, ys1, zs0, zs1] = slot;
+  const zk = zf - 0.005;                                         // the skin's back (the slot's front wall is 8-10 mm in)
   const xs = sx > 0 ? x1 - slotDepth : x0 + slotDepth;          // the slot's floor
   const [mx0, mx1] = sx > 0 ? [x0, xs] : [xs, x1];
   const [ex0, ex1] = sx > 0 ? [xs, x1] : [x0, xs];
-  const F = front;                                               // every piece's front wears the door's photo
-  const faces = (sideOut) => sx > 0 ? [sideOut, edgeMats.out, doorEdge, doorEdge, F, doorBack] : [edgeMats.out, sideOut, doorEdge, doorEdge, F, doorBack];
+  const F = front, E = doorEdge;
+  const faces = (sideOut) => sx > 0 ? [sideOut, edgeMats.out, doorEdge, doorEdge, E, doorBack] : [edgeMats.out, sideOut, doorEdge, doorEdge, E, doorBack];
   const edge = edgeMats.slotSide;
   const lowTop = recess;                                         // the slot's floor and roof are the low and high pieces' faces
+  const skin = bx(name + "Face", x0, x1, 0, h, zk, zf, sx > 0 ? [edge, edgeMats.out, doorEdge, doorEdge, F, E] : [edgeMats.out, edge, doorEdge, doorEdge, F, E]);
   const pieces = [
-    bx(name + "Body", mx0, mx1, 0, h, zb, zf, faces(recess)),
-    bx(name + "EdgeLow", ex0, ex1, 0, ys0, zb, zf, sx > 0 ? [edge, recess, lowTop, doorEdge, F, doorBack] : [recess, edge, lowTop, doorEdge, F, doorBack]),
-    bx(name + "EdgeHigh", ex0, ex1, ys1, h, zb, zf, sx > 0 ? [edge, recess, doorEdge, recess, F, doorBack] : [recess, edge, doorEdge, recess, F, doorBack]),
-    bx(name + "EdgeFront", ex0, ex1, ys0, ys1, zs1, zf, sx > 0 ? [edge, recess, recess, recess, F, recess] : [recess, edge, recess, recess, F, recess]),
+    bx(name + "Body", mx0, mx1, 0, h, zb, zk, faces(recess)),
+    bx(name + "EdgeLow", ex0, ex1, 0, ys0, zb, zk, sx > 0 ? [edge, recess, lowTop, doorEdge, E, doorBack] : [recess, edge, lowTop, doorEdge, E, doorBack]),
+    bx(name + "EdgeHigh", ex0, ex1, ys1, h, zb, zk, sx > 0 ? [edge, recess, doorEdge, recess, E, doorBack] : [recess, edge, doorEdge, recess, E, doorBack]),
+    bx(name + "EdgeFront", ex0, ex1, ys0, ys1, zs1, zk, sx > 0 ? [edge, recess, recess, recess, E, recess] : [recess, edge, recess, recess, E, recess]),
     bx(name + "EdgeBack", ex0, ex1, ys0, ys1, zb, zs0, sx > 0 ? [edge, recess, recess, recess, recess, doorBack] : [recess, edge, recess, recess, recess, doorBack]),
   ];
   // the photo spans the whole face, x0 to x1 and the door's height (v 0 at the top)
-  for (const m of pieces) {
-    const p = m.geometry.attributes.position, n = m.geometry.attributes.normal, uv = m.geometry.attributes.uv;
-    for (let i = 0; i < p.count; i++) if (n.getZ(i) > 0.5) uv.setXY(i, (p.getX(i) + m.position.x - x0) / (x1 - x0), (h - (p.getY(i) + m.position.y)) / h);
-    g.add(m);
-  }
+  const p = skin.geometry.attributes.position, n = skin.geometry.attributes.normal, uv = skin.geometry.attributes.uv;
+  for (let i = 0; i < p.count; i++) if (n.getZ(i) > 0.5) uv.setXY(i, (p.getX(i) + skin.position.x - x0) / (x1 - x0), (h - (p.getY(i) + skin.position.y)) / h);
+  g.add(skin, ...pieces);
 }
 // the gasket round the opening, the liner inside it and the bins standing on the liner's face (pin space)
 function doorInside(g, name, c) {
