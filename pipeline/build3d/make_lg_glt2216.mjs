@@ -15,7 +15,7 @@
 import fs from "node:fs";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { LGStock } from "./stock_lg.mjs";
 
@@ -49,11 +49,11 @@ const faceH = 0.14, fzH = 0.27;              // the drawer's white front (97-237
 // LG mark (light on the dark doors); line: the print's ink (null: no print); and the door's finish
 const FIN = [
   { name: "Radiant Onyx", variant: "Radiant Onyx", slug: "radiant_onyx", code: "GLT2216WYRO", swatch: "#141318", edge: 0x1c1c1f, top: 0x1d1d20, mark: "light", line: C.radiant_onyx_line,
-    door: { metal: 0.45, rough: 0.3, coat: null } },
+    door: { metal: 0.45, rough: 0.3, coat: null, spec: 0.3 } },
   { name: "Radiant Inox", variant: "Radiant Inox", slug: "radiant_inox", code: "GLT2216WYRI", swatch: "#b9babb", edge: 0x9fa0a2, top: 0x7e8083, mark: "dark", line: C.radiant_inox_line,
     door: { metal: 0.3, rough: 0.45, coat: [0.35, 0.3] } },
   { name: "Onyx Black", variant: "Onyx Black", slug: "onyx_black", code: "GLT2216WYOB", swatch: "#09090b", edge: 0x1c1c1f, top: 0x1d1d20, mark: "light", line: null,
-    door: { metal: 0.45, rough: 0.3, coat: null } },
+    door: { metal: 0.45, rough: 0.3, coat: null, spec: 0.3 } },
   { name: "Shiny Steel", variant: "Shiny Steel", slug: "shiny_steel", code: "GLT2216WYPZ", swatch: "#a9aaab", edge: 0x9a9b9d, top: 0x7e8083, mark: "dark", line: null,
     door: { metal: 0.38, rough: 0.5, coat: [0.6, 0.22], grain: "hairline_soft_v" } },
   { name: "Dazzle Steel", variant: "Dazzle Steel", slug: "dazzle_steel", code: "GLT2216WYDS", swatch: "#8b8c8d", edge: 0x8e8f91, top: 0x7a7c7f, mark: "dark", line: null,
@@ -419,7 +419,7 @@ await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
     hairline_soft_h: { n: [`${T}/grain_hairline_soft_h_n.jpg`, "grain_hairline_soft_h_n"], r: [`${T}/grain_hairline_h_r.jpg`, "grain_hairline_h_r"] },
   };
   const coatExt = R.listExtensionsUsed().find((e) => e.extensionName === "KHR_materials_clearcoat") || doc.createExtension(KHRMaterialsClearcoat);
-  const varExt = doc.createExtension(KHRMaterialsVariants);
+  const varExt = doc.createExtension(KHRMaterialsVariants), specExt = doc.createExtension(KHRMaterialsSpecular);
   const hex = (c) => [((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255].map((v) => Math.pow(v, 2.2));   // sRGB to linear, as three.js writes it
   const lin = (rgb) => rgb.map((v) => Math.pow(v / 255, 2.2));
   const VARY = ["DoorFreezer", "DoorFridge", "PrintFreezer", "PrintFridge", "SideSteel", "DoorEdge", "TopSteel", "LgMark"];
@@ -434,6 +434,10 @@ await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
       m.setMetallicRoughnessTexture(image(...g.r)); m.getMetallicRoughnessTextureInfo().setTexCoord(1);
     } else { m.setNormalTexture(null); m.setMetallicRoughnessTexture(null); }
     m.setExtension("KHR_materials_clearcoat", f.door.coat ? coatExt.createClearcoat().setClearcoatFactor(f.door.coat[0]).setClearcoatRoughnessFactor(f.door.coat[1]) : null);
+    // spec: the black doors' own reflection, held down on the web. At rough 0.3 the studio's light spread over the whole
+    // door at the page's 3/4 view (door p50 52 against LG large03's 11) and read charcoal; at 0.3 it reads 21, straight on
+    // 4 (photo 12). Apple's files ignore it and already sit on the photo (SceneKit 12 / 12).
+    m.setExtension("KHR_materials_specular", f.door.spec != null ? specExt.createSpecular().setSpecularFactor(f.door.spec) : null);
   };
   const setPrint = (m, f, part) => {
     // the Radiant colours' decals carry their ink in the image (tex_lg_glt2216.py, INK_K)
