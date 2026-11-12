@@ -416,6 +416,16 @@ const freezerDoor = group("FreezerDoor", W / 2, base, zFront);
   freezerDoor.add(box("FreezerDoorPanel", rw, rh, relief + 0.001, liner, -pw / 2, h / 2, rz + 0.0005));   // 1 mm into the liner
   for (const f of [0.27, 0.5, 0.73]) freezerDoor.add(box("FreezerDoorRib", rw - 0.06, 0.008, 0.005, linerDk, -pw / 2, h / 2 - rh / 2 + f * rh, -linerFace - relief - 0.002));
 }
+// the 4 mm gap between the doors: the white mullion behind it showed through as a bright line when seen from its own
+// height (on Haier's fronts it reads dark, in the doors' shadow). Each door carries a dark fin (the base's near black) into
+// the gap, the fridge door's in front (it opens most, and its fin swings away from the other), overlapping 0.4 mm in the
+// gap's middle, so no straight line of sight reaches the mullion; each fin is set 1 mm into its own door and stops 2 mm
+// short of the doors' sides, and its faces keep 1.3 mm or more from the centre hinge's (which sits in the gap)
+{
+  const mid = (fzTop + frBot) / 2, ov = 0.0002, fin = 0.008, K = Array(6).fill(baseDark);
+  freezerDoor.add(slab("SeamFinFreezer", [-pw + 0.002, -0.002], [fzTop - base - 0.001, mid + ov - base], [0.002, 0.002 + fin], K));
+  fridgeDoor.add(slab("SeamFinFridge", [-pw + 0.002, -0.002], [mid - ov - frBot, 0.001], [0.012, 0.012 + fin], K));
+}
 { // what sits in the door bins, so it swings out with the door
   const [b0, b1, b2, b3] = BINS;
   stock.doorFridge(fridgeDoor, { fit: true, eggY: b3.f, eggX: EGGS, eggDY: 0, eggTurn: Math.PI / 2, jarY: b2.f, botY: b1.f, canY: b0.f, deps: { egg: b3.d, jar: b2.d, bottle: b1.d, can: b0.d }, inside });

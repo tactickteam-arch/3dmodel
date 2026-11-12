@@ -59,7 +59,11 @@ rng = np.random.default_rng(4052)
 # tuned until the gate's straight-on and 3/4 renders give the same ratios (REVIEW.md). Each photo's door heights are its
 # own body's: the dark steel photos show the 1640 mm body, the Inox photo this 1730 mm one.
 FINISHES = {
-    "gk": {"photo": "gk_front.jpg", "base": (35, 40, 54), "grain": 0.25,
+    # the dark front shows deep soft upright bands too (p95 - p5 over the mean 0.60 across the fridge door, 0.64 of its
+    # mean at the edges to 1.25): baked in as on the Inox. The viewer's clear coat flattens them, hence 1.3; base lifted
+    # 8 % so the doors at Haier's 18 deg read as the photos', and less blue (blue / red 1.46 in the viewer against the
+    # photos' 1.33-1.36): the HRB-3752's Graphite Black base (finesse pass, NOTES.md)
+    "gk": {"photo": "gk_front.jpg", "base": (39, 43, 55), "grain": 0.25, "bands": 1.3,
            "level": {"door_fridge": 1.0, "door_freezer": 1.15},
            "rows": (59.5, 1141.5), "cols": (392.5, 809.5), "h_mm": 1640.0,
            "fridge": (637.5, 1640.0), "freezer": (24.5, 577.0)},
