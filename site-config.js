@@ -6,11 +6,11 @@
 // With every list empty, the site behaves exactly as it did before this file existed.
 export const SITE = {
   // the address people are sent to: link previews, canonical links, QR codes and every link people share
-  publicOrigin: "https://3dmodel-chi-nine.vercel.app",
+  publicOrigin: "https://3d.sangeetha.com",
 
   // other addresses that serve this same site, such as the store app's old AR address once its DNS points here.
   // Pages keep working on them; links shared from them point at publicOrigin.
-  alsoServedAt: [],
+  alsoServedAt: ["https://3dmodel-chi-nine.vercel.app"],
 
   // the store app's own addresses (live and test) that may pass us the staff sign-in (store-bridge.js).
   // Empty: the bridge does nothing at all.
