@@ -62,10 +62,13 @@ POCKET = (0.066, 0.086, 0.232, 0.400)   # the handle's pocket (kept: it is a rec
 LOCK_R = 0.022                          # the key lock's radius in u (modelled)
 EDGE_U = 0.125                          # the door's rounded sides: the outer 74 mm each side carry LG's highlight bands
 # the viewer's light lifts textures; each colour's door is held at gain * photo - lift, tuned on the
-# render as a ratio to the energy label's white (REVIEW.md). The prints' clear coat adds a near-even shine on top, so
-# their dark ground needs a lift taken off as well as a gain, or the flowers go dull once the ground matches: fitted from
-# two regions (the plain ground and the big flowers) on renders at two settings. The stand's front at STAND_SHADE.
-SHADE = {"shiny_steel": (0.86, 0), "wine_spring": (0.80, 13.8), "royal_spring": (0.78, 11.7), "blue_waterlily": (0.84, 17)}
+# render as a ratio to the energy label's white (REVIEW.md). The prints' printed layer has no reflection of its own under
+# the clear coat (the builder sets KHR_materials_specular 0 on them, 12 Nov): before, its soft reflection laid a grey veil
+# on the dark grounds and the texture had a lift taken off to make up for it. Now the page draws the dark ground near the
+# photo's and lifts the mid-tones, so a lower gain with a small offset added holds both regions: fitted on the plain
+# ground (the door's darkest quarter) and the big flowers (its brightest tenth), straight on and at -12 degrees, against
+# LG's fronts and three-quarter photos (NOTES.md, finesse pass). The stand's front at STAND_SHADE.
+SHADE = {"shiny_steel": (0.86, 0), "wine_spring": (0.73, -7), "royal_spring": (0.72, -7.5), "blue_waterlily": (0.77, -1.5)}
 # the steel's light bands at its rounded sides: a share of the photo's band is kept in the texture (a flat pale steel
 # reads as paint); the prints' come from their clear coat instead
 BANDS_KEPT = {"shiny_steel": 0.7}

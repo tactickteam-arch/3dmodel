@@ -12,14 +12,16 @@
 // left; inside, the freezer box at the top behind a clear flap (its grip on the left, so hinged on the right), the knob
 // dial and the lamp beside it, LG's Fit Max Chiller Tray under it, three toughened glass shelves, the Moist Balance
 // Crisper's cover and the vegetable box; in the door, two pairs of small baskets, a wide basket, the 2 L bottle basket and
-// the can basket (LG's open photos: seven; LG's spec says 6 transparent baskets). The shelves, the chiller tray and the
+// the can basket: seven, as LG's open photos of all four colours show (the right top one with the egg cups for its floor),
+// and the manual's door figure (seven holders; "the number of baskets may differ depending on models"). LG's spec table
+// says 6; the specs row follows the product. The shelves, the chiller tray and the
 // vegetable box come out with their food (FridgeTrays). Stocked for a south Indian kitchen, the base drawer with onions
 // and potatoes as in LG's stocked photo.
 // usage: node make_lg_gld2356.mjs <entry .json, never products.json> <tex dir> <out.glb>
 import fs from "node:fs";
 import { mergeGeometries, mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { LGStock } from "./stock_lg.mjs";
 
@@ -73,11 +75,11 @@ const FIN = [
   { name: "Shiny Steel", variant: "Shiny Steel", slug: "shiny_steel", code: "GLD2356ZAPZ", swatch: "#a9aaab", edge: 0x949596, side: 0x76777a, top: 0x6a6b6d, stand: 0x5f5f61, mark: "dark",
     door: { metal: 0.38, rough: 0.5, coat: [0.6, 0.22], grain: true } },
   { name: "Wine Spring", variant: "Wine Spring", slug: "wine_spring", code: "GLD2356ZAWS", swatch: "#4a1a22", edge: 0x3e1e20, side: 0x31131d, top: 0x2c111a, stand: 0x311217, mark: "light",
-    door: { metal: 0, rough: 0.35, coat: [0.9, 0.06] } },
+    door: { metal: 0, rough: 0.35, coat: [0.9, 0.06], spec0: true } },
   { name: "Royal Spring", variant: "Royal Spring", slug: "royal_spring", code: "GLD2356ZARS", swatch: "#141a3c", edge: 0x1d2337, side: 0x03082d, top: 0x03072a, stand: 0x090a1e, mark: "light",
-    door: { metal: 0, rough: 0.35, coat: [0.9, 0.06] } },
+    door: { metal: 0, rough: 0.35, coat: [0.9, 0.06], spec0: true } },
   { name: "Blue Waterlily", variant: "Blue Waterlily", slug: "blue_waterlily", code: "GLD2356ZABW", swatch: "#24406e", edge: 0x283755, side: 0x050d3a, top: 0x050c35, stand: 0x0c0f26, mark: "light",
-    door: { metal: 0, rough: 0.35, coat: [0.9, 0.06] } },
+    door: { metal: 0, rough: 0.35, coat: [0.9, 0.06], spec0: true } },
 ];
 const F0 = FIN[0];
 
@@ -194,14 +196,15 @@ cab.add(rearPanel("RearPlate", -W / 2, W / 2, yBay, cabTop, zPlate));
 for (const sx of [-1, 1]) cab.add(rearPanel("RearPlate", sx < 0 ? -W / 2 : inW / 2, sx < 0 ? -inW / 2 : W / 2, standTop, yBay, zPlate));
 cab.add(rearPanel("RearPlate", -inW / 2, inW / 2, standTop, yBay, zBay - 0.0005));
 cab.add(box("BayTop", inW, 0.003, bayD + 0.003, dark, 0, yBay + 0.0015, zBay - (bayD + 0.003) / 2));
-for (const sx of [-1, 1]) cab.add(box("BaySide", 0.003, yBay - standTop, bayD, dark, sx * (inW / 2 - 0.0015), (yBay + standTop) / 2, zBay - bayD / 2));
+// (the bay's sides stand 1.5 mm in from the floor's ends, so no two faces share a plane: zfight)
+for (const sx of [-1, 1]) cab.add(box("BaySide", 0.003, yBay - standTop, bayD, dark, sx * (inW / 2 - 0.003), (yBay + standTop) / 2, zBay - bayD / 2));
 cab.add(box("BayFloor", inW, 0.003, zBay - zStandBack, dark, 0, standTop - 0.0015, (zBay + zStandBack) / 2));
 // two dark spacers stand 14 mm off the back at each side (side photo: 944-1279 and 465-657 mm)
 for (const sx of [-1, 1]) for (const [y0, y1] of [[0.944, 1.279], [0.465, 0.657]]) cab.add(box("RearSpacer", 0.012, y1 - y0, 0.011, dark, sx * (W / 2 - 0.008), (y0 + y1) / 2, zCabBack - 0.003 - 0.0055));
 // hinges on the right: a dark cover on the cabinet's top behind the door (DZ-09, DZ-05: 90 mm across, 18 mm tall, 90 mm
 // deep) and the bottom bracket under the door's right corner (fronts, DZ-03)
 cab.add(box("HingeCoverTop", 0.09, 0.018, 0.09, hingeM, W / 2 - 0.045, cabTop + 0.009, zDoor - 0.002 - 0.045));
-cab.add(box("HingeBottom", 0.035, 0.003, 0.07, chrome, W / 2 - 0.0185, standTop + 0.0025, zFront + 0.03));
+cab.add(box("HingeBottom", 0.035, 0.003, 0.07, chrome, W / 2 - 0.0205, standTop + 0.0025, zFront + 0.03));   // 3 mm in from the side: not in the stand post's plane
 // power cord: its route traced on LG's rear photo (rear_paths.json: out of the compressor, through the clamp, toward
 // the right side) inside the compressor bay; it stops 30 mm short of the side and the three-pin plug hangs flat
 // against the bay's back, pins down, so no front, 3/4 or side view shows them (ESTIMATED past the photo's trace)
@@ -232,10 +235,11 @@ cab.add(mesh("VentSlots", mergeGeometries([0, 1, 2, 3, 4, 5, 6].map((i) => new T
 {
   const zc = (zIn + fbZ1) / 2, d = fbZ1 - zIn, h = fbTop - fbBot;
   cab.add(box("FreezerBoxFloor", panelX0 - xL, wt, d, white, (xL + panelX0) / 2, fbBot + wt / 2, zc));
-  cab.add(box("FreezerBoxRight", wt, h - 0.002, d - 0.002, white, panelX0 - wt / 2 - 0.0008, (fbBot + fbTop) / 2, zc - 0.001));   // tucked 1 mm inside the panel block
+  // tucked 1 mm inside the panel block, and stopping 1 mm behind the frame strip in front of it (no shared faces: zfight)
+  cab.add(box("FreezerBoxRight", wt, h - 0.002, d - 0.013, white, panelX0 - wt / 2 - 0.0008, (fbBot + fbTop) / 2, zIn + (d - 0.013) / 2));
   // the frame round the flap: left strip, the strip between the flap's hinge and the panel, the band over the flap
   cab.add(box("FreezerFrameL", flX0 - xL, h, 0.012, white, (xL + flX0) / 2, (fbBot + fbTop) / 2, fbZ1 - 0.006));
-  cab.add(box("FreezerFrameR", panelX0 - 0.0012 - flX1, h, 0.012, white, (flX1 + panelX0 - 0.0012) / 2, (fbBot + fbTop) / 2, fbZ1 - 0.006));
+  cab.add(box("FreezerFrameR", panelX0 - 0.003 - flX1, h, 0.012, white, (flX1 + panelX0 - 0.003) / 2, (fbBot + fbTop) / 2, fbZ1 - 0.006));
   cab.add(box("FreezerFrameTop", flX1 - flX0, fbTop - flY1, 0.012, white, (flX0 + flX1) / 2, (fbTop + flY1) / 2, fbZ1 - 0.006));
   cab.add(box("FreezerFrameBot", flX1 - flX0, flY0 - fbBot, 0.012, white, (flX0 + flX1) / 2, (fbBot + flY0) / 2, fbZ1 - 0.006));
   // the box's back: the cavity's back wall, grey, with "Fast Freezing Zone" across it (DZ-04: 126 mm wide)
@@ -246,7 +250,7 @@ cab.add(mesh("VentSlots", mergeGeometries([0, 1, 2, 3, 4, 5, 6].map((i) => new T
   const px0 = panelX0, px1 = xR, pcx = (px0 + px1) / 2;
   cab.add(box("ControlPanel", px1 - px0, h, d, white, pcx, (fbBot + fbTop) / 2, zc));
   const kx = 0.2045, ky = 1.228;
-  cab.add(plane("DialRingDecal", 0.07, 0.07 / C.dial_fig.aspect, dialM, kx + (0.5 - C.dial_fig.cx) * 0.07, ky - (C.dial_fig.cy - 0.5) * 0.07 / C.dial_fig.aspect, fbZ1 + 0.0007));
+  cab.add(plane("DialRingDecal", 0.07, 0.07 / C.dial_fig.aspect, dialM, kx + (0.5 - C.dial_fig.cx) * 0.07, ky - (C.dial_fig.cy - 0.5) * 0.07 / C.dial_fig.aspect, fbZ1 + 0.0016));
   const k = mesh("KnobDial", new THREE.CylinderGeometry(0.021, 0.021, 0.016, 36), [knobSide, knobFace, knobSide], kx, ky, fbZ1 + 0.008);
   k.rotation.x = Math.PI / 2;
   cab.add(k);
@@ -625,7 +629,7 @@ await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
     return texCache.get(file);
   };
   const coatExt = R.listExtensionsUsed().find((e) => e.extensionName === "KHR_materials_clearcoat") || doc.createExtension(KHRMaterialsClearcoat);
-  const varExt = doc.createExtension(KHRMaterialsVariants);
+  const varExt = doc.createExtension(KHRMaterialsVariants), specExt = doc.createExtension(KHRMaterialsSpecular);
   const hex = (c) => [((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255].map((v) => Math.pow(v, 2.2));   // sRGB to linear, as three.js writes it
   const VARY = ["DoorFace", "DoorEdge", "SidePaint", "TopPaint", "StandPlastic", "StandFront", "LgMark", "StandMark"];
   const base = Object.fromEntries(VARY.map((n) => [n, byName(n)]));
@@ -640,6 +644,10 @@ await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
         m.setMetallicFactor(f.door.metal).setRoughnessFactor(f.door.rough);
         m.setNormalTexture(null); m.setMetallicRoughnessTexture(null);
         m.setExtension("KHR_materials_clearcoat", f.door.coat ? coatExt.createClearcoat().setClearcoatFactor(f.door.coat[0]).setClearcoatRoughnessFactor(f.door.coat[1]) : null);
+        // the printed film under its gloss has no reflection of its own (KHR_materials_specular 0), as a glass door's colour
+        // layer: its soft one laid a grey veil over the dark grounds at 3/4 under the page's light. The Apple files don't
+        // carry it (NOTES.md, finesse pass)
+        if (f.door.spec0) m.setExtension("KHR_materials_specular", specExt.createSpecular().setSpecularFactor(0));
       }
       if (n === "StandFront") m.setBaseColorTexture(image(`${T}/stand_${f.slug}.jpg`, `StandFront_${f.slug}`));
       if (n === "DoorEdge") m.setBaseColorFactor([...hex(f.edge), 1]);

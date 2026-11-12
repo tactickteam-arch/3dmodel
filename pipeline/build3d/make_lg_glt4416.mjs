@@ -13,7 +13,7 @@
 import fs from "node:fs";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { LGStock } from "./stock_lg.mjs";
 
@@ -51,7 +51,12 @@ const topM = mat("TopSteel", 0x1c1d1f, { metal: 0.15, rough: 0.7 });
 const logoM = mat("LgMark", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const doorEdge = mat("DoorEdge", 0x8a8c90, { metal: 0.6, rough: 0.35 });
 const silverCap = mat("SilverLip", 0xb4b5b7, { metal: 0.8, rough: 0.3 });
-const pocketM = mat("PocketDark", 0x26272a, { metal: 0.3, rough: 0.55 });
+// the pocket reads 11-15 on LG's front photos of both colours (was 55 at 0x26272a, metal 0.3): a matt black with no
+// reflection of its own (KHR_materials_specular 0, set below)
+const pocketM = mat("PocketDark", 0x202022, { rough: 0.8 });
+// the freezer door's underside, seen in the 6.5 mm gap over the fridge door's cap: dark on both colours' front photos
+// (16-20, then the cap), where the grey door edge drew a light band 4 px deep over the cap
+const seamM = mat("SeamFin", 0x0b0c0d, { rough: 0.9 });
 const steelEdge = mat("SteelEdge", 0x9a9b9d, { metal: 0.2, rough: 0.6 });
 const black = mat("GripBlack", 0x151516, { rough: 0.5 });
 const labelM = mat("LabelBEE", 0xffffff, { rough: 0.5, opacity: 0.999 });
@@ -389,6 +394,7 @@ const rect = (x0, y0, x1, y1) => { const s = new THREE.Shape(); s.moveTo(x0, y0)
 const freezerDoor = doorShell("FreezerDoor", fzBot, (g) => {
   const h = H - fzBot;
   g.add(slab("FzPanel", rect(-pw + bev, bev, -bev, h - bev), -pw, pw, h, doorT, bev, doorFzM, doorEdge, liner));
+  g.add(box("FzUnderside", pw - 2 * bev, 0.0005, doorT - bev, seamM, -pw / 2, -0.0003, (doorT - bev) / 2));
   // print, measured on LG's front photos: the LG mark 64 x 27 mm, 31 mm from the left and 31 mm down; the energy label
   // 73 mm wide (at its photo's aspect, 0.522), 30 mm from the right and 33 mm down
   g.add(plane("LgMarkDecal", 0.064, 0.0293, logoM, -pw + 0.031 + 0.032, h - 0.031 - 0.0147, doorT + 0.0007));
@@ -504,6 +510,9 @@ await exportGLB(root, clips, OUT, textures, { dir: `${TEX}/grain`, materials: {
     list.addMapping(ext.createMapping().setMaterial(pair[1]).addVariant(vPZ));
     p.setExtension("KHR_materials_variants", list);
   }
+  // the pocket and the gap strip: no reflection of their own (as the LG 260 L's seam fins)
+  const sp = doc.createExtension(KHRMaterialsSpecular);
+  for (const n of ["PocketDark", "SeamFin"]) byName(n).setExtension("KHR_materials_specular", sp.createSpecular().setSpecularFactor(0));
   // drop the hairline images if nothing uses them any more (they stay: the Shiny Steel copies use them)
   fs.writeFileSync(OUT, await io.writeBinary(doc));
   console.log(OUT, (fs.statSync(OUT).size / 1048576).toFixed(2) + " MB with 2 colours");
