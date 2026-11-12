@@ -17,7 +17,7 @@
 // usage: node make_godrej_eon366.mjs <entry .json, never products.json> <tex dir> <out.glb>
 import fs from "node:fs";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 import { LGStock } from "./stock_lg.mjs";
 import { THREE, mat, mesh, box, faced, group, stateClips, exportGLB, productParts, saveZones, GRAIN } from "./lib.mjs";
 
@@ -339,7 +339,11 @@ const xHinge = -pw / 2 + bw / 2 - 0.004;
 const EGGS = [0, 1, 2, 3, 4, 5].map((i) => xHinge - 0.03 - i * 0.05);   // a row of six from the hinge end (Godrej's stocked photo)
 function door(name, y0, h, frontMat) {
   const pivot = group(name, W / 2, y0, zFront);
-  pivot.add(mesh(name + "Panel", flipV(new THREE.BoxGeometry(pw, h, doorT)), [doorEdge, doorEdge, doorEdge, doorEdge, frontMat, liner], -pw / 2, h / 2, doorT / 2));
+  // the two faces in the gap between the doors (the freezer door's bottom, the fridge door's top) are black end caps: every
+  // colour's front and 3/4 photo shows the gap as a dark band 14-21 mm tall (levels 2-50, the Steel Rush front shows the
+  // cap's screws), where the edge colour lit through the gap read as a light strip (finesse pass, NOTES.md)
+  const capTop = name === "FridgeDoor" ? frame : doorEdge, capBottom = name === "FreezerDoor" ? frame : doorEdge;
+  pivot.add(mesh(name + "Panel", flipV(new THREE.BoxGeometry(pw, h, doorT)), [doorEdge, doorEdge, capTop, capBottom, frontMat, liner], -pw / 2, h / 2, doorT / 2));
   if (name === "FreezerDoor") {
     // the Godrej script, 70 mm wide, centred, its middle 80 mm under the top (front photo)
     pivot.add(mesh("GodrejLogoDecal", flipV(new THREE.PlaneGeometry(0.07, 0.07 * 234 / 512)), logoM, -pw / 2 + 0.002, h - 0.08, doorT + 0.0006));
@@ -443,7 +447,7 @@ await exportGLB(root, clips, OUT, {
     GodrejLogo: { image: `${T}/${f.logo}` },
   });
   const alt = {};
-  let coatExt = null;
+  let coatExt = null, specExt = null;
   for (const name of Object.keys(change(F0))) {
     const base = mats.find((m) => m.getName() === name);
     if (!base) throw new Error(`no material ${name}`);
@@ -460,8 +464,13 @@ await exportGLB(root, clips, OUT, {
         else m.setMetallicRoughnessTexture(null);
       } else if (c.grain === null) { m.setNormalTexture(null); m.setMetallicRoughnessTexture(null); }
       if (c.coat) {
+        // the print under the film has no reflection of its own (KHR_materials_specular 0): the film alone carries it.
+        // With the base's own soft reflection on as well, the page's studio lit the whole door as a haze (finesse pass,
+        // NOTES.md); the Apple files do not carry the setting
         coatExt ||= doc.createExtension(KHRMaterialsClearcoat);
+        specExt ||= doc.createExtension(KHRMaterialsSpecular);
         m.setExtension("KHR_materials_clearcoat", coatExt.createClearcoat().setClearcoatFactor(c.coat[0]).setClearcoatRoughnessFactor(c.coat[1]));
+        m.setExtension("KHR_materials_specular", specExt.createSpecular().setSpecularFactor(0));
       }
       return m;
     });

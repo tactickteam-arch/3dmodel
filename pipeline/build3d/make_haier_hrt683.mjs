@@ -81,8 +81,10 @@ const channelM = mat("ChannelFace", 0x202124, { metal: 0.5, rough: 0.3 });
 const doorEdge = mat("DoorEdge", 0x2b2f3a, { metal: 0.3, rough: 0.75 });   // rough, so the lower doors' tops stay dark from above, as the split in Haier's photos
 const recess = mat("Recess", 0x141518, { rough: 0.7 });
 // the left doors' end caps and seal at the split between the Magic Zone and the freezer: dark moulded plastic, so the
-// 10 mm gap reads as the dark line it is in every Haier front (gk_front.jpg, kg_front.jpg, pwg_front.jpg)
-const capM = mat("DoorCap", 0x17181b, { rough: 0.8 });
+// 10 mm gap reads as the dark line it is in every Haier front (gk_front.jpg, kg_front.jpg, pwg_front.jpg). Near black
+// (11 Nov): the photos' split reads 4-14 grey at its core, a deep shadowed gap; at 0x17181b the studio light lifted it to
+// 43-66 in an eye-level render (there is no ambient shadow in the viewer)
+const capM = mat("DoorCap", 0x08090a, { rough: 0.9 });
 const trimM = mat("TrimSilver", 0xc9ccd1, { metal: 0.9, rough: 0.25 });
 const dispM = mat("DisplayGlass", 0x0b0b0d, { metal: 0.6, rough: 0.15 });
 const printDisp = mat("print_display", 0xffffff, { rough: 0.4, opacity: 0.999 });

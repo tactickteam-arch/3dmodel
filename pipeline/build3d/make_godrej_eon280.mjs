@@ -357,6 +357,14 @@ function door(name, y0, h, glassMat, rt, rb) {
   const body = new THREE.ExtrudeGeometry(rr(-pw / 2 + BEV, BEV, pw / 2 - BEV, h - BEV, rt && rt - BEV, rb && rb - BEV),
     { depth: doorT - 2 * BEV, bevelEnabled: true, bevelThickness: BEV, bevelSize: BEV, bevelSegments: 3, curveSegments: 6 });
   pivot.add(mesh(name + "Body", body, doorRim, -pw / 2, 0, BEV));
+  // the flat face in the gap (the fridge door's top, the freezer door's bottom) is a black end cap: Godrej's front and 3/4
+  // show the gap dark (0-34 of 255) between two thin bright lines (the rounded edges), where the near-metal rim mirrored
+  // the studio's top light as a light strip (184). A dark plate over the flat face, between the rounded front and back edges, 0.9 mm proud
+  // and 2 mm into the body, keeping 0.1 mm off the centre hinge (finesse pass, NOTES.md)
+  {
+    const t = 0.0029, out = 0.0009, cy = name === "FridgeDoor" ? h + out - t / 2 : -out + t / 2;
+    pivot.add(box(name + "GapCap", pw - 0.003, t, doorT - 2 * BEV, frame, -pw / 2, cy, doorT / 2));   // 1.5 mm in from the sides
+  }
   // the glass inside the rim, its corners following the door's, textured with its own UVs (top of the image at the top)
   const gx0 = -pw / 2 + RIM, gx1 = pw / 2 - RIM, gy0 = RIM, gy1 = h - RIM;
   const gg = new THREE.ShapeGeometry(rr(gx0, gy0, gx1, gy1, rt && rt - 0.008, rb && rb - 0.008), 8);
