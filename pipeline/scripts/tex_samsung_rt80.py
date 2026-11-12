@@ -86,9 +86,10 @@ GAIN = {
     "s": {"fz": [(0.0, 0.78), (1.0, 0.80)], "fr": [(0.0, 0.83), (0.2, 0.81), (1.0, 0.80)]},
     "b": {"fz": [(0.0, 0.84), (1.0, 0.86)], "fr": [(0.0, 0.86), (1.0, 0.86)]},
 }
-# Black Glass: under the builder's full clear coat the base keeps the photo's own colour, nudged per channel (R, G, B) in linear
-# light until the gate's front render reads the photo's [19, 17, 28] at 0.072 of the label's white (trials in NOTES.md)
-LIN_K = {"b": (1.02, 0.98, 1.1)}
+# Black Glass: under the builder's full clear coat (base specular 0, metal 0.65) the base keeps the photo's own colour, lifted
+# per channel (R, G, B) in linear light until the gate's front render and the Apple render both come near the photo's
+# [19, 17, 28]: three.js draws the same base bluer and darker than RealityKit, so neither is exact (NOTES.md, 11 Nov)
+LIN_K = {"b": (1.94, 1.86, 1.54)}
 PX_MM = {"f": 0.8, "s": 1.2, "b": 0.8}             # the smooth films need little; the brushed steel carries its grain
 
 
@@ -173,9 +174,9 @@ def label(c):
     a = np.asarray(src).astype(int)
     ys, xs = np.where(a.min(2) < 225)
     lab = src.crop((xs.min() - 2, ys.min() - 2, xs.max() + 3, ys.max() + 3))
-    # about 4.2 px per mm (546 px across the 130 mm label; Samsung's picture has 5.2): the three colours' labels together
-    # had to come down for the GLB budget, and every word still reads at the 4 degree close-up (REVIEW.md)
-    lab = lab.resize((546, round(lab.height * 546 / lab.width)), Image.LANCZOS).convert("RGBA")
+    # Samsung's picture's own 5.2 px per mm (about 680 px across the 130 mm label; 11 Nov: up from 546 px, so the small
+    # print reads on 2-3x phone screens; the three labels still fit the GLB budget as 47-colour PNGs)
+    lab = lab.convert("RGBA")
     px = lab.load()
     w, h = lab.size
     seen = np.zeros((h, w), bool)

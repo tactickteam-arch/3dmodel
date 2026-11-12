@@ -208,15 +208,26 @@ const panelX0 = flX1 + 0.002;
   cab.add(k);
   cab.add(box("KnobGrip", 0.004, 0.016, 0.004, white, kx, ky, fbZ1 + 0.0135));
 }
-// the flap: clear blue, hinged on its right edge (Samsung's photo of the box open, ht_g_551227027)
+// the flap: clear blue, hinged on its right edge (Samsung's photo of the box open, ht_g_551227027). It is a shallow clear
+// tray, not a flat panel: on that photo its four sides stand about 18 mm deep round the face (ESTIMATED, about a twentieth
+// of its 398 mm width), reaching into the box when it is shut; they stop 3 mm inside its outline so its free edge's
+// inner corner clears the frame as it swings (it moves out sideways by at most 0.3 mm)
 const flap = group("FreezerFlap", flX1, 0, fbZ1);
 {
-  const w = flX1 - flX0, yc = (flY0 + flY1) / 2, h = flY1 - flY0;
+  const w = flX1 - flX0, yc = (flY0 + flY1) / 2, h = flY1 - flY0, sd = 0.018, st = 0.0025, ins = 0.003;
   flap.add(box("FlapPanel", w - 0.012, h - 0.012, 0.004, flapM, -w / 2, yc, 0.004));
   flap.add(box("FlapRimT", w, 0.006, 0.008, frosted, -w / 2, flY1 - 0.003, 0.004));
   flap.add(box("FlapRimB", w, 0.006, 0.008, frosted, -w / 2, flY0 + 0.003, 0.004));
   flap.add(box("FlapRimR", 0.006, h, 0.008, frosted, -0.003, yc, 0.004));
   flap.add(box("FlapRimL", 0.006, h, 0.008, frosted, -w + 0.003, yc, 0.004));
+  // the tray's sides, one clear mesh: top and bottom across, left and right between them
+  const sides = [
+    new THREE.BoxGeometry(w - 2 * ins, st, sd).translate(-w / 2, flY1 - ins - st / 2, -sd / 2),
+    new THREE.BoxGeometry(w - 2 * ins, st, sd).translate(-w / 2, flY0 + ins + st / 2, -sd / 2),
+    new THREE.BoxGeometry(st, h - 2 * ins - 2 * st, sd).translate(-ins - st / 2, yc, -sd / 2),
+    new THREE.BoxGeometry(st, h - 2 * ins - 2 * st, sd).translate(-w + ins + st / 2, yc, -sd / 2),
+  ];
+  flap.add(mesh("FlapSides", mergeGeometries(sides), flapM, 0, 0, 0));
   // the grip: a raised clear pocket on the flap's left (open photo: 40 mm wide, 100 mm tall)
   flap.add(box("FlapGrip", 0.04, 0.1, 0.008, frosted, -w + 0.034, yc + 0.01, 0.006));
 }
@@ -320,7 +331,25 @@ const dbW = Wc - 0.05, dbZ0 = zStandBack + 0.03, dbZ1 = zNose - 0.034, dbFloor =
 {
   const zc = (dbZ0 + dbZ1) / 2, d = dbZ1 - dbZ0;
   drawer.add(box("DrawerBinFloor", dbW, 0.004, d, dark, 0, dbFloor - 0.002, zc));
-  for (const sx of [-1, 1]) drawer.add(box("DrawerBinSide", 0.004, dbTop - dbFloor + 0.004, d, dark, sx * (dbW / 2 - 0.002), (dbTop + dbFloor - 0.004) / 2, zc));
+  // the sides: open lattice, as Samsung's photo of the drawer pulled out shows (ht_g_551226985): two rows of upright slots
+  // along each side (ESTIMATED off that photo: slots 8 x 24 mm at a 20 mm pitch, a 30 mm solid band at the foot, 8 mm
+  // between the rows), built from the bands and the posts between the slots
+  const hS = dbTop - dbFloor + 0.004, y0 = dbFloor - 0.002, sw = 0.008, sh = 0.024, pitch = 0.02, end = 0.03;
+  const r1 = y0 + 0.03, r2 = r1 + sh + 0.008, n = Math.floor((d - 2 * end + (pitch - sw)) / pitch);
+  const z0 = zc - ((n - 1) * pitch + sw) / 2;                          // the first slot's back edge, the rows centred
+  for (const sx of [-1, 1]) {
+    const x = sx * (dbW / 2 - 0.002), g = [];
+    const band = (ya, yb) => g.push(new THREE.BoxGeometry(0.004, yb - ya, d).translate(x, (ya + yb) / 2, zc));
+    band(y0, r1); band(r1 + sh, r2); band(r2 + sh, y0 + hS);
+    for (const ra of [r1, r2]) {
+      // the posts: the solid ends, then one between each pair of slots
+      g.push(new THREE.BoxGeometry(0.004, sh, z0 - (zc - d / 2)).translate(x, ra + sh / 2, (z0 + zc - d / 2) / 2));
+      const zl = z0 + (n - 1) * pitch + sw;
+      g.push(new THREE.BoxGeometry(0.004, sh, zc + d / 2 - zl).translate(x, ra + sh / 2, (zl + zc + d / 2) / 2));
+      for (let i = 0; i < n - 1; i++) g.push(new THREE.BoxGeometry(0.004, sh, pitch - sw).translate(x, ra + sh / 2, z0 + i * pitch + sw + (pitch - sw) / 2));
+    }
+    drawer.add(mesh("DrawerBinSide", mergeGeometries(g), dark, 0, 0, 0));
+  }
   drawer.add(box("DrawerBinBack", dbW, dbTop - dbFloor + 0.004, 0.004, dark, 0, (dbTop + dbFloor - 0.004) / 2, dbZ0 + 0.002));
   drawer.add(box("DrawerBinFront", dbW, dbTop - dbFloor + 0.004, 0.004, dark, 0, (dbTop + dbFloor - 0.004) / 2, dbZ1 - 0.002));
 }

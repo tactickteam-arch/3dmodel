@@ -20,7 +20,7 @@ import fs from "node:fs";
 import { LGStock } from "./stock_lg.mjs";
 import { THREE, mat, mesh, box, faced, group, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS, KHRMaterialsVariants, KHRMaterialsClearcoat, KHRMaterialsSpecular } from "@gltf-transform/extensions";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "samsung-rt80h51c2fhl";
@@ -393,8 +393,10 @@ const DOOR = {
   // the brushed grain kept and the photo's light bands baked into the texture
   s: { metal: 0.38, rough: 0.55, coat: [0.4, 0.3] },
   // Black Glass: glass, not satin: a full clear coat (1.0, roughness 0.05) gives the sharp reflection, over a dark navy base
-  // (metal 0.8, roughness 0.5) whose texture is the photo's own colour (tex_samsung_rt80.py LIN_K). Trials in NOTES.md
-  b: { grain: false, metal: 0.8, rough: 0.5, coat: [1.0, 0.05] },
+  // with no soft reflection of its own (KHR_materials_specular 0: paint behind glass hardly reflects) whose texture is the
+  // photo's own colour (tex_samsung_rt80.py LIN_K). Metal 0.65 balances the two renderers: the Apple files ignore the
+  // specular setting, and at 0.8 RealityKit drew the door at 0.70 of Samsung's photo (11 Nov, NOTES.md)
+  b: { grain: false, metal: 0.65, rough: 0.5, coat: [1.0, 0.05], spec: 0 },
 };
 const FINISHES = [
   ["Black DOI", { FreezerFront: DOOR.f, FridgeFront: DOOR.f }],
@@ -412,6 +414,7 @@ const FINISHES = [
   const doc = await io.readBinary(new Uint8Array(fs.readFileSync(OUT)));
   const ext = doc.createExtension(KHRMaterialsVariants);
   const coatExt = doc.createExtension(KHRMaterialsClearcoat);
+  const specExt = doc.createExtension(KHRMaterialsSpecular);
   const lin = (c) => ((c / 255) <= 0.04045 ? c / 255 / 12.92 : Math.pow((c / 255 + 0.055) / 1.055, 2.4));
   const vs = FINISHES.map(([n]) => ext.createVariant(n));
   const mats = doc.getRoot().listMaterials(), texCache = new Map();
@@ -427,6 +430,7 @@ const FINISHES = [
     if (v.grain === false) { m.setNormalTexture(null); m.setMetallicRoughnessTexture(null); }
     if (v.coat === null) m.setExtension("KHR_materials_clearcoat", null);
     else if (v.coat) m.setExtension("KHR_materials_clearcoat", coatExt.createClearcoat().setClearcoatFactor(v.coat[0]).setClearcoatRoughnessFactor(v.coat[1]));
+    if (v.spec != null) m.setExtension("KHR_materials_specular", specExt.createSpecular().setSpecularFactor(v.spec));
     return m;
   };
   const alt = {};
