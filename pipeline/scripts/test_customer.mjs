@@ -36,7 +36,7 @@ const barFits = async () => JSON.parse(await b.evalJS(`(() => { const s = docume
 
 // 1. the fridge's part bar on a small laptop and an iPad on its side
 await b.viewport(1024, 700, false);
-await load("lg-glt3426snpz");
+await load("haier-hes-690gk");
 let f = await barFits();
 check(f.inside && f.n === 5, `1024x700: all ${f.n} part buttons inside the 3D view (under it: ${f.below})`);
 await b.shot(`${out}/1024-fridge.png`);
@@ -44,14 +44,14 @@ await b.viewport(1440, 900, false); await sleep(800);
 f = await barFits();
 check(f.inside && !f.below, `1440x900: the part buttons sit over the model in one row (under it: ${f.below})`);
 await b.viewport(1180, 820, true, IPAD);
-await load("lg-glt3426snpz");
+await load("haier-hes-690gk");
 f = await barFits();
 check(f.inside, `iPad landscape 1180x820: all part buttons inside the 3D view (under it: ${f.below})`);
 await b.shot(`${out}/ipad-land-fridge.png`);
 
 // 2. presses made while a part moves wait their turn
 await b.viewport(1280, 800, false);
-await load("lg-glt3426snpz");
+await load("haier-hes-690gk");
 await b.evalJS(restAt);
 await tap("#part-freezer"); await sleep(300); await tap("#part-fridge"); await sleep(3500);
 let s = await st(), d = await drawn();
@@ -65,12 +65,12 @@ s = await st(); d = await drawn();
 const full = await b.evalJS("window.__organise.isFull()");
 check(full && s.trays && s.fridge && s.freezer && d.every((x) => x[2]), `Fill, then "Take out trays" 300 ms later: full, trays out, doors open (${JSON.stringify(s)})`);
 await b.shot(`${out}/fill-trays.png`);
-await tap("#part-freezer"); await sleep(250); await tap("#part-icemaker"); await sleep(4000);
+await tap("#part-freezer"); await sleep(250); await tap("#part-freezerDrawer"); await sleep(4000);
 s = await st(); d = await drawn();
-check(d.every((x) => x[2]), `Close freezer, then ice tray 250 ms later: every part drawn as the page says (${JSON.stringify(s)})`);
+check(d.every((x) => x[2]), `Close freezer, then freezer drawers 250 ms later: every part drawn as the page says (${JSON.stringify(s)})`);
 
 // 3. close-up: wider, a way back, and a second double-click goes back
-await load("samsung-wa70bg4441bytl");
+await load("haier-hrb-3752bnsa-p");
 const r = JSON.parse(await b.evalJS("JSON.stringify(document.querySelector('model-viewer').getBoundingClientRect())"));
 const spot = JSON.parse(await b.evalJS(`(() => { const mv = document.querySelector('model-viewer'), r = mv.getBoundingClientRect(); for (let fy = 0.45; fy < 0.8; fy += 0.02) for (let fx = 0.4; fx < 0.6; fx += 0.02) { const x = r.x + r.width * fx, y = r.y + r.height * fy, h = mv.positionAndNormalFromPoint(x, y); if (h && h.normal.z > 0.9) return JSON.stringify({ x, y }); } return 'null'; })()`));
 const dbl = async () => { for (let i = 0; i < 2; i++) { await b.send("Input.dispatchMouseEvent", { type: "mousePressed", ...spot, button: "left", clickCount: 1 }); await sleep(30); await b.send("Input.dispatchMouseEvent", { type: "mouseReleased", ...spot, button: "left", clickCount: 1 }); await sleep(90); } };
@@ -88,12 +88,13 @@ check(Math.abs(await b.evalJS("document.querySelector('model-viewer').getFieldOf
 check(!(await st()).lid, "none of the double-clicks opened the lid");
 
 // 4. the wall unit stops at its sides, without a Back button
-await load("haier-hso52kucai3nb");
+// no wall unit is on show since 11 Nov: this runs again once one is (haier-hso52kucai3nb is hidden)
+if (await load("haier-hso52kucai3nb"))
 check(await b.evalJS("document.querySelector('.view[data-view=back]').offsetParent === null && document.querySelector('model-viewer').maxCameraOrbit.startsWith('100deg')"), "the AC has no Back button and turns at most 100 degrees");
 
 // 5. phone: feature numbers that need a door open still open their card
 await b.viewport(390, 844, true, IPHONE);
-await load("lg-glt3426snpz");
+await load("haier-hes-690gk");
 await tap("#btnShowFeat", true); await sleep(1500);
 const away = await b.evalJS("JSON.stringify([...document.querySelectorAll('.flab')].map((x, i) => [i, x.classList.contains('away'), getComputedStyle(x).pointerEvents]))");
 const aw = JSON.parse(away).find((x) => x[1]);
@@ -108,7 +109,7 @@ await tap("#fcClose", true); await sleep(600);
 check(await b.evalJS("document.getElementById('fcard').inert === true"), "the hidden feature card can't be reached with Tab");
 
 // 6. phone: the tip sits above the AR bar
-await load("lg-glt3426snpz");
+await load("haier-hes-690gk");
 await tap("#part-freezer", true); await sleep(400);
 await b.evalJS("document.getElementById('toast').textContent = 'Tap “Fill the fridge” to stock it'; document.getElementById('toast').classList.add('show')"); await sleep(400);
 const ov = JSON.parse(await b.evalJS("(() => { const t = document.getElementById('toast').getBoundingClientRect(), a = document.getElementById('arBox').getBoundingClientRect(); return JSON.stringify({ t: t.bottom, a: a.top }); })()"));
@@ -117,7 +118,7 @@ check(await b.evalJS("!!document.getElementById('btnShare') && document.getEleme
 
 // 7. phone on its side
 await b.viewport(740, 360, true, "Mozilla/5.0 (Linux; Android 13; SM-A145F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36");
-await load("samsung-wa70bg4441bytl");
+await load("haier-hrb-3752bnsa-p");
 const land = JSON.parse(await b.evalJS(`(() => { const s = document.getElementById('stage').getBoundingClientRect(), bar = document.getElementById('parts').getBoundingClientRect(), a = getComputedStyle(document.getElementById('arBox')).position; return JSON.stringify({ sb: s.bottom, bb: bar.bottom, a, h: innerHeight }); })()`));
 check(land.sb <= land.h + 1 && land.bb <= land.h + 1 && land.a !== "fixed", `phone on its side: the 3D view and its buttons fit the screen (view ends ${Math.round(land.sb)}, buttons ${Math.round(land.bb)}, screen ${land.h}), the AR bar doesn't cover it (${land.a})`);
 await b.shot(`${out}/phone-landscape.png`);
@@ -127,13 +128,13 @@ await b.viewport(1280, 800, false);
 await go(`${base}/p/does-not-exist`); await sleep(2500);
 const before = b.logs.length;
 check(await b.evalJS("document.title") === "Product not found" && /couldn/.test(await b.evalJS("document.body.innerText")), `an unknown product says so, and the tab says "Product not found"`);
-await go(`${base}/p/LG-GLT3426SNPZ`); await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 60000);
-check(/GLT3426SNPZ/.test(await b.evalJS("document.title")), "the model number in capitals opens the product");
+await go(`${base}/p/HAIER-HES-690GK`); await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 60000);
+check(/HES-690GK/.test(await b.evalJS("document.title")), "the model number in capitals opens the product");
 
 // 9. catalogue: back returns to the card that was opened, and cards say which size is which
 await b.viewport(360, 740, true, "Mozilla/5.0 (Linux; Android 13; SM-A145F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36");
 await go(`${base}/`); await b.waitFor("document.querySelectorAll('#grid .card').length > 2", 20000); await sleep(800);
-check(/W \d+ × H \d+ × D \d+ cm/.test(await b.evalJS("document.querySelector('#grid .tags').innerText")), `cards give width, height and depth (${await b.evalJS("document.querySelector('#grid .tags span').innerText")})`);
+check(/W [\d.]+ × H [\d.]+ × D [\d.]+ cm/.test(await b.evalJS("document.querySelector('#grid .tags').innerText")), `cards give width, height and depth (${await b.evalJS("document.querySelector('#grid .tags span').innerText")})`);
 await b.evalJS("document.querySelectorAll('#grid .card')[3].scrollIntoView({ block: 'center' })"); await sleep(500);
 const y0 = await b.evalJS("scrollY");
 await tap("#grid .cell:nth-child(4) .card", true);

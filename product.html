@@ -325,6 +325,9 @@
     .brand span, .pill { display: none; }
     main { display: block; height: auto; min-height: 0; }
     .stage { height: 64svh; min-height: 420px; }
+    /* a short phone (360 x 640) left the model 214 px under the part buttons, and staff read it as "very small":
+       there the 3D view takes the screen down to the AR bar, up to 520 px */
+    .stage { height: max(64svh, min(100svh - 150px, 520px)); }
     /* top right, under "Show features": at the bottom, the part buttons wrap to two rows and covered it */
     .controls { right: 12px; top: 68px; bottom: auto; transform: none; padding: 4px; }
     .feat-btn { top: 12px; right: 12px; }
@@ -355,6 +358,12 @@
     .toast { bottom: calc(118px + env(safe-area-inset-bottom, 0px)); } /* above the AR bar, not over it */
     .all-btn { left: 12px; top: 12px; font-size: 13px; }
     .fit-in label, .size small { font-size: 12px; }
+  }
+  /* narrow phones: tighter part buttons, so they take fewer rows from the model */
+  @media (max-width: 480px) {
+    .parts, .stage.parts-below .parts { gap: 2px; padding: 4px; margin: 4px auto 8px; max-width: calc(100% - 16px); }
+    .parts button { padding: 8px 11px 8px 9px; gap: 6px; font-size: 13px; }
+    .parts svg { width: 16px; height: 16px; }
   }
   /* a phone on its side: the 3D view and its buttons fill the screen, and the AR bar scrolls with the page
      instead of covering the product */
