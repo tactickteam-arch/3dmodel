@@ -3,6 +3,17 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": ".*\\.vercel\\.app"
+        }
+      ],
+      "destination": "https://3d.sangeetha.com/:path*",
+      "permanent": false
+    },
+    {
       "source": "/p",
       "destination": "/",
       "permanent": false
