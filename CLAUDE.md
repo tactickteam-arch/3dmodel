@@ -25,7 +25,8 @@ A static site that shows Sangeetha's appliances in 3D and AR:
 ## Deploy
 From 10 Nov 2026 the repo is https://github.com/tactickteam-arch/3dmodel (remote `origin`). Push `main` there.
 - Push as `tanmayagr2021`, the account with push access; never as `tanmay-viamagus`.
-- Pushing to `main` deploys the Vercel project "3dmodel" (team "sangeetha", Vercel account `tactickteam-arch`). The public address is https://3dmodel-chi-nine.vercel.app, which is `publicOrigin` in site-config.js. The team alias `3dmodel-sangeetha20.vercel.app` is behind Vercel's login.
+- **From 13 Nov 2026 the live site is https://3d.sangeetha.com on Sangeetha's server** (it pulls `main` every minute). Vercel no longer builds on push (`git.deploymentEnabled: false` in vercel.json) and its address redirects to 3d.sangeetha.com.
+- Before that, pushing to `main` deployed the Vercel project "3dmodel" (team "sangeetha", Vercel account `tactickteam-arch`). The public address is https://3dmodel-chi-nine.vercel.app, which is `publicOrigin` in site-config.js. The team alias `3dmodel-sangeetha20.vercel.app` is behind Vercel's login.
 - This project's Vercel CLI login is kept apart from the machine's default one. Pass `-Q ~/.config/vercel-3dmodel --scope sangeetha20` to every `vercel` command here.
 - The old repo, https://github.com/tanmayagr2021/3dmodelssangeetha (remote `personal`), still feeds the old Vercel project "3dmodelssangeetha". It's no longer pushed to.
 - Don't run `vercel deploy` for this project; deploys come from Git pushes.
