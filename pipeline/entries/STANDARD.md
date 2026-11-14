@@ -118,7 +118,9 @@ The tests can't judge looks: the Samsung peel grain and the Haier logo passed ev
 - every word sharp at the 4-degree close-up;
 - the grain, switched on and off;
 - for a fridge, every shelf after Fill, close up;
-- the back and underside.
+- the back and underside;
+- with every door open, each inside part (shelves, crispers, baskets, trays, lamp, vents, switches) against the maker's interior photos of this exact model: the same count, place, material and colour, and every word printed or moulded inside spelled and placed as on the real one;
+- real size on a real phone, next to the real product in a store: same floor, same distance, both bases in view. A visible mismatch is a bug until it is explained.
 
 The filled REVIEW.md is kept in `private/research/<slug>/`.
 

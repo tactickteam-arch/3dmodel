@@ -4,21 +4,19 @@
 //    later, so a shared /p/<id> link otherwise showed "Product in 3D and AR" with no picture.
 //    Vercel serves /p/<id> from p/<id>.html (cleanUrls); any other id still falls through to product.html
 //    (vercel.json), and so does serve.mjs locally.
-// 2. Old links, so the store app and old QR codes keep working once their AR address points here. Each is a
-//    tiny page that sends the visitor on, keeping the query string (?embed and the rest):
+// 2. Short links by Sangeetha's Product ID, for the store app's AR link field and QR codes. Each is a tiny page
+//    that sends the visitor on, keeping the query string (?embed and the rest):
 //      id/<Sangeetha Product ID>.html → /p/<id>, for each product on show whose sangeethaUrl ends in its ID, and
 //                                       /p/<id>?finish=<slug> for each colour (finish) whose own sangeethaUrl does
-//      ar-experience/<old id>.html    → the same pages, from pipeline/integration/old-links.json
-//      embed/discovery.html           → /?embed, the page the store app frames
-//    Any other address under /id/, /ar-experience/ or /embed/ falls through to the catalogue (vercel.json, and
-//    serve.mjs locally), which says kindly that it couldn't find the product.
+//    Any other address under /id/ falls through to the catalogue (vercel.json, and serve.mjs locally), which says
+//    kindly that it couldn't find the product.
 // 3. The og:url of index.html, compare.html and showroom.html (/, /compare, /showroom: cleanUrls on Vercel, serve.mjs
 //    locally), and vercel.json's frame-ancestors header, which is there only while site-config.js lists frameParents.
 //    vercel.json is kept in JSON.stringify's two-space layout.
-// Run it after any change to product.html, site-config.js or old-links.json, or to a product's name, summary,
+// Run it after any change to product.html or site-config.js, or to a product's name, summary,
 // photo, sangeethaUrl (its own or a finish's) or "hidden" flag.
 // --check writes nothing and exits 1 if anything is missing, stale or left over (the test suite runs it).
-// SITE_CONFIG=<file> or OLD_LINKS=<file> reads that file in place of the real one. test_store_bridge.mjs calls build().
+// SITE_CONFIG=<file> reads that file in place of the real one. test_store_bridge.mjs calls build().
 // usage: node pipeline/scripts/make_pages.mjs [--check]
 import fs from "node:fs";
 import path from "node:path";
@@ -27,7 +25,7 @@ import { finishSlug, productIdOf } from "../../site.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-const OWNED = ["p", "id", "ar-experience", "embed"]; // the folders this script owns: a page in them it didn't make is removed
+const OWNED = ["p", "id"]; // the folders this script owns: a page in them it didn't make is removed
 const HEAD = /<title>[^<]*<\/title>\n<meta name="description" content="[^"]*">\n/;
 const OG_URL = /<meta property="og:url" content="[^"]*">/;
 const PAGES = [["index.html", "/"], ["compare.html", "/compare"], ["showroom.html", "/showroom"]]; // pages with a fixed address
@@ -49,9 +47,9 @@ export function checkSite(site) {
   return site;
 }
 
-// a page that sends an old link on to its page here, with the visitor's query string and #part
+// a page that sends a short link on to its page here, with the visitor's query string and #part
 const redirect = (to) => `<!doctype html>
-<!-- made by pipeline/scripts/make_pages.mjs: an old link, sent on to its page here -->
+<!-- made by pipeline/scripts/make_pages.mjs: a short link, sent on to its page here -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -85,9 +83,9 @@ export function productIds(shown) {
 }
 
 // What every made file should hold, as a map of path (from the site's root) → text, plus notes for the person
-// running it. It reads and writes nothing, so the tests can call it with a made-up config or old links.
+// running it. It reads and writes nothing, so the tests can call it with a made-up config.
 // compareHtml and showroomHtml are left alone when not given.
-export function build({ site, products, oldLinks, productHtml, indexHtml, compareHtml, showroomHtml, vercelJson }) {
+export function build({ site, products, productHtml, indexHtml, compareHtml, showroomHtml, vercelJson }) {
   const ORIGIN = site.publicOrigin;
   const files = new Map(), notes = [];
   const shown = products.filter((p) => !p.hidden);
@@ -114,17 +112,10 @@ export function build({ site, products, oldLinks, productHtml, indexHtml, compar
       .replace(HEAD, tags.join("\n") + "\n"));
   }
 
-  // 2. old links: Sangeetha's Product IDs (a product's, and each colour's), the store app's old AR links, and the page it frames
+  // 2. short links by Sangeetha's Product ID (a product's, and each colour's)
   const { byPid, notes: idNotes } = productIds(shown);
   notes.push(...idNotes);
   for (const [pid, { to }] of byPid) files.set(`id/${pid}.html`, redirect(to));
-  for (const [old, to] of Object.entries(oldLinks.links || {})) {
-    const p = shown.find((x) => x.id === String(to)), page = p ? `/p/${p.id}` : byPid.get(String(to))?.to;
-    if (!/^[A-Za-z0-9_-][A-Za-z0-9._~-]{0,199}$/.test(old)) notes.push(`old-links.json: "${old}" can't be a file name, so it was skipped`);
-    else if (!page) notes.push(`old-links.json: ${old} → ${to} is not a product on show, so that link opens the catalogue`);
-    else files.set(`ar-experience/${old}.html`, redirect(page));
-  }
-  files.set("embed/discovery.html", redirect("/?embed"));
 
   // 3. the address in the link previews of the pages with a fixed address, and who may frame us
   const fixed = { "index.html": indexHtml, "compare.html": compareHtml, "showroom.html": showroomHtml };
@@ -151,7 +142,6 @@ async function main() {
   const { files, notes } = build({
     site: checkSite(SITE),
     products: JSON.parse(read("products.json")).products,
-    oldLinks: JSON.parse(fs.readFileSync(process.env.OLD_LINKS || path.join(root, "pipeline/integration/old-links.json"), "utf8")),
     productHtml: read("product.html"),
     indexHtml: read("index.html"),
     compareHtml: read("compare.html"),

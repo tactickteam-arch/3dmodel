@@ -50,7 +50,7 @@ console.log(`  (scratch: ${F.id} gets "${gold.name}" with ID ${PID} and ${G.id}'
 
 console.log("\n[make_pages.mjs build()]");
 const { files, notes } = build({
-  site: SITE, products: cat.products, oldLinks: { links: {} }, productHtml: read("product.html"), indexHtml: read("index.html"),
+  site: SITE, products: cat.products, productHtml: read("product.html"), indexHtml: read("index.html"),
   compareHtml: read("compare.html"), showroomHtml: read("showroom.html"), vercelJson: read("vercel.json"),
 });
 const target = (f) => files.get(f)?.match(/var to = "([^"]+)"/)?.[1];

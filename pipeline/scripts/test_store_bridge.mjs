@@ -2,10 +2,10 @@
 // 1. the sign-in check (pipeline/integration/check-token.mjs) with a made-up secret: a good token passes; a wrong
 //    secret, another algorithm, an expired or not-yet-valid token, another issuer or audience, missing claims and
 //    tampering all fail; it answers 503 until configured, and never writes to the console;
-// 2. make_pages.mjs build(): old-links.json's two kinds of value, and the frame-ancestors header appearing in
-//    vercel.json only once frameParents is filled; a mistyped address in site-config.js is refused;
-// 3. the old paths on the local server: /id/<Product ID>, /embed/discovery and /ar-experience/<id> (unknown ids
-//    land on the catalogue with a note), each keeping its query string;
+// 2. make_pages.mjs build(): the frame-ancestors header appearing in vercel.json only once frameParents is filled;
+//    a mistyped address in site-config.js is refused; it makes only the product pages, the short links and the fixed pages;
+// 3. the short links on the local server: /id/<Product ID> (unknown ids land on the catalogue with a note), keeping
+//    its query string; /?embed is the catalogue without our header;
 // 4. store-bridge.js with today's empty config, framed by a page standing in for the store app: it posts nothing,
 //    listens to nothing and sets no window.storeApp;
 // 5. store-bridge.js switched on by a test config, framed on a second local origin: SC_EMBED_READY reaches the
@@ -92,18 +92,15 @@ check(rStr.statusCode === 200, "a body Vercel left as text is read too");
 check(!quiet.said, `writes nothing to the console${quiet.said ? `: ${quiet.said[0]}` : ""}`);
 check(!JSON.stringify([r200, r401]).includes(sign(staff()).split(".")[2]), "never sends a token back");
 
-console.log("\n[make_pages: old links and the frame rule]");
+console.log("\n[make_pages: short links and the frame rule]");
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const products = JSON.parse(read("products.json")).products;
 const withPid = products.find((p) => !p.hidden && /\/\d+\/?$/.test(p.sangeethaUrl || ""));
 const PID = withPid.sangeethaUrl.match(/(\d+)\/?$/)[1];
-const U1 = "11111111-1111-4111-8111-111111111111", U2 = "22222222-2222-4222-8222-222222222222", U3 = "33333333-3333-4333-8333-333333333333";
-const inputs = (site, links = {}) => ({ site: checkSite(site), products, oldLinks: { links }, productHtml: read("product.html"), indexHtml: read("index.html"), vercelJson: read("vercel.json") });
-const made = build(inputs(structuredClone(SITE), { [U1]: withPid.id, [U2]: PID, [U3]: "no-such-product", "../up": withPid.id }));
-check(made.files.get(`ar-experience/${U1}.html`)?.includes(`"/p/${withPid.id}"`), `an old id mapped to our id opens /p/${withPid.id}`);
-check(made.files.get(`ar-experience/${U2}.html`)?.includes(`"/p/${withPid.id}"`), `an old id mapped to Product ID ${PID} opens the same page`);
-check(!made.files.has(`ar-experience/${U3}.html`) && made.notes.some((n) => n.includes(U3)), "an old id mapped to no product makes no page, and says so");
-check(![...made.files.keys()].some((f) => f.includes("..")) && made.notes.some((n) => n.includes("../up")), "an old id that isn't a safe file name is skipped");
+const inputs = (site) => ({ site: checkSite(site), products, productHtml: read("product.html"), indexHtml: read("index.html"), vercelJson: read("vercel.json") });
+const made = build(inputs(structuredClone(SITE)));
+check(made.files.get(`id/${PID}.html`)?.includes(`"/p/${withPid.id}"`), `/id/${PID} opens /p/${withPid.id}`);
+check([...made.files.keys()].every((f) => /^(p|id)\/[^/]+\.html$/.test(f) || ["index.html", "compare.html", "showroom.html", "vercel.json"].includes(f)), "it makes only p/, id/ and the fixed pages: no other old paths");
 check(made.files.get("vercel.json") === read("vercel.json") && !read("vercel.json").includes("frame-ancestors"), "with frameParents empty, vercel.json has no frame rule (framing open, as today)");
 const TEST_SITE = { ...structuredClone(SITE), storeAppOrigins: ["https://store.example.invalid", APP], frameParents: [APP, "https://www.example.invalid"] };
 const framed = JSON.parse(build(inputs(structuredClone(TEST_SITE))).files.get("vercel.json"));
@@ -140,15 +137,12 @@ const servers = [
 process.on("exit", () => servers.forEach((s) => s.kill()));
 for (const u of [REAL, ON, APP]) for (let t = 0; t < 50; t++) { try { if ((await fetch(`${u}/site-config.js`)).ok) break; } catch {} await sleep(200); }
 
-console.log("\n[the old paths]");
+console.log("\n[the short links]");
 const get = async (u) => { const r = await fetch(u); return { status: r.status, text: await r.text() }; };
-const idPage = await get(`${REAL}/id/${PID}`), embedPage = await get(`${REAL}/embed/discovery`);
+const idPage = await get(`${REAL}/id/${PID}`);
 check(idPage.status === 200 && idPage.text.includes(`"/p/${withPid.id}"`), `/id/${PID} is a page that opens /p/${withPid.id}`);
-check(embedPage.status === 200 && embedPage.text.includes('"/?embed"'), "/embed/discovery is a page that opens /?embed");
-for (const p of [`/ar-experience/${U1}`, "/id/1", "/embed/discovery/category/x"]) {
-  const r = await get(`${REAL}${p}`);
-  check(r.status === 200 && r.text.includes('id="oldLink"'), `${p} (no page of its own): the catalogue, not a 404`);
-}
+const unknown = await get(`${REAL}/id/1`);
+check(unknown.status === 200 && unknown.text.includes('id="oldLink"'), "/id/1 (no page of its own): the catalogue, not a 404");
 
 const b = await launch({ profile: `${out}/prof`, port: BASE + 9 });
 const contexts = [];
@@ -160,8 +154,7 @@ await b.viewport(900, 800, false);
 
 for (const [from, to, embed, note] of [
   [`/id/${PID}?embed&source=qr`, `/p/${withPid.id}?embed&source=qr`, true, false],
-  ["/embed/discovery?source=app", "/?embed&source=app", true, false],
-  [`/ar-experience/${U1}?source=qr`, `/ar-experience/${U1}?source=qr`, false, true],
+  ["/?embed&source=app", "/?embed&source=app", true, false],
   [`/id/1`, `/id/1`, false, true],
 ]) {
   await b.go(`${REAL}${from}`);
@@ -207,7 +200,7 @@ const send = (m) => b.evalJS(`send(${JSON.stringify(m)})`);
 const state = (origin) => inFrame(origin, "window.storeApp ? JSON.stringify({ signedIn: storeApp.signedIn, name: storeApp.unverifiedName }) : 'none'");
 
 console.log("\n[the bridge with today's empty config]");
-await b.go(`${APP}/__test/parent.html?src=${encodeURIComponent(`${REAL}/embed/discovery`)}`);
+await b.go(`${APP}/__test/parent.html?src=${encodeURIComponent(`${REAL}/?embed`)}`);
 check(await catalogueIn(REAL), "the catalogue loads in the frame");
 await sleep(2500);
 check((await got()).length === 0, "nothing is posted to the parent");
@@ -222,7 +215,7 @@ await sleep(2500);
 check((await got()).length === 0 && await inFrame(REAL, "window.storeApp === undefined"), "the product page is silent too");
 
 console.log("\n[switched on: the frame's parent on an address that isn't allowed]");
-await b.go(`${OTHER}/__test/parent.html?src=${encodeURIComponent(`${ON}/embed/discovery`)}`);
+await b.go(`${OTHER}/__test/parent.html?src=${encodeURIComponent(`${ON}/?embed`)}`);
 check(await catalogueIn(ON), "the catalogue loads in the frame");
 await sleep(2500);
 check(await count("SC_EMBED_READY") === 0, "SC_EMBED_READY is not posted to it (the bridge never posts to \"*\")");
@@ -231,8 +224,8 @@ await sleep(800);
 check(JSON.parse(await state(ON)).signedIn === false, "a token from that address is ignored");
 
 console.log("\n[switched on: framed by the store app stand-in]");
-await b.go(`${APP}/__test/parent.html?src=${encodeURIComponent(`${ON}/embed/discovery`)}`);
-check(await catalogueIn(ON), "/embed/discovery opens the catalogue in the frame");
+await b.go(`${APP}/__test/parent.html?src=${encodeURIComponent(`${ON}/?embed`)}`);
+check(await catalogueIn(ON), "/?embed opens the catalogue in the frame");
 check(await until(async () => (await count("SC_EMBED_READY")) === 1), "SC_EMBED_READY reaches the parent");
 const ready = (await got()).find((m) => m.type === "SC_EMBED_READY");
 check(ready?.origin === ON && ready?.fromSite, `  from the site's frame (${ready?.origin}), to the parent's exact address`);

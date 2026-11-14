@@ -1,6 +1,6 @@
 // Static server for the demo site with the same rewrites as vercel.json: /p/<id> is p/<id>.html when
-// make_pages.mjs has written one (Vercel serves a file before it rewrites), otherwise product.html; an old link
-// under /ar-experience/, /id/ or /embed/ with no page of its own is the catalogue; /compare and /showroom are
+// make_pages.mjs has written one (Vercel serves a file before it rewrites), otherwise product.html; a short link
+// under /id/ with no page of its own is the catalogue; /compare and /showroom are
 // their pages (cleanUrls), and so is any address under them (/showroom/<id> opens with that product in front).
 // usage: node serve.mjs <siteDir> <port> [extraDir mounted at /__test]
 import http from "node:http";
@@ -21,7 +21,7 @@ http.createServer((req, res) => {
   else if (p === "/") p = "/index.html";
   else if (/^\/(compare|showroom)\/[^.]*$/.test(p)) p = `/${p.split("/")[1]}.html`;
   else if (!path.extname(p) && fs.existsSync(path.join(root, p + ".html"))) p += ".html";
-  else if (/^\/(ar-experience|id|embed)(\/|$)/.test(p) && !p.endsWith(".html")) p = "/index.html";
+  else if (/^\/id(\/|$)/.test(p) && !p.endsWith(".html")) p = "/index.html";
   const file = path.join(base, path.normalize(p));
   if (!file.startsWith(base) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); res.end("not found"); return; }
   res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream" });
