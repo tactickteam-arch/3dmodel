@@ -10,6 +10,10 @@
 //                                       /p/<id>?finish=<slug> for each colour (finish) whose own sangeethaUrl does
 //    Any other address under /id/ falls through to the catalogue (vercel.json, and serve.mjs locally), which says
 //    kindly that it couldn't find the product.
+//      item/<item code>.html → /p/<id>?finish=<slug>, for each colour's maker code (its `code`), so every colour has a
+//                               short link before Sangeetha's Product IDs come in. The code is written as itemSlug
+//                               makes it: capitals, and anything but letters, digits and "-" as "-" (RR24H2823HT/NL →
+//                               RR24H2823HT-NL). A separate folder, so a numeric code can never clash with a Product ID.
 // 3. The og:url of index.html, compare.html and showroom.html (/, /compare, /showroom: cleanUrls on Vercel, serve.mjs
 //    locally), and vercel.json's frame-ancestors header, which is there only while site-config.js lists frameParents.
 //    vercel.json is kept in JSON.stringify's two-space layout.
@@ -25,7 +29,7 @@ import { finishSlug, productIdOf } from "../../site.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-const OWNED = ["p", "id"]; // the folders this script owns: a page in them it didn't make is removed
+const OWNED = ["p", "id", "item"]; // the folders this script owns: a page in them it didn't make is removed
 const HEAD = /<title>[^<]*<\/title>\n<meta name="description" content="[^"]*">\n/;
 const OG_URL = /<meta property="og:url" content="[^"]*">/;
 const PAGES = [["index.html", "/"], ["compare.html", "/compare"], ["showroom.html", "/showroom"]]; // pages with a fixed address
@@ -82,6 +86,9 @@ export function productIds(shown) {
   return { byPid, notes };
 }
 
+// a colour's maker code as it appears at the end of its /item/ link
+export const itemSlug = (code) => String(code).toUpperCase().replace(/[^A-Z0-9-]+/g, "-").replace(/^-+|-+$/g, "");
+
 // What every made file should hold, as a map of path (from the site's root) → text, plus notes for the person
 // running it. It reads and writes nothing, so the tests can call it with a made-up config.
 // compareHtml and showroomHtml are left alone when not given.
@@ -116,6 +123,13 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
   const { byPid, notes: idNotes } = productIds(shown);
   notes.push(...idNotes);
   for (const [pid, { to }] of byPid) files.set(`id/${pid}.html`, redirect(to));
+  // and by each colour's maker code
+  for (const p of shown) for (const f of p.finishes || []) {
+    if (!f.code) continue;
+    const at = `item/${itemSlug(f.code)}.html`, to = `/p/${p.id}?finish=${finishSlug(f.name)}`;
+    if (files.has(at)) { notes.push(`item code ${f.code} is on two colours; /${at.slice(0, -5)} opens the first`); continue; }
+    files.set(at, redirect(to));
+  }
 
   // 3. the address in the link previews of the pages with a fixed address, and who may frame us
   const fixed = { "index.html": indexHtml, "compare.html": compareHtml, "showroom.html": showroomHtml };
