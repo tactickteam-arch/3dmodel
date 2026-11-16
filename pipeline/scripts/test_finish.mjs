@@ -3,8 +3,8 @@
 // its own Sangeetha Product ID. The scratch colour points at another product's USDZ, so the AR link can be told
 // apart from the first colour's. A second product's first colour repeats that ID, so the clash report is checked too.
 // - /p/<id>?finish=<slug>: that swatch pressed, mv.variantName set, Quick Look opens that colour's USDZ with a link
-//   back that keeps ?finish=; any case works; an unknown slug, or none, falls back to the first colour; a swatch
-//   press puts its slug in the address;
+//   back to that colour (/p/<item code> for a colour with a maker code); any case works; an unknown slug, or none, falls back to the first colour; a swatch
+//   press puts its item code (or, without one, its slug) in the address;
 // - /compare?a=<id>&fa=<slug>: that colour, and a swatch press updates fa;
 // - make_pages.mjs build(): /id/<the colour's ID> opens /p/<id>?finish=<slug>, keeping the visitor's query string;
 //   the product's own ID still opens /p/<id>; the repeated ID is reported and opens the first;
@@ -40,12 +40,15 @@ for (const p of [F, G, W]) delete p.hidden;
 const shown = cat.products.filter((p) => !p.hidden);
 const PID = "990001", OWN = F.sangeethaUrl.match(/(\d+)$/)[1];
 const gold = { name: "Gold, Matt White", swatchColor: "#d9c9a0", usdz: G.finishes[0].usdz, variant: "test-gold", code: "TEST-GMW", sangeethaUrl: `https://www.sangeetha.com/product-details/test-colour/${PID}` };
+// a colour with a maker code is shown at /p/<item code> (product.html); one without keeps /p/<id>?finish=<slug>
+const GOLD_AT = `/p/${encodeURI(gold.code)}`;
 F.finishes.push(gold);
 G.finishes[0].sangeethaUrl = `https://www.sangeetha.com/product-details/test-clash/${PID}`;
 const scratch = path.join(out, "products.json");
 fs.writeFileSync(scratch, JSON.stringify(cat, null, 2));
 check(read("products.json") === real && scratch !== path.join(root, "products.json"), "the scratch catalogue is a copy; the real products.json is untouched");
 const first = F.finishes[0], firstSlug = first.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const FIRST_AT = first.itemCode || first.code ? `/p/${encodeURI(first.itemCode || first.code)}` : null; // Sangeetha's item code first
 console.log(`  (scratch: ${F.id} gets "${gold.name}" with ID ${PID} and ${G.id}'s USDZ; ${G.id}'s colour repeats ${PID})`);
 
 console.log("\n[make_pages.mjs build()]");
@@ -113,7 +116,7 @@ check(await open(`/p/${F.id}?finish=gold-matt-white`), "the page loads");
 let s = await page();
 let ql = await quickLook();
 check(s.pressed.join() === "false,true" && s.variant === gold.variant, `?finish=gold-matt-white: its swatch pressed, variantName "${s.variant}"`);
-check(ql?.file === gold.usdz && new URL(ql.back).searchParams.get("finish") === "gold-matt-white", `the AR button opens ${ql?.file}, linking back to ${ql?.back}`);
+check(ql?.file === gold.usdz && new URL(ql.back).pathname === GOLD_AT, `the AR button opens ${ql?.file}, linking back to ${ql?.back}`);
 await open(`/p/${F.id}?finish=Gold-Matt-White`);
 s = await page();
 check(s.pressed.join() === "false,true" && s.variant === gold.variant, "?finish=Gold-Matt-White works too");
@@ -127,12 +130,12 @@ await b.evalJS(`document.querySelectorAll("#swatches .swatch")[1].click()`);
 await sleep(500);
 s = await page();
 ql = await quickLook();
-check(s.search === "?finish=gold-matt-white" && s.variant === gold.variant && ql?.file === gold.usdz && ql.back.includes("finish=gold-matt-white"), `pressing "${gold.name}": address ${s.search}, AR opens ${ql?.file}`);
-check(await b.evalJS(`decodeURIComponent(document.getElementById("btnWhatsApp").href).includes("finish=gold-matt-white")`), "the WhatsApp link shares that colour");
+check(s.path === GOLD_AT && s.search === "" && s.variant === gold.variant && ql?.file === gold.usdz && new URL(ql.back).pathname === GOLD_AT, `pressing "${gold.name}": address ${s.path}${s.search}, AR opens ${ql?.file}`);
+check(await b.evalJS(`decodeURIComponent(document.getElementById("btnWhatsApp").href).includes(${JSON.stringify(GOLD_AT)})`), "the WhatsApp link shares that colour's item link");
 await b.evalJS(`document.querySelectorAll("#swatches .swatch")[0].click()`);
 await sleep(400);
 s = await page();
-check(s.search === `?finish=${firstSlug}` && s.variant === null, `pressing "${first.name}": address ${s.search}`);
+check((FIRST_AT ? s.path === FIRST_AT && s.search === "" : s.search === `?finish=${firstSlug}`) && s.variant === null, `pressing "${first.name}": address ${s.path}${s.search}`);
 await b.shot(`${out}/product-finish.png`);
 
 console.log("\n[/id/ pages]");
@@ -141,13 +144,13 @@ await b.waitFor("location.pathname.startsWith('/p/')", 10000);
 check(await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 90000), "the colour's id page lands on the product");
 await sleep(1000);
 s = await page();
-check(s.path === `/p/${F.id}` && s.search === "?finish=gold-matt-white&embed=1" && s.pressed.join() === "false,true" && s.variant === gold.variant, `/id/${PID}?embed=1 opens ${s.path}${s.search} in ${gold.name}`);
+check(s.path === GOLD_AT && s.search === "?embed=1" && s.pressed.join() === "false,true" && s.variant === gold.variant, `/id/${PID}?embed=1 opens ${s.path}${s.search} in ${gold.name}`);
 await b.go(`${base}/__test/id/${OWN}.html`);
 await b.waitFor("location.pathname.startsWith('/p/')", 10000);
 await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 90000);
 await sleep(800);
 s = await page();
-check(s.path === `/p/${F.id}` && s.search === "" && s.pressed.join() === "true,false", `/id/${OWN} opens ${s.path} in ${first.name}`);
+check(s.path === (FIRST_AT || `/p/${F.id}`) && s.search === "" && s.pressed.join() === "true,false", `/id/${OWN} opens ${s.path} in ${first.name}`);
 
 console.log("\n[/compare?fa=]");
 await b.viewport(1440, 900);

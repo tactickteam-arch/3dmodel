@@ -25,7 +25,9 @@
         {
           "name": "Luxe Black",
           "swatchColor": "#2b2d31",
-          "usdz": "/models/usdz/samsung-rt34hg5a42bxhl-luxe-black.usdz"
+          "usdz": "/models/usdz/samsung-rt34hg5a42bxhl-luxe-black.usdz",
+          "itemCode": "RT34HG5A42BXHL",
+          "code": "RT34HG5A42BXHL"
         }
       ],
       "parts": [
@@ -328,7 +330,12 @@
         {
           "name": "Shiny Steel",
           "swatchColor": "#b4b5b7",
-          "usdz": "/models/usdz/lg-glt2526xwpz-shiny-steel.usdz"
+          "usdz": "/models/usdz/lg-glt2526xwpz-shiny-steel.usdz",
+          "itemCode": "GLT2526XWPZ",
+          "code": "GLT2526XWPZ",
+          "altCodes": [
+            "GLT2526XWPZ.DPZZEBN"
+          ]
         }
       ],
       "parts": [
@@ -642,7 +649,9 @@
         {
           "name": "Shiny Steel",
           "swatchColor": "#b4b5b7",
-          "usdz": "/models/usdz/lg-glt3426snpz-shiny-steel.usdz"
+          "usdz": "/models/usdz/lg-glt3426snpz-shiny-steel.usdz",
+          "itemCode": "GLT3426SNPZ.APZZEBN",
+          "code": "GLT3426SNPZ"
         }
       ],
       "parts": [
@@ -959,7 +968,9 @@
         {
           "name": "Shiny Steel",
           "swatchColor": "#b4b5b7",
-          "usdz": "/models/usdz/lg-glt4626tmpz-shiny-steel.usdz"
+          "usdz": "/models/usdz/lg-glt4626tmpz-shiny-steel.usdz",
+          "itemCode": "GLT4626TMPZ.DPZZEBN",
+          "code": "GLT4626TMPZ"
         }
       ],
       "parts": [
@@ -1276,7 +1287,12 @@
         {
           "name": "Marine Carnation",
           "swatchColor": "#1d3f9c",
-          "usdz": "/models/usdz/haier-hrf-2902icmc-p-marine-carnation.usdz"
+          "usdz": "/models/usdz/haier-hrf-2902icmc-p-marine-carnation.usdz",
+          "itemCode": "HRF-2902ICMC-P",
+          "code": "HRF-2902ICMC-P",
+          "altCodes": [
+            "HRF-2902ICMCA-P"
+          ]
         }
       ],
       "parts": [
@@ -1577,7 +1593,8 @@
         {
           "name": "EZ Clean Steel",
           "swatchColor": "#8f9296",
-          "usdz": "/models/usdz/samsung-rt45hg6a22slhl-ez-clean-steel.usdz"
+          "usdz": "/models/usdz/samsung-rt45hg6a22slhl-ez-clean-steel.usdz",
+          "code": "RT45HG6A22SLHL"
         }
       ],
       "parts": [
@@ -1883,7 +1900,8 @@
         {
           "name": "Camellia Purple",
           "swatchColor": "#2a0a33",
-          "usdz": "/models/usdz/samsung-rt40h28w1cpnl-camellia-purple.usdz"
+          "usdz": "/models/usdz/samsung-rt40h28w1cpnl-camellia-purple.usdz",
+          "code": "RT40H28W1CPNL"
         }
       ],
       "parts": [
@@ -2188,7 +2206,12 @@
         {
           "name": "Dazzle Steel",
           "swatchColor": "#6e6f73",
-          "usdz": "/models/usdz/lg-gl-b257jds3-dazzle-steel.usdz"
+          "usdz": "/models/usdz/lg-gl-b257jds3-dazzle-steel.usdz",
+          "itemCode": "GL-B257JDS3",
+          "code": "GL-B257JDS3",
+          "altCodes": [
+            "GL-B257JDS3.DDSZEBN"
+          ]
         }
       ],
       "parts": [
@@ -2502,7 +2525,8 @@
         {
           "name": "Wine Silk",
           "swatchColor": "#5a0a1c",
-          "usdz": "/models/usdz/whirlpool-73723-wine-silk.usdz"
+          "usdz": "/models/usdz/whirlpool-73723-wine-silk.usdz",
+          "code": "73723"
         }
       ],
       "parts": [
@@ -2786,7 +2810,8 @@
         {
           "name": "Refined Inox",
           "swatchColor": "#7e8186",
-          "usdz": "/models/usdz/samsung-rs76cg80x0s9hl-refined-inox.usdz"
+          "usdz": "/models/usdz/samsung-rs76cg80x0s9hl-refined-inox.usdz",
+          "code": "RS76CG80X0S9HL"
         }
       ],
       "parts": [
@@ -3108,7 +3133,8 @@
           "usdz": "/models/usdz/haier-hes-690gk-graphite-black.usdz",
           "variant": "Graphite Black",
           "code": "HES-690GK",
-          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-596l-side-by-side-frost-free-refrigerator-or-graphite-black-finish-hes-690gk/21330"
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-596l-side-by-side-frost-free-refrigerator-or-graphite-black-finish-hes-690gk/21330",
+          "itemCode": "HES-690GK"
         },
         {
           "name": "Shiny Silver",
@@ -3419,7 +3445,8 @@
           "usdz": "/models/usdz/haier-hrb-3752bnsa-p-nickel-steel.usdz",
           "variant": "Nickel Steel",
           "code": "HRB-3752BNSA-P",
-          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-325l-2-star-nickel-steel-double-door-bottom-mount-refrigerator-or-hrb-3752bnsa-p-hrb-3752bnsa-p/20623"
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-325l-2-star-nickel-steel-double-door-bottom-mount-refrigerator-or-hrb-3752bnsa-p-hrb-3752bnsa-p/20623",
+          "itemCode": "HRB-3752BNSA-P"
         },
         {
           "name": "Graphite Black",
@@ -4995,7 +5022,8 @@
           "usdz": "/models/usdz/haier-hrf-3182ibns-p-nickel-steel.usdz",
           "variant": "Nickel Steel",
           "code": "HRF-3182IBNS-P",
-          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-268l-frost-free-double-door-refrigerator-or-flat-door-or-nickel-steel-or-2-star-hrf-3182ibns-p/21526"
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-268l-frost-free-double-door-refrigerator-or-flat-door-or-nickel-steel-or-2-star-hrf-3182ibns-p/21526",
+          "itemCode": "HRF-3182IBNS-P"
         },
         {
           "name": "Graphite Black",
@@ -5623,7 +5651,10 @@
           "swatchColor": "#b8babc",
           "usdz": "/models/usdz/haier-hrf-3782bnsa-p-nickel-steel.usdz",
           "variant": "Nickel Steel",
-          "code": "HRF-3782BNSA-P"
+          "code": "HRF-3782BNSA-P",
+          "altCodes": [
+            "HRF-3782BNS-P"
+          ]
         },
         {
           "name": "Graphite Black",
@@ -6274,7 +6305,8 @@
           "usdz": "/models/usdz/haier-hrb-4052busa-p-graphite-black.usdz",
           "variant": "Graphite Black",
           "code": "HRB-4052BGKA-P",
-          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-355l-bottom-mount-refrigerator-graphite-black-3-star-hrb-4052bgka-p-new/21342"
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-355l-bottom-mount-refrigerator-graphite-black-3-star-hrb-4052bgka-p-new/21342",
+          "itemCode": "HRB-4052BGKA-P new"
         },
         {
           "name": "Inox Steel",
@@ -6897,7 +6929,8 @@
         {
           "name": "Illusia Steel",
           "swatchColor": "#9a9ca0",
-          "usdz": "/models/usdz/whirlpool-22343-illusia-steel.usdz"
+          "usdz": "/models/usdz/whirlpool-22343-illusia-steel.usdz",
+          "code": "22343"
         }
       ],
       "parts": [
@@ -10783,7 +10816,9 @@
         {
           "name": "Platinum Black",
           "swatchColor": "#45444a",
-          "usdz": "/models/usdz/lg-fhp1412z9b-platinum-black.usdz"
+          "usdz": "/models/usdz/lg-fhp1412z9b-platinum-black.usdz",
+          "itemCode": "FHP1412Z9B.APBQEIL",
+          "code": "FHP1412Z9B"
         }
       ],
       "parts": [
@@ -11007,7 +11042,9 @@
         {
           "name": "Lavender Gray",
           "swatchColor": "#bcbec4",
-          "usdz": "/models/usdz/samsung-wa70bg4441bytl-lavender-gray.usdz"
+          "usdz": "/models/usdz/samsung-wa70bg4441bytl-lavender-gray.usdz",
+          "itemCode": "WA70BG4441BYTL",
+          "code": "WA70BG4441BYTL"
         }
       ],
       "parts": [
@@ -11248,7 +11285,9 @@
         {
           "name": "Dark Lake",
           "swatchColor": "#4a5060",
-          "usdz": "/models/usdz/bosch-wga1420pin-dark-lake.usdz"
+          "usdz": "/models/usdz/bosch-wga1420pin-dark-lake.usdz",
+          "itemCode": "WGA1420PIN",
+          "code": "WGA1420PIN"
         }
       ],
       "parts": [
@@ -11519,7 +11558,9 @@
         {
           "name": "Middle Black",
           "swatchColor": "#3c3c3e",
-          "usdz": "/models/usdz/lg-fhb1208z2m-middle-black.usdz"
+          "usdz": "/models/usdz/lg-fhb1208z2m-middle-black.usdz",
+          "itemCode": "FHB1208Z2M.AMBQEIL",
+          "code": "FHB1208Z2M"
         }
       ],
       "parts": [
@@ -11794,7 +11835,9 @@
         {
           "name": "Deep Charcoal",
           "swatchColor": "#323235",
-          "usdz": "/models/usdz/samsung-wa80f08s2ctl-deep-charcoal.usdz"
+          "usdz": "/models/usdz/samsung-wa80f08s2ctl-deep-charcoal.usdz",
+          "itemCode": "WA80F08S2CTL",
+          "code": "WA80F08S2CTL"
         }
       ],
       "parts": [
@@ -12042,7 +12085,9 @@
         {
           "name": "Dark Lake",
           "swatchColor": "#4a5060",
-          "usdz": "/models/usdz/bosch-wga254zpin-dark-lake.usdz"
+          "usdz": "/models/usdz/bosch-wga254zpin-dark-lake.usdz",
+          "itemCode": "WGA254ZPIN",
+          "code": "WGA254ZPIN"
         }
       ],
       "parts": [
@@ -12310,7 +12355,9 @@
         {
           "name": "Black",
           "swatchColor": "#3c3f46",
-          "usdz": "/models/usdz/haier-hwd120-dm14f11bku1-black.usdz"
+          "usdz": "/models/usdz/haier-hwd120-dm14f11bku1-black.usdz",
+          "itemCode": "HWD120-DM14F11BKU1",
+          "code": "HWD120-DM14F11BKU1"
         }
       ],
       "parts": [
@@ -12543,7 +12590,9 @@
         {
           "name": "Black",
           "swatchColor": "#2f3033",
-          "usdz": "/models/usdz/samsung-ww80ta046ab1tl-black.usdz"
+          "usdz": "/models/usdz/samsung-ww80ta046ab1tl-black.usdz",
+          "itemCode": "WW80TA046AB1TL",
+          "code": "WW80TA046AB1TL"
         }
       ],
       "size": {
@@ -12821,7 +12870,9 @@
         {
           "name": "Middle Black",
           "swatchColor": "#323232",
-          "usdz": "/models/usdz/lg-t12sjmb1z-middle-black.usdz"
+          "usdz": "/models/usdz/lg-t12sjmb1z-middle-black.usdz",
+          "itemCode": "T12SJMB1Z.ABMQEIL",
+          "code": "T12SJMB1Z"
         }
       ],
       "parts": [
@@ -13066,7 +13117,9 @@
         {
           "name": "Midnight Grey",
           "swatchColor": "#464d56",
-          "usdz": "/models/usdz/whirlpool-31671-midnight-grey.usdz"
+          "usdz": "/models/usdz/whirlpool-31671-midnight-grey.usdz",
+          "itemCode": "31671",
+          "code": "31671"
         }
       ],
       "parts": [
@@ -13272,7 +13325,9 @@
         {
           "name": "Graphite",
           "swatchColor": "#363638",
-          "usdz": "/models/usdz/whirlpool-31688-graphite.usdz"
+          "usdz": "/models/usdz/whirlpool-31688-graphite.usdz",
+          "itemCode": "31688",
+          "code": "31688"
         }
       ],
       "parts": [
@@ -13478,7 +13533,9 @@
         {
           "name": "Mocha",
           "swatchColor": "#5b4a42",
-          "usdz": "/models/usdz/ifb-executive-plus-mbn-1014k-cms-mocha.usdz"
+          "usdz": "/models/usdz/ifb-executive-plus-mbn-1014k-cms-mocha.usdz",
+          "itemCode": "EXECUTIVE PLUS MBN 1",
+          "code": "EXECUTIVE PLUS MBN 1014K CMS"
         }
       ],
       "parts": [
@@ -13753,7 +13810,9 @@
         {
           "name": "Mocha",
           "swatchColor": "#5b4a42",
-          "usdz": "/models/usdz/ifb-serena-mbn-7012k-cms-mocha.usdz"
+          "usdz": "/models/usdz/ifb-serena-mbn-7012k-cms-mocha.usdz",
+          "itemCode": "SERENA MBN 7012K CMS",
+          "code": "SERENA MBN 7012K CMS"
         }
       ],
       "parts": [
@@ -14032,7 +14091,8 @@
         {
           "name": "White",
           "swatchColor": "#f3f4f6",
-          "usdz": "/models/usdz/carrier-19k-xceed-edge-gxi-white.usdz"
+          "usdz": "/models/usdz/carrier-19k-xceed-edge-gxi-white.usdz",
+          "code": "19KXCEED EDGEGXI"
         }
       ],
       "parts": [
@@ -14247,7 +14307,8 @@
         {
           "name": "White and gold",
           "swatchColor": "#f3f3f4",
-          "usdz": "/models/usdz/voltas-183inv-vertis-ai-zest-gold-white-and-gold.usdz"
+          "usdz": "/models/usdz/voltas-183inv-vertis-ai-zest-gold-white-and-gold.usdz",
+          "code": "SAC 183INV VERTIS AI ZEST GOLD"
         }
       ],
       "parts": [
@@ -14433,7 +14494,8 @@
         {
           "name": "White and gold",
           "swatchColor": "#f3f3f4",
-          "usdz": "/models/usdz/haier-hso52kucai3nb-white-and-gold.usdz"
+          "usdz": "/models/usdz/haier-hso52kucai3nb-white-and-gold.usdz",
+          "code": "HSO52KUCAI3NB"
         }
       ],
       "parts": [

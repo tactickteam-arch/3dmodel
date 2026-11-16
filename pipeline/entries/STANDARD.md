@@ -30,6 +30,14 @@ The slug (folder names) is `<brand>_<short model>`, for example `lg_glt3426`. Th
 
 ## 2. What comes out: the same as the reference
 
+**The link (16 Nov 2026, for every product and every colour).** Each colour's link is `https://3d.sangeetha.com/p/<item code>`, with the item code written exactly as given: capitals, spaces, `.` and `/` included (`/p/HRB-3752BNSA-P`, `/p/RR24H2823HT/NL`, `/p/RT EONVIBE 366BN RCIT MT BK`). The store app and every integration build the link this way, so:
+- the item code is **Sangeetha's own `item_code`** from that colour's listing (the product API in `BRIEF.md`), kept in `products.json` as the colour's `itemCode`, even where it differs from the maker's code (`HRB-4052BGKA-P new`, `GLT3426SNPZ.APZZEBN`);
+- every colour also carries the maker's exact `code`, from the sheet or the maker's page, and that link works too. Any other code a Sangeetha sheet gives for that row (`GLT2526XWPZ.DPZZEBN`) goes in `altCodes` and works too; where it names a different model than the one built, the hand-over says so. A colour with no listing yet uses its maker code, and the hand-over says the code is not yet confirmed by Sangeetha;
+- a code is never guessed, tidied or completed. If no source gives a colour's code, that colour has no item link, and NOTES.md says so;
+- the page shows that link in the address bar however the visitor arrived (`/p/<id>`, `/id/<Product ID>`, an old link), and picking another colour switches it to that colour's link;
+- `make_pages.mjs` writes `p/<item code>.html` for each colour, with its link preview, and lists any code it can't use;
+- a product is not done until every one of its item links opens that product in that colour on the live site.
+
 **Every product has:**
 - a GLB (web, Android, headsets);
 - for each colour, a USDZ and a `-free` copy (floor products only);
@@ -94,6 +102,7 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 | rk-grain, rk-size | RealityKit finds the grain. It places the product at the published W × H within 3.5 mm, with its lowest point at 0. |
 | apple-render | Apple's renderer draws each colour closed and open. |
 | page-site, page-features, page-controls, page-arphone, page-room, page-xr | The page tests for this product, each with 0 failures and no console errors. |
+| item-links | Every colour has its exact item code (Sangeetha's `itemCode`, else the maker's `code`), usable as `/p/<item code>`, none repeated. (`test_finish.mjs` and `test_store_bridge.mjs` check that such a link opens that colour and stays in the address bar.) |
 | page-organise, page-trays | Fridges: Fill and Empty, and the trays. |
 | renders | The views for the review, in `look/`. |
 

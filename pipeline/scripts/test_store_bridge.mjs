@@ -21,8 +21,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { launch, sleep } from "./cdp.mjs";
 import { verifyToken, default as handler } from "../integration/check-token.mjs";
-import { build, checkSite, itemSlug } from "./make_pages.mjs";
-import { finishSlug } from "../../site.js";
+import { build, checkSite } from "./make_pages.mjs";
 import { SITE } from "../../site-config.js";
 
 const [out] = process.argv.slice(2);
@@ -101,9 +100,9 @@ const PID = withPid.sangeethaUrl.match(/(\d+)\/?$/)[1];
 const inputs = (site) => ({ site: checkSite(site), products, productHtml: read("product.html"), indexHtml: read("index.html"), vercelJson: read("vercel.json") });
 const made = build(inputs(structuredClone(SITE)));
 check(made.files.get(`id/${PID}.html`)?.includes(`"/p/${withPid.id}"`), `/id/${PID} opens /p/${withPid.id}`);
-check([...made.files.keys()].every((f) => (/^(p|id)\/[^/]+\.html$/.test(f) || /^item\/.+\.html$/.test(f)) || ["index.html", "compare.html", "showroom.html", "vercel.json"].includes(f)), "it makes only p/, id/, item/ and the fixed pages: no other old paths");
+check([...made.files.keys()].every((f) => /^p\/.+\.html$/.test(f) || /^id\/[^/]+\.html$/.test(f) || ["index.html", "compare.html", "showroom.html", "vercel.json"].includes(f)), "it makes only p/, id/ and the fixed pages: no other old paths");
 const withCode = products.find((p) => !p.hidden && p.finishes?.[1]?.code), second = withCode.finishes[1];
-check(made.files.get(`item/${itemSlug(second.code)}.html`)?.includes(`"/p/${withCode.id}?finish=${finishSlug(second.name)}"`), `/item/${itemSlug(second.code)} opens /p/${withCode.id} in ${second.name}`);
+check(made.files.get(`p/${second.code}.html`)?.includes(`<link rel="canonical" href="${SITE.publicOrigin}/p/${encodeURI(second.code)}">`), `/p/${second.code} is ${withCode.id}'s page for ${second.name}`);
 check(made.files.get("vercel.json") === read("vercel.json") && !read("vercel.json").includes("frame-ancestors"), "with frameParents empty, vercel.json has no frame rule (framing open, as today)");
 const TEST_SITE = { ...structuredClone(SITE), storeAppOrigins: ["https://store.example.invalid", APP], frameParents: [APP, "https://www.example.invalid"] };
 const framed = JSON.parse(build(inputs(structuredClone(TEST_SITE))).files.get("vercel.json"));
@@ -156,7 +155,8 @@ const page = async (expr, ms = 15000) => { for (let t = 0; t < ms; t += 250) { c
 await b.viewport(900, 800, false);
 
 for (const [from, to, embed, note] of [
-  [`/id/${PID}?embed&source=qr`, `/p/${withPid.id}?embed&source=qr`, true, false],
+  // the product page puts the colour's item code in the address (and writes ?embed as ?embed=)
+  [`/id/${PID}?embed&source=qr`, withPid.finishes?.[0]?.code ? `/p/${encodeURI(withPid.finishes[0].code)}?embed=&source=qr` : `/p/${withPid.id}?embed&source=qr`, true, false],
   ["/?embed&source=app", "/?embed&source=app", true, false],
   [`/id/1`, `/id/1`, false, true],
 ]) {

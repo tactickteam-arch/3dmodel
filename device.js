@@ -29,8 +29,9 @@
     function showing() {
       const path = location.pathname.replace(/\/+$/, "") || "/";
       const q = new URLSearchParams(location.search);
-      let m = /^\/p\/([^/]+)$/.exec(path);
-      const pid = m ? decodeURIComponent(m[1]).toLowerCase() : /^\/product(\.html)?$/.test(path) ? (q.get("id") || "").toLowerCase() : null;
+      let m = /^\/p\/(.+)$/.exec(path);
+      // /p/<item code> names a colour, not the product: the product page says which product it opened
+      const pid = m ? (window.__demo?.product?.id || decodeURIComponent(m[1])).toLowerCase() : /^\/product(\.html)?$/.test(path) ? (q.get("id") || "").toLowerCase() : null;
       if (pid !== null) return ID.test(pid) ? `product:${pid}` : "other";
       if (/^\/kiosk(\.html)?$/.test(path)) return NUM.test(q.get("list") || "") ? `playlist:${q.get("list")}` : "kiosk";
       if (path === "/" || /^\/index(\.html)?$/.test(path)) return "catalogue";

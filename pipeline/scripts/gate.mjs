@@ -77,6 +77,12 @@ const parts = entry.parts || [];
   const badParts = parts.filter((p) => !p.key || !p.node || !p.zone?.closed || !p.zone?.open || !(p.axis || p.slide));
   record("parts", parts.length >= 1 && parts.length <= 4 && !badParts.length && parts.some((p) => p.hint), `${parts.length} moving parts (${parts.map((p) => p.key + (p.needs ? `<${p.needs}` : "")).join(" ")})${badParts.length ? `, ${badParts.length} without node, axis or zones` : ""}${parts.some((p) => p.hint) ? "" : ", no hint part"}`);
   record("source", /^https:\/\//.test(entry.source || ""), `maker page: ${entry.source || "none"}`);
+  // STANDARD 2: each colour's link is /p/<item code>, the maker's code exactly as written (make_pages.mjs writes the page)
+  const codes = (entry.finishes || []).map((f) => String(f.itemCode || f.code || "").trim()); // Sangeetha's item code first
+  const badCode = codes.filter((c) => c && (!/^[\w .\-]+(\/[\w .\-]+)*$/.test(c) || /(^|\/)\.\.?(\/|$)/.test(c)));
+  record("item-links", codes.length > 0 && codes.every(Boolean) && !badCode.length && new Set(codes).size === codes.length,
+    codes.every(Boolean) ? `${codes.length} colours: ${codes.map((c) => `/p/${c}`).join(", ")}${badCode.length ? `; can't be a link: ${badCode.join(", ")}` : ""}${new Set(codes).size < codes.length ? "; a code is repeated" : ""}`
+      : `${codes.filter((c) => !c).length} of ${codes.length} colours have no maker code (each colour needs its exact item code)`);
   record("sangeetha", !!entry.sangeethaUrl, entry.sangeethaUrl ? "Sangeetha listing linked" : "no Sangeetha listing (fine only if the product isn't in Sangeetha's catalogue)", true);
   if (!wall) record("fit", !!entry.fit, entry.fit ? `clearances: ${Object.keys(entry.fit).join(", ")}` : "no clearances (fine only if the maker publishes none)", true);
   const jpegSize = (f) => { const b = fs.readFileSync(f); for (let i = 2; i < b.length - 9;) { if (b[i] !== 0xff) { i++; continue; } const t = b[i + 1]; if (t >= 0xc0 && t <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(t)) return [b.readUInt16BE(i + 7), b.readUInt16BE(i + 5)]; i += 2 + b.readUInt16BE(i + 2); } return [0, 0]; };

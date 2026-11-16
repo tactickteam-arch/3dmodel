@@ -1,6 +1,9 @@
 // Writes the pages made from other files, and keeps the site's address in step with site-config.js.
 // 1. p/<id>.html for every product on show: product.html with that product's title, description and
-//    link-preview tags. WhatsApp and other link previews read only the HTML, not what the page's script sets
+//    link-preview tags. Each colour gets one too at its item code, exactly as written: Sangeetha's item code from
+//    its listing (`itemCode`) and the maker's code (`code`) when they differ (p/HRB-3752BNSA-P.html,
+//    p/RR24H2823HT/NL.html), so the store's link is always /p/<item code>; product.html finds the product and
+//    colour from it. WhatsApp and other link previews read only the HTML, not what the page's script sets
 //    later, so a shared /p/<id> link otherwise showed "Product in 3D and AR" with no picture.
 //    Vercel serves /p/<id> from p/<id>.html (cleanUrls); any other id still falls through to product.html
 //    (vercel.json), and so does serve.mjs locally.
@@ -10,12 +13,6 @@
 //                                       /p/<id>?finish=<slug> for each colour (finish) whose own sangeethaUrl does
 //    Any other address under /id/ falls through to the catalogue (vercel.json, and serve.mjs locally), which says
 //    kindly that it couldn't find the product.
-//      item/<item code>.html → /p/<id>?finish=<slug>, for each colour's maker code (its `code`), so every colour has a
-//                               short link before Sangeetha's Product IDs come in. The code is written as itemSlug
-//                               makes it: capitals, and anything but letters, digits and "-" as "-" (RR24H2823HT/NL →
-//                               RR24H2823HT-NL). A separate folder, so a numeric code can never clash with a Product ID.
-//                               The code exactly as the maker writes it works too (item/RR24H2823HT/NL, item/RT EONVIBE
-//                               366BN RCIT MT BK), so a link is always the same address with the item code on the end.
 // 3. The og:url of index.html, compare.html and showroom.html (/, /compare, /showroom: cleanUrls on Vercel, serve.mjs
 //    locally), and vercel.json's frame-ancestors header, which is there only while site-config.js lists frameParents.
 //    vercel.json is kept in JSON.stringify's two-space layout.
@@ -31,7 +28,7 @@ import { finishSlug, productIdOf } from "../../site.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-const OWNED = ["p", "id", "item"]; // the folders this script owns: a page in them it didn't make is removed
+const OWNED = ["p", "id"]; // the folders this script owns: a page in them it didn't make is removed
 const HEAD = /<title>[^<]*<\/title>\n<meta name="description" content="[^"]*">\n/;
 const OG_URL = /<meta property="og:url" content="[^"]*">/;
 const PAGES = [["index.html", "/"], ["compare.html", "/compare"], ["showroom.html", "/showroom"]]; // pages with a fixed address
@@ -88,9 +85,6 @@ export function productIds(shown) {
   return { byPid, notes };
 }
 
-// a colour's maker code as it appears at the end of its /item/ link
-export const itemSlug = (code) => String(code).toUpperCase().replace(/[^A-Z0-9-]+/g, "-").replace(/^-+|-+$/g, "");
-
 // What every made file should hold, as a map of path (from the site's root) → text, plus notes for the person
 // running it. It reads and writes nothing, so the tests can call it with a made-up config.
 // compareHtml and showroomHtml are left alone when not given.
@@ -101,10 +95,10 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
 
   // 1. a page per product on show
   if (!HEAD.test(productHtml)) throw new Error("product.html: the <title> and description lines have changed; update make_pages.mjs");
-  for (const p of shown) {
-    const title = `${p.brand} ${p.model} in 3D and AR`, url = `${ORIGIN}/p/${p.id}`;
+  const page = (p, at, model) => {
+    const url = `${ORIGIN}/p/${encodeURI(at)}`;
     const tags = [
-      `<title>${attr(title)}</title>`,
+      `<title>${attr(`${p.brand} ${model} in 3D and AR`)}</title>`,
       `<meta name="description" content="${attr(p.summary)}">`,
       `<link rel="canonical" href="${url}">`,
       `<meta property="og:type" content="website">`,
@@ -116,25 +110,25 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
       `<meta property="og:image:alt" content="${attr(p.name)}">`,
       `<meta name="twitter:card" content="summary">`, // the photos are square
     ];
-    files.set(`p/${p.id}.html`, productHtml
+    const f = `p/${at}.html`;
+    if (files.has(f)) return notes.push(`/p/${at} is both ${p.id} and another product or colour; it opens the first`);
+    files.set(f, productHtml
       .replace("<!doctype html>\n", "<!doctype html>\n<!-- made from product.html by pipeline/scripts/make_pages.mjs: edit product.html, then run it -->\n")
       .replace(HEAD, tags.join("\n") + "\n"));
+  };
+  for (const p of shown) page(p, p.id, p.model);
+  // and one per colour at its item code; a code with anything but letters, digits, spaces, "." "-" "_" and "/" is left out
+  // (Sangeetha's own item code, `itemCode`, from its listing; the maker's `code`; and `altCodes`, other codes Sangeetha's
+  // sheets give for that row)
+  for (const p of shown) for (const fin of p.finishes || []) for (const code of new Set([fin.itemCode, fin.code, ...(fin.altCodes || [])].map((c) => String(c || "").trim()).filter(Boolean))) {
+    if (!/^[\w .\-]+(\/[\w .\-]+)*$/.test(code) || /(^|\/)\.\.?(\/|$)/.test(code)) { notes.push(`item code "${code}" can't be a link; left out`); continue; }
+    page(p, code, code);
   }
 
   // 2. short links by Sangeetha's Product ID (a product's, and each colour's)
   const { byPid, notes: idNotes } = productIds(shown);
   notes.push(...idNotes);
   for (const [pid, { to }] of byPid) files.set(`id/${pid}.html`, redirect(to));
-  // and by each colour's maker code
-  for (const p of shown) for (const f of p.finishes || []) {
-    if (!f.code) continue;
-    const to = `/p/${p.id}?finish=${finishSlug(f.name)}`, exact = String(f.code).trim();
-    const ats = [itemSlug(f.code), ...(exact !== itemSlug(f.code) && /^[\w .\-]+(\/[\w .\-]+)*$/.test(exact) && !/(^|\/)\.\.?(\/|$)/.test(exact) ? [exact] : [])];
-    for (const at of ats.map((a) => `item/${a}.html`)) {
-      if (files.has(at)) { notes.push(`item code ${f.code} is on two colours; /${at.slice(0, -5)} opens the first`); continue; }
-      files.set(at, redirect(to));
-    }
-  }
 
   // 3. the address in the link previews of the pages with a fixed address, and who may frame us
   const fixed = { "index.html": indexHtml, "compare.html": compareHtml, "showroom.html": showroomHtml };

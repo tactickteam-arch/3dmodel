@@ -638,13 +638,20 @@ const I = {
   box: svg('<path d="M12 3 3 7.5v9L12 21l9-4.5v-9z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>'),
 };
 
-// ── which product: /p/<id>, or ?id=<id> ──
-const id = decodeURIComponent((location.pathname.match(/\/p\/([^/]+)/) || [])[1] || new URLSearchParams(location.search).get("id") || "").toLowerCase();
+// ── which product: /p/<id>, /p/<item code> (a colour's maker code, as Sangeetha's sheets have it), or ?id=<id> ──
+const opened = decodeURIComponent((location.pathname.match(/\/p\/(.+?)\/?$/) || [])[1] || new URLSearchParams(location.search).get("id") || "");
+const id = opened.toLowerCase();
 // on show: products.json's "hidden" flag, unless the team approved or declined the product in the admin (live.js).
 // ?preview=1 opens any product, on show or not, for staff to test it on their phones and headsets before it goes live.
 const PREVIEW = new URLSearchParams(location.search).get("preview") === "1";
 const catalogue = await loadCatalogue();
-const product = catalogue.products.find((p) => p.id === id && (PREVIEW || catalogue.isShown(p)));
+const open = (p) => PREVIEW || catalogue.isShown(p);
+const codeKey = (c) => String(c).toUpperCase().replace(/[^A-Z0-9]+/g, "");
+let product = catalogue.products.find((p) => p.id === id && open(p)), codeFinish = -1;
+if (!product && opened) for (const p of catalogue.products.filter(open)) {
+  const i = (p.finishes || []).findIndex((f) => [f.itemCode, f.code, ...(f.altCodes || [])].some((c) => c && codeKey(c) === codeKey(opened)));
+  if (i >= 0) { product = p; codeFinish = i; break; }
+}
 if (PREVIEW) {
   const robots = document.createElement("meta");
   robots.name = "robots";
@@ -657,6 +664,19 @@ if (!product) {
   document.title = "Product not found";
   await new Promise(() => {}); // nothing below applies to a missing product
 }
+// ?finish=<slug> opens that colour (an old or mistyped one opens the first), and so does a colour's item code
+// (Sangeetha's `itemCode` or the maker's `code`). On /p/ the address then names the colour's item code
+// (/p/HRB-3752BNSA-P; Sangeetha's when its listing gives one), so the link people copy, share or scan is the store's; a colour without a code keeps /p/<id>?finish=<slug>.
+let finishIndex = codeFinish >= 0 && !new URLSearchParams(location.search).get("finish") ? codeFinish : finishIndexOf(product, new URLSearchParams(location.search).get("finish"));
+function addressFor(i) {
+  const f = product.finishes?.[i], u = new URL(location.href), code = String(f?.itemCode || f?.code || "").trim(); // Sangeetha's item code first
+  if (!u.pathname.startsWith("/p/")) { if ((product.finishes || []).length > 1) u.searchParams.set("finish", finishSlug(product.finishes[i].name)); return u; }
+  u.pathname = code ? `/p/${encodeURI(code)}` : `/p/${product.id}`;
+  if (code) u.searchParams.delete("finish");
+  else if ((product.finishes || []).length > 1) u.searchParams.set("finish", finishSlug(product.finishes[i].name));
+  return u;
+}
+{ const u = addressFor(finishIndex); if (u.pathname !== location.pathname) history.replaceState(history.state, "", u.pathname + u.search + u.hash); }
 // Vercel's other addresses for this site (per deployment and per branch) ask for a Vercel login, and
 // the other addresses in site-config.js are kept for old links, so the links people scan and share
 // always point at the public address
@@ -713,9 +733,7 @@ if (document.documentElement.classList.contains("embed")) track("EMBED", (() => 
 // ── fill the page ──
 const parts = product.parts || [];
 const state = Object.fromEntries(parts.map((p) => [p.key, false]));
-// ?finish=<slug> opens that colour (an old or mistyped one opens the first); a colour chosen here goes into the
-// address, so the link people copy or share keeps it
-let finishIndex = finishIndexOf(product, new URLSearchParams(location.search).get("finish"));
+// a colour chosen here goes into the address (addressFor, above), so the link people copy or share keeps it
 const onWall = product.placement === "wall";
 initRoom({ product, model: model(product.glb), parts, onWall, toast, openButton: $("btnRoom") });
 $("btnRoom")?.addEventListener("click", () => track("ROOM"));
@@ -765,7 +783,7 @@ function openPhoto(src) {
 }
 
 // the delivered files, with their real sizes
-const files = [[product.glb, "GLB", "Android, web and headsets"], ...product.finishes.map((f) => [f.usdz, "USDZ", `iPhone, iPad and Vision Pro${product.finishes.length > 1 ? ` · ${f.name}` : ""}`])];
+const files = [[product.glb, "GLB", "Android, web and headsets"], ...product.finishes.map((f) => [f.usdz, "USDZ", `iPhone, iPad and Vision Pro${(product.finishes || []).length > 1 ? ` · ${f.name}` : ""}`])];
 for (const [url, kind, use] of files) {
   const a = document.createElement("a");
   a.href = url;
@@ -823,15 +841,14 @@ function renderSwatches() {
 function applyFinish(i) {
   finishIndex = i;
   const f = product.finishes[i];
-  if (f.variant || product.finishes.length > 1) mv.variantName = f.variant || null;
+  if (f.variant || (product.finishes || []).length > 1) mv.variantName = f.variant || null;
   document.querySelectorAll("#swatches .swatch, #arFinishes button").forEach((b) => b.setAttribute("aria-pressed", String([...b.parentNode.children].indexOf(b) === i)));
 }
 // a colour the shopper picks: shown, and kept in the address and the share links
 function chooseFinish(i) {
   applyFinish(i);
   if (product.finishes.length < 2) return;
-  const u = new URL(location.href);
-  u.searchParams.set("finish", finishSlug(product.finishes[i].name));
+  const u = addressFor(i);
   history.replaceState(history.state, "", u.pathname + u.search + u.hash);
   shareUrl = makeShareUrl();
   renderShare();

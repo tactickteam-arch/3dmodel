@@ -114,7 +114,9 @@ for (const p of products) {
   await sleep(500);
 
   const wa = await b.evalJS(`document.getElementById("btnWhatsApp").href`);
-  check(wa.startsWith("https://wa.me/?text=") && decodeURIComponent(wa).includes(`/p/${p.id}`), `WhatsApp link ${wa.slice(0, 60)}…`);
+  // the shared link is the first colour's item link (STANDARD 2), or /p/<id> for a colour without a code
+  const at = `/p/${encodeURI(p.finishes?.[0]?.itemCode || p.finishes?.[0]?.code || p.id)}`;
+  check(wa.startsWith("https://wa.me/?text=") && decodeURIComponent(wa).includes(new URL(at, "https://x").pathname), `WhatsApp link ${wa.slice(0, 60)}… shares ${decodeURI(at)}`);
 
   // phone
   await b.viewport(390, 844, true, IPHONE);
