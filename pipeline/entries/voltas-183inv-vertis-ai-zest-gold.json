@@ -25,7 +25,12 @@
         {
           "name": "White and gold",
           "swatchColor": "#f3f3f4",
-          "usdz": "/models/usdz/voltas-183inv-vertis-ai-zest-gold-white-and-gold.usdz"
+          "usdz": "/models/usdz/voltas-183inv-vertis-ai-zest-gold-white-and-gold.usdz",
+          "code": "SAC 183INV VERTIS AI ZEST GOLD",
+          "itemCode": "VERTIS AI ZEST ODU",
+          "altCodes": [
+            "VERTIS AI ZEST IDU"
+          ]
         }
       ],
       "parts": [
@@ -183,7 +188,8 @@
           ],
           "show": "always"
         }
-      ]
+      ],
+      "hidden": true
     }
   ]
 }

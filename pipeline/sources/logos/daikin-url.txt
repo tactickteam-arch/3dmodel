@@ -1,0 +1,1 @@
+daikin.svg: Daikin wordmark and flag mark (Daikin blue #00a0e4, flag #44c8f5 and #231f20), Daikin Europe's own site header logo: https://www.daikin.eu/etc.clientlibs/daikin/clientlibs/clientlib-internet-site/resources/images/logo/daikin-logo.svg (same mark as daikinindia.com's header logo_0.png)

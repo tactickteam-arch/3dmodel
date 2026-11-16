@@ -302,8 +302,7 @@
         "sides": 5,
         "back": 5,
         "note": "From Samsung's user manual for this range: at least 5 cm at each side, more than 5 cm behind it, and 129.4 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "lg-glt2526xwpz",
@@ -621,8 +620,7 @@
         "front": 36,
         "back": 5,
         "note": "From LG's owner's manual: keep at least 5 cm between the back and the wall. The manual gives 99.9 cm total depth with a door open, which is 36 cm in front of the fridge."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "lg-glt3426snpz",
@@ -940,8 +938,7 @@
       "fit": {
         "back": 5,
         "note": "From LG's owner's manual for its double-door range: keep at least 5 cm between the back and the wall. The 343 L model's own door swing is not published; the doors open about 135 degrees in this model."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "lg-glt4626tmpz",
@@ -1259,8 +1256,7 @@
       "fit": {
         "back": 5,
         "note": "From LG's owner's manual for its double-door range: keep at least 5 cm between the back and the wall. The 466 L model's own door swing is not published; the doors open about 135 degrees in this model."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "haier-hrf-2902icmc-p",
@@ -1291,7 +1287,9 @@
           "itemCode": "HRF-2902ICMC-P",
           "code": "HRF-2902ICMC-P",
           "altCodes": [
-            "HRF-2902ICMCA-P"
+            "HRF-2902ICMCA-P",
+            "HRF-2902ICMCA",
+            "HRF-2902ICMCA-P N D"
           ]
         }
       ],
@@ -1565,8 +1563,7 @@
           ],
           "show": "fridge"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "samsung-rt45hg6a22slhl",
@@ -1594,7 +1591,8 @@
           "name": "EZ Clean Steel",
           "swatchColor": "#8f9296",
           "usdz": "/models/usdz/samsung-rt45hg6a22slhl-ez-clean-steel.usdz",
-          "code": "RT45HG6A22SLHL"
+          "code": "RT45HG6A22SLHL",
+          "itemCode": "RT45HG6A22SLHL"
         }
       ],
       "parts": [
@@ -1872,8 +1870,7 @@
         "sides": 5,
         "back": 5,
         "note": "From Samsung's user manual for this model: at least 5 cm at each side, more than 5 cm behind it, and 136.3 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "samsung-rt40h28w1cpnl",
@@ -1901,7 +1898,8 @@
           "name": "Camellia Purple",
           "swatchColor": "#2a0a33",
           "usdz": "/models/usdz/samsung-rt40h28w1cpnl-camellia-purple.usdz",
-          "code": "RT40H28W1CPNL"
+          "code": "RT40H28W1CPNL",
+          "itemCode": "RT40H28W1CPNL"
         }
       ],
       "parts": [
@@ -2178,8 +2176,7 @@
         "sides": 5,
         "back": 5,
         "note": "From Samsung's user manual for this model: at least 5 cm at each side, more than 5 cm behind it, and 114.5 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "lg-gl-b257jds3",
@@ -2497,8 +2494,7 @@
         "front": 44.5,
         "back": 5,
         "note": "From LG's owner's manual: allow over 5 cm between the back and the wall. The manual gives 118 cm of depth with the doors open, which is 44.5 cm in front of the fridge, and 163.5 cm across with both doors open."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "whirlpool-73723",
@@ -2526,7 +2522,8 @@
           "name": "Wine Silk",
           "swatchColor": "#5a0a1c",
           "usdz": "/models/usdz/whirlpool-73723-wine-silk.usdz",
-          "code": "73723"
+          "code": "73723",
+          "itemCode": "73723"
         }
       ],
       "parts": [
@@ -2782,8 +2779,7 @@
           ],
           "show": "!fridge"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "samsung-rs76cg80x0s9hl",
@@ -2811,7 +2807,8 @@
           "name": "Refined Inox",
           "swatchColor": "#7e8186",
           "usdz": "/models/usdz/samsung-rs76cg80x0s9hl-refined-inox.usdz",
-          "code": "RS76CG80X0S9HL"
+          "code": "RS76CG80X0S9HL",
+          "itemCode": "RS76CG80X0S9HL"
         }
       ],
       "parts": [
@@ -3102,8 +3099,7 @@
           ],
           "show": "!fridge"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "haier-hes-690gk",
@@ -3134,7 +3130,10 @@
           "variant": "Graphite Black",
           "code": "HES-690GK",
           "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-596l-side-by-side-frost-free-refrigerator-or-graphite-black-finish-hes-690gk/21330",
-          "itemCode": "HES-690GK"
+          "itemCode": "HES-690GK",
+          "altCodes": [
+            "HES-690GK D"
+          ]
         },
         {
           "name": "Shiny Silver",
@@ -3446,7 +3445,10 @@
           "variant": "Nickel Steel",
           "code": "HRB-3752BNSA-P",
           "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-325l-2-star-nickel-steel-double-door-bottom-mount-refrigerator-or-hrb-3752bnsa-p-hrb-3752bnsa-p/20623",
-          "itemCode": "HRB-3752BNSA-P"
+          "itemCode": "HRB-3752BNSA-P",
+          "altCodes": [
+            "HRB-3752BNSA-P D"
+          ]
         },
         {
           "name": "Graphite Black",
@@ -3750,7 +3752,11 @@
           "swatchColor": "#141318",
           "variant": "Radiant Onyx",
           "code": "GLT2216WYRO",
-          "usdz": "/models/usdz/lg-glt2216wyro-radiant-onyx.usdz"
+          "usdz": "/models/usdz/lg-glt2216wyro-radiant-onyx.usdz",
+          "itemCode": "GLT2216WYRO",
+          "altCodes": [
+            "GLT2216WYRO.AROZEBN"
+          ]
         },
         {
           "name": "Radiant Inox",
@@ -4092,7 +4098,8 @@
           "swatchColor": "#36373c",
           "usdz": "/models/usdz/godrej-rt-eonregalis-477an-rci-mt-bk-matt-black.usdz",
           "variant": "Matt Black",
-          "code": "RT EONREGALIS 477AN RCI MT BK"
+          "code": "RT EONREGALIS 477AN RCI MT BK",
+          "itemCode": "EONREGALIS 477AN"
         },
         {
           "name": "Champagne Gold",
@@ -4371,8 +4378,7 @@
           ],
           "show": "fridge"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "lg-glt4416cces",
@@ -4401,7 +4407,8 @@
           "swatchColor": "#141416",
           "usdz": "/models/usdz/lg-glt4416cces-ebony-sheen.usdz",
           "variant": "Ebony Sheen",
-          "code": "GLT4416CCES"
+          "code": "GLT4416CCES",
+          "itemCode": "GLT4416CCES.DESZEBN"
         },
         {
           "name": "Shiny Steel",
@@ -4726,14 +4733,16 @@
           "swatchColor": "#a8aaad",
           "usdz": "/models/usdz/whirlpool-22439-alpha-steel.usdz",
           "variant": "Alpha Steel",
-          "code": "22439"
+          "code": "22439",
+          "itemCode": "22439"
         },
         {
           "name": "Illusia Steel",
           "swatchColor": "#989a9c",
           "usdz": "/models/usdz/whirlpool-22439-illusia-steel.usdz",
           "variant": "Illusia Steel",
-          "code": "22440"
+          "code": "22440",
+          "itemCode": "22440"
         },
         {
           "name": "Gravity Black",
@@ -4741,7 +4750,8 @@
           "usdz": "/models/usdz/whirlpool-22439-gravity-black.usdz",
           "variant": "Gravity Black",
           "code": "22441",
-          "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-intellifresh-431l-2-star-inverter-convertible-frost-free-double-door-refrigerator-or-gravity-black-22441/21158"
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-intellifresh-431l-2-star-inverter-convertible-frost-free-double-door-refrigerator-or-gravity-black-22441/21158",
+          "itemCode": "22441"
         },
         {
           "name": "Platina Illusia Steel",
@@ -4991,8 +5001,7 @@
           ],
           "show": "fridge"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "haier-hrf-3182ibns-p",
@@ -5332,7 +5341,8 @@
           "swatchColor": "#26272c",
           "usdz": "/models/usdz/godrej-rt-eonvibe-366bn-rcit-mt-bk-matt-black.usdz",
           "variant": "Matt Black",
-          "code": "RT EONVIBE 366BN RCIT MT BK"
+          "code": "RT EONVIBE 366BN RCIT MT BK",
+          "itemCode": "EONVIBE 366BN"
         },
         {
           "name": "Champagne Gold",
@@ -5653,8 +5663,10 @@
           "variant": "Nickel Steel",
           "code": "HRF-3782BNSA-P",
           "altCodes": [
-            "HRF-3782BNS-P"
-          ]
+            "HRF-3782BNS-P",
+            "HRF-3782BNS-P D"
+          ],
+          "itemCode": "HRF-3782BNSA-P"
         },
         {
           "name": "Graphite Black",
@@ -5936,8 +5948,7 @@
           ],
           "show": "fridge"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "samsung-rs76cg8113slhl",
@@ -5966,7 +5977,10 @@
           "code": "RS76CG8113SLHL",
           "swatchColor": "#7e8186",
           "variant": "EZ Clean Steel",
-          "usdz": "/models/usdz/samsung-rs76cg8113slhl-ez-clean-steel.usdz"
+          "usdz": "/models/usdz/samsung-rs76cg8113slhl-ez-clean-steel.usdz",
+          "altCodes": [
+            "RS76CG8113SLHL D"
+          ]
         },
         {
           "name": "Black DOI",
@@ -6297,7 +6311,8 @@
           "swatchColor": "#3a4256",
           "usdz": "/models/usdz/haier-hrb-4052busa-p-ultramarine-steel.usdz",
           "variant": "Ultramarine Steel",
-          "code": "HRB-4052BUSA-P"
+          "code": "HRB-4052BUSA-P",
+          "itemCode": "HRB-4052BUSA-P"
         },
         {
           "name": "Graphite Black",
@@ -6306,7 +6321,10 @@
           "variant": "Graphite Black",
           "code": "HRB-4052BGKA-P",
           "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-355l-bottom-mount-refrigerator-graphite-black-3-star-hrb-4052bgka-p-new/21342",
-          "itemCode": "HRB-4052BGKA-P new"
+          "itemCode": "HRB-4052BGKA-P new",
+          "altCodes": [
+            "HRB-4052BGKA-P D"
+          ]
         },
         {
           "name": "Inox Steel",
@@ -6610,7 +6628,8 @@
           "swatchColor": "#313235",
           "usdz": "/models/usdz/samsung-rt80h51c2fhl-black-doi.usdz",
           "variant": "Black DOI",
-          "code": "RT80H51C2FHL"
+          "code": "RT80H51C2FHL",
+          "itemCode": "RT80H51C2FHL"
         },
         {
           "name": "EZ Clean Steel",
@@ -6930,7 +6949,8 @@
           "name": "Illusia Steel",
           "swatchColor": "#9a9ca0",
           "usdz": "/models/usdz/whirlpool-22343-illusia-steel.usdz",
-          "code": "22343"
+          "code": "22343",
+          "itemCode": "22343"
         }
       ],
       "parts": [
@@ -7177,8 +7197,7 @@
           ],
           "show": "!fridge"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "samsung-rr24h2823htnl",
@@ -7207,7 +7226,8 @@
           "swatchColor": "#4a0d22",
           "variant": "Hydrangea Plum",
           "code": "RR24H2823HT/NL",
-          "usdz": "/models/usdz/samsung-rr24h2823htnl-hydrangea-plum.usdz"
+          "usdz": "/models/usdz/samsung-rr24h2823htnl-hydrangea-plum.usdz",
+          "itemCode": "RR24H2823HT/NL"
         },
         {
           "name": "Hydrangea Blue",
@@ -7542,7 +7562,8 @@
           "name": "Onyx Black",
           "swatchColor": "#121315",
           "usdz": "/models/usdz/godrej-rt-eoncrystal-280bn-ri-ob-onyx-black.usdz",
-          "code": "RT EONCRYSTAL 280BN RI OB"
+          "code": "RT EONCRYSTAL 280BN RI OB",
+          "itemCode": "EONCRYSTAL 280BN"
         }
       ],
       "parts": [
@@ -7839,7 +7860,10 @@
           "swatchColor": "#7a7b7f",
           "usdz": "/models/usdz/samsung-rt40h28u2phl-elegant-inox.usdz",
           "variant": "Elegant Inox",
-          "code": "RT40H28U2PHL"
+          "code": "RT40H28U2PHL",
+          "altCodes": [
+            "RT40H28U2PHL D"
+          ]
         },
         {
           "name": "Black DOI",
@@ -7867,7 +7891,10 @@
           "swatchColor": "#2f1f3a",
           "usdz": "/models/usdz/samsung-rt40h28u2phl-paradise-bloom-purple.usdz",
           "variant": "Paradise Bloom Purple",
-          "code": "RT40H28U2PRHL"
+          "code": "RT40H28U2PRHL",
+          "altCodes": [
+            "RT40H28U2PRHL DD"
+          ]
         }
       ],
       "parts": [
@@ -8178,7 +8205,8 @@
           "swatchColor": "#a9aaab",
           "variant": "Shiny Steel",
           "code": "GLD2356ZAPZ",
-          "usdz": "/models/usdz/lg-gld2356zapz-shiny-steel.usdz"
+          "usdz": "/models/usdz/lg-gld2356zapz-shiny-steel.usdz",
+          "itemCode": "GLD2356ZAPZ.DPZZEBN"
         },
         {
           "name": "Wine Spring",
@@ -8523,7 +8551,8 @@
           "swatchColor": "#1b1b1d",
           "usdz": "/models/usdz/lg-gl-b257dbm3-black-mirror.usdz",
           "variant": "Black Mirror",
-          "code": "GL-B257DBM3"
+          "code": "GL-B257DBM3",
+          "itemCode": "GL-B257DBM3.DBMZEBN"
         },
         {
           "name": "Linen White",
@@ -8855,7 +8884,8 @@
           "swatchColor": "#834940",
           "variant": "Begonia Red",
           "code": "RR21H2H25BR",
-          "usdz": "/models/usdz/samsung-rr21h2h25brhl-begonia-red.usdz"
+          "usdz": "/models/usdz/samsung-rr21h2h25brhl-begonia-red.usdz",
+          "itemCode": "RR21H2H25BR/HL"
         },
         {
           "name": "Begonia Blue",
@@ -9244,7 +9274,8 @@
           "swatchColor": "#161618",
           "usdz": "/models/usdz/lg-gv-b23ffgmb-black-mirror.usdz",
           "variant": "Black Mirror",
-          "code": "GV-B23FFGMB"
+          "code": "GV-B23FFGMB",
+          "itemCode": "GV-B23FFGMB.ABMQEBN"
         },
         {
           "name": "Prime Silver",
@@ -9566,7 +9597,11 @@
           "name": "Black Steel",
           "swatchColor": "#16171b",
           "code": "HRD-752KSA",
-          "usdz": "/models/usdz/haier-hrd-752ksa-black-steel.usdz"
+          "usdz": "/models/usdz/haier-hrd-752ksa-black-steel.usdz",
+          "itemCode": "HRD-752KSA",
+          "altCodes": [
+            "HRD-752KSA N D"
+          ]
         }
       ],
       "parts": [
@@ -9851,7 +9886,8 @@
           "swatchColor": "#3f4659",
           "usdz": "/models/usdz/haier-hrt-683gku1-graphite-black.usdz",
           "variant": "Graphite Black",
-          "code": "HRT-683GKU1"
+          "code": "HRT-683GKU1",
+          "itemCode": "HRT-683GKU1"
         },
         {
           "name": "Inox Steel",
@@ -9872,14 +9908,16 @@
           "swatchColor": "#253340",
           "usdz": "/models/usdz/haier-hrt-683gku1-grey-onyx-glass.usdz",
           "variant": "Grey Onyx Glass",
-          "code": "HRT-683GOGU1"
+          "code": "HRT-683GOGU1",
+          "itemCode": "HRT-683GOGU1"
         },
         {
           "name": "Pearl White Glass",
           "swatchColor": "#f1f5f6",
           "usdz": "/models/usdz/haier-hrt-683gku1-pearl-white-glass.usdz",
           "variant": "Pearl White Glass",
-          "code": "HRT-683PWGU1"
+          "code": "HRT-683PWGU1",
+          "itemCode": "HRT-683PWGU1"
         }
       ],
       "parts": [
@@ -10176,7 +10214,8 @@
           "swatchColor": "#8e8f90",
           "usdz": "/models/usdz/whirlpool-22457-rhodium-steel.usdz",
           "variant": "Rhodium Steel",
-          "code": "22457"
+          "code": "22457",
+          "itemCode": "22457"
         },
         {
           "name": "Cosmos Black",
@@ -10490,7 +10529,8 @@
           "swatchColor": "#141416",
           "usdz": "/models/usdz/whirlpool-22461-duo-noir.usdz",
           "variant": "Duo Noir",
-          "code": "22461"
+          "code": "22461",
+          "itemCode": "22461"
         },
         {
           "name": "Nero Quartz",
@@ -11014,8 +11054,7 @@
         "sides": 2,
         "back": 10,
         "note": "From LG's owner's manual: at least 2 cm at each side and 10 cm behind for the hoses and air, and 110 cm of depth in total with the door open at 90°."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "samsung-wa70bg4441bytl",
@@ -11257,8 +11296,7 @@
         "back": 10,
         "top": 34,
         "note": "From Samsung's user manual: keep the machine 10 cm from the adjacent wall. The lid swings up and back: with it open, this model is about 132 cm tall (the opening angle is estimated), so keep 34 cm free above it."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "bosch-wga1420pin",
@@ -11530,8 +11568,7 @@
       "fit": {
         "front": 46,
         "note": "From Bosch: 63.6 cm deep with the door closed and 104.9 cm with the door open at 90 degrees. Bosch's page and manual publish no side or back gaps; leave room for the hoses and the plug."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "lg-fhb1208z2m",
@@ -11806,8 +11843,7 @@
           ],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "samsung-wa80f08s2ctl",
@@ -12057,8 +12093,7 @@
         "back": 10,
         "top": 36,
         "note": "From Samsung's user manual: keep the machine 10 cm from each adjacent wall. The lid swings up and back: with it open, this model is about 134 cm tall (the opening angle is estimated), so keep 36 cm free above it."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "bosch-wga254zpin",
@@ -12326,8 +12361,7 @@
       "fit": {
         "front": 46,
         "note": "From Bosch: 63.6 cm deep with the door closed and 104.9 cm with the door open at 90 degrees. Bosch's page and manual publish no side or back gaps; leave room for the hoses and the plug."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "haier-hwd120-dm14f11bku1",
@@ -12562,8 +12596,7 @@
           ],
           "show": "door"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "samsung-ww80ta046ab1tl",
@@ -12842,8 +12875,7 @@
             ]
           }
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "lg-t12sjmb1z",
@@ -13089,8 +13121,7 @@
         "back": 10,
         "top": 33.5,
         "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 130 cm, so keep 33.5 cm free above it."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "whirlpool-31671",
@@ -13297,8 +13328,7 @@
           ],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "whirlpool-31688",
@@ -13505,8 +13535,7 @@
           ],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "ifb-executive-plus-mbn-1014k-cms",
@@ -13782,8 +13811,7 @@
       "fit": {
         "back": 10,
         "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "ifb-serena-mbn-7012k-cms",
@@ -14063,8 +14091,7 @@
       "fit": {
         "back": 10,
         "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
-      },
-      "hidden": true
+      }
     },
     {
       "id": "carrier-19k-xceed-edge-gxi",
@@ -14092,7 +14119,11 @@
           "name": "White",
           "swatchColor": "#f3f4f6",
           "usdz": "/models/usdz/carrier-19k-xceed-edge-gxi-white.usdz",
-          "code": "19KXCEED EDGEGXI"
+          "code": "19KXCEED EDGEGXI",
+          "itemCode": "19KXCEED EDGEGXI ODU",
+          "altCodes": [
+            "19KXCEED EDGEGXI IDU"
+          ]
         }
       ],
       "parts": [
@@ -14279,8 +14310,7 @@
           ],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "voltas-183inv-vertis-ai-zest-gold",
@@ -14308,7 +14338,11 @@
           "name": "White and gold",
           "swatchColor": "#f3f3f4",
           "usdz": "/models/usdz/voltas-183inv-vertis-ai-zest-gold-white-and-gold.usdz",
-          "code": "SAC 183INV VERTIS AI ZEST GOLD"
+          "code": "SAC 183INV VERTIS AI ZEST GOLD",
+          "itemCode": "VERTIS AI ZEST ODU",
+          "altCodes": [
+            "VERTIS AI ZEST IDU"
+          ]
         }
       ],
       "parts": [
@@ -14466,8 +14500,7 @@
           ],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     },
     {
       "id": "haier-hso52kucai3nb",
@@ -14495,7 +14528,11 @@
           "name": "White and gold",
           "swatchColor": "#f3f3f4",
           "usdz": "/models/usdz/haier-hso52kucai3nb-white-and-gold.usdz",
-          "code": "HSO52KUCAI3NB"
+          "code": "HSO52KUCAI3NB",
+          "itemCode": "HSO52KUCAI3NB ODU",
+          "altCodes": [
+            "HSO52KUCAI3NB IDU"
+          ]
         }
       ],
       "parts": [
@@ -14678,8 +14715,1866 @@
           ],
           "show": "always"
         }
+      ]
+    },
+    {
+      "id": "haier-hrf-3182iensa-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-3182IENSA-P",
+      "name": "Haier 268 L double-door refrigerator, Nickel Steel, HRF-3182IENSA-P",
+      "shortName": "268 L Nickel Steel refrigerator (IENSA-P)",
+      "summary": "Open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-3182iensa-p.glb",
+      "thumb": "/photos/haier-hrf-3182iensa-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrf-3182iensa-p/0.jpg",
+        "/photos/haier-hrf-3182iensa-p/1.jpg",
+        "/photos/haier-hrf-3182iensa-p/2.jpg",
+        "/photos/haier-hrf-3182iensa-p/3.jpg"
       ],
-      "hidden": true
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Nickel Steel",
+          "swatchColor": "#b8babc",
+          "usdz": "/models/usdz/haier-hrf-3182iensa-p-nickel-steel.usdz",
+          "code": "HRF-3182IENSA-P",
+          "itemCode": "HRF-3182IENSA-P",
+          "altCodes": [
+            "HRF-3182IENSA-P D"
+          ]
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                1.204,
+                0.161
+              ],
+              [
+                0.274,
+                1.685,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.254,
+                1.204,
+                0.21
+              ],
+              [
+                0.728,
+                1.685,
+                0.641
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icebox",
+          "label": "ice box",
+          "node": "IceBox",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.232,
+                1.424,
+                -0.064
+              ],
+              [
+                -0.082,
+                1.496,
+                0.137
+              ]
+            ],
+            "open": [
+              [
+                -0.232,
+                1.424,
+                0.056
+              ],
+              [
+                -0.082,
+                1.496,
+                0.257
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                0.043,
+                0.141
+              ],
+              [
+                0.274,
+                1.206,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.241,
+                0.043,
+                0.21
+              ],
+              [
+                0.728,
+                1.206,
+                0.656
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.01,
+            0,
+            0.5
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.239,
+                0.109,
+                -0.258
+              ],
+              [
+                0.239,
+                1.152,
+                0.134
+              ]
+            ],
+            "open": [
+              [
+                -0.249,
+                0.109,
+                0.242
+              ],
+              [
+                0.229,
+                1.152,
+                0.634
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "168.5 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier gives 548 × 615 × 1685 mm (W × D × H); no door swing or clearances are published",
+      "specs": [
+        [
+          "Total capacity",
+          "268 L"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Energy rating",
+          "2 star, 235 units a year"
+        ],
+        [
+          "Features",
+          "Turbo Icing, Cool Pad, Twin Energy Saving Mode"
+        ],
+        [
+          "Voltage",
+          "Works without a stabilizer from 110 to 300 V"
+        ],
+        [
+          "Shelves",
+          "Toughened glass"
+        ],
+        [
+          "Storage",
+          "Vegetable case, egg tray"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Flat steel door with recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "56 kg"
+        ]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/hrf-3182iens-p-2-star-nickel-steel-finish-top-mount-frost-free-refrigerator-hrf-3182iensa-p.shtml",
+      "hotspots": [
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo icing technology accelerates the time needed to freeze products in the freezer section.",
+          "pos": [
+            -0.1,
+            1.48,
+            0.1385
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Cool Pad",
+          "text": "Keeps your food cool even during power cuts, for hours without electricity.",
+          "pos": [
+            0.12,
+            1.413,
+            0.1585
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Easy Sliding Shelf",
+          "text": "The sliding shelf lets you store and organise food even at the back of the shelf.",
+          "pos": [
+            0.17,
+            0.998,
+            0.1325
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Stabilizer free operation",
+          "text": "Can withstand voltage fluctuations from 110–300 V.",
+          "pos": [
+            -0.12,
+            0.75,
+            0.308
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
+      "id": "bluestar-ia318exu",
+      "brand": "Blue Star",
+      "brandLogo": "/logos/bluestar.png",
+      "category": "Air conditioner",
+      "model": "IA318EXU",
+      "name": "Blue Star 1.5 ton 3-star E Series inverter split AC",
+      "shortName": "1.5 ton E Series AC",
+      "summary": "Swing the louvre open, then hang it on your wall at its real size.",
+      "arTip": "Tap the louvre to open it",
+      "glb": "/models/bluestar-ia318exu.glb",
+      "thumb": "/photos/bluestar-ia318exu/0.jpg",
+      "photos": [
+        "/photos/bluestar-ia318exu/0.jpg",
+        "/photos/bluestar-ia318exu/1.jpg",
+        "/photos/bluestar-ia318exu/2.jpg",
+        "/photos/bluestar-ia318exu/3.jpg"
+      ],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "Basic White",
+          "swatchColor": "#e6e5ec",
+          "usdz": "/models/usdz/bluestar-ia318exu-basic-white.usdz",
+          "code": "IA318EXU",
+          "itemCode": "IA318EXU ODU",
+          "altCodes": [
+            "IA318EXU IDU"
+          ]
+        }
+      ],
+      "parts": [
+        {
+          "key": "louvre",
+          "label": "louvre",
+          "node": "Louvre",
+          "axis": "x",
+          "angle": -50,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.407,
+                0,
+                0.176
+              ],
+              [
+                0.407,
+                0.045,
+                0.227
+              ]
+            ],
+            "open": [
+              [
+                -0.407,
+                -0.023,
+                0.194
+              ],
+              [
+                0.407,
+                0.045,
+                0.261
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "93.1 cm",
+        "h": "31.5 cm",
+        "d": "23.5 cm"
+      },
+      "sizeNote": "Indoor unit. Outdoor unit 83.5 x 59.6 x 29.8 cm",
+      "specs": [
+        [
+          "Capacity",
+          "1.5 ton (1.44 TR), 5050 W"
+        ],
+        [
+          "Energy rating",
+          "3 star, ISEER 4.35"
+        ],
+        [
+          "Compressor",
+          "Inverter rotary, with acoustic jacket"
+        ],
+        [
+          "Cooling modes",
+          "5-in-1 Convertible Cooling, Turbo Cool, Comfort Sleep"
+        ],
+        [
+          "Swing",
+          "4-way, motorised horizontal and vertical"
+        ],
+        [
+          "Filters",
+          "PM2.5 filter with activated carbon, high density dust filter"
+        ],
+        [
+          "Airflow",
+          "630 / 470 / 410 / 350 CFM"
+        ],
+        [
+          "Indoor noise",
+          "54 / 48 / 44 / 40 dBA"
+        ],
+        [
+          "Outdoor cooling",
+          "Works up to 52 degrees C outdoors"
+        ],
+        [
+          "Condenser",
+          "100% copper, R32 refrigerant"
+        ],
+        [
+          "Remote",
+          "LCD remote with display, night glow buttons"
+        ],
+        [
+          "Indoor unit weight",
+          "11 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/blue-star-inverter-split-ac-or-1-5-ton-or-3-star-or-2026-bee-label-ia318exu-odu/21038",
+      "source": "https://consumer.bluestarindia.com/products/premium-inverter-ac-e-series-1-5-ton-5-star",
+      "hotspots": [
+        {
+          "title": "5-in-1 Convertible Cooling",
+          "text": "Runs your AC at 5 different capacities as per the desired comfort, optimising power use in real time.",
+          "pos": [
+            -0.2,
+            0.17,
+            0.236
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Turbo Cool",
+          "text": "A pre-set mode to instantly cool the room during extreme summers.",
+          "pos": [
+            0.25,
+            0.2,
+            0.236
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "4-Way Swing",
+          "text": "A motorised horizontal and vertical swing ensures uniform cooling across the room.",
+          "pos": [
+            0.3,
+            0.03,
+            0.215
+          ],
+          "normal": [
+            0,
+            -0.6,
+            0.8
+          ],
+          "show": "!louvre"
+        },
+        {
+          "title": "DigiQ Hepta Sensors",
+          "text": "Intelligent digital sensors optimise cooling in varying load conditions and protect critical electronic components.",
+          "pos": [
+            0.4656,
+            0.2,
+            0.12
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "show": "always"
+        }
+      ]
+    },
+    {
+      "id": "daikin-atklrkl50xv16vka",
+      "brand": "Daikin",
+      "brandLogo": "/logos/daikin.png",
+      "category": "Air conditioner",
+      "model": "ATKL50XV16VKA",
+      "name": "Daikin 1.5 ton 3-star Premium Series inverter split AC",
+      "shortName": "1.5 ton Premium Series AC",
+      "summary": "Open the two flaps, lift the front panel to see the air filters, then hang it on your wall at its real size.",
+      "arTip": "Tap the flaps or the front panel to open them",
+      "glb": "/models/daikin-atklrkl50xv16vka.glb",
+      "thumb": "/photos/daikin-atklrkl50xv16vka/0.jpg",
+      "photos": [
+        "/photos/daikin-atklrkl50xv16vka/0.jpg",
+        "/photos/daikin-atklrkl50xv16vka/1.jpg",
+        "/photos/daikin-atklrkl50xv16vka/2.jpg",
+        "/photos/daikin-atklrkl50xv16vka/3.jpg"
+      ],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "Premium White",
+          "swatchColor": "#f2f3f4",
+          "usdz": "/models/usdz/daikin-atklrkl50xv16vka-premium-white.usdz",
+          "code": "ATKLRKL50XV16VKA",
+          "itemCode": "ATKLRKL50XV16VKA ODU",
+          "altCodes": [
+            "ATKL50XV16VKA",
+            "ATKLRKL50XV16VKA IDU"
+          ],
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/daikin-atkl50xv16vka-15-ton-3-star-inverter-split-ac-atklrkl50xv16vka-odu/20682"
+        }
+      ],
+      "parts": [
+        {
+          "key": "panel",
+          "label": "front panel",
+          "node": "FrontPanel",
+          "axis": "x",
+          "angle": -55,
+          "zone": {
+            "closed": [
+              [
+                -0.443,
+                0.045,
+                0.172
+              ],
+              [
+                0.443,
+                0.298,
+                0.236
+              ]
+            ],
+            "open": [
+              [
+                -0.443,
+                0.152,
+                0.17
+              ],
+              [
+                0.443,
+                0.348,
+                0.413
+              ]
+            ]
+          }
+        },
+        {
+          "key": "flaps",
+          "label": "flaps",
+          "node": "FlapUpper",
+          "axis": "x",
+          "angle": -40,
+          "also": [
+            {
+              "node": "FlapLower",
+              "angle": 45
+            }
+          ],
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.378,
+                0.001,
+                0.17
+              ],
+              [
+                0.289,
+                0.031,
+                0.232
+              ]
+            ],
+            "open": [
+              [
+                -0.378,
+                -0.037,
+                0.17
+              ],
+              [
+                0.289,
+                0.031,
+                0.236
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "90.6 cm",
+        "h": "29.8 cm",
+        "d": "23.5 cm"
+      },
+      "sizeNote": "Indoor unit, Daikin's 298 × 906 × 235 mm. Outdoor unit 84.5 × 59.5 × 30 cm",
+      "specs": [
+        [
+          "Capacity",
+          "5.0 kW (1.40 to 5.30 kW); Daikin rates it 1.42 ton, Sangeetha lists it as 1.5 ton"
+        ],
+        [
+          "Energy rating",
+          "3 star (2026 BEE label), ISEER 4.40"
+        ],
+        [
+          "Power use",
+          "880.1 kWh a year"
+        ],
+        [
+          "Compressor",
+          "Patented swing compressor, inverter"
+        ],
+        [
+          "Airflow",
+          "551 CFM, 3D airflow, air throw up to 16 m"
+        ],
+        [
+          "Filters",
+          "PM 2.5 filter and Apatite filter, anti-bacterial pre-filter"
+        ],
+        [
+          "Cleaning",
+          "Dew Clean technology, filter clean indicator"
+        ],
+        [
+          "Outdoor temperature",
+          "100% cooling up to 43 °C, cools from 16 to 52 °C"
+        ],
+        [
+          "Indoor noise",
+          "From 32 dB(A)"
+        ],
+        [
+          "Voltage",
+          "Stabilizer inside, 130 to 285 V"
+        ],
+        [
+          "Refrigerant",
+          "R-32"
+        ],
+        [
+          "Indoor unit weight",
+          "10.5 kg"
+        ],
+        [
+          "Warranty",
+          "10 years on the compressor, 5 years on the PCB"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/daikin-atkl50xv16vka-15-ton-3-star-inverter-split-ac-atklrkl50xv16vka-odu/20682",
+      "source": "https://daikinindia.com/product-category/splitac/premium-series/ATKL50XV",
+      "fit": {
+        "top": 3,
+        "sides": 5,
+        "note": "From Daikin's installation manual: at least 30 mm from the ceiling and 50 mm from the walls on both sides."
+      },
+      "hotspots": [
+        {
+          "title": "Triple Display",
+          "text": "Shows the share of power being used, the set temperature and any error code.",
+          "pos": [
+            0.398,
+            0.0555,
+            0.2346
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Power Chill",
+          "text": "Cools the room 20% faster than the normal mode, for quick relief from the heat.",
+          "pos": [
+            -0.22,
+            0.19,
+            0.2352
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!panel"
+        },
+        {
+          "title": "Dew Clean Technology",
+          "text": "Cleans the indoor heat exchanger on its own, getting rid of bacteria, mould and odour.",
+          "pos": [
+            0.22,
+            0.2,
+            0.225
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "panel"
+        },
+        {
+          "title": "3D Airflow",
+          "text": "The flaps and louvres move in turn to spread the air evenly into every corner.",
+          "pos": [
+            -0.3,
+            0.05,
+            0.2325
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        }
+      ]
+    },
+    {
+      "id": "lg-q18knxeamlg",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Air conditioner",
+      "model": "AS-Q18KNXE",
+      "name": "LG 1.5 ton 3-star DUAL Inverter split AC, AI Convertible 6-in-1",
+      "shortName": "1.5 ton DUAL Inverter AC",
+      "summary": "Swing the vane open, lift the air filter out of the top, then hang it on your wall at its real size.",
+      "arTip": "Tap the vane or the filter to open them",
+      "glb": "/models/lg-q18knxeamlg.glb",
+      "thumb": "/photos/lg-q18knxeamlg/0.jpg",
+      "photos": [
+        "/photos/lg-q18knxeamlg/0.jpg",
+        "/photos/lg-q18knxeamlg/1.jpg",
+        "/photos/lg-q18knxeamlg/2.jpg",
+        "/photos/lg-q18knxeamlg/3.jpg"
+      ],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "White",
+          "swatchColor": "#f3f4f5",
+          "usdz": "/models/usdz/lg-q18knxeamlg-white.usdz",
+          "code": "Q18KNXEAMLG",
+          "itemCode": "Q18KNXEAMLG ODU",
+          "altCodes": [
+            "AS-Q18KNXE.AMLG",
+            "ASNQ18KNXE.AMLG",
+            "AS-Q18KNXE",
+            "Q18KNXEAMLG IDU"
+          ],
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-15-ton-3-star-dual-inverter-split-ac-as-q18knxe-2026-model-new-bee-star-rated-q18knxeamlg-odu/20681"
+        }
+      ],
+      "parts": [
+        {
+          "key": "louvre",
+          "label": "louvre",
+          "node": "Louvre",
+          "axis": "x",
+          "angle": 40,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.35,
+                0.002,
+                0.118
+              ],
+              [
+                0.35,
+                0.075,
+                0.189
+              ]
+            ],
+            "open": [
+              [
+                -0.35,
+                -0.044,
+                0.118
+              ],
+              [
+                0.35,
+                0.058,
+                0.219
+              ]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "air filter",
+          "node": "AirFilter",
+          "slide": [
+            0,
+            0.09,
+            0.03
+          ],
+          "text": [
+            "Lift out the filter",
+            "Put the filter back"
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.41,
+                0.303,
+                0.014
+              ],
+              [
+                0.41,
+                0.306,
+                0.152
+              ]
+            ],
+            "open": [
+              [
+                -0.41,
+                0.393,
+                0.044
+              ],
+              [
+                0.41,
+                0.396,
+                0.182
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "83.7 cm",
+        "h": "30.8 cm",
+        "d": "18.9 cm"
+      },
+      "sizeNote": "Indoor unit, Sangeetha's 83.7 × 30.8 × 18.9 cm. Outdoor unit 71.7 × 49.5 × 23.0 cm",
+      "specs": [
+        [
+          "Capacity",
+          "1.5 ton, 4.4 kW (4400 W)"
+        ],
+        [
+          "Energy rating",
+          "3 star, ISEER 4.43"
+        ],
+        [
+          "Power use",
+          "769.55 kWh a year"
+        ],
+        [
+          "Compressor",
+          "DUAL Inverter"
+        ],
+        [
+          "Cooling modes",
+          "AI Convertible 6-in-1, VIRAAT mode, Diet Mode+, Sleep mode"
+        ],
+        [
+          "Cleaning",
+          "Auto Clean, Gold Fin+ coating"
+        ],
+        [
+          "Outdoor temperature",
+          "Cools even at 52 °C outside"
+        ],
+        [
+          "Noise",
+          "Indoor 26 dB, outdoor 55 dB"
+        ],
+        [
+          "Air swing",
+          "Auto swing, 2 way"
+        ],
+        [
+          "Refrigerant",
+          "R-32"
+        ],
+        [
+          "Heat exchanger",
+          "Copper"
+        ],
+        [
+          "Power supply",
+          "230 V, 50 Hz, single phase"
+        ],
+        [
+          "Indoor unit weight",
+          "8.1 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-15-ton-3-star-dual-inverter-split-ac-as-q18knxe-2026-model-new-bee-star-rated-q18knxeamlg-odu/20681",
+      "source": "https://www.lg.com/in/support/product-support/cs-AS-Q18KNXE/",
+      "hotspots": [
+        {
+          "title": "AI Convertible 6-in-1",
+          "text": "Sets the cooling power for the room: 100%, 80%, 60% or 40%, VIRAAT at 113%, or AI mode that adjusts it for you.",
+          "pos": [
+            -0.2,
+            0.19,
+            0.1896
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "VIRAAT mode",
+          "text": "Boosts cooling to 113% of the rated capacity for an instant chill in extreme heat.",
+          "pos": [
+            0.2,
+            0.05,
+            0.1866
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Anti-virus HD filter",
+          "text": "Silver ions in the filter deactivate viruses and bacteria for cleaner, germ-free air.",
+          "pos": [
+            -0.15,
+            0.3065,
+            0.08
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "!filter"
+        },
+        {
+          "title": "Gold Fin+",
+          "text": "The coil's fins carry an anti-corrosion coating, and Auto Clean dries the inside after use for fresh, odourless air.",
+          "pos": [
+            0.15,
+            0.292,
+            0.08
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "filter"
+        }
+      ]
+    },
+    {
+      "id": "lloyd-gls18i3aschc",
+      "brand": "Lloyd",
+      "brandLogo": "/logos/lloyd.png",
+      "category": "Air conditioner",
+      "model": "GLS18I3ASCHC / GLS18I3GWSPC",
+      "name": "Lloyd 1.5 ton 3-star inverter split AC",
+      "shortName": "1.5 ton inverter split AC",
+      "summary": "Swing the louvre open, then hang it on your wall at its real size.",
+      "arTip": "Tap the louvre to open it",
+      "glb": "/models/lloyd-gls18i3aschc.glb",
+      "thumb": "/photos/lloyd-gls18i3aschc/0.jpg",
+      "photos": [
+        "/photos/lloyd-gls18i3aschc/0.jpg",
+        "/photos/lloyd-gls18i3aschc/1.jpg",
+        "/photos/lloyd-gls18i3aschc/2.jpg",
+        "/photos/lloyd-gls18i3aschc/3.jpg"
+      ],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "White and grey",
+          "swatchColor": "#c6c8cb",
+          "usdz": "/models/usdz/lloyd-gls18i3aschc-white-and-grey.usdz",
+          "variant": "White and grey",
+          "code": "GLS18I3ASCHC",
+          "itemCode": "GLS18I3ASCHC",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/lloyd-classic-series-inverter-split-ac-1-5-or-3-star-gls18i3aschc/20486",
+          "altCodes": [
+            "GLS18I3ASCHC IDU",
+            "GLS18I3ASCHC ODU"
+          ]
+        },
+        {
+          "name": "White",
+          "swatchColor": "#f1f2f4",
+          "usdz": "/models/usdz/lloyd-gls18i3aschc-white.usdz",
+          "variant": "White",
+          "code": "GLS18I3GWSPC",
+          "itemCode": "GLS18I3GWSPC",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/lloyd-inverter-split-ac-1-5-or-3-star-gls18i3gwspc/21039"
+        }
+      ],
+      "parts": [
+        {
+          "key": "louvre",
+          "label": "louvre",
+          "node": "Louvre",
+          "axis": "x",
+          "angle": 55,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.363,
+                0.026,
+                0.15
+              ],
+              [
+                0.315,
+                0.066,
+                0.201
+              ]
+            ],
+            "open": [
+              [
+                -0.363,
+                -0.015,
+                0.148
+              ],
+              [
+                0.315,
+                0.05,
+                0.21
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "85.6 cm",
+        "h": "28.5 cm",
+        "d": "21.9 cm"
+      },
+      "sizeNote": "Indoor unit, Lloyd's size for GLS18I3ASCHC. Outdoor unit 87 x 56 x 36.5 cm",
+      "specs": [
+        [
+          "Capacity",
+          "1.5 ton, 4800 W"
+        ],
+        [
+          "Energy rating",
+          "3 star"
+        ],
+        [
+          "Technology",
+          "Inverter, rotary compressor"
+        ],
+        [
+          "Refrigerant",
+          "R-32"
+        ],
+        [
+          "Cooling",
+          "Turbo Cool"
+        ],
+        [
+          "Smart features",
+          "Wi-Fi ready (Wi-Fi optional)"
+        ],
+        [
+          "Checks",
+          "Low gas detection, installation check"
+        ],
+        [
+          "Outdoor coil",
+          "Golden fin condenser"
+        ],
+        [
+          "Operating temperature",
+          "16 to 54 degrees C"
+        ],
+        [
+          "Power supply",
+          "230 V, 50 Hz, single phase"
+        ],
+        [
+          "Warranty",
+          "1 year on the product, 10 years on the compressor"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lloyd-classic-series-inverter-split-ac-1-5-or-3-star-gls18i3aschc/20486",
+      "source": "https://havells.com/lloyd/home-appliances/air-conditioners/classic-series-inverter-split-ac-15-3-star-gls18i3aschc.html",
+      "hotspots": [
+        {
+          "title": "Turbo Cool",
+          "text": "Turbo Cool gives a rapid drop in temperature when the room is hot.",
+          "pos": [
+            -0.2,
+            0.2,
+            0.218
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Low gas detection",
+          "text": "Warns when the refrigerant gas runs low, for timely maintenance.",
+          "pos": [
+            0.18,
+            0.17,
+            0.218
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Installation check",
+          "text": "A self check that the AC has been installed correctly.",
+          "pos": [
+            -0.3,
+            0.09,
+            0.21
+          ],
+          "normal": [
+            0,
+            -0.25,
+            0.97
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Wi-Fi ready",
+          "text": "Upgrade to smart control at any time with the optional Wi-Fi module.",
+          "pos": [
+            0.33,
+            0.14,
+            0.217
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        }
+      ]
+    },
+    {
+      "id": "haier-hsu18c-tqb3bn-inv",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Air conditioner",
+      "model": "HSU18C-TQB3BN-INV",
+      "name": "Haier 1.5 ton 3-star Clean Cool Triple Inverter+ split AC",
+      "shortName": "1.5 ton Clean Cool AC",
+      "summary": "Swing the louvre open, lift the front panel to see the filter, then hang it on your wall at its real size.",
+      "arTip": "Tap the louvre or the front panel to open it",
+      "glb": "/models/haier-hsu18c-tqb3bn-inv.glb",
+      "thumb": "/photos/haier-hsu18c-tqb3bn-inv/0.jpg",
+      "photos": [
+        "/photos/haier-hsu18c-tqb3bn-inv/0.jpg",
+        "/photos/haier-hsu18c-tqb3bn-inv/1.jpg",
+        "/photos/haier-hsu18c-tqb3bn-inv/2.jpg",
+        "/photos/haier-hsu18c-tqb3bn-inv/3.jpg"
+      ],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "White and blue",
+          "swatchColor": "#f3f3f4",
+          "usdz": "/models/usdz/haier-hsu18c-tqb3bn-inv-white-and-blue.usdz",
+          "code": "HSU18C-TQB3BN-INV",
+          "itemCode": "HSU18C - TQB3BN-INV",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-1-5-ton-3-star-clean-cool-triple-inverter-split-air-conditioner-hsu18c-tqb3bn-inv/18668"
+        }
+      ],
+      "parts": [
+        {
+          "key": "panel",
+          "label": "front panel",
+          "node": "FrontPanel",
+          "axis": "x",
+          "angle": -60,
+          "zone": {
+            "closed": [
+              [
+                -0.447,
+                0.08,
+                0.084
+              ],
+              [
+                0.447,
+                0.303,
+                0.21
+              ]
+            ],
+            "open": [
+              [
+                -0.447,
+                0.176,
+                0.089
+              ],
+              [
+                0.447,
+                0.397,
+                0.345
+              ]
+            ]
+          }
+        },
+        {
+          "key": "louvre",
+          "label": "louvre",
+          "node": "Louvre",
+          "axis": "x",
+          "angle": 50,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.402,
+                0.026,
+                0.145
+              ],
+              [
+                0.399,
+                0.067,
+                0.205
+              ]
+            ],
+            "open": [
+              [
+                -0.402,
+                -0.015,
+                0.148
+              ],
+              [
+                0.399,
+                0.053,
+                0.215
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "91 cm",
+        "h": "31 cm",
+        "d": "21 cm"
+      },
+      "sizeNote": "Indoor unit, Haier's size for HSU18C-TQB3BN-INV. Outdoor unit 86 x 55 x 35 cm",
+      "specs": [
+        [
+          "Capacity",
+          "1.5 ton, 5125 W"
+        ],
+        [
+          "Energy rating",
+          "3 star"
+        ],
+        [
+          "Series",
+          "Clean Cool"
+        ],
+        [
+          "Inverter",
+          "Triple Inverter+"
+        ],
+        [
+          "Cooling",
+          "Supersonic cooling in 10 seconds"
+        ],
+        [
+          "Cleaning",
+          "Frost Self Clean"
+        ],
+        [
+          "Modes",
+          "7-in-1 Intelli Convertible"
+        ],
+        [
+          "Coil",
+          "Copper heat exchanger"
+        ],
+        [
+          "Refrigerant",
+          "R32"
+        ],
+        [
+          "Indoor unit weight",
+          "11.5 kg"
+        ],
+        [
+          "Warranty",
+          "5 years on the product, 12 years on the compressor"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-1-5-ton-3-star-clean-cool-triple-inverter-split-air-conditioner-hsu18c-tqb3bn-inv/18668",
+      "source": "https://www.haier.com/in/air-conditioners/haier-15-ton-3-star-clean-cool-triple-inverter-split-air-conditioner.shtml",
+      "hotspots": [
+        {
+          "title": "Supersonic Cooling",
+          "text": "Supersonic cooling you can feel in just 10 seconds.",
+          "pos": [
+            -0.25,
+            0.225,
+            0.2099
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!panel"
+        },
+        {
+          "title": "Frost Self Clean",
+          "text": "A complete wet wash of the indoor unit, by frost.",
+          "pos": [
+            -0.3,
+            0.13,
+            0.2105
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!panel"
+        },
+        {
+          "title": "Air filter",
+          "text": "Lift the front panel to reach the micro anti-bacterial filter for cleaning.",
+          "pos": [
+            -0.15,
+            0.2,
+            0.2045
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "panel"
+        },
+        {
+          "title": "7-in-1 Intelli Convertible",
+          "text": "Seven modes, from Child Comfort to Super Expandable, match the cooling to the room.",
+          "pos": [
+            0.15,
+            0.13,
+            0.2105
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        }
+      ]
+    },
+    {
+      "id": "haier-hw120-dm14f11bku1",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HW120-DM14F11BKU1",
+      "name": "Haier F11 12 kg front-load washer with AI Colour Full Touch Panel",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-12kg-ai-colorful-touch-panel-front-load-washing-machine-hw120-dm14f11bku/21448",
+      "shortName": "12 kg F11 front-load washer",
+      "summary": "Open the door to see the 525 mm Super Drum and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/haier-hw120-dm14f11bku1.glb",
+      "thumb": "/photos/haier-hw120-dm14f11bku1/0.jpg",
+      "photos": [
+        "/photos/haier-hw120-dm14f11bku1/0.jpg",
+        "/photos/haier-hw120-dm14f11bku1/1.jpg",
+        "/photos/haier-hw120-dm14f11bku1/2.jpg",
+        "/photos/haier-hw120-dm14f11bku1/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#3c3f46",
+          "usdz": "/models/usdz/haier-hw120-dm14f11bku1-black.usdz",
+          "itemCode": "HW120-DM14F11BKU",
+          "code": "HW120-DM14F11BKU1"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.24
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.29,
+                0.738,
+                -0.004
+              ],
+              [
+                -0.097,
+                0.845,
+                0.296
+              ]
+            ],
+            "open": [
+              [
+                -0.29,
+                0.738,
+                0.236
+              ],
+              [
+                -0.097,
+                0.845,
+                0.536
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -126,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.268,
+                0.182,
+                0.206
+              ],
+              [
+                0.268,
+                0.718,
+                0.324
+              ]
+            ],
+            "open": [
+              [
+                -0.564,
+                0.182,
+                0.294
+              ],
+              [
+                -0.204,
+                0.718,
+                0.738
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.5 cm",
+        "h": "85 cm",
+        "d": "59.3 cm"
+      },
+      "sizeNote": "About 62 cm deep with the door (Haier's shop gives 62 cm)",
+      "specs": [
+        [
+          "Capacity",
+          "12 kg"
+        ],
+        [
+          "Type",
+          "Front-load washer, fully automatic"
+        ],
+        [
+          "Max spin",
+          "1400 rpm"
+        ],
+        [
+          "Motor",
+          "Direct Motion motor"
+        ],
+        [
+          "Drum",
+          "525 mm Super Drum, pillow-shape drum"
+        ],
+        [
+          "Panel",
+          "AI Colour Full Touch Panel, AI One Touch"
+        ],
+        [
+          "Programmes",
+          "Drum Clean, Spin, Rinse + Spin, Saree, Bedding, Cotton, Delicate, Jeans, Eco, Quick, Smart Wash, AI One Touch"
+        ],
+        [
+          "Features",
+          "Ultra Fresh Air, Steam, Stain Remover, Night Wash, Dual Spray, AI DBT, Smart Dosing"
+        ],
+        [
+          "Smart",
+          "HaiSmart app over Wi-Fi"
+        ],
+        [
+          "Wash temperature",
+          "Cold to 90°C"
+        ],
+        [
+          "Energy",
+          "5 star, 0.0408 kWh per kg per cycle"
+        ],
+        [
+          "Water",
+          "6.45 litres per kg per cycle"
+        ],
+        [
+          "Noise",
+          "Wash 62 dB or less, spin 76 dB or less"
+        ],
+        [
+          "Supply",
+          "2000 W, 50 Hz"
+        ],
+        [
+          "Door",
+          "Hinged on the left, two-layer half-transparent glass, silver rim"
+        ],
+        [
+          "Warranty",
+          "4 years comprehensive, 12 years on the motor"
+        ]
+      ],
+      "source": "https://www.haier.com/in/washing-machines/haier-f11-12kg-washer-colorful-touch-panel-front-load-washing-machine.shtml",
+      "hotspots": [
+        {
+          "title": "Ultra Fresh Air Technology",
+          "text": "Enjoy up to 12 hours of lasting freshness after your wash cycle, keeping clothes hygienic and odor-free.",
+          "pos": [
+            0.035,
+            0.7547,
+            0.2925
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "AI Colour Full Panel",
+          "text": "An AI-powered colourful display panel offers an intuitive and vibrant interface, making laundry smarter and more interactive.",
+          "pos": [
+            0.12,
+            0.81,
+            0.2965
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "One-Touch AI Wash",
+          "text": "Just one touch is all it takes: it automatically senses fabric type, load, and dirt level to choose the perfect wash settings.",
+          "pos": [
+            0.252,
+            0.798,
+            0.2965
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Super Drum 525",
+          "text": "The 525 mm drum diameter provides greater capacity and tangle-free laundry with 25% improved wash quality.",
+          "pos": [
+            0.1,
+            0.505,
+            -0.1385
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        }
+      ]
+    },
+    {
+      "id": "godrej-wfeon-rgl-9014-5-0-idcrm-chgd",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Washing machine",
+      "model": "WFEON RGL 9014 5.0 IDCRM CHGD",
+      "name": "Godrej Eon Regalis 9 kg front-load washer with AI-powered turbidity sensing",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/godrej-eon-regalis-front-load-washing-machine-8-kg-5-star-wfeon-rgl-9014-5-0/21659",
+      "shortName": "Eon Regalis 9 kg front-load washer",
+      "summary": "Open the door to see the FabriSafe drum, pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/godrej-wfeon-rgl-9014-5-0-idcrm-chgd.glb",
+      "thumb": "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/0.jpg",
+      "photos": [
+        "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/0.jpg",
+        "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/1.jpg",
+        "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/2.jpg",
+        "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Champagne Gold",
+          "swatchColor": "#b9b5b1",
+          "usdz": "/models/usdz/godrej-wfeon-rgl-9014-5-0-idcrm-chgd-champagne-gold.usdz",
+          "itemCode": "WFEON RGL 9014 5.0",
+          "code": "WFEON RGL 9014 5.0 IDCRM CHGD"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.2
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.294,
+                0.723,
+                0.007
+              ],
+              [
+                -0.09,
+                0.837,
+                0.277
+              ]
+            ],
+            "open": [
+              [
+                -0.294,
+                0.723,
+                0.207
+              ],
+              [
+                -0.09,
+                0.837,
+                0.477
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -110,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.244,
+                0.206,
+                0.197
+              ],
+              [
+                0.25,
+                0.7,
+                0.317
+              ]
+            ],
+            "open": [
+              [
+                -0.404,
+                0.206,
+                0.269
+              ],
+              [
+                -0.155,
+                0.7,
+                0.742
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.6 cm",
+        "h": "84 cm",
+        "d": "55.4 cm"
+      },
+      "sizeNote": "The door and the knob stand a few centimetres in front of the 55.4 cm cabinet",
+      "fit": {
+        "front": 47,
+        "sides": 2,
+        "back": 10,
+        "note": "From Godrej's user manual: at least 2 cm at each side and 10 cm behind. The door is about 49 cm across and, open, reaches about 47 cm in front of the cabinet."
+      },
+      "specs": [
+        [
+          "Capacity",
+          "9 kg"
+        ],
+        [
+          "Type",
+          "Front load, fully automatic"
+        ],
+        [
+          "Max spin",
+          "1400 rpm"
+        ],
+        [
+          "Motor",
+          "BLDC Digi inverter motor"
+        ],
+        [
+          "Energy",
+          "5 star"
+        ],
+        [
+          "Drum",
+          "FabriSafe drum"
+        ],
+        [
+          "Heater",
+          "In-built, heats water up to 90°C"
+        ],
+        [
+          "Programmes",
+          "Quick 15', Bulky, Woollens, Sports Shoe, Refresh, Rinse + Spin, Mix Fabric, Cotton, Eco Wash, Whites, Gentle Wash, Baby Care"
+        ],
+        [
+          "Options",
+          "Steam Wash, Turbidity Sense, Stain Wash, Soak, Pre Wash, Delay Start, Tub Clean, Spin Only, Rinse Hold, Add Clothes, child lock"
+        ],
+        [
+          "Features",
+          "AI-powered turbidity sensing, Steam wash, Refresh cycle, Hygiene wash, Tested for handlooms"
+        ],
+        [
+          "Supply",
+          "220-240 V, 50 Hz, 2300 W"
+        ],
+        [
+          "Water pressure",
+          "0.05 to 1 MPa"
+        ],
+        [
+          "Weight",
+          "64.6 kg"
+        ],
+        [
+          "Door",
+          "Hinged on the left, chrome rim"
+        ],
+        [
+          "Warranty",
+          "5 years comprehensive, on registering on Godrej's site within 15 days of purchase"
+        ]
+      ],
+      "source": "https://www.godrejenterprises.com/home-appliances/washing-machines/front-load/p/wfeon-rgl-9014-5-0-idcrm-chgd",
+      "hotspots": [
+        {
+          "title": "AI Powered turbidity sensing",
+          "text": "The AI Powered Turbidity Sensing, intelligently detects detergent residue during the wash cycle and removes up to 50%* more of it. This ensures a cleaner wash while keeping fabrics soft and gentle on the skin—so you enjoy truly clean clothes.",
+          "pos": [
+            0.206,
+            0.8153,
+            0.2775
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Refresh cycle",
+          "text": "Uses steam to deodorize and refresh clothes. Helpful for lightly worn clothes which don’t need washing.",
+          "pos": [
+            -0.052,
+            0.7836,
+            0.2775
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Digi inverter motor",
+          "text": "The advanced Digital Inverter Motor delivers powerful, energy-efficient washes with minimal noise and vibration. Built to last longer with less maintenance, it ensures reliable performance for years.",
+          "pos": [
+            -0.126,
+            0.762,
+            0.2775
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "FabriSafe™ drum",
+          "text": "Multiple coin sized grooves reduce friction while scrubbing. Cleans clothes while taking care of fabric quality.",
+          "pos": [
+            0.06,
+            0.3,
+            0.1
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        }
+      ]
     }
   ]
 }

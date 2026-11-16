@@ -1,0 +1,119 @@
+{
+  "products": [
+    {
+      "id": "haier-hsu18c-tqb3bn-inv",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Air conditioner",
+      "model": "HSU18C-TQB3BN-INV",
+      "name": "Haier 1.5 ton 3-star Clean Cool Triple Inverter+ split AC",
+      "shortName": "1.5 ton Clean Cool AC",
+      "summary": "Swing the louvre open, lift the front panel to see the filter, then hang it on your wall at its real size.",
+      "arTip": "Tap the louvre or the front panel to open it",
+      "glb": "/models/haier-hsu18c-tqb3bn-inv.glb",
+      "thumb": "/photos/haier-hsu18c-tqb3bn-inv/0.jpg",
+      "photos": ["/photos/haier-hsu18c-tqb3bn-inv/0.jpg", "/photos/haier-hsu18c-tqb3bn-inv/1.jpg", "/photos/haier-hsu18c-tqb3bn-inv/2.jpg", "/photos/haier-hsu18c-tqb3bn-inv/3.jpg"],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "White and blue",
+          "swatchColor": "#f3f3f4",
+          "usdz": "/models/usdz/haier-hsu18c-tqb3bn-inv-white-and-blue.usdz",
+          "code": "HSU18C-TQB3BN-INV",
+          "itemCode": "HSU18C - TQB3BN-INV",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-1-5-ton-3-star-clean-cool-triple-inverter-split-air-conditioner-hsu18c-tqb3bn-inv/18668"
+        }
+      ],
+      "parts": [
+        {
+          "key": "panel",
+          "label": "front panel",
+          "node": "FrontPanel",
+          "axis": "x",
+          "angle": -60,
+          "zone": {
+            "closed": [
+              [-0.447, 0.08, 0.084],
+              [0.447, 0.303, 0.21]
+            ],
+            "open": [
+              [-0.447, 0.176, 0.089],
+              [0.447, 0.397, 0.345]
+            ]
+          }
+        },
+        {
+          "key": "louvre",
+          "label": "louvre",
+          "node": "Louvre",
+          "axis": "x",
+          "angle": 50,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.402, 0.026, 0.145],
+              [0.399, 0.067, 0.205]
+            ],
+            "open": [
+              [-0.402, -0.015, 0.148],
+              [0.399, 0.053, 0.215]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "91 cm",
+        "h": "31 cm",
+        "d": "21 cm"
+      },
+      "sizeNote": "Indoor unit, Haier's size for HSU18C-TQB3BN-INV. Outdoor unit 86 x 55 x 35 cm",
+      "specs": [
+        ["Capacity", "1.5 ton, 5125 W"],
+        ["Energy rating", "3 star"],
+        ["Series", "Clean Cool"],
+        ["Inverter", "Triple Inverter+"],
+        ["Cooling", "Supersonic cooling in 10 seconds"],
+        ["Cleaning", "Frost Self Clean"],
+        ["Modes", "7-in-1 Intelli Convertible"],
+        ["Coil", "Copper heat exchanger"],
+        ["Refrigerant", "R32"],
+        ["Indoor unit weight", "11.5 kg"],
+        ["Warranty", "5 years on the product, 12 years on the compressor"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-1-5-ton-3-star-clean-cool-triple-inverter-split-air-conditioner-hsu18c-tqb3bn-inv/18668",
+      "source": "https://www.haier.com/in/air-conditioners/haier-15-ton-3-star-clean-cool-triple-inverter-split-air-conditioner.shtml",
+      "hotspots": [
+        {
+          "title": "Supersonic Cooling",
+          "text": "Supersonic cooling you can feel in just 10 seconds.",
+          "pos": [-0.25, 0.225, 0.2099],
+          "normal": [0, 0, 1],
+          "show": "!panel"
+        },
+        {
+          "title": "Frost Self Clean",
+          "text": "A complete wet wash of the indoor unit, by frost.",
+          "pos": [-0.3, 0.13, 0.2105],
+          "normal": [0, 0, 1],
+          "show": "!panel"
+        },
+        {
+          "title": "Air filter",
+          "text": "Lift the front panel to reach the micro anti-bacterial filter for cleaning.",
+          "pos": [-0.15, 0.2, 0.2045],
+          "normal": [0, 0, 1],
+          "show": "panel"
+        },
+        {
+          "title": "7-in-1 Intelli Convertible",
+          "text": "Seven modes, from Child Comfort to Super Expandable, match the cooling to the room.",
+          "pos": [0.15, 0.13, 0.2105],
+          "normal": [0, 0, 1],
+          "show": "always"
+        }
+      ]
+    }
+  ]
+}

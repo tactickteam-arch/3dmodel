@@ -9,6 +9,9 @@ import { launch, sleep } from "./cdp.mjs";
 
 const [base, host, out, id = "lg-glt3426snpz"] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
+// the page shows the first colour's item code in the address bar (STANDARD.md section 2), so that is where it lands
+const first = JSON.parse(fs.readFileSync(new URL("../../products.json", import.meta.url), "utf8")).products.find((p) => p.id === id)?.finishes?.[0];
+const at = `/p/${encodeURI(String(first?.itemCode || first?.code || id).trim())}`;
 let failed = 0;
 const check = (ok, msg) => { console.log(`  ${ok ? "ok  " : "FAIL"} ${msg}`); if (!ok) failed++; };
 const b = await launch({ profile: `${out}/prof`, port: +(process.env.PORT || 9471) });
@@ -30,7 +33,7 @@ for (const [w, h, mobile] of [[900, 640, false], [390, 480, true]]) {
     scroll: document.documentElement.scrollHeight - innerHeight })`));
   check(r.embed && r.header === "none" && r.aside === "none", `${w}×${h}: header and side panel hidden`);
   check(Math.abs(r.stage - h) < 2 && r.scroll <= 1, `${w}×${h}: viewer fills the window (${r.stage} px), no scrolling`);
-  check(r.open !== "none" && r.target === "_blank" && r.href.endsWith(`/p/${id}`), `${w}×${h}: "View in your room" opens ${r.href} in a new tab`);
+  check(r.open !== "none" && r.target === "_blank" && r.href.endsWith(at), `${w}×${h}: "View in your room" opens ${r.href} in a new tab`);
   await b.shot(`${out}/embed-${w}x${h}.png`);
 }
 await b.viewport(900, 640, false);
@@ -56,7 +59,7 @@ for (let t = 0; t < 60 && !child?.url?.includes("/p/"); t++) {
   child = (await b.send("Page.getFrameTree")).result.frameTree.childFrames?.[0]?.frame;
   if (!child?.url?.includes("/p/")) await sleep(500);
 }
-check(!!child && child.url.includes(`/p/${id}?embed`) && new URL(child.url).origin !== new URL(host).origin, `the frame is on another origin (${child?.url})`);
+check(!!child && child.url.includes(`${at}?embed`) && new URL(child.url).origin !== new URL(host).origin, `the frame is on another origin (${child?.url})`);
 const world = await b.send("Page.createIsolatedWorld", { frameId: child.id, worldName: "t" });
 const ctx = world.result.executionContextId;
 const inFrame = async (expr) => (await b.send("Runtime.evaluate", { expression: expr, contextId: ctx, returnByValue: true, userGesture: true })).result?.result?.value;
@@ -73,7 +76,7 @@ await b.shot(`${out}/host-full.png`);
 await inFrame("document.getElementById('embedOpen').click()");
 await sleep(2500);
 const tabs = [...new Set(opened)].filter((u) => !u.startsWith(host));
-check(tabs.some((u) => u.endsWith(`/p/${id}`)), `tapping "View in your room" opened the full page in a new tab (${tabs.join(", ") || "nothing"})`);
+check(tabs.some((u) => u.endsWith(at)), `tapping "View in your room" opened the full page in a new tab (${tabs.join(", ") || "nothing"})`);
 const errs = b.logs.filter((l) => /EXCEPTION|Uncaught/.test(l));
 check(errs.length === 0, errs.length ? `errors: ${errs.slice(0, 2).join(" | ")}` : "no page errors");
 b.close();

@@ -1,0 +1,242 @@
+{
+  "products": [
+    {
+      "id": "lg-q18knxeamlg",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Air conditioner",
+      "model": "AS-Q18KNXE",
+      "name": "LG 1.5 ton 3-star DUAL Inverter split AC, AI Convertible 6-in-1",
+      "shortName": "1.5 ton DUAL Inverter AC",
+      "summary": "Swing the vane open, lift the air filter out of the top, then hang it on your wall at its real size.",
+      "arTip": "Tap the vane or the filter to open them",
+      "glb": "/models/lg-q18knxeamlg.glb",
+      "thumb": "/photos/lg-q18knxeamlg/0.jpg",
+      "photos": [
+        "/photos/lg-q18knxeamlg/0.jpg",
+        "/photos/lg-q18knxeamlg/1.jpg",
+        "/photos/lg-q18knxeamlg/2.jpg",
+        "/photos/lg-q18knxeamlg/3.jpg"
+      ],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "White",
+          "swatchColor": "#f3f4f5",
+          "usdz": "/models/usdz/lg-q18knxeamlg-white.usdz",
+          "code": "Q18KNXEAMLG",
+          "itemCode": "Q18KNXEAMLG ODU",
+          "altCodes": [
+            "AS-Q18KNXE.AMLG",
+            "ASNQ18KNXE.AMLG",
+            "AS-Q18KNXE",
+            "Q18KNXEAMLG IDU"
+          ],
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-15-ton-3-star-dual-inverter-split-ac-as-q18knxe-2026-model-new-bee-star-rated-q18knxeamlg-odu/20681"
+        }
+      ],
+      "parts": [
+        {
+          "key": "louvre",
+          "label": "louvre",
+          "node": "Louvre",
+          "axis": "x",
+          "angle": 40,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.35,
+                0.002,
+                0.118
+              ],
+              [
+                0.35,
+                0.075,
+                0.189
+              ]
+            ],
+            "open": [
+              [
+                -0.35,
+                -0.044,
+                0.118
+              ],
+              [
+                0.35,
+                0.058,
+                0.219
+              ]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "air filter",
+          "node": "AirFilter",
+          "slide": [
+            0,
+            0.09,
+            0.03
+          ],
+          "text": [
+            "Lift out the filter",
+            "Put the filter back"
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.41,
+                0.303,
+                0.014
+              ],
+              [
+                0.41,
+                0.306,
+                0.152
+              ]
+            ],
+            "open": [
+              [
+                -0.41,
+                0.393,
+                0.044
+              ],
+              [
+                0.41,
+                0.396,
+                0.182
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "83.7 cm",
+        "h": "30.8 cm",
+        "d": "18.9 cm"
+      },
+      "sizeNote": "Indoor unit, Sangeetha's 83.7 × 30.8 × 18.9 cm. Outdoor unit 71.7 × 49.5 × 23.0 cm",
+      "specs": [
+        [
+          "Capacity",
+          "1.5 ton, 4.4 kW (4400 W)"
+        ],
+        [
+          "Energy rating",
+          "3 star, ISEER 4.43"
+        ],
+        [
+          "Power use",
+          "769.55 kWh a year"
+        ],
+        [
+          "Compressor",
+          "DUAL Inverter"
+        ],
+        [
+          "Cooling modes",
+          "AI Convertible 6-in-1, VIRAAT mode, Diet Mode+, Sleep mode"
+        ],
+        [
+          "Cleaning",
+          "Auto Clean, Gold Fin+ coating"
+        ],
+        [
+          "Outdoor temperature",
+          "Cools even at 52 °C outside"
+        ],
+        [
+          "Noise",
+          "Indoor 26 dB, outdoor 55 dB"
+        ],
+        [
+          "Air swing",
+          "Auto swing, 2 way"
+        ],
+        [
+          "Refrigerant",
+          "R-32"
+        ],
+        [
+          "Heat exchanger",
+          "Copper"
+        ],
+        [
+          "Power supply",
+          "230 V, 50 Hz, single phase"
+        ],
+        [
+          "Indoor unit weight",
+          "8.1 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-15-ton-3-star-dual-inverter-split-ac-as-q18knxe-2026-model-new-bee-star-rated-q18knxeamlg-odu/20681",
+      "source": "https://www.lg.com/in/support/product-support/cs-AS-Q18KNXE/",
+      "hotspots": [
+        {
+          "title": "AI Convertible 6-in-1",
+          "text": "Sets the cooling power for the room: 100%, 80%, 60% or 40%, VIRAAT at 113%, or AI mode that adjusts it for you.",
+          "pos": [
+            -0.2,
+            0.19,
+            0.1896
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "VIRAAT mode",
+          "text": "Boosts cooling to 113% of the rated capacity for an instant chill in extreme heat.",
+          "pos": [
+            0.2,
+            0.05,
+            0.1866
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Anti-virus HD filter",
+          "text": "Silver ions in the filter deactivate viruses and bacteria for cleaner, germ-free air.",
+          "pos": [
+            -0.15,
+            0.3065,
+            0.08
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "!filter"
+        },
+        {
+          "title": "Gold Fin+",
+          "text": "The coil's fins carry an anti-corrosion coating, and Auto Clean dries the inside after use for fresh, odourless air.",
+          "pos": [
+            0.15,
+            0.292,
+            0.08
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "filter"
+        }
+      ]
+    }
+  ]
+}

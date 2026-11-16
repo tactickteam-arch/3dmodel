@@ -1,0 +1,122 @@
+{
+  "products": [
+    {
+      "id": "haier-hw120-dm14f11bku1",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HW120-DM14F11BKU1",
+      "name": "Haier F11 12 kg front-load washer with AI Colour Full Touch Panel",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-12kg-ai-colorful-touch-panel-front-load-washing-machine-hw120-dm14f11bku/21448",
+      "shortName": "12 kg F11 front-load washer",
+      "summary": "Open the door to see the 525 mm Super Drum and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/haier-hw120-dm14f11bku1.glb",
+      "thumb": "/photos/haier-hw120-dm14f11bku1/0.jpg",
+      "photos": ["/photos/haier-hw120-dm14f11bku1/0.jpg", "/photos/haier-hw120-dm14f11bku1/1.jpg", "/photos/haier-hw120-dm14f11bku1/2.jpg", "/photos/haier-hw120-dm14f11bku1/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#3c3f46",
+          "usdz": "/models/usdz/haier-hw120-dm14f11bku1-black.usdz",
+          "itemCode": "HW120-DM14F11BKU",
+          "code": "HW120-DM14F11BKU1"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.24],
+          "zone": {
+            "closed": [
+              [-0.29, 0.738, -0.004],
+              [-0.097, 0.845, 0.296]
+            ],
+            "open": [
+              [-0.29, 0.738, 0.236],
+              [-0.097, 0.845, 0.536]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -126,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.268, 0.182, 0.206],
+              [0.268, 0.718, 0.324]
+            ],
+            "open": [
+              [-0.564, 0.182, 0.294],
+              [-0.204, 0.718, 0.738]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.5 cm",
+        "h": "85 cm",
+        "d": "59.3 cm"
+      },
+      "sizeNote": "About 62 cm deep with the door (Haier's shop gives 62 cm)",
+      "specs": [
+        ["Capacity", "12 kg"],
+        ["Type", "Front-load washer, fully automatic"],
+        ["Max spin", "1400 rpm"],
+        ["Motor", "Direct Motion motor"],
+        ["Drum", "525 mm Super Drum, pillow-shape drum"],
+        ["Panel", "AI Colour Full Touch Panel, AI One Touch"],
+        ["Programmes", "Drum Clean, Spin, Rinse + Spin, Saree, Bedding, Cotton, Delicate, Jeans, Eco, Quick, Smart Wash, AI One Touch"],
+        ["Features", "Ultra Fresh Air, Steam, Stain Remover, Night Wash, Dual Spray, AI DBT, Smart Dosing"],
+        ["Smart", "HaiSmart app over Wi-Fi"],
+        ["Wash temperature", "Cold to 90°C"],
+        ["Energy", "5 star, 0.0408 kWh per kg per cycle"],
+        ["Water", "6.45 litres per kg per cycle"],
+        ["Noise", "Wash 62 dB or less, spin 76 dB or less"],
+        ["Supply", "2000 W, 50 Hz"],
+        ["Door", "Hinged on the left, two-layer half-transparent glass, silver rim"],
+        ["Warranty", "4 years comprehensive, 12 years on the motor"]
+      ],
+      "source": "https://www.haier.com/in/washing-machines/haier-f11-12kg-washer-colorful-touch-panel-front-load-washing-machine.shtml",
+      "hotspots": [
+        {
+          "title": "Ultra Fresh Air Technology",
+          "text": "Enjoy up to 12 hours of lasting freshness after your wash cycle, keeping clothes hygienic and odor-free.",
+          "pos": [0.035, 0.7547, 0.2925],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "AI Colour Full Panel",
+          "text": "An AI-powered colourful display panel offers an intuitive and vibrant interface, making laundry smarter and more interactive.",
+          "pos": [0.12, 0.81, 0.2965],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "One-Touch AI Wash",
+          "text": "Just one touch is all it takes: it automatically senses fabric type, load, and dirt level to choose the perfect wash settings.",
+          "pos": [0.252, 0.798, 0.2965],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Super Drum 525",
+          "text": "The 525 mm drum diameter provides greater capacity and tangle-free laundry with 25% improved wash quality.",
+          "pos": [0.1, 0.505, -0.1385],
+          "normal": [0, 0, 1],
+          "show": "door"
+        }
+      ]
+    }
+  ]
+}

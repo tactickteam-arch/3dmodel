@@ -1,0 +1,127 @@
+{
+  "products": [
+    {
+      "id": "godrej-wfeon-rgl-9014-5-0-idcrm-chgd",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Washing machine",
+      "model": "WFEON RGL 9014 5.0 IDCRM CHGD",
+      "name": "Godrej Eon Regalis 9 kg front-load washer with AI-powered turbidity sensing",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/godrej-eon-regalis-front-load-washing-machine-8-kg-5-star-wfeon-rgl-9014-5-0/21659",
+      "shortName": "Eon Regalis 9 kg front-load washer",
+      "summary": "Open the door to see the FabriSafe drum, pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/godrej-wfeon-rgl-9014-5-0-idcrm-chgd.glb",
+      "thumb": "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/0.jpg",
+      "photos": ["/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/0.jpg", "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/1.jpg", "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/2.jpg", "/photos/godrej-wfeon-rgl-9014-5-0-idcrm-chgd/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Champagne Gold",
+          "swatchColor": "#b9b5b1",
+          "usdz": "/models/usdz/godrej-wfeon-rgl-9014-5-0-idcrm-chgd-champagne-gold.usdz",
+          "itemCode": "WFEON RGL 9014 5.0",
+          "code": "WFEON RGL 9014 5.0 IDCRM CHGD"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.2],
+          "zone": {
+            "closed": [
+              [-0.294, 0.723, 0.007],
+              [-0.09, 0.837, 0.277]
+            ],
+            "open": [
+              [-0.294, 0.723, 0.207],
+              [-0.09, 0.837, 0.477]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -110,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.244, 0.206, 0.197],
+              [0.25, 0.7, 0.317]
+            ],
+            "open": [
+              [-0.404, 0.206, 0.269],
+              [-0.155, 0.7, 0.742]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.6 cm",
+        "h": "84 cm",
+        "d": "55.4 cm"
+      },
+      "sizeNote": "The door and the knob stand a few centimetres in front of the 55.4 cm cabinet",
+      "fit": {
+        "front": 47,
+        "sides": 2,
+        "back": 10,
+        "note": "From Godrej's user manual: at least 2 cm at each side and 10 cm behind. The door is about 49 cm across and, open, reaches about 47 cm in front of the cabinet."
+      },
+      "specs": [
+        ["Capacity", "9 kg"],
+        ["Type", "Front load, fully automatic"],
+        ["Max spin", "1400 rpm"],
+        ["Motor", "BLDC Digi inverter motor"],
+        ["Energy", "5 star"],
+        ["Drum", "FabriSafe drum"],
+        ["Heater", "In-built, heats water up to 90°C"],
+        ["Programmes", "Quick 15', Bulky, Woollens, Sports Shoe, Refresh, Rinse + Spin, Mix Fabric, Cotton, Eco Wash, Whites, Gentle Wash, Baby Care"],
+        ["Options", "Steam Wash, Turbidity Sense, Stain Wash, Soak, Pre Wash, Delay Start, Tub Clean, Spin Only, Rinse Hold, Add Clothes, child lock"],
+        ["Features", "AI-powered turbidity sensing, Steam wash, Refresh cycle, Hygiene wash, Tested for handlooms"],
+        ["Supply", "220-240 V, 50 Hz, 2300 W"],
+        ["Water pressure", "0.05 to 1 MPa"],
+        ["Weight", "64.6 kg"],
+        ["Door", "Hinged on the left, chrome rim"],
+        ["Warranty", "5 years comprehensive, on registering on Godrej's site within 15 days of purchase"]
+      ],
+      "source": "https://www.godrejenterprises.com/home-appliances/washing-machines/front-load/p/wfeon-rgl-9014-5-0-idcrm-chgd",
+      "hotspots": [
+        {
+          "title": "AI Powered turbidity sensing",
+          "text": "The AI Powered Turbidity Sensing, intelligently detects detergent residue during the wash cycle and removes up to 50%* more of it. This ensures a cleaner wash while keeping fabrics soft and gentle on the skin—so you enjoy truly clean clothes.",
+          "pos": [0.206, 0.8153, 0.2775],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Refresh cycle",
+          "text": "Uses steam to deodorize and refresh clothes. Helpful for lightly worn clothes which don’t need washing.",
+          "pos": [-0.052, 0.7836, 0.2775],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Digi inverter motor",
+          "text": "The advanced Digital Inverter Motor delivers powerful, energy-efficient washes with minimal noise and vibration. Built to last longer with less maintenance, it ensures reliable performance for years.",
+          "pos": [-0.126, 0.762, 0.2775],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "FabriSafe™ drum",
+          "text": "Multiple coin sized grooves reduce friction while scrubbing. Cleans clothes while taking care of fabric quality.",
+          "pos": [0.06, 0.3, 0.1],
+          "normal": [0, 0, 1],
+          "show": "door"
+        }
+      ]
+    }
+  ]
+}

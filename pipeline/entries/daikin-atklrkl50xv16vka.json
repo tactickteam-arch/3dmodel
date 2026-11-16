@@ -1,0 +1,244 @@
+{
+  "products": [
+    {
+      "id": "daikin-atklrkl50xv16vka",
+      "brand": "Daikin",
+      "brandLogo": "/logos/daikin.png",
+      "category": "Air conditioner",
+      "model": "ATKL50XV16VKA",
+      "name": "Daikin 1.5 ton 3-star Premium Series inverter split AC",
+      "shortName": "1.5 ton Premium Series AC",
+      "summary": "Open the two flaps, lift the front panel to see the air filters, then hang it on your wall at its real size.",
+      "arTip": "Tap the flaps or the front panel to open them",
+      "glb": "/models/daikin-atklrkl50xv16vka.glb",
+      "thumb": "/photos/daikin-atklrkl50xv16vka/0.jpg",
+      "photos": [
+        "/photos/daikin-atklrkl50xv16vka/0.jpg",
+        "/photos/daikin-atklrkl50xv16vka/1.jpg",
+        "/photos/daikin-atklrkl50xv16vka/2.jpg",
+        "/photos/daikin-atklrkl50xv16vka/3.jpg"
+      ],
+      "placement": "wall",
+      "arLabel": "View on your wall",
+      "orbit": "-22deg 82deg 128%",
+      "finishes": [
+        {
+          "name": "Premium White",
+          "swatchColor": "#f2f3f4",
+          "usdz": "/models/usdz/daikin-atklrkl50xv16vka-premium-white.usdz",
+          "code": "ATKLRKL50XV16VKA",
+          "itemCode": "ATKLRKL50XV16VKA ODU",
+          "altCodes": [
+            "ATKL50XV16VKA",
+            "ATKLRKL50XV16VKA IDU"
+          ],
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/daikin-atkl50xv16vka-15-ton-3-star-inverter-split-ac-atklrkl50xv16vka-odu/20682"
+        }
+      ],
+      "parts": [
+        {
+          "key": "panel",
+          "label": "front panel",
+          "node": "FrontPanel",
+          "axis": "x",
+          "angle": -55,
+          "zone": {
+            "closed": [
+              [
+                -0.443,
+                0.045,
+                0.172
+              ],
+              [
+                0.443,
+                0.298,
+                0.236
+              ]
+            ],
+            "open": [
+              [
+                -0.443,
+                0.152,
+                0.17
+              ],
+              [
+                0.443,
+                0.348,
+                0.413
+              ]
+            ]
+          }
+        },
+        {
+          "key": "flaps",
+          "label": "flaps",
+          "node": "FlapUpper",
+          "axis": "x",
+          "angle": -40,
+          "also": [
+            {
+              "node": "FlapLower",
+              "angle": 45
+            }
+          ],
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.378,
+                0.001,
+                0.17
+              ],
+              [
+                0.289,
+                0.031,
+                0.232
+              ]
+            ],
+            "open": [
+              [
+                -0.378,
+                -0.037,
+                0.17
+              ],
+              [
+                0.289,
+                0.031,
+                0.236
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "90.6 cm",
+        "h": "29.8 cm",
+        "d": "23.5 cm"
+      },
+      "sizeNote": "Indoor unit, Daikin's 298 × 906 × 235 mm. Outdoor unit 84.5 × 59.5 × 30 cm",
+      "specs": [
+        [
+          "Capacity",
+          "5.0 kW (1.40 to 5.30 kW); Daikin rates it 1.42 ton, Sangeetha lists it as 1.5 ton"
+        ],
+        [
+          "Energy rating",
+          "3 star (2026 BEE label), ISEER 4.40"
+        ],
+        [
+          "Power use",
+          "880.1 kWh a year"
+        ],
+        [
+          "Compressor",
+          "Patented swing compressor, inverter"
+        ],
+        [
+          "Airflow",
+          "551 CFM, 3D airflow, air throw up to 16 m"
+        ],
+        [
+          "Filters",
+          "PM 2.5 filter and Apatite filter, anti-bacterial pre-filter"
+        ],
+        [
+          "Cleaning",
+          "Dew Clean technology, filter clean indicator"
+        ],
+        [
+          "Outdoor temperature",
+          "100% cooling up to 43 °C, cools from 16 to 52 °C"
+        ],
+        [
+          "Indoor noise",
+          "From 32 dB(A)"
+        ],
+        [
+          "Voltage",
+          "Stabilizer inside, 130 to 285 V"
+        ],
+        [
+          "Refrigerant",
+          "R-32"
+        ],
+        [
+          "Indoor unit weight",
+          "10.5 kg"
+        ],
+        [
+          "Warranty",
+          "10 years on the compressor, 5 years on the PCB"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/daikin-atkl50xv16vka-15-ton-3-star-inverter-split-ac-atklrkl50xv16vka-odu/20682",
+      "source": "https://daikinindia.com/product-category/splitac/premium-series/ATKL50XV",
+      "fit": {
+        "top": 3,
+        "sides": 5,
+        "note": "From Daikin's installation manual: at least 30 mm from the ceiling and 50 mm from the walls on both sides."
+      },
+      "hotspots": [
+        {
+          "title": "Triple Display",
+          "text": "Shows the share of power being used, the set temperature and any error code.",
+          "pos": [
+            0.398,
+            0.0555,
+            0.2346
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Power Chill",
+          "text": "Cools the room 20% faster than the normal mode, for quick relief from the heat.",
+          "pos": [
+            -0.22,
+            0.19,
+            0.2352
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!panel"
+        },
+        {
+          "title": "Dew Clean Technology",
+          "text": "Cleans the indoor heat exchanger on its own, getting rid of bacteria, mould and odour.",
+          "pos": [
+            0.22,
+            0.2,
+            0.225
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "panel"
+        },
+        {
+          "title": "3D Airflow",
+          "text": "The flaps and louvres move in turn to spread the air evenly into every corner.",
+          "pos": [
+            -0.3,
+            0.05,
+            0.2325
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        }
+      ]
+    }
+  ]
+}

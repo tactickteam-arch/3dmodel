@@ -179,4 +179,10 @@ saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
   PanelFront: `${TEX}/voltas_183inv/panel.jpg`,
   Louvre: `${TEX}/voltas_183inv/louvre.jpg`,
-});
+}, { dir: `${TEX}/grain`, materials: {
+  // Grain (BENCHMARK.md section 10): moulded white plastic, the gentlest ripple (peel_soft), as on the Haier AC.
+  // Voltas does not publish the material, so this is ESTIMATED from its photos. Never on the front panel: it carries
+  // the printed wordmark, TATA line and Inverter badge, and grain mottles print.
+  Body: { type: "peel_soft" }, SideCap: { type: "peel_soft" },
+  Louvre: { type: "peel_soft" }, Bottom: { type: "peel_soft" },
+} });
