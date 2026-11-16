@@ -14,6 +14,8 @@
 //                               short link before Sangeetha's Product IDs come in. The code is written as itemSlug
 //                               makes it: capitals, and anything but letters, digits and "-" as "-" (RR24H2823HT/NL →
 //                               RR24H2823HT-NL). A separate folder, so a numeric code can never clash with a Product ID.
+//                               The code exactly as the maker writes it works too (item/RR24H2823HT/NL, item/RT EONVIBE
+//                               366BN RCIT MT BK), so a link is always the same address with the item code on the end.
 // 3. The og:url of index.html, compare.html and showroom.html (/, /compare, /showroom: cleanUrls on Vercel, serve.mjs
 //    locally), and vercel.json's frame-ancestors header, which is there only while site-config.js lists frameParents.
 //    vercel.json is kept in JSON.stringify's two-space layout.
@@ -126,9 +128,12 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
   // and by each colour's maker code
   for (const p of shown) for (const f of p.finishes || []) {
     if (!f.code) continue;
-    const at = `item/${itemSlug(f.code)}.html`, to = `/p/${p.id}?finish=${finishSlug(f.name)}`;
-    if (files.has(at)) { notes.push(`item code ${f.code} is on two colours; /${at.slice(0, -5)} opens the first`); continue; }
-    files.set(at, redirect(to));
+    const to = `/p/${p.id}?finish=${finishSlug(f.name)}`, exact = String(f.code).trim();
+    const ats = [itemSlug(f.code), ...(exact !== itemSlug(f.code) && /^[\w .\-]+(\/[\w .\-]+)*$/.test(exact) && !/(^|\/)\.\.?(\/|$)/.test(exact) ? [exact] : [])];
+    for (const at of ats.map((a) => `item/${a}.html`)) {
+      if (files.has(at)) { notes.push(`item code ${f.code} is on two colours; /${at.slice(0, -5)} opens the first`); continue; }
+      files.set(at, redirect(to));
+    }
   }
 
   // 3. the address in the link previews of the pages with a fixed address, and who may frame us
@@ -163,8 +168,8 @@ async function main() {
     vercelJson: read("vercel.json"),
   });
   const stale = [...files].filter(([f, text]) => !fs.existsSync(path.join(root, f)) || read(f) !== text).map(([f]) => f);
-  const extra = OWNED.flatMap((d) => (fs.existsSync(path.join(root, d)) ? fs.readdirSync(path.join(root, d)) : [])
-    .filter((f) => f.endsWith(".html")).map((f) => `${d}/${f}`)).filter((f) => !files.has(f));
+  const extra = OWNED.flatMap((d) => (fs.existsSync(path.join(root, d)) ? fs.readdirSync(path.join(root, d), { recursive: true }) : [])
+    .filter((f) => f.endsWith(".html")).map((f) => `${d}/${f.split(path.sep).join("/")}`)).filter((f) => !files.has(f));
   const count = OWNED.map((d) => `${d}/ ${[...files.keys()].filter((f) => f.startsWith(`${d}/`)).length}`).join(", ");
   for (const n of notes) console.log(`note: ${n}`);
   if (check) {
