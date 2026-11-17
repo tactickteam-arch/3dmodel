@@ -90,7 +90,7 @@ export function productIds(shown) {
 // compareHtml and showroomHtml are left alone when not given.
 export function build({ site, products, productHtml, indexHtml, compareHtml, showroomHtml, vercelJson }) {
   const ORIGIN = site.publicOrigin;
-  const files = new Map(), notes = [];
+  const files = new Map(), notes = [], taken = new Set(); // taken: lower-case paths (the Mac's disk ignores case, the server doesn't)
   const shown = products.filter((p) => !p.hidden);
 
   // 1. a page per product on show
@@ -112,6 +112,8 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
     ];
     const f = `p/${at}.html`;
     if (files.has(f)) return notes.push(`/p/${at} is both ${p.id} and another product or colour; it opens the first`);
+    if (taken.has(f.toLowerCase())) return notes.push(`/p/${at} differs from another address only in case; left out (one file on this Mac)`);
+    taken.add(f.toLowerCase());
     files.set(f, productHtml
       .replace("<!doctype html>\n", "<!doctype html>\n<!-- made from product.html by pipeline/scripts/make_pages.mjs: edit product.html, then run it -->\n")
       .replace(HEAD, tags.join("\n") + "\n"));
