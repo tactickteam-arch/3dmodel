@@ -30,12 +30,13 @@ The slug (folder names) is `<brand>_<short model>`, for example `lg_glt3426`. Th
 
 ## 2. What comes out: the same as the reference
 
-**The link (16 Nov 2026, for every product and every colour).** Each colour's link is `https://3d.sangeetha.com/p/<item code>`, with the item code written exactly as given: capitals, spaces, `.` and `/` included (`/p/HRB-3752BNSA-P`, `/p/RR24H2823HT/NL`, `/p/RT EONVIBE 366BN RCIT MT BK`). The store app and every integration build the link this way, so:
-- the item code is **Sangeetha's own `item_code`** from that colour's listing (the product API in `BRIEF.md`), kept in `products.json` as the colour's `itemCode`, even where it differs from the maker's code (`HRB-4052BGKA-P new`, `GLT3426SNPZ.APZZEBN`);
-- every colour also carries the maker's exact `code`, from the sheet or the maker's page, and that link works too. Any other code a Sangeetha sheet gives for that row (`GLT2526XWPZ.DPZZEBN`) goes in `altCodes` and works too; where it names a different model than the one built, the hand-over says so. A colour with no listing yet uses its maker code, and the hand-over says the code is not yet confirmed by Sangeetha;
+**The link (17 Nov 2026, for every product and every colour).** Sangeetha's item master (`Item Model Master List.xlsx`, kept private) decides what exists: a code that isn't in it doesn't exist for Sangeetha.
+- **A colour in the master** links as `https://3d.sangeetha.com/p/<item code>`, with its master Item Code written exactly as there: capitals, spaces, `.` and `/` included (`/p/HRB-3752BNSA-P`, `/p/RR24H2823HT/NL`, `/p/GLT3426SNPZ.APZZEBN`). It is the colour's `itemCode` in `products.json`. A split AC goes by its outdoor unit (`… ODU`; the `… IDU` code is in `altCodes`). A `… D` code (Sangeetha's display units) counts only when it is the colour's one entry in the master.
+- **A colour that isn't in the master** has no `itemCode` and no link of its own. It opens under its product's master code and its name: `/p/<item code>/<colour>` (`/p/RR21H2H25BR/HL/begonia-blue`). `finishPath` in `site.js` makes every colour's address, for the page, `make_pages.mjs`, the gate and the tests.
+- Every colour also carries the maker's exact `code`, and any other code a Sangeetha sheet gives for it in `altCodes`. Those links still open that colour, then show its address above, so an old link never breaks.
 - a code is never guessed, tidied or completed. If no source gives a colour's code, that colour has no item link, and NOTES.md says so;
 - the page shows that link in the address bar however the visitor arrived (`/p/<id>`, `/id/<Product ID>`, an old link), and picking another colour switches it to that colour's link;
-- `make_pages.mjs` writes `p/<item code>.html` for each colour, with its link preview, and lists any code it can't use;
+- `make_pages.mjs` writes `p/<item code>.html` for each code and `p/<item code>/<colour>.html` for each colour outside the master, with its link preview, and lists any code it can't use;
 - a product is not done until every one of its item links opens that product in that colour on the live site.
 
 **Every product has:**
@@ -52,8 +53,8 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 | **Inside** | Every shelf, bin, drawer, light, vent and label in the maker's open-door photos, with the maker's names. | Drum pattern, lifters, gasket folds, and the drawer's real compartments. | Drum, pulsator, lint filter, and the box's compartments. | Filters, coil fins, and the display window. |
 | **Stock** | South Indian kitchen: vegetarian plus eggs, real brands' packs, food from `food.mjs`. Fitted to its trays (BENCHMARK 13). Every item tagged, so Fill and Empty work. Empty in the web view, full in AR. | none | none | none |
 | **Back and underside** | Cord with Indian 3-pin plug, compressor bay, rating plate, feet and rollers. | Cord and plug, inlet and hose, drain hose, transit bolts, feet. | Cord and plug, valves, drain hose, feet. | Pipe bundle as a showroom unit has it, mounting-plate hooks. |
-| **Controls and text** | Raised 3D knobs and buttons. Every word, number and icon re-set sharp from the photo and the manual's drawing. The model's own energy label, or none. | same | same | same |
-| **Surface** | Grain chosen from the maker's finish name (BENCHMARK 10): hairline plus clear coat on steel film, soft peel on paint, none on panels with print. | same | same | same |
+| **Controls and text** | Raised 3D knobs and buttons. Every word, number and icon re-set sharp from the photo and the manual's drawing. The model's own energy label (its BEE star label, cut out by `tex_bee_label.py` and stuck on by `add_label.mjs` from `entries/labels.json`; the units in Sangeetha's stores all carry one), or none until that model's own label is confirmed. | same | same | same |
+| **Surface** | Grain chosen from the maker's finish name (BENCHMARK 10): hairline plus clear coat on steel film, soft peel on paint, none on panels with print. Fridge shelves, bins and covers get the shared clear tint (`clear_look.mjs`, applied in `exportGLB`) so they read against a white liner. | same | same | same |
 
 ## 3. The steps, in this order, every time
 
@@ -103,7 +104,7 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 | rk-grain, rk-size | RealityKit finds the grain. It places the product at the published W × H within 3.5 mm, with its lowest point at 0. |
 | apple-render | Apple's renderer draws each colour closed and open. |
 | page-site, page-features, page-controls, page-arphone, page-room, page-xr | The page tests for this product, each with 0 failures and no console errors. |
-| item-links | Every colour has its exact item code (Sangeetha's `itemCode`, else the maker's `code`), usable as `/p/<item code>`, none repeated. (`test_finish.mjs` and `test_store_bridge.mjs` check that such a link opens that colour and stays in the address bar.) |
+| item-links | Every colour has an address: `/p/<master item code>`, or `/p/<product's item code>/<colour>` for a colour outside the master (`finishPath` in `site.js`), none repeated. (`test_finish.mjs` and `test_store_bridge.mjs` check that such a link opens that colour and stays in the address bar.) |
 | page-organise, page-trays | Fridges: Fill and Empty, and the trays. |
 | renders | The views for the review, in `look/`. |
 

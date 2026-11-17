@@ -17,6 +17,7 @@ PLACEMENT=$(node -e 'const p=require(process.argv[1]).products.find(p=>p.id===pr
 cd "$SITE/pipeline/build3d"
 echo "== GLB: $MAKE"
 node "$MAKE" "$STAGE/entry.json" ../tex "$STAGE/$ID.glb" | tail -3
+node add_label.mjs "$STAGE/$ID.glb" "$ID"     # its BEE label, if pipeline/entries/labels.json has one
 echo "== Apple files"
 node make_usdz.mjs "$STAGE/$ID.glb" "$STAGE/entry.json" "$ID" "$STAGE/usd" > /dev/null
 [ "$PLACEMENT" = wall ] || node make_usdz.mjs "$STAGE/$ID.glb" "$STAGE/entry.json" "$ID" "$STAGE/usd" free > /dev/null

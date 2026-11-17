@@ -6,6 +6,7 @@ import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS, KHRMaterialsClearcoat } from "@gltf-transform/extensions";
 import { defight } from "./defight.mjs";
+import { clearLook } from "./clear_look.mjs";
 
 // GLTFExporter reads blobs with FileReader, which Node lacks
 globalThis.FileReader = class {
@@ -220,6 +221,7 @@ export async function exportGLB(root, clips, out, textures = {}, grain = null) {
     m.setBaseColorFactor([1, 1, 1, c[3]]);
   }
   if (grain) applyGrain(doc, grain);
+  clearLook(doc); // shelves and door bins tinted so they read against a white liner
   const separated = defight(doc); // surfaces in the same plane flicker: move them 0.8 mm apart
   fs.writeFileSync(out, await io.writeBinary(doc));
   const missing = [...Object.keys(textures), ...Object.keys(grain?.materials || {})].filter((k) => !doc.getRoot().listMaterials().some((m) => m.getName() === k));

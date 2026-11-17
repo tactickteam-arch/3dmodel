@@ -1,0 +1,14 @@
+{
+  "_about": "BEE star labels stuck on by pipeline/build3d/add_label.mjs. Each label is this model's own (sources in each product's research notes). Sizes: fridge labels 90 mm wide (the 2026-28 layout, as measured on LG GL-B257 / GLT4626 / GV-B23), washer labels 64 mm (LG FHP1412's, measured). Placement: Daikin and Lloyd from Sangeetha's and the maker's photos; the rest have no photo of the sticker on the unit, so they sit where the other fridges and washers on the site carry theirs (top door, upper corner; washer front, top right beside the door).",
+  "whirlpool-73723": { "node": "FridgeDoor", "file": "whirlpool_73723/bee_label.png", "width": 0.09, "cx": 0.74, "top": 0.06 },
+  "whirlpool-22439": { "node": "FreezerDoor", "file": "whirlpool_22439/bee_label.png", "width": 0.09, "cx": 0.74, "top": 0.06 },
+  "whirlpool-22343": { "node": "FreezerDoor", "file": "whirlpool_22343/bee_label.png", "width": 0.09, "cx": 0.74, "top": 0.06 },
+  "godrej-rt-eonvibe-366bn-rcit-mt-bk": { "node": "FreezerDoor", "file": "godrej_eon366/bee_label.png", "width": 0.09, "cx": 0.78, "top": 0.07 },
+  "ifb-executive-plus-mbn-1014k-cms": { "node": "Cabinet", "file": "ifb_exec1014/bee_label.png", "width": 0.064, "cx": 0.941, "cy": 0.255 },
+  "ifb-serena-mbn-7012k-cms": { "node": "Cabinet", "file": "ifb_serena7012/bee_label.png", "width": 0.064, "cx": 0.941, "cy": 0.255 },
+  "haier-hw120-dm14f11bku1": { "node": "Cabinet", "file": "haier_hw120/bee_label.png", "width": 0.064, "cx": 0.9, "cy": 0.24 },
+  "daikin-atklrkl50xv16vka": { "node": "FrontPanel", "file": "daikin_atkl50/bee_label.png", "wfrac": 0.097, "cx": 0.936, "cy": 0.45 },
+  "voltas-183inv-vertis-ai-zest-gold": { "node": "Chassis", "file": "voltas_183inv/bee_label.png", "wfrac": 0.1, "cx": 0.891, "cy": 0.55 },
+  "lloyd-gls18i3aschc": { "node": "FrontPanel", "file": "lloyd_gls18i3/bee_label_aschc.png", "wfrac": 0.082, "cx": 0.908, "cy": 0.5,
+    "finishes": { "White and grey": "lloyd_gls18i3/bee_label_aschc.png", "White": null } }
+}
