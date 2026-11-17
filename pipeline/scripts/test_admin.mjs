@@ -1,7 +1,9 @@
 // Tests the 3D Catalogue Admin (/admin) and the catalogue's usage tracking (/track.js) in headless Chrome:
 // 1. every admin page in demo mode (/admin?demo=1) at desktop and phone width: it renders, the demo banner
 //    shows, nothing scrolls sideways, no console errors; plus the add/edit/delete, invite, approve, QR, CSV
-//    and audit-filter flows on the sample data, and what the manager and viewer roles see;
+//    and audit-filter flows on the sample data, and what the manager and viewer roles see; the 3D tracker (list,
+//    filters, an item's details, status change, comment, the auto "Live on site", CSV, a spreadsheet import built
+//    here from made-up rows) and the notification bell (count, mark all read, click-through, a new one arriving);
 // 2. real mode shows the sign-in screen (no sample numbers) without touching the database;
 // 3. track.js: off on localhost; with ?track=1 it sends the right body to s3d_track (fetch is stubbed, so
 //    nothing reaches Supabase); the product page's hooks; pairing with ?pair=CODE.
@@ -17,7 +19,7 @@ const products = (await (await fetch(`${base}/products.json`)).json()).products;
 const id = pid || products.find((p) => !p.hidden && p.category === "Refrigerator")?.id || products.find((p) => !p.hidden).id;
 const b = await launch({ profile: `${out}/prof`, port: +(process.env.PORT || 9066) });
 const errors = () => b.logs.filter((l) => /EXCEPTION|LOG |\[error\]/.test(l));
-const PAGES = ["dashboard", "analytics", "stores", "devices", "products", "categories", "users", "roles", "audit"];
+const PAGES = ["dashboard", "analytics", "stores", "devices", "products", "tracker", "categories", "users", "roles", "audit", "notifications"];
 const IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1";
 const DESKTOP = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 const js = (o) => JSON.stringify(o);
@@ -189,6 +191,184 @@ await b.evalJS("document.querySelector('dialog [data-close]').click()");
 await sleep(1500);
 check(await b.evalJS("[...document.querySelectorAll('#rows [data-size]')].every(c => c.textContent !== '…' && !/Missing/.test(c.textContent))"), "products: every file answers its HEAD request");
 
+// ── the 3D tracker and the notifications (demo: the catalogue's colours plus made-up SAMPLE- items) ──
+console.log("\n[demo mode: tracker and notifications]");
+const shownColours = products.filter((p) => !p.hidden).reduce((n, p) => n + (p.finishes?.length || 1), 0);
+await b.go("about:blank");   // a fresh load: nothing marked live yet in this demo
+await b.go(`${base}/admin?demo=1#/tracker`);
+await open("tracker");
+await sleep(400);
+await b.evalJS(`window.__csv = []; HTMLAnchorElement.prototype.click = function () { if (this.download) window.__csv.push({ name: this.download, href: this.href }); };`);
+const trk = JSON.parse(await b.evalJS(`JSON.stringify({
+  rows: document.querySelectorAll('#rows tr[data-id]').length,
+  count: document.getElementById('count').textContent,
+  cards: document.querySelectorAll('#stats .stat').length,
+  live: [...document.querySelectorAll('#stats .stat')].find(s => /Live on site/.test(s.textContent))?.querySelector('.v').textContent,
+  built: [...document.querySelectorAll('#stats .stat')].find(s => /3D built/.test(s.textContent))?.querySelector('.v').textContent,
+  synced: document.getElementById('synced')?.textContent || '',
+  bars: document.querySelectorAll('#byStatus .bar-row, #byCat .bar-row, #byBrand .bar-row').length,
+  last: document.getElementById('last').textContent })`));
+const nItems = parseInt(trk.count.replace(/,/g, ""), 10);
+check(trk.rows === Math.min(100, nItems) && nItems >= 100 && trk.cards === 9, `tracker: ${trk.count}, ${trk.rows} rows on the first page, ${trk.cards} summary cards`);
+check(+trk.built.replace(/,/g, "") >= shownColours && +trk.live.replace(/,/g, "") > 0 && trk.bars >= 9, `tracker: ${trk.built} built, ${trk.live} live on site (the catalogue has ${shownColours} colours), ${trk.bars} bars by status, category and brand`);
+check(/items? (is|are) on the site, so (it is|they are) now marked Live on site/.test(trk.synced), `tracker: items on the site are marked live by themselves (“${trk.synced}”)`);
+check(/^Last import: .*new, .*changed/.test(trk.last), `tracker: the last import is shown (${trk.last.slice(0, 60)}…)`);
+// a second visit records nothing again
+await b.go(`${base}/admin?demo=1#/dashboard`); await open("dashboard"); await open("tracker"); await sleep(300);
+check(!(await b.evalJS("!!document.getElementById('synced')")), "tracker: marking live is done once (no note on the next visit)");
+// filters
+const setSel = (id, v) => b.evalJS(`(()=>{const s=document.getElementById(${js(id)}); s.value=${js(v)}; s.dispatchEvent(new Event('change'));})()`);
+await setSel("fcat", "Air conditioner");
+await sleep(150);
+check(await b.evalJS("[...document.querySelectorAll('#rows tr[data-id]')].every(tr => tr.children[1].textContent === 'Air conditioners') && document.querySelectorAll('#rows tr[data-id]').length > 0 && location.hash.includes('cat=Air')"), `tracker: the category filter (${await b.evalJS("document.getElementById('count').textContent")}), kept in the address`);
+await setSel("fcat", "");
+await setSel("fstatus", "blocked");
+await sleep(150);
+check(await b.evalJS("document.querySelectorAll('#rows tr[data-id]').length > 0 && [...document.querySelectorAll('#rows tr[data-id]')].every(tr => tr.children[3].textContent.startsWith('Blocked'))"), "tracker: the status filter");
+await setSel("fstatus", "");
+await setSel("fbrand", "Sample Brand A");
+await sleep(150);
+check(await b.evalJS("document.querySelectorAll('#rows tr[data-id]').length > 0 && [...document.querySelectorAll('#rows tr[data-id]')].every(tr => tr.children[2].textContent === 'Sample Brand A')"), "tracker: the brand filter");
+await setSel("fbrand", "");
+await setSel("fwho", "me");
+await sleep(150);
+check(await b.evalJS("document.querySelectorAll('#rows tr[data-id]').length >= 1 && [...document.querySelectorAll('#rows tr[data-id]')].every(tr => tr.children[5].textContent === 'Demo Admin')"), "tracker: Assigned to me");
+await setSel("fwho", "");
+await b.evalJS("document.getElementById('flate').click()");
+await sleep(150);
+check(await b.evalJS("document.querySelectorAll('#rows tr[data-id]').length >= 1 && [...document.querySelectorAll('#rows tr[data-id]')].every(tr => tr.classList.contains('late'))"), "tracker: Past due");
+await b.evalJS("document.getElementById('flate').click()");
+await b.evalJS("(()=>{const q=document.getElementById('q'); q.value='sample rf 00'; q.dispatchEvent(new Event('input'));})()");
+await sleep(150);
+check(await b.evalJS("document.querySelectorAll('#rows tr[data-id]').length === 9 && [...document.querySelectorAll('#rows tr[data-id]')].every(tr => tr.textContent.includes('SAMPLE-RF-00'))"), "tracker: the search ignores case, spaces and dashes (sample rf 00 → 9 items)");
+// CSV of the filtered view
+await b.evalJS("document.getElementById('csv').click()");
+await sleep(200);
+const tcsv = await b.evalJS("(async()=>{const c=window.__csv.at(-1); return c ? c.name + '\\n' + await (await fetch(c.href)).text() : ''})()");
+check(/^3d-tracker-\d{4}-\d{2}-\d{2}\.csv\n/.test(tcsv) && /Category,Item code,Item \/ Model,Brand/.test(tcsv) && tcsv.trim().split("\n").length === 11 && /On the earlier vendor list/.test(tcsv), `tracker: CSV of the filtered view (${tcsv.split("\n")[0]}, 9 rows)`);
+// one item: details, a status change, a comment
+await b.evalJS("(()=>{const q=document.getElementById('q'); q.value='SAMPLE-RF-004'; q.dispatchEvent(new Event('input'));})()");
+await sleep(150);
+await b.evalJS("document.querySelector('#rows tr[data-id] [data-open]').click()");
+await b.waitFor("document.querySelector('dialog[open] #tmForm')", 5000);
+const item = JSON.parse(await b.evalJS(`JSON.stringify({ code: document.querySelector('dialog[open] .modal-head h2').textContent, facts: document.querySelectorAll('dialog[open] .facts > div').length, hash: location.hash, from: document.querySelector('dialog[open] #tmForm').status.value })`));
+check(item.code === "SAMPLE-RF-004" && item.facts >= 14 && /^#\/tracker\/\d+/.test(item.hash), `tracker: an item opens with its details (${item.facts} facts) and its own address ${item.hash.split("?")[0]}`);
+const toStatus = item.from === "blocked" ? "in_progress" : "blocked";
+await b.evalJS(`(()=>{const f=document.querySelector('dialog[open] #tmForm'); f.status.value=${js(toStatus)}; f.priority.value='urgent'; f.querySelector('[type=submit]').click();})()`);
+await b.waitFor(`document.querySelector('dialog[open] #tmForm')?.status.value === ${js(toStatus)} && /moved it/.test(document.querySelector('dialog[open] .timeline')?.textContent || '')`, 5000);
+const hist = await b.evalJS("document.querySelector('dialog[open] .timeline').textContent");
+check(/Demo Admin moved it/.test(hist) && /set the priority to Urgent/.test(hist), "tracker: a status change is saved and recorded: who, when, from → to");
+await b.evalJS(`(()=>{const f=document.querySelector('dialog[open] #tcForm'); f.querySelector('[type=submit]').click();})()`);
+await sleep(150);
+check(/Write a comment first/.test(await b.evalJS("document.querySelector('dialog[open] #tcErr').textContent")), "tracker: an empty comment is refused");
+await b.evalJS(`(()=>{const f=document.querySelector('dialog[open] #tcForm'); f.body.value='Test comment <b>not bold</b>'; f.querySelector('[type=submit]').click();})()`);
+await b.waitFor("/Test comment <b>not bold<\\/b>/.test(document.querySelector('dialog[open] .timeline')?.textContent || '')", 5000);
+check(await b.evalJS("!document.querySelector('dialog[open] .timeline b b') && [...document.querySelectorAll('dialog[open] .timeline li.cm')].some(li => li.textContent.includes('Test comment <b>not bold</b>'))"), "tracker: a comment is added to the item's history (as text, not HTML)");
+await b.shot(`${out}/tracker-item.png`);
+await b.evalJS("document.querySelector('dialog[open] [data-close]').click()");
+await sleep(200);
+check(await b.evalJS(`!location.hash.match(/tracker\\/\\d/) && [...document.querySelectorAll('#rows tr[data-id]')][0].children[3].textContent.startsWith(${js(toStatus === "blocked" ? "Blocked" : "In progress")}) && [...document.querySelectorAll('#rows tr[data-id]')][0].children[8].textContent !== '0'`), "tracker: closing the item updates its row (status, comments) and the address");
+
+// the import: a workbook built in the page from made-up rows (SheetJS from cdnjs, checked against its SRI hash)
+await b.evalJS("(()=>{const q=document.getElementById('q'); q.value=''; q.dispatchEvent(new Event('input'));})()");
+const before01 = await b.evalJS("(()=>{const q=document.getElementById('q'); q.value='SAMPLE-RF-001'; q.dispatchEvent(new Event('input')); const tr=document.querySelector('#rows tr[data-id]'); return [tr.children[5].textContent, tr.children[6].textContent, tr.children[3].textContent].join('|');})()");
+await b.evalJS("document.getElementById('import').click()");
+await sleep(200);
+const dropFile = (make) => b.evalJS(`(async()=>{ const [name, bytes] = await (${make})(); const dt = new DataTransfer(); dt.items.add(new File([bytes], name)); const i = document.querySelector('dialog[open] #file'); i.files = dt.files; i.dispatchEvent(new Event('change')); })()`);
+await dropFile(`async () => ["not-a-sheet.xlsx", new Uint8Array([1, 2, 3, 4])]`);
+const xlsxOk = await b.waitFor("!!window.XLSX?.read && !document.querySelector('dialog[open] #preview .loading')", 30000);
+check(xlsxOk && (await b.evalJS("!document.querySelector('dialog[open] #imErr').classList.contains('hide') && document.querySelector('dialog[open] [data-go]').disabled")), `import: SheetJS loads when asked (${await b.evalJS("document.querySelector('script[src*=xlsx]')?.integrity ? 'with SRI' : 'no SRI'")}); a file that isn't the tracker is refused (“${await b.evalJS("document.querySelector('dialog[open] #imErr').textContent")}”)`);
+if (xlsxOk) {
+  await dropFile(`async () => {
+    const X = window.XLSX, wb = X.utils.book_new();
+    X.utils.book_append_sheet(wb, X.utils.aoa_to_sheet([["Made-up test sheet"], ["Every row here is invented"], ["Dashboard only"]]), "Dashboard");
+    const ws = X.utils.aoa_to_sheet([
+      ["Test tracker, refrigerators"], [],
+      ["#", "Item Code", "Item / Model", "Brand", "Created On", "3D Status", "Colour Built", "Our Product ID", "3D Link", "On the earlier vendor list", "Notes"],
+      [1, "TEST-IMPORT-001", "Test fridge one", "Test Brand", new Date(Date.UTC(2026, 9, 1)), "Not started", null, null, "Open 3D", "Yes", "made up"],
+      [2, "TEST-IMPORT-002", "Test fridge two", "Test Brand", null, "In progress", null, null, null, "", null],
+      [3, "SAMPLE-RF-001", "Changed model text", "Sample Brand A", null, "Blocked", null, null, null, "", "changed by the test import"],
+      [4, "TEST-IMPORT-003", "Bad status", "Test Brand", null, "Maybe", null, null, null, "", null],
+      [5, "TEST-IMPORT-001", "Again", "Test Brand", null, "Not started", null, null, null, "", null],
+    ]);
+    ws["I4"].l = { Target: "https://example.com/test-3d" };
+    X.utils.book_append_sheet(wb, ws, "Refrigerators");
+    return ["test-tracker.xlsx", X.write(wb, { type: "array", bookType: "xlsx" })];
+  }`);
+  await b.waitFor("!!document.querySelector('dialog[open] .tr-preview') || !document.querySelector('dialog[open] #imErr').classList.contains('hide')", 15000);
+  const pv = JSON.parse(await b.evalJS(`JSON.stringify({ stats: [...document.querySelectorAll('dialog[open] .tr-preview .stat')].map(s => s.querySelector('.v').textContent), text: document.querySelector('dialog[open] #preview').textContent, err: document.querySelector('dialog[open] #imErr:not(.hide)')?.textContent || '', go: document.querySelector('dialog[open] [data-go]').textContent })`));
+  check(pv.stats.join(",") === "2,1,0,2" && /Read 3 items from Refrigerators \(3\)/.test(pv.text) && /Unknown status “Maybe”/.test(pv.text) && /earlier row/.test(pv.text), `import: the preview shows new ${pv.stats[0]}, changed ${pv.stats[1]}, unchanged ${pv.stats[2]}, skipped ${pv.stats[3]} ${pv.err}`);
+  await b.shot(`${out}/tracker-import.png`);
+  await b.evalJS("document.querySelector('dialog[open] [data-go]').click()");
+  await b.waitFor("!document.querySelector('dialog[open]')", 8000);
+  await sleep(300);
+  const after = JSON.parse(await b.evalJS(`JSON.stringify({ count: document.getElementById('count').textContent, last: document.getElementById('last').textContent, toast: [...document.querySelectorAll('.toast')].map(t => t.textContent).join(' | ') })`));
+  check(/Imported: 2 new, 1 changed/.test(after.toast) && /test-tracker\.xlsx.*2 new, 1 changed/.test(after.last), `import: done (“${after.toast}”), the last import line updated`);
+  const after01 = await b.evalJS("(()=>{const q=document.getElementById('q'); q.value='SAMPLE-RF-001'; q.dispatchEvent(new Event('input')); const tr=document.querySelector('#rows tr[data-id]'); return [tr.children[5].textContent, tr.children[6].textContent, tr.children[3].textContent].join('|');})()");
+  check(after01.split("|").slice(0, 2).join("|") === before01.split("|").slice(0, 2).join("|") && /^Blocked/.test(after01.split("|")[2]), `import: the sheet's status is taken (${before01.split("|")[2]} → ${after01.split("|")[2]}), the owner and due date are kept (${after01.split("|").slice(0, 2).join(", ")})`);
+  await b.evalJS("document.querySelector('#rows tr[data-id]').click()");
+  await b.waitFor("/imported a change/.test(document.querySelector('dialog[open] .timeline')?.textContent || '')", 5000);
+  check(true, "import: the change is in the item's history (“imported a change”)");
+  await b.evalJS("document.querySelector('dialog[open] [data-close]').click()");
+  await b.evalJS("(()=>{const q=document.getElementById('q'); q.value='TEST-IMPORT-001'; q.dispatchEvent(new Event('input'));})()");
+  await b.evalJS("document.querySelector('#rows tr[data-id]').click()");
+  await b.waitFor("document.querySelector('dialog[open] .modal-head h2')?.textContent === 'TEST-IMPORT-001'", 5000);
+  check(await b.evalJS("!!document.querySelector('dialog[open] a[href=\"https://example.com/test-3d\"]') && /On the earlier vendor list\\s*Yes/.test(document.querySelector('dialog[open] .facts').innerText)"), "import: a new item keeps the cell's 3D link and the earlier vendor list flag");
+  await b.evalJS("document.querySelector('dialog[open] [data-close]').click()");
+}
+await b.evalJS("(()=>{const q=document.getElementById('q'); q.value=''; q.dispatchEvent(new Event('input'));})()");
+
+// the bell
+const bellN = () => b.evalJS("document.getElementById('bellN').classList.contains('hide') ? 0 : parseInt(document.getElementById('bellN').textContent, 10)");
+const n0 = await bellN();
+check(n0 >= 3, `bell: ${n0} unread`);
+await b.evalJS("document.getElementById('bellBtn').click()");
+await sleep(300);
+const bp = JSON.parse(await b.evalJS(`JSON.stringify({ open: !document.getElementById('bellPanel').classList.contains('hide'), items: document.querySelectorAll('#bellList a[data-nid]').length, unread: document.querySelectorAll('#bellList .nt.unread').length, exp: document.getElementById('bellBtn').getAttribute('aria-expanded') })`));
+check(bp.open && bp.items >= n0 && bp.unread === n0 && bp.exp === "true", `bell: the panel opens with ${bp.items} notifications, ${bp.unread} unread`);
+await b.shot(`${out}/bell.png`);
+const target = await b.evalJS("[...document.querySelectorAll('#bellList .nt.unread a[data-nid]')].find(a => /^#\\/tracker\\/\\d+$/.test(a.getAttribute('href')))?.getAttribute('href') || ''");
+// (a dispatched click: this tab's link .click() is caught for the CSV checks)
+await b.evalJS(`[...document.querySelectorAll('#bellList a[data-nid]')].find(a => a.getAttribute('href') === ${js(target)}).dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))`);
+const opened = await b.waitFor(`/^tracker\\/\\d+$/.test(window.__admin?.page) && !!document.querySelector('dialog[open] .facts')`, 10000);
+const n1 = await bellN();
+check(!!target && opened && (await b.evalJS("document.getElementById('bellPanel').classList.contains('hide')")) && n1 === n0 - 1, `bell: a notification opens its item (${target}, ${await b.evalJS("window.__admin.page")}) and is marked read (${n0} → ${n1} unread)`);
+await b.evalJS("document.querySelector('dialog[open] [data-close]').click()");
+await b.evalJS("document.getElementById('bellBtn').click()");
+await sleep(200);
+await b.evalJS("document.getElementById('bellAll').click()");
+await sleep(400);
+check((await bellN()) === 0 && (await b.evalJS("document.querySelectorAll('#bellList .nt.unread').length === 0")), "bell: Mark all read clears the count");
+await b.evalJS("document.addEventListener('keydown', ()=>{}); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))");
+await sleep(150);
+check(await b.evalJS("document.getElementById('bellPanel').classList.contains('hide')"), "bell: Escape closes the panel");
+// a comment on an item someone else owns: in the demo, its owner answers a few seconds later
+await b.evalJS("(()=>{const s=document.getElementById('fwho'); s.value='demo-3'; s.dispatchEvent(new Event('change'));})()");
+await sleep(150);
+await b.evalJS("document.querySelector('#rows tr[data-id]').click()");
+await b.waitFor("document.querySelector('dialog[open] #tcForm')", 5000);
+await b.evalJS(`(()=>{const f=document.querySelector('dialog[open] #tcForm'); f.body.value='Test question for the owner'; f.querySelector('[type=submit]').click();})()`);
+await b.waitFor("/Test question for the owner/.test(document.querySelector('dialog[open] .timeline')?.textContent || '')", 5000);
+await b.evalJS("document.querySelector('dialog[open] [data-close]').click()");
+const got = await b.waitFor("!document.getElementById('bellN').classList.contains('hide') && document.getElementById('bellN').textContent === '1'", 12000);
+check(got && (await b.evalJS("[...document.querySelectorAll('.toast')].some(t => /New comment/.test(t.textContent))")), "bell: a new notification arrives by itself (the owner's reply), with a toast");
+
+// the Notifications page: the list, unread only, the settings
+await open("notifications");
+await sleep(300);
+const np = JSON.parse(await b.evalJS(`JSON.stringify({ n: document.querySelectorAll('#list a[data-nid]').length, kinds: document.querySelectorAll('#want input[type=checkbox]').length, email: /Email: not yet/.test(document.getElementById('page').textContent) })`));
+check(np.n >= n0 + 1 && np.kinds === 8 && np.email, `notifications: ${np.n} in the history, ${np.kinds} kinds to choose, the email note`);
+await b.evalJS("document.querySelector('[data-only=unread]').click()");
+await sleep(300);
+check(await b.evalJS("document.querySelectorAll('#list a[data-nid]').length === 1"), "notifications: Unread shows only the new one");
+await b.evalJS("(()=>{const f=document.getElementById('want'); f.comment.checked=false; f.querySelector('[type=submit]').click();})()");
+await b.waitFor("[...document.querySelectorAll('.toast')].some(t => t.textContent === 'Saved.')", 5000);
+await open("tracker");
+await open("notifications");
+check(await b.evalJS("!document.getElementById('want').comment.checked && document.getElementById('want').live.checked"), "notifications: a kind can be turned off, and it stays off");
+await b.evalJS("(()=>{const f=document.getElementById('want'); f.comment.checked=true; f.querySelector('[type=submit]').click();})()");
+await sleep(300);
+
 // roles
 for (const [as, users, add] of [["manager", false, true], ["viewer", false, false]]) {
   await b.go(`${base}/admin?demo=1&as=${as}#/stores`);
@@ -200,13 +380,26 @@ for (const [as, users, add] of [["manager", false, true], ["viewer", false, fals
   check(await b.evalJS("window.__admin.page === 'dashboard'"), `${as}: #/users falls back to the dashboard`);
 }
 
+// a viewer on the tracker: reads and comments, changes nothing
+await b.go(`${base}/admin?demo=1&as=viewer#/tracker`);
+await b.waitFor("window.__admin?.page === 'tracker' && !document.querySelector('#page .loading')", 15000);
+await sleep(300);
+check(await b.evalJS("!document.getElementById('import') && !document.getElementById('synced') && document.querySelectorAll('#rows tr[data-id]').length > 0"), "viewer: the tracker is read-only (no import, nothing marked live)");
+await b.evalJS("document.querySelector('#rows tr[data-id]').click()");
+await b.waitFor("!!document.querySelector('dialog[open] #tcForm')", 5000);
+check(await b.evalJS("!document.querySelector('dialog[open] #tmForm') && !!document.querySelector('dialog[open] #tcForm')"), "viewer: an item can be commented on but not changed");
+await b.evalJS("document.querySelector('dialog[open] [data-close]').click()");
+await b.evalJS("location.hash = '#/notifications'");
+await b.waitFor("window.__admin?.page === 'notifications' && !document.querySelector('#page .loading')", 10000);
+check(await b.evalJS("document.getElementById('want').feedback.disabled && !document.getElementById('want').comment.disabled"), "viewer: the admins-only notifications can't be chosen");
+
 // ── 2. real mode: the sign-in screen, no sample data ──
 console.log("\n[real mode]");
 for (const [w, h, mobile] of [[1440, 900, false], [390, 844, true]]) {
   await b.viewport(w, h, mobile, mobile ? IPHONE : DESKTOP);
   await b.go(`${base}/admin`);
   const ok = await b.waitFor("!!document.getElementById('login')", 20000);
-  check(ok && (await b.evalJS("!document.querySelector('.banner.demo') && !/Sample|Demo data/.test(document.body.innerText)")), `${w} px: /admin shows the sign-in form and no sample data`);
+  check(ok && (await b.evalJS("!document.querySelector('.banner.demo') && !/Sample|Demo data/.test(document.body.innerText) && !document.getElementById('bellBtn')")), `${w} px: /admin shows the sign-in form, no sample data and no bell`);
   check(await noSideScroll(), `${w} px: sign-in has no sideways scroll`);
   await b.shot(`${out}/signin-${w}.png`);
 }

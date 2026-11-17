@@ -5,6 +5,8 @@ import { COMPANY } from "./config.js";
 import * as pages from "./pages.js";
 import { reviewPage } from "./review.js";
 import * as tools from "./tools.js";   // requests, playlists, profile, and what each device shows
+import { trackerPage } from "./tracker.js";
+import { startBell, stopBell, notificationsPage } from "./notify.js";   // the bell in the top bar, and #/notifications
 
 const params = new URLSearchParams(location.search);
 const DEMO = params.get("demo") === "1";
@@ -18,6 +20,7 @@ const PAGES = [
   { id: "stores", group: "Business operations", label: "Stores", ic: "store", run: pages.storesPage },
   { id: "devices", group: "Business operations", label: "Devices", ic: "devices", run: pages.devicesPage },
   { id: "products", group: "Business operations", label: "Products", ic: "box", run: pages.products },
+  { id: "tracker", group: "Business operations", label: "Tracker", ic: "tracker", run: trackerPage },   // #/tracker and #/tracker/<item id>
   { id: "categories", group: "Metadata", label: "Categories", ic: "grid", run: pages.categories },
   { id: "users", group: "Access management", label: "Users", ic: "users", run: pages.usersPage, roles: ["admin"] },
   { id: "roles", group: "Access management", label: "Roles", ic: "shield", run: pages.rolesPage },
@@ -25,6 +28,7 @@ const PAGES = [
   { id: "requests", group: "Business operations", label: "Requests", ic: "plus", run: tools.requestsPage },
   { id: "playlists", group: "Business operations", label: "Playlists", ic: "tablet", run: tools.playlistsPage },
   { id: "profile", group: "Account", label: "Your profile", ic: "userCheck", run: tools.profilePage },
+  { id: "notifications", group: "Account", label: "Notifications", ic: "bell", run: notificationsPage },
 ];
 
 let api = null;
@@ -137,6 +141,7 @@ function showBlocked() {
 }
 
 async function signOut() {
+  stopBell();
   try { await api.signOut(); } catch {}
   profile = null;
   shellBuilt = false;
@@ -184,6 +189,7 @@ function buildShell() {
         <button class="btn ghost icon" id="sideBtn" aria-label="Show or hide the sections" aria-controls="side">${icon("panel")}</button>
         <nav class="crumbs" aria-label="Breadcrumb"><span>${COMPANY}</span>${icon("chevron")}<b id="crumb">Dashboard</b></nav>
         <span class="spacer"></span>
+        <div class="bell-wrap" id="bellSlot"></div>
         ${DEMO ? `<span class="demo-pill">DEMO DATA</span>` : ""}
       </header>
       <div class="content">
@@ -202,7 +208,8 @@ function buildShell() {
   ub.addEventListener("click", (e) => { e.stopPropagation(); menu.classList.toggle("hide"); ub.setAttribute("aria-expanded", String(!menu.classList.contains("hide"))); });
   document.addEventListener("click", (e) => { if (!e.target.closest("#userMenu")) { menu.classList.add("hide"); ub.setAttribute("aria-expanded", "false"); } });
   root.querySelector("#outBtn").addEventListener("click", signOut);
-  root.querySelector("#pwBtn").addEventListener("click", () => { shellBuilt = false; showSetPassword("change"); });
+  root.querySelector("#pwBtn").addEventListener("click", () => { stopBell(); shellBuilt = false; showSetPassword("change"); });
+  startBell({ api, profile });
 }
 
 let token = 0;

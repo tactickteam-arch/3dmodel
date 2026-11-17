@@ -1,7 +1,9 @@
 // Runs schema.sql in PGlite (Postgres 17 in WebAssembly) behind a small stand-in for Supabase's auth schema,
 // roles and Storage tables, twice (it must be re-runnable), then walks through the sign-in, invite, pairing,
-// tracking, product review (approve, decline, feedback, checklist, s3d_live, the photo bucket) and permission
-// cases as anon, admin, manager, viewer and a pending account. Nothing touches Supabase.
+// tracking, product review (approve, decline, feedback, checklist, s3d_live, the photo bucket), the 3D tracker
+// (import, assign, status, comments, found on the site, due dates) and its notifications (who is told, settings,
+// each person reads only their own, the Realtime publication), and the permission cases as anon, admin, manager,
+// viewer and a pending account. Nothing touches Supabase.
 // setup once: cd .work/admin && npm i @electric-sql/pglite      (the work folder is gitignored)
 // usage: node pipeline/admin/test_schema.mjs [schema.sql]
 import fs from "node:fs";
@@ -41,7 +43,9 @@ await db.exec(`
   insert into storage.buckets (id, name, public) values ('other-app', 'other-app', true);
 `);
 await db.exec(sql);
-check(true, "schema.sql ran (first time)");
+check(true, "schema.sql ran (first time, on a database without Supabase Realtime's publication)");
+// Supabase makes this publication for Realtime; the second run must add the notifications table to it
+await db.exec("create publication supabase_realtime");
 await db.exec(sql);
 check(true, "schema.sql ran again (re-runnable)");
 
@@ -380,17 +384,241 @@ check(!r.error && r.affected === 0, "nobody deletes a photo from the browser", J
 const sp = (await db.query("select policyname, roles::text, cmd, coalesce(qual, '') || coalesce(with_check, '') t from pg_policies where schemaname = 'storage' order by 1")).rows;
 check(sp.length === 2 && sp.every((x) => /s3d-feedback/.test(x.t) && x.roles === "{authenticated}"), "the only storage policies are this bucket's two, for signed-in users", JSON.stringify(sp));
 
+// ── the 3D tracker and notifications ──
+// A admin, B manager, C inactive, E viewer (all from above). The item codes are made up.
+// a person's notifications, oldest first; the store-feedback ones (from the review tests above) only when asked for
+const notes = async (uid, feedback = false) => (await db.query(`select id, kind, title, body, link, item_id, actor, read_at from public.s3d_notifications
+  where recipient = $1 and ($2 or kind <> 'feedback') order by id`, [uid, feedback])).rows;
+const kinds = async (uid) => (await notes(uid)).map((x) => x.kind);
+for (const [q, what] of [
+  ["select * from public.s3d_tracker", "read s3d_tracker"],
+  ["select * from public.s3d_tracker_log", "read s3d_tracker_log"],
+  ["select * from public.s3d_notifications", "read s3d_notifications"],
+  ["select * from public.s3d_notify_settings", "read s3d_notify_settings"],
+  ["select public.s3d_tracker_import('[]'::jsonb)", "import the tracker"],
+  ["select * from public.s3d_staff()", "list the staff"],
+  ["select public.s3d_notify_read()", "mark notifications read"],
+  ["select public.s3d_tracker_due()", "send the due-date notices"],
+]) {
+  r = await as("anon", null, q);
+  check(/permission denied/.test(r.error || ""), `anon can't ${what}`, r.error);
+}
+// the made-up spreadsheet: three good rows, then a repeat, a row without a category and an unknown status
+const SHEET = [
+  { category: "Refrigerator", item_code: "TEST-FR-001", model: "Test fridge one", brand: "TestBrand", created_on: "2026-08-19", status: "not_started", prior_list: true, notes: "Sample note" },
+  { category: "Refrigerator", item_code: "TEST-FR-002", model: "Test fridge two", brand: "TestBrand", status: "live", colour: "Test Black", product_id: P1, link: "https://3d.sangeetha.com/p/TEST-FR-002" },
+  { category: "Air conditioner", item_code: "TEST-AC-001", model: "Test AC one", brand: "OtherBrand", status: "blocked", ref_list: true },
+  { category: "Refrigerator", item_code: "TEST-FR-001", model: "A repeat", status: "live" },
+  { category: "", item_code: "TEST-XX-001", status: "live" },
+  { category: "Refrigerator", item_code: "TEST-FR-009", status: "maybe" },
+];
+r = await as("authenticated", E, "select public.s3d_tracker_import($1::jsonb, 'tracker.xlsx')", [JSON.stringify(SHEET)]);
+check(/Not allowed/.test(r.error || ""), "a viewer can't import the tracker", r.error);
+r = await as("authenticated", C, "select public.s3d_tracker_import($1::jsonb, 'tracker.xlsx')", [JSON.stringify(SHEET)]);
+check(/Not allowed/.test(r.error || ""), "an inactive account can't import the tracker", r.error);
+r = await one("authenticated", B, "select public.s3d_tracker_import($1::jsonb, 'tracker.xlsx') as j", [JSON.stringify(SHEET)]);
+check(r.j?.added === 3 && r.j?.skipped === 3 && r.j?.total === 6 && r.j?.changed === 0 && r.j?.file_name === "tracker.xlsx", "a manager imports: 3 added, a repeat, a row without a category and an unknown status skipped", JSON.stringify(r));
+const item = async (code) => (await db.query("select * from public.s3d_tracker where item_code = $1", [code])).rows[0];
+const FR1 = (await item("TEST-FR-001")).id, FR2 = (await item("TEST-FR-002")).id, AC1 = (await item("TEST-AC-001")).id;
+let it = await item("TEST-FR-001");
+check(it.prior_list === true && it.ref_list === false && it.in_master === true && it.notes === "Sample note" && it.status === "not_started" && it.priority === "normal" && it.model === "Test fridge one",
+  "the first row of a repeated code wins, with the sheet's fields", JSON.stringify(it));
+check((await item("TEST-AC-001")).ref_list === true && (await item("TEST-FR-002")).link === "https://3d.sangeetha.com/p/TEST-FR-002", "flags and the 3D link are kept");
+let na = await notes(A), nb = await notes(B), ne = await notes(E);
+check(na.length === 1 && na[0].kind === "import" && /3 new, 0 changed/.test(na[0].title) && na[0].link === "#/tracker" && nb.length === 0 && ne.length === 0,
+  "the import's summary goes to the other admins and managers (not the importer, not viewers)", JSON.stringify({ na, nb, ne }));
+r = await as("authenticated", E, "select item_code, status from public.s3d_tracker order by id");
+check(r.rows?.length === 3, "a viewer reads the tracker", JSON.stringify(r));
+r = await as("authenticated", C, "select * from public.s3d_tracker");
+check(!r.error && r.rows.length === 0, "an inactive account reads nothing of the tracker", JSON.stringify(r));
+r = await as("authenticated", E, "select * from public.s3d_staff()");
+check(r.rows?.map((x) => x.email).sort().join() === "first@example.com,second@example.com,viewer@example.com", "the staff list: active staff only", JSON.stringify(r.rows));
+r = await as("authenticated", C, "select * from public.s3d_staff()");
+check(!r.error && r.rows.length === 0, "an inactive account gets no staff list", JSON.stringify(r));
+
+// direct writes are refused: everything goes through the functions
+for (const [uid, q, what] of [
+  [A, "insert into public.s3d_tracker (category, item_code) values ('Refrigerator', 'X')", "an admin can't insert an item directly"],
+  [B, `update public.s3d_tracker set status = 'live' where id = ${FR1}`, "a manager can't change an item directly"],
+  [A, "insert into public.s3d_notifications (recipient, kind, title) values ('" + E + "', 'live', 'x')", "nobody writes a notification directly"],
+  [E, "update public.s3d_notifications set read_at = now()", "nobody changes a notification directly"],
+  [E, `insert into public.s3d_tracker_log (item_id, kind, body) values (${FR1}, 'comment', 'x')`, "nobody writes the history directly"],
+]) {
+  r = await as("authenticated", uid, q);
+  check(/permission denied/.test(r.error || ""), what, r.error);
+}
+r = await as("authenticated", E, `select public.s3d_tracker_update(${FR1}, '{"status":"in_progress"}')`);
+check(/Not allowed/.test(r.error || ""), "a viewer can't change an item's status", r.error);
+
+// assign, due date, priority, status
+r = await one("authenticated", B, `select public.s3d_tracker_update(${FR1}, $1::jsonb) as j`, [JSON.stringify({ assignee: E, due_on: new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10), priority: "high" })]);
+check(r.j?.assignee === E && r.j?.priority === "high" && !!r.j?.due_on, "a manager assigns an item to the viewer, with a due date and high priority", JSON.stringify(r));
+ne = await notes(E);
+check(ne.length === 1 && ne[0].kind === "assigned" && ne[0].title === "TEST-FR-001 (TestBrand) is assigned to you" && ne[0].link === `#/tracker/${FR1}` && ne[0].actor === B && ne[0].item_id === FR1,
+  "the viewer is told it is assigned to them, with a link to the item", JSON.stringify(ne));
+r = await as("authenticated", B, `select public.s3d_tracker_update(${FR1}, '{"assignee":"${C}"}')`);
+check(/active user/.test(r.error || ""), "an item can't be assigned to an inactive account", r.error);
+r = await as("authenticated", B, `select public.s3d_tracker_update(${FR1}, '{"due_on":"2020-01-01"}')`);
+check(/from today on/.test(r.error || ""), "a due date in the past is refused", r.error);
+r = await as("authenticated", B, `select public.s3d_tracker_update(${FR1}, '{"status":"done"}')`);
+check(/Unknown status/.test(r.error || ""), "an unknown status is refused", r.error);
+r = await one("authenticated", A, `select public.s3d_tracker_update(${FR1}, '{"status":"in_progress"}') as j`);
+check(r.j?.status === "in_progress" && r.j?.assignee === E && r.j?.priority === "high", "an admin moves it to In progress; the owner and priority stay", JSON.stringify(r));
+ne = await notes(E);
+check(ne.length === 2 && ne[1].kind === "status" && ne[1].title === "TEST-FR-001 (TestBrand): In progress" && /from “Not started” to “In progress”/.test(ne[1].body),
+  "its owner is told about the status change, from and to", JSON.stringify(ne[1]));
+check((await kinds(B)).length === 0, "a manager who isn't its owner or a commenter isn't told about an ordinary status change");
+let log = (await db.query("select kind, actor_email, from_value, to_value, how from public.s3d_tracker_log where item_id = $1 order by id", [FR1])).rows;
+check(log.map((x) => x.kind).join() === "assignee,due,priority,status" && log[3].from_value === "not_started" && log[3].to_value === "in_progress" && log[3].actor_email === "first@example.com" && log[0].actor_email === "second@example.com" && log[0].to_value === E,
+  "every change is in the item's history: who, from and to", JSON.stringify(log));
+r = await one("authenticated", A, `select public.s3d_tracker_update(${FR1}, '{"status":"in_progress"}') as j`);
+check((await notes(E)).length === 2 && (await db.query("select count(*)::int n from public.s3d_tracker_log where item_id = $1", [FR1])).rows[0].n === 4, "saving with no change writes no history and tells nobody");
+
+// comments: the owner and everyone who commented hear about a new one, never its author
+r = await one("authenticated", E, `select public.s3d_tracker_comment(${FR1}, '  Started on the doors.  ') as j`);
+check(r.j?.body === "Started on the doors." && r.j?.kind === "comment", "a viewer comments on an item", JSON.stringify(r));
+check((await notes(E)).length === 2 && (await kinds(A)).length === 1 && (await kinds(B)).length === 0, "the author of a comment isn't told about it (and nobody else follows it yet)");
+await as("authenticated", B, `select public.s3d_tracker_comment(${FR1}, 'Thanks. The handle photo is in the shared folder.')`);
+ne = await notes(E);
+check(ne.length === 3 && ne[2].kind === "comment" && ne[2].title === "New comment on TEST-FR-001 (TestBrand)" && ne[2].body === "second: Thanks. The handle photo is in the shared folder.",
+  "the owner hears about a manager's comment", JSON.stringify(ne[2]));
+await as("authenticated", A, `select public.s3d_tracker_comment(${FR1}, 'Due on Friday, please.')`);
+check((await kinds(E)).filter((k) => k === "comment").length === 2 && (await kinds(B)).filter((k) => k === "comment").length === 1 && (await kinds(A)).filter((k) => k === "comment").length === 0,
+  "an admin's comment reaches the owner and the earlier commenter, not the admin");
+r = await as("authenticated", E, `select public.s3d_tracker_comment(${FR1}, '   ')`);
+check(/Write a comment/.test(r.error || ""), "an empty comment is refused", r.error);
+r = await as("authenticated", C, `select public.s3d_tracker_comment(${FR1}, 'Hello')`);
+check(/Not allowed/.test(r.error || ""), "an inactive account can't comment", r.error);
+check((await item("TEST-FR-001")).comments === 3, "the item counts its comments");
+
+// settings: a kind turned off isn't sent; live and blocked go to admins and managers too
+r = await one("authenticated", E, "select public.s3d_notify_settings_set(array['status', 'status']) as j");
+check(r.j?.off?.join() === "status", "the viewer turns off ordinary status changes", JSON.stringify(r));
+r = await as("authenticated", E, "select public.s3d_notify_settings_set(array['nope'])");
+check(/Unknown kind/.test(r.error || ""), "an unknown kind of notification is refused", r.error);
+r = await as("authenticated", E, "select user_id, off from public.s3d_notify_settings");
+check(r.rows?.length === 1 && r.rows[0].user_id === E, "each person reads only their own settings", JSON.stringify(r));
+let before = (await notes(E)).length;
+await as("authenticated", A, `select public.s3d_tracker_update(${FR1}, '{"status":"review"}')`);
+check((await notes(E)).length === before, "settings respected: no status notice for the viewer who turned it off");
+await as("authenticated", A, `select public.s3d_tracker_update(${FR1}, '{"status":"blocked"}')`);
+ne = await notes(E); nb = await notes(B);
+check(ne.at(-1).kind === "blocked" && ne.at(-1).title === "TEST-FR-001 (TestBrand) is blocked" && nb.at(-1).kind === "blocked" && !(await kinds(A)).includes("blocked"),
+  "Blocked goes to the owner and the managers (not to the admin who did it)", JSON.stringify({ e: ne.at(-1), b: nb.at(-1) }));
+
+// found on the site: s3d_tracker_live (admins and managers), once
+r = await as("authenticated", E, `select public.s3d_tracker_live('[{"id":${FR1}}]')`);
+check(/Not allowed/.test(r.error || ""), "a viewer can't mark items live", r.error);
+r = await one("authenticated", B, `select public.s3d_tracker_live($1::jsonb) as n`, [JSON.stringify([{ id: FR1, product: P1, colour: "Shiny Steel" }, { id: FR2, product: P2 }, { id: "x" }])]);
+check(r.n === 1, "items found on the site go live; one already live is left alone", JSON.stringify(r));
+it = await item("TEST-FR-001");
+check(it.status === "live" && it.product_id === P1 && it.colour === "Shiny Steel" && (await item("TEST-FR-002")).product_id === P1, "the product id and colour fill in only where empty", JSON.stringify(it));
+r = await one("authenticated", B, `select public.s3d_tracker_live($1::jsonb) as n`, [JSON.stringify([{ id: FR1, product: P1 }])]);
+check(r.n === 0, "doing it again changes nothing (idempotent)", JSON.stringify(r));
+ne = await notes(E); na = await notes(A);
+check(ne.at(-1).kind === "live" && ne.at(-1).title === "TEST-FR-001 (TestBrand) is live on the site" && /Found on the site/.test(ne.at(-1).body) && na.at(-1).kind === "live",
+  "Live on site goes to the owner and the admins", JSON.stringify({ e: ne.at(-1), a: na.at(-1) }));
+log = (await db.query("select how, from_value, to_value from public.s3d_tracker_log where item_id = $1 and kind = 'status' order by id desc limit 1", [FR1])).rows[0];
+check(log?.how === "site" && log.from_value === "blocked" && log.to_value === "live", "the history says the site made it live", JSON.stringify(log));
+
+// importing again: sheet fields change, team fields and comments stay, status changes notify nobody one by one
+const SHEET2 = [
+  { ...SHEET[0], status: "review", notes: "Sample note, changed" },
+  SHEET[1],
+  { category: "Washing machine", item_code: "TEST-WM-001", model: "Test washer", brand: "TestBrand", status: "not_started" },
+];
+const eBefore = (await notes(E)).length, bBefore = (await notes(B)).length;
+r = await one("authenticated", A, "select public.s3d_tracker_import($1::jsonb, 'tracker 2.xlsx') as j", [JSON.stringify(SHEET2)]);
+check(r.j?.added === 1 && r.j?.changed === 1 && r.j?.unchanged === 1 && r.j?.missing === 1 && r.j?.skipped === 0, "the second import: 1 new, 1 changed, 1 unchanged, 1 in the tracker but not the file", JSON.stringify(r));
+it = await item("TEST-FR-001");
+check(it.status === "review" && it.notes === "Sample note, changed" && it.assignee === E && it.priority === "high" && !!it.due_on && it.comments === 3,
+  "the import changes the sheet's fields and keeps the owner, due date, priority and comments", JSON.stringify(it));
+check(!!(await item("TEST-AC-001")), "an item the file doesn't have is kept");
+check((await notes(E)).length === eBefore && (await notes(B)).length === bBefore + 1 && (await notes(B)).at(-1).kind === "import",
+  "the import's status changes don't notify one by one; the manager gets its summary", JSON.stringify((await notes(B)).at(-1)));
+log = (await db.query("select how, actor_email from public.s3d_tracker_log where item_id = $1 and kind = 'status' order by id desc limit 1", [FR1])).rows[0];
+check(log?.how === "import" && log.actor_email === "first@example.com", "the history says the import changed the status, and who imported", JSON.stringify(log));
+r = await as("authenticated", A, "select file_name, added, changed, unchanged, missing from public.s3d_tracker_imports order by id");
+check(r.rows?.length === 2 && r.rows[1].file_name === "tracker 2.xlsx", "each import is listed", JSON.stringify(r.rows));
+
+// past the due date: once per due date, to the owner (system notice: even when the owner opens the admin), or to the leads
+const AC = (await item("TEST-AC-001")).id, WM = (await item("TEST-WM-001")).id;
+await db.query("update public.s3d_tracker set due_on = current_date - 2 where id = $1", [AC]);
+await db.query("update public.s3d_tracker set due_on = current_date - 1, assignee = $2 where id = $1", [WM, E]);
+await db.query("update public.s3d_tracker set due_on = current_date - 5 where id = $1", [FR2]);   // live: built, so not overdue
+const dueOf = async (uid) => (await notes(uid)).filter((x) => x.kind === "due");
+r = await one("authenticated", E, "select public.s3d_tracker_due() as n");
+check(r.n === 3, "the due check sends 3 notices: the unowned item to the admin and the manager, the owned one to its owner", JSON.stringify(r));
+check((await dueOf(E)).length === 1 && (await dueOf(E))[0].title === "TEST-WM-001 (TestBrand) is past its due date" && (await dueOf(E))[0].actor === null && (await dueOf(A)).length === 1 && (await dueOf(B)).length === 1,
+  "…each to the right people, from the system itself", JSON.stringify(await dueOf(E)));
+r = await one("authenticated", A, "select public.s3d_tracker_due() as n");
+check(r.n === 0, "the due check sends each notice once");
+r = await one("service_role", null, "select public.s3d_tracker_due() as n");
+check(r.n === 0 && !r.error, "the database itself (pg_cron, no user) may run the due check", JSON.stringify(r));
+r = await as("authenticated", C, "select public.s3d_tracker_due()");
+check(/Not allowed/.test(r.error || ""), "an inactive account can't run the due check", r.error);
+
+// store feedback: admins and managers hear about it, as their settings allow
+const fbA = (await notes(A, true)).filter((x) => x.kind === "feedback").length, fbB = (await notes(B, true)).filter((x) => x.kind === "feedback").length;
+check(fbA >= 1 && fbB >= 1 && (await notes(A, true)).find((x) => x.kind === "feedback").link === `#/review/${P1}`, "the earlier store feedback reached the admin and the manager, with a link to its review", `${fbA} ${fbB}`);
+check(!(await kinds(E)).includes("feedback"), "…and not the viewer who wrote it");
+await as("authenticated", A, "select public.s3d_notify_settings_set(array['feedback'])");
+await as("authenticated", E, `select public.s3d_feedback_add('${P2}', 'Sample: the label is blurry in the headset.', 'headset', null, 'Labels and logos')`);
+check((await notes(A, true)).filter((x) => x.kind === "feedback").length === fbA && (await notes(B, true)).filter((x) => x.kind === "feedback").length === fbB + 1
+  && /Labels and logos/.test((await notes(B, true)).at(-1).body), "new feedback: the manager is told; the admin who turned feedback off isn't");
+
+// reading: each person sees and marks only their own
+const eAll = await notes(E, true);
+r = await as("authenticated", E, "select id, recipient from public.s3d_notifications");
+check(r.rows?.length === eAll.length && r.rows.every((x) => x.recipient === E), "a user only sees their own notifications", `${r.rows?.length} of ${eAll.length}`);
+r = await as("authenticated", A, "select id from public.s3d_notifications where recipient = $1", [E]);
+check(!r.error && r.rows.length === 0, "an admin can't read someone else's notifications", JSON.stringify(r));
+r = await one("authenticated", A, `select public.s3d_notify_read(${eAll[0].id}) as n`);
+check(r.n === 0 && (await notes(E, true))[0].read_at === null, "nobody marks someone else's notification read");
+r = await one("authenticated", E, `select public.s3d_notify_read(${eAll[0].id}) as n`);
+check(r.n === 1 && (await notes(E, true))[0].read_at !== null, "a user marks one of theirs read");
+r = await one("authenticated", E, "select public.s3d_notify_read() as n");
+check(r.n === eAll.length - 1 && (await notes(E, true)).every((x) => x.read_at), "…and then all the rest", JSON.stringify(r));
+r = await as("authenticated", C, "select id from public.s3d_notifications");
+check(!r.error && r.rows.length === 0 && !(await kinds(C)).length, "the inactive account was never told anything", JSON.stringify(r));
+
+// the audit log has the tracker's actions too
+r = await as("authenticated", A, "select action from public.s3d_audit where target_type = 'tracker'");
+const ta = new Set(r.rows.map((x) => x.action));
+check(["tracker_import", "tracker_updated", "tracker_commented"].every((a) => ta.has(a)), "audit: tracker imports, changes and comments", [...ta].join());
+
+// who may call what
+const TFNS = ["s3d_staff()", "s3d_tracker_update(bigint,jsonb)", "s3d_tracker_comment(bigint,text)", "s3d_tracker_import(jsonb,text)", "s3d_tracker_live(jsonb)",
+  "s3d_tracker_due()", "s3d_notify_read(bigint)", "s3d_notify_settings_set(text[])"];
+const HELPERS = ["s3d_clean(text,int,boolean)", "s3d_need(text[])", "s3d_notify(uuid[],text,text,text,text,bigint,boolean)", "s3d_leads()", "s3d_watchers(bigint)", "s3d_tracker_label(text)"];
+const tr = (await db.query(`select f, has_function_privilege('anon', 'public.' || f, 'execute') a, has_function_privilege('authenticated', 'public.' || f, 'execute') u
+  from unnest($1::text[]) f`, [[...TFNS, ...HELPERS]])).rows;
+check(!tr.some((x) => x.a), "anon may call none of the tracker and notification functions", JSON.stringify(tr.filter((x) => x.a)));
+check(tr.filter((x) => x.u).map((x) => x.f).join() === TFNS.join(), "signed-in users may call the eight tracker functions, not the helpers", JSON.stringify(tr));
+const pub = (await db.query("select tablename from pg_publication_tables where pubname = 'supabase_realtime'")).rows;
+check(pub.length === 1 && pub[0].tablename === "s3d_notifications", "Realtime: the notifications table is in supabase_realtime's publication", JSON.stringify(pub));
+
 // and once more with all this data in it
 await db.exec(sql);
 r = await as("anon", null, "select * from public.s3d_live()");
 check(r.rows?.length === 2, "schema.sql runs again with reviews in it, and keeps them", JSON.stringify(r));
+check((await db.query("select count(*)::int n from public.s3d_tracker")).rows[0].n === 4 && (await notes(E, true)).length === eAll.length && (await item("TEST-FR-001")).assignee === E,
+  "…and keeps the tracker, its owners and the notifications");
+check((await db.query("select count(*)::int n from pg_publication_tables where pubname = 'supabase_realtime'")).rows[0].n === 1, "…and adds the notifications table to the publication only once");
 
 // grants as listed by Postgres
 const g = (await db.query(`select grantee, table_name, string_agg(privilege_type, ',' order by privilege_type) p from information_schema.role_table_grants
   where table_schema='public' and table_name like 's3d_%' and grantee in ('anon','authenticated') group by 1,2 order by 1,2`)).rows;
 console.log("table grants:", g.map((x) => `${x.grantee}:${x.table_name}=${x.p}`).join("  "));
 check(!g.some((x) => x.grantee === "anon"), "anon has no table grants");
+const NEW = ["s3d_tracker", "s3d_tracker_log", "s3d_tracker_imports", "s3d_notifications", "s3d_notify_settings"];
+check(NEW.every((t) => g.find((x) => x.grantee === "authenticated" && x.table_name === t)?.p === "SELECT"), "authenticated may only read the five tracker and notification tables");
+const sr = (await db.query(`select table_name, string_agg(privilege_type, ',' order by privilege_type) p from information_schema.role_table_grants
+  where table_schema = 'public' and grantee = 'service_role' and table_name = any($1) group by 1`, [NEW])).rows;
+check(sr.length === 5 && sr.every((x) => x.p === "DELETE,INSERT,SELECT,UPDATE"), "service_role has exactly select, insert, update and delete on them", JSON.stringify(sr));
 const rls = (await db.query("select relname, relrowsecurity from pg_class where relname like 's3d_%' and relkind='r'")).rows;
-check(rls.length === 9 && rls.every((x) => x.relrowsecurity), "row level security is on for all nine tables", rls.map((x) => x.relname).join());
+check(rls.length === 14 && rls.every((x) => x.relrowsecurity), "row level security is on for all fourteen tables", rls.map((x) => x.relname).join());
+const tp = (await db.query("select tablename, cmd, roles::text r from pg_policies where tablename = any($1) order by 1", [NEW])).rows;
+check(tp.length === 5 && tp.every((x) => x.cmd === "SELECT" && x.r === "{authenticated}"), "one read policy per new table, for signed-in users only", JSON.stringify(tp));
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

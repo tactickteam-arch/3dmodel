@@ -22,7 +22,8 @@ begin;
 do $$
 begin
   if to_regclass('public.s3d_devices') is null or to_regprocedure('public.s3d_role()') is null
-     or to_regprocedure('public.s3d_audit_write(text, text, text, text, jsonb, uuid, text)') is null then
+     or to_regprocedure('public.s3d_audit_write(text, text, text, text, jsonb, uuid, text)') is null
+     or to_regprocedure('public.s3d_need(text[])') is null or to_regprocedure('public.s3d_clean(text, int, boolean)') is null then
     raise exception 'Run pipeline/admin/schema.sql first, then this file.';
   end if;
 end $$;
@@ -112,27 +113,7 @@ alter table public.s3d_request_comments enable row level security;
 alter table public.s3d_playlists enable row level security;
 alter table public.s3d_device_screens enable row level security;
 
--- ── helpers ──────────────────────────────────────────────────────────────────────────────────────────────
-
--- Text from a form, trimmed and cut to p_max characters, without control characters (new lines are kept
--- when p_lines); null when nothing is left.
-create or replace function public.s3d_clean(p text, p_max int, p_lines boolean default false) returns text
-language sql immutable set search_path = public as $$
-  select nullif(btrim(left(regexp_replace(coalesce(p, ''),
-    case when p_lines then E'[\\x01-\\x09\\x0B-\\x1F\\x7F]' else '[[:cntrl:]]' end, '', 'g'), p_max)), '')
-$$;
-
--- The calling staff member's role, or an error if they can't do this. p_roles null: any active staff.
-create or replace function public.s3d_need(p_roles text[] default null) returns text
-language plpgsql stable security definer set search_path = public as $$
-declare
-  r text := public.s3d_role();
-begin
-  if r is null or (p_roles is not null and not r = any (p_roles)) then
-    raise exception 'Not allowed' using errcode = '42501';
-  end if;
-  return r;
-end $$;
+-- The helpers s3d_clean (text from a form) and s3d_need (the caller's role, or "Not allowed") are in schema.sql.
 
 -- ── product requests (any active staff asks and comments; admins and managers change the status) ─────────
 
@@ -469,8 +450,6 @@ grant select on table public.s3d_requests, public.s3d_request_comments, public.s
   to authenticated;
 -- the ids are identity columns, so no sequence grants are needed
 
-revoke all on function public.s3d_clean(text, int, boolean) from public, anon, authenticated;
-revoke all on function public.s3d_need(text[]) from public, anon, authenticated;
 revoke all on function public.s3d_request_add(text, text, text, text, text, date, text) from public, anon, authenticated;
 revoke all on function public.s3d_request_status(bigint, text, text, text) from public, anon, authenticated;
 revoke all on function public.s3d_request_comment(bigint, text) from public, anon, authenticated;
@@ -492,9 +471,7 @@ grant execute on function public.s3d_playlist_save(bigint, text, int, text, json
 grant execute on function public.s3d_playlist_delete(bigint) to authenticated, service_role;
 grant execute on function public.s3d_device_show(bigint, text, text, text, bigint) to authenticated, service_role;
 grant execute on function public.s3d_my_name(text) to authenticated, service_role;
--- s3d_clean and s3d_need run only inside the functions above (their owner calls them)
-grant execute on function public.s3d_clean(text, int, boolean) to service_role;
-grant execute on function public.s3d_need(text[]) to service_role;
+-- s3d_clean and s3d_need (schema.sql) run only inside the functions above (their owner calls them)
 
 commit;
 

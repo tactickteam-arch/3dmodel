@@ -10,6 +10,12 @@ export const SUPABASE_JS = {
   integrity: "sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R",
 };
 
+// SheetJS, loaded only when an admin imports the tracker spreadsheet (the Tracker page)
+export const SHEETJS = {
+  src: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+  integrity: "sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw",
+};
+
 // Vercel's other addresses for this site (per deployment and per branch) ask for a Vercel login, and the other
 // addresses in /site-config.js are kept for old links, so the links staff copy and the pairing links always use
 // the public address (as product.html does)

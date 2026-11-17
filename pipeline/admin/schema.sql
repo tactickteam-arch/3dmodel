@@ -14,6 +14,9 @@
 --   manager  stores and devices (create, edit, delete), analytics, dashboard; approves or declines products
 --   viewer   read-only: dashboard, analytics, products, stores, devices
 -- Every active staff member, viewers too, can test a product: give feedback (with photos) and fill its checklist.
+-- The 3D tracker (the Tracker page): every active staff member reads it and comments on an item; admins and managers
+-- change an item's status, owner, due date and priority, and import the tracker spreadsheet.
+-- Notifications: each person reads only their own, and their own settings; only the triggers and functions write them.
 -- A signed-in account counts as staff only while its profile is active and its own password is set.
 --
 -- The first admin is named by hand, straight after the first run, in the same SQL editor (put your own email in;
@@ -26,8 +29,12 @@
 -- s3d_track (usage events), s3d_pair (link a shop device to a store) and s3d_login_failed (audit a failed login).
 -- It reads one thing, the team's product decisions, through s3d_live (live.js). anon has no direct access to any table.
 --
--- Feedback photos go in the private Storage bucket s3d-feedback, made at the end of this file. Its two policies on
+-- Feedback photos go in the private Storage bucket s3d-feedback, made near the end of this file. Its two policies on
 -- storage.objects apply to that bucket only; other apps' buckets are not touched.
+--
+-- Two more things outside `public`, both guarded and named for this admin, at the very end: the notifications table
+-- joins Supabase Realtime's publication (supabase_realtime), and where pg_cron is switched on, one hourly job
+-- (s3d-tracker-due) sends the "past its due date" notices.
 
 begin;
 
@@ -204,6 +211,26 @@ language sql stable security definer set search_path = public as $$
   select role from public.s3d_profiles
   where user_id = auth.uid() and status = 'active' and password_set
 $$;
+
+-- Text from a form, trimmed and cut to p_max characters, without control characters (new lines are kept
+-- when p_lines); null when nothing is left. (The tracker below and tools.sql use it.)
+create or replace function public.s3d_clean(p text, p_max int, p_lines boolean default false) returns text
+language sql immutable set search_path = public as $$
+  select nullif(btrim(left(regexp_replace(coalesce(p, ''),
+    case when p_lines then E'[\\x01-\\x09\\x0B-\\x1F\\x7F]' else '[[:cntrl:]]' end, '', 'g'), p_max)), '')
+$$;
+
+-- The calling staff member's role, or an error if they can't do this. p_roles null: any active staff.
+create or replace function public.s3d_need(p_roles text[] default null) returns text
+language plpgsql stable security definer set search_path = public as $$
+declare
+  r text := public.s3d_role();
+begin
+  if r is null or (p_roles is not null and not r = any (p_roles)) then
+    raise exception 'Not allowed' using errcode = '42501';
+  end if;
+  return r;
+end $$;
 
 create or replace function public.s3d_audit_write(
   p_action text, p_target_type text, p_target_id text, p_label text, p_detail jsonb,
@@ -963,6 +990,631 @@ drop policy if exists s3d_feedback_photos_add on storage.objects;
 create policy s3d_feedback_photos_add on storage.objects for insert to authenticated
   with check (bucket_id = 's3d-feedback' and (select public.s3d_role()) is not null
     and name ~ '^[a-z0-9][a-z0-9-]{0,79}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpg$');
+
+-- ── the 3D tracker (the admin's Tracker page) ────────────────────────────────────────────────────────────
+-- One row per item to build: Sangeetha's item master, one sheet per category, plus colours built that aren't in
+-- it. The sheet's own fields come from the tracker spreadsheet, uploaded on the Tracker page (s3d_tracker_import);
+-- the team's fields (who it is assigned to, the due date, the priority) are set on the page, and an import never
+-- changes them. An item whose code is a product on show is live: the page marks it so by itself (s3d_tracker_live).
+-- Every change of status, owner, due date or priority is a row in s3d_tracker_log (who, when, from and to), made by
+-- a trigger, and so is every comment. Nobody writes these tables directly: only the s3d_tracker_ functions do.
+
+create table if not exists public.s3d_tracker (
+  id bigint generated always as identity primary key,
+  category text not null check (char_length(btrim(category)) between 1 and 60),
+  item_code text not null check (char_length(btrim(item_code)) between 1 and 80),   -- exactly as the sheet writes it
+  model text check (model is null or char_length(model) <= 400),
+  brand text check (brand is null or char_length(brand) <= 60),
+  created_on date,
+  status text not null default 'not_started' check (status in ('live', 'review', 'hidden', 'in_progress', 'blocked', 'not_started')),
+  colour text check (colour is null or char_length(colour) <= 120),
+  product_id text check (product_id is null or product_id ~ '^[a-z0-9][a-z0-9-]{0,79}$'),
+  link text check (link is null or (char_length(link) <= 500 and link ~ '^https://')),
+  prior_list boolean not null default false,   -- on the earlier vendor's list
+  ref_list boolean not null default false,     -- on the CD Ref list
+  in_master boolean not null default true,     -- false: built or listed, but not in the item master
+  source text check (source is null or char_length(source) <= 60),
+  notes text check (notes is null or char_length(notes) <= 1000),
+  assignee uuid,
+  due_on date,
+  priority text not null default 'normal' check (priority in ('low', 'normal', 'high', 'urgent')),
+  comments int not null default 0,
+  due_told date,   -- the due date whose "past its due date" notice has been sent
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  status_at timestamptz not null default now()
+);
+create unique index if not exists s3d_tracker_code on public.s3d_tracker (category, item_code);
+create index if not exists s3d_tracker_assignee on public.s3d_tracker (assignee) where assignee is not null;
+
+-- An item's history and comments. kind 'comment' has a body; the others have from_value and to_value (the status
+-- key, the user id, the date or the priority). how: the import or the site made the change, not a person.
+create table if not exists public.s3d_tracker_log (
+  id bigint generated always as identity primary key,
+  item_id bigint not null references public.s3d_tracker (id) on delete cascade,
+  at timestamptz not null default now(),
+  actor uuid,
+  actor_email text,
+  actor_name text,
+  kind text not null check (kind in ('comment', 'status', 'assignee', 'due', 'priority')),
+  body text check (body is null or char_length(body) <= 1000),
+  from_value text,
+  to_value text,
+  how text check (how is null or how in ('import', 'site')),
+  constraint s3d_tracker_log_body check (kind <> 'comment' or char_length(btrim(coalesce(body, ''))) > 0)
+);
+create index if not exists s3d_tracker_log_item on public.s3d_tracker_log (item_id, id);
+
+-- Each import of the spreadsheet, with what it did.
+create table if not exists public.s3d_tracker_imports (
+  id bigint generated always as identity primary key,
+  at timestamptz not null default now(),
+  actor uuid,
+  actor_email text,
+  actor_name text,
+  file_name text check (file_name is null or char_length(file_name) <= 200),
+  total int not null default 0,
+  added int not null default 0,
+  changed int not null default 0,
+  unchanged int not null default 0,
+  skipped int not null default 0,
+  missing int not null default 0   -- items in the tracker that the file doesn't have (they are kept)
+);
+
+-- ── notifications ────────────────────────────────────────────────────────────────────────────────────────
+-- One row per person told (so each reads only their own: recipient = auth.uid()), written only by the triggers and
+-- functions here. What each kind is for, and who gets it:
+--   live, blocked  an item went live on the site, or is blocked: admins and managers, its owner and its commenters
+--   status         any other status change: the item's owner and its commenters
+--   assigned       an item was assigned to you
+--   comment        a new comment on an item you own or commented on
+--   due            an item you own is past its due date and not built (nobody owns it: admins and managers)
+--   import         a tracker import finished, with its counts: admins and managers
+--   feedback       new store feedback on a product (the Testing pages): admins and managers
+-- Nobody is told about their own action, and nobody gets a kind they turned off (s3d_notify_settings).
+-- The admin hears about new rows at once through Supabase Realtime (the publication at the end of this file).
+create table if not exists public.s3d_notifications (
+  id bigint generated always as identity primary key,
+  recipient uuid not null,
+  at timestamptz not null default now(),
+  kind text not null check (kind in ('live', 'blocked', 'status', 'assigned', 'comment', 'due', 'import', 'feedback')),
+  title text not null check (char_length(title) between 1 and 200),
+  body text check (body is null or char_length(body) <= 500),
+  link text check (link is null or (char_length(link) <= 300 and link ~ '^#/')),   -- a page of the admin
+  item_id bigint references public.s3d_tracker (id) on delete cascade,
+  actor uuid,
+  actor_name text,
+  read_at timestamptz
+);
+create index if not exists s3d_notifications_recipient on public.s3d_notifications (recipient, id desc);
+create index if not exists s3d_notifications_unread on public.s3d_notifications (recipient) where read_at is null;
+
+-- The kinds a person turned off (no row: everything on).
+create table if not exists public.s3d_notify_settings (
+  user_id uuid primary key,
+  off text[] not null default '{}' check (off <@ array['live', 'blocked', 'status', 'assigned', 'comment', 'due', 'import', 'feedback']),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.s3d_tracker enable row level security;
+alter table public.s3d_tracker_log enable row level security;
+alter table public.s3d_tracker_imports enable row level security;
+alter table public.s3d_notifications enable row level security;
+alter table public.s3d_notify_settings enable row level security;
+
+-- ── tracker and notification helpers ─────────────────────────────────────────────────────────────────────
+
+create or replace function public.s3d_tracker_label(p_status text) returns text
+language sql immutable set search_path = public as $$
+  select case p_status when 'live' then 'Live on site' when 'review' then 'Built, in review' when 'hidden' then 'Built, hidden'
+    when 'in_progress' then 'In progress' when 'blocked' then 'Blocked' when 'not_started' then 'Not started' else p_status end
+$$;
+
+-- Active admins and managers.
+create or replace function public.s3d_leads() returns uuid[]
+language sql stable security definer set search_path = public as $$
+  select coalesce(array_agg(user_id), '{}') from public.s3d_profiles
+  where status = 'active' and password_set and role in ('admin', 'manager')
+$$;
+
+-- An item's owner and everyone who commented on it.
+create or replace function public.s3d_watchers(p_item bigint) returns uuid[]
+language sql stable security definer set search_path = public as $$
+  select coalesce(array_agg(distinct u), '{}') from (
+    select assignee as u from public.s3d_tracker where id = p_item
+    union select actor from public.s3d_tracker_log where item_id = p_item and kind = 'comment'
+  ) x where u is not null
+$$;
+
+-- One notification for each of p_to who is active staff and hasn't turned p_kind off; never to the person acting
+-- (auth.uid()), unless p_system (a notice from the system itself, as "past its due date"). Returns how many.
+create or replace function public.s3d_notify(
+  p_to uuid[], p_kind text, p_title text, p_body text default null, p_link text default null, p_item bigint default null,
+  p_system boolean default false
+) returns int
+language plpgsql security definer set search_path = public as $$
+declare
+  v_actor uuid := case when p_system then null else auth.uid() end;
+  v_name text;
+  n int;
+begin
+  select coalesce(full_name, split_part(email, '@', 1)) into v_name from public.s3d_profiles where user_id = v_actor;
+  insert into public.s3d_notifications (recipient, kind, title, body, link, item_id, actor, actor_name)
+    select p.user_id, p_kind, left(p_title, 200), left(p_body, 500), p_link, p_item, v_actor, v_name
+    from public.s3d_profiles p
+    where p.user_id = any (coalesce(p_to, '{}')) and p.user_id is distinct from v_actor
+      and p.status = 'active' and p.password_set
+      and not exists (select 1 from public.s3d_notify_settings s where s.user_id = p.user_id and p_kind = any (s.off));
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+-- An item's name in a notification: its code, and the brand when there is one.
+create or replace function public.s3d_tracker_name(t public.s3d_tracker) returns text
+language sql immutable set search_path = public as $$
+  select t.item_code || coalesce(' (' || t.brand || ')', '')
+$$;
+
+-- Before an update: the times. updated_at moves when anything but the due notice changed; status_at with the status.
+create or replace function public.s3d_tracker_touch() returns trigger
+language plpgsql set search_path = public as $$
+begin
+  if (to_jsonb(new) - array['due_told', 'updated_at']) is distinct from (to_jsonb(old) - array['due_told', 'updated_at']) then
+    new.updated_at := now();
+  end if;
+  if new.status is distinct from old.status then new.status_at := now(); end if;
+  if new.due_on is distinct from old.due_on then new.due_told := null; end if;
+  return new;
+end $$;
+
+-- After an update: a history row for each change of status, owner, due date or priority, and its notifications.
+-- s3d.how ('import' or 'site') is set by the import and by s3d_tracker_live for their own changes; an import's
+-- status changes notify nobody one by one (the import's summary does).
+create or replace function public.s3d_tracker_trg() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_email text;
+  v_name text;
+  v_how text := nullif(current_setting('s3d.how', true), '');
+  v_kind text;
+  v_who text;
+begin
+  select email, full_name into v_email, v_name from public.s3d_profiles where user_id = v_uid;
+  v_who := coalesce(v_name, split_part(v_email, '@', 1), 'The system');
+  if new.status is distinct from old.status then
+    insert into public.s3d_tracker_log (item_id, actor, actor_email, actor_name, kind, from_value, to_value, how)
+      values (new.id, v_uid, v_email, v_name, 'status', old.status, new.status, v_how);
+    if v_how is distinct from 'import' then
+      v_kind := case new.status when 'live' then 'live' when 'blocked' then 'blocked' else 'status' end;
+      perform public.s3d_notify(
+        case when v_kind = 'status' then public.s3d_watchers(new.id) else public.s3d_watchers(new.id) || public.s3d_leads() end,
+        v_kind,
+        case v_kind when 'live' then public.s3d_tracker_name(new) || ' is live on the site'
+                    when 'blocked' then public.s3d_tracker_name(new) || ' is blocked'
+                    else public.s3d_tracker_name(new) || ': ' || public.s3d_tracker_label(new.status) end,
+        case when v_how = 'site' then 'Found on the site. It was “' || public.s3d_tracker_label(old.status) || '”.'
+             else v_who || ' changed it from “' || public.s3d_tracker_label(old.status) || '” to “' || public.s3d_tracker_label(new.status) || '”.' end,
+        '#/tracker/' || new.id, new.id);
+    end if;
+  end if;
+  if new.assignee is distinct from old.assignee then
+    insert into public.s3d_tracker_log (item_id, actor, actor_email, actor_name, kind, from_value, to_value, how)
+      values (new.id, v_uid, v_email, v_name, 'assignee', old.assignee::text, new.assignee::text, v_how);
+    if new.assignee is not null then
+      perform public.s3d_notify(array[new.assignee], 'assigned', public.s3d_tracker_name(new) || ' is assigned to you',
+        v_who || ' assigned it to you.' || coalesce(' Due ' || to_char(new.due_on, 'FMDD Mon YYYY') || '.', ''),
+        '#/tracker/' || new.id, new.id);
+    end if;
+  end if;
+  if new.due_on is distinct from old.due_on then
+    insert into public.s3d_tracker_log (item_id, actor, actor_email, actor_name, kind, from_value, to_value, how)
+      values (new.id, v_uid, v_email, v_name, 'due', old.due_on::text, new.due_on::text, v_how);
+  end if;
+  if new.priority is distinct from old.priority then
+    insert into public.s3d_tracker_log (item_id, actor, actor_email, actor_name, kind, from_value, to_value, how)
+      values (new.id, v_uid, v_email, v_name, 'priority', old.priority, new.priority, v_how);
+  end if;
+  return null;
+end $$;
+
+-- After a comment: its notifications (the item's owner and everyone who commented on it, not the author).
+create or replace function public.s3d_tracker_comment_trg() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  t public.s3d_tracker;
+begin
+  if new.kind <> 'comment' then return null; end if;
+  select * into t from public.s3d_tracker where id = new.item_id;
+  perform public.s3d_notify(public.s3d_watchers(t.id), 'comment', 'New comment on ' || public.s3d_tracker_name(t),
+    coalesce(new.actor_name, split_part(new.actor_email, '@', 1), 'Someone') || ': ' || left(new.body, 300),
+    '#/tracker/' || t.id, t.id);
+  return null;
+end $$;
+
+-- After an import: its summary, to admins and managers.
+create or replace function public.s3d_tracker_import_trg() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform public.s3d_notify(public.s3d_leads(), 'import',
+    'Tracker import: ' || new.added || ' new, ' || new.changed || ' changed',
+    coalesce(new.actor_name, split_part(new.actor_email, '@', 1), 'Someone') || ' imported ' || coalesce('“' || new.file_name || '”', 'the spreadsheet')
+      || ': ' || new.total || ' rows, ' || new.unchanged || ' unchanged' || case when new.skipped > 0 then ', ' || new.skipped || ' skipped' else '' end || '.',
+    '#/tracker', null);
+  return null;
+end $$;
+
+-- After new store feedback (s3d_feedback_add): admins and managers hear about it.
+create or replace function public.s3d_feedback_notify() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform public.s3d_notify(public.s3d_leads(), 'feedback', 'New feedback on ' || new.product_id,
+    coalesce((select coalesce(full_name, split_part(email, '@', 1)) from public.s3d_profiles where user_id = new.author), 'Someone')
+      || coalesce(' (' || new.area || ')', '') || ': ' || left(new.body, 300),
+    '#/review/' || new.product_id, null);
+  return null;
+end $$;
+
+drop trigger if exists s3d_tracker_touch on public.s3d_tracker;
+create trigger s3d_tracker_touch before update on public.s3d_tracker
+  for each row execute function public.s3d_tracker_touch();
+drop trigger if exists s3d_tracker_changes on public.s3d_tracker;
+create trigger s3d_tracker_changes after update on public.s3d_tracker
+  for each row execute function public.s3d_tracker_trg();
+drop trigger if exists s3d_tracker_comment on public.s3d_tracker_log;
+create trigger s3d_tracker_comment after insert on public.s3d_tracker_log
+  for each row execute function public.s3d_tracker_comment_trg();
+drop trigger if exists s3d_tracker_import on public.s3d_tracker_imports;
+create trigger s3d_tracker_import after insert on public.s3d_tracker_imports
+  for each row execute function public.s3d_tracker_import_trg();
+drop trigger if exists s3d_feedback_notify on public.s3d_feedback;
+create trigger s3d_feedback_notify after insert on public.s3d_feedback
+  for each row execute function public.s3d_feedback_notify();
+
+-- ── the tracker's functions ──────────────────────────────────────────────────────────────────────────────
+
+-- Active staff, for "assigned to" and for names on the page (any active staff; nobody else gets a row).
+create or replace function public.s3d_staff() returns table (user_id uuid, name text, email text, role text)
+language sql stable security definer set search_path = public as $$
+  select p.user_id, coalesce(p.full_name, split_part(p.email, '@', 1)), p.email, p.role
+  from public.s3d_profiles p
+  where public.s3d_role() is not null and p.status = 'active' and p.password_set
+  order by 2
+$$;
+
+-- Change an item's team fields (admins and managers). p_patch has any of: status, assignee (a user id, or null for
+-- nobody), due_on ('YYYY-MM-DD', or null), priority. The triggers above write the history and the notifications.
+create or replace function public.s3d_tracker_update(p_id bigint, p_patch jsonb) returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  o public.s3d_tracker;
+  n public.s3d_tracker;
+  v_status text;
+  v_assignee uuid;
+  v_due date;
+  v_prio text;
+  v_raw text;
+  v_changed jsonb := '{}'::jsonb;
+begin
+  perform public.s3d_need(array['admin', 'manager']);
+  if p_patch is null or jsonb_typeof(p_patch) <> 'object' then raise exception 'Nothing to change.' using errcode = 'P0001'; end if;
+  select * into o from public.s3d_tracker where id = p_id for update;
+  if not found then raise exception 'No such item.' using errcode = 'P0002'; end if;
+  v_status := case when p_patch ? 'status' then p_patch ->> 'status' else o.status end;
+  if v_status is null or v_status not in ('live', 'review', 'hidden', 'in_progress', 'blocked', 'not_started') then
+    raise exception 'Unknown status.' using errcode = 'P0001';
+  end if;
+  v_assignee := o.assignee;
+  if p_patch ? 'assignee' then
+    v_raw := nullif(btrim(coalesce(p_patch ->> 'assignee', '')), '');
+    if v_raw is not null and v_raw !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then
+      raise exception 'Choose someone on the team.' using errcode = 'P0001';
+    end if;
+    v_assignee := v_raw::uuid;
+    if v_assignee is not null and v_assignee is distinct from o.assignee
+       and not exists (select 1 from public.s3d_profiles where user_id = v_assignee and status = 'active' and password_set) then
+      raise exception 'Choose someone on the team: an active user.' using errcode = 'P0001';
+    end if;
+  end if;
+  v_due := o.due_on;
+  if p_patch ? 'due_on' then
+    v_raw := nullif(btrim(coalesce(p_patch ->> 'due_on', '')), '');
+    if v_raw is not null and v_raw !~ '^\d{4}-\d{2}-\d{2}$' then raise exception 'That due date isn’t a date.' using errcode = 'P0001'; end if;
+    v_due := v_raw::date;
+    if v_due is distinct from o.due_on and v_due is not null and (v_due < current_date - 1 or v_due > current_date + 730) then
+      raise exception 'The due date has to be from today on, within two years.' using errcode = 'P0001';
+    end if;
+  end if;
+  v_prio := case when p_patch ? 'priority' then p_patch ->> 'priority' else o.priority end;
+  if v_prio is null or v_prio not in ('low', 'normal', 'high', 'urgent') then raise exception 'Unknown priority.' using errcode = 'P0001'; end if;
+  if v_status = o.status and v_assignee is not distinct from o.assignee and v_due is not distinct from o.due_on and v_prio = o.priority then
+    return row_to_json(o);   -- nothing changed
+  end if;
+  update public.s3d_tracker set status = v_status, assignee = v_assignee, due_on = v_due, priority = v_prio
+    where id = o.id returning * into n;
+  if n.status <> o.status then v_changed := v_changed || jsonb_build_object('status', jsonb_build_object('from', o.status, 'to', n.status)); end if;
+  if n.assignee is distinct from o.assignee then
+    v_changed := v_changed || jsonb_build_object('assignee', jsonb_build_object(
+      'from', (select email from public.s3d_profiles where user_id = o.assignee), 'to', (select email from public.s3d_profiles where user_id = n.assignee)));
+  end if;
+  if n.due_on is distinct from o.due_on then v_changed := v_changed || jsonb_build_object('due_on', jsonb_build_object('from', o.due_on, 'to', n.due_on)); end if;
+  if n.priority <> o.priority then v_changed := v_changed || jsonb_build_object('priority', jsonb_build_object('from', o.priority, 'to', n.priority)); end if;
+  perform public.s3d_audit_write('tracker_updated', 'tracker', n.id::text, public.s3d_tracker_name(n), v_changed);
+  return row_to_json(n);
+end $$;
+
+-- A comment on an item (any active staff).
+create or replace function public.s3d_tracker_comment(p_id bigint, p_body text) returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  v_body text := public.s3d_clean(p_body, 1000, true);
+  v_me public.s3d_profiles;
+  t public.s3d_tracker;
+  c public.s3d_tracker_log;
+begin
+  perform public.s3d_need();
+  if v_body is null then raise exception 'Write a comment first.' using errcode = 'P0001'; end if;
+  select * into t from public.s3d_tracker where id = p_id for update;
+  if not found then raise exception 'No such item.' using errcode = 'P0002'; end if;
+  select * into v_me from public.s3d_profiles where user_id = auth.uid();
+  insert into public.s3d_tracker_log (item_id, actor, actor_email, actor_name, kind, body)
+    values (t.id, auth.uid(), v_me.email, v_me.full_name, 'comment', v_body) returning * into c;
+  update public.s3d_tracker set comments = comments + 1 where id = t.id;
+  perform public.s3d_audit_write('tracker_commented', 'tracker', t.id::text, public.s3d_tracker_name(t), jsonb_build_object('text', left(v_body, 120)));
+  return row_to_json(c);
+end $$;
+
+-- Import the tracker spreadsheet (admins and managers): p_rows is every item row the page read from the file,
+-- [{category, item_code, model, brand, created_on, status, colour, product_id, link, prior_list, ref_list, in_master,
+-- source, notes}], at most 5000. Matched on category and item code (exactly as written). A new item is added, a
+-- known one gets the sheet's fields, and its owner, due date, priority and comments stay as they are. Items the
+-- file doesn't have are kept. A row with no category or code, an unknown status, or a code already in the file
+-- is skipped. Its status changes go in each item's history; one summary notification goes to admins and managers.
+create or replace function public.s3d_tracker_import(p_rows jsonb, p_file text default null) returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  e jsonb;
+  o public.s3d_tracker;
+  v_cat text;
+  v_code text;
+  v_status text;
+  v_created date;
+  v_prod text;
+  v_link text;
+  v_seen text[] := '{}';
+  v_me public.s3d_profiles;
+  v_added int := 0;
+  v_changed int := 0;
+  v_same int := 0;
+  v_skipped int := 0;
+  v_missing int;
+  v_total int;
+  r public.s3d_tracker_imports;
+begin
+  perform public.s3d_need(array['admin', 'manager']);
+  if p_rows is null or jsonb_typeof(p_rows) <> 'array' then raise exception 'The rows are missing.' using errcode = 'P0001'; end if;
+  v_total := jsonb_array_length(p_rows);
+  if v_total = 0 then raise exception 'The file has no items.' using errcode = 'P0001'; end if;
+  if v_total > 5000 then raise exception 'At most 5000 rows at a time.' using errcode = 'P0001'; end if;
+  perform pg_advisory_xact_lock(hashtext('s3d_tracker_import'));   -- two imports at once: one after the other
+  perform set_config('s3d.how', 'import', true);
+  for e in select value from jsonb_array_elements(p_rows) loop
+    if jsonb_typeof(e) <> 'object' then v_skipped := v_skipped + 1; continue; end if;
+    v_cat := public.s3d_clean(e ->> 'category', 60);
+    v_code := public.s3d_clean(e ->> 'item_code', 80);
+    v_status := coalesce(nullif(e ->> 'status', ''), 'not_started');
+    if v_cat is null or v_code is null or v_status not in ('live', 'review', 'hidden', 'in_progress', 'blocked', 'not_started')
+       or (v_cat || chr(1) || v_code) = any (v_seen) then
+      v_skipped := v_skipped + 1;
+      continue;
+    end if;
+    v_seen := v_seen || (v_cat || chr(1) || v_code);
+    v_created := case when e ->> 'created_on' ~ '^\d{4}-\d{2}-\d{2}$' then (e ->> 'created_on')::date end;
+    v_prod := nullif(lower(btrim(coalesce(e ->> 'product_id', ''))), '');
+    if v_prod !~ '^[a-z0-9][a-z0-9-]{0,79}$' then v_prod := null; end if;
+    v_link := public.s3d_clean(e ->> 'link', 500);
+    if v_link !~ '^https://' then v_link := null; end if;
+    select * into o from public.s3d_tracker where category = v_cat and item_code = v_code for update;
+    if not found then
+      insert into public.s3d_tracker (category, item_code, model, brand, created_on, status, colour, product_id, link, prior_list, ref_list, in_master, source, notes)
+        values (v_cat, v_code, public.s3d_clean(e ->> 'model', 400), public.s3d_clean(e ->> 'brand', 60), v_created, v_status,
+                public.s3d_clean(e ->> 'colour', 120), v_prod, v_link, coalesce(e -> 'prior_list' = 'true'::jsonb, false),
+                coalesce(e -> 'ref_list' = 'true'::jsonb, false), coalesce(e -> 'in_master' <> 'false'::jsonb, true),
+                public.s3d_clean(e ->> 'source', 60), public.s3d_clean(e ->> 'notes', 1000, true));
+      v_added := v_added + 1;
+    elsif (o.model, o.brand, o.created_on, o.status, o.colour, o.product_id, o.link, o.prior_list, o.ref_list, o.in_master, o.source, o.notes)
+          is not distinct from
+          (public.s3d_clean(e ->> 'model', 400), public.s3d_clean(e ->> 'brand', 60), v_created, v_status, public.s3d_clean(e ->> 'colour', 120),
+           v_prod, v_link, coalesce(e -> 'prior_list' = 'true'::jsonb, false), coalesce(e -> 'ref_list' = 'true'::jsonb, false),
+           coalesce(e -> 'in_master' <> 'false'::jsonb, true), public.s3d_clean(e ->> 'source', 60), public.s3d_clean(e ->> 'notes', 1000, true)) then
+      v_same := v_same + 1;
+    else
+      update public.s3d_tracker set model = public.s3d_clean(e ->> 'model', 400), brand = public.s3d_clean(e ->> 'brand', 60), created_on = v_created,
+        status = v_status, colour = public.s3d_clean(e ->> 'colour', 120), product_id = v_prod, link = v_link,
+        prior_list = coalesce(e -> 'prior_list' = 'true'::jsonb, false), ref_list = coalesce(e -> 'ref_list' = 'true'::jsonb, false),
+        in_master = coalesce(e -> 'in_master' <> 'false'::jsonb, true), source = public.s3d_clean(e ->> 'source', 60),
+        notes = public.s3d_clean(e ->> 'notes', 1000, true)
+        where id = o.id;
+      v_changed := v_changed + 1;
+    end if;
+  end loop;
+  perform set_config('s3d.how', '', true);
+  select count(*) into v_missing from public.s3d_tracker where not ((category || chr(1) || item_code) = any (v_seen));
+  select * into v_me from public.s3d_profiles where user_id = auth.uid();
+  insert into public.s3d_tracker_imports (actor, actor_email, actor_name, file_name, total, added, changed, unchanged, skipped, missing)
+    values (auth.uid(), v_me.email, v_me.full_name, public.s3d_clean(p_file, 200), v_total, v_added, v_changed, v_same, v_skipped, v_missing)
+    returning * into r;
+  perform public.s3d_audit_write('tracker_import', 'tracker', r.id::text, coalesce(r.file_name, 'Tracker spreadsheet'),
+    jsonb_build_object('rows', v_total, 'added', v_added, 'changed', v_changed, 'unchanged', v_same, 'skipped', v_skipped));
+  return row_to_json(r);
+end $$;
+
+-- Items the Tracker page found on the site (their code is a colour of a product on show): live (admins and managers,
+-- every time one of them opens the page; an item already live is left alone). p_items: [{id, product, colour}];
+-- the product id and colour fill in only where the item has none. Each change notifies as any status change does.
+create or replace function public.s3d_tracker_live(p_items jsonb) returns int
+language plpgsql security definer set search_path = public as $$
+declare
+  e jsonb;
+  v_prod text;
+  n int := 0;
+begin
+  perform public.s3d_need(array['admin', 'manager']);
+  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) > 5000 then
+    raise exception 'The list of items is missing.' using errcode = 'P0001';
+  end if;
+  perform set_config('s3d.how', 'site', true);
+  for e in select value from jsonb_array_elements(p_items) loop
+    continue when jsonb_typeof(e) <> 'object' or coalesce(e ->> 'id', '') !~ '^[0-9]{1,18}$';
+    v_prod := nullif(lower(btrim(coalesce(e ->> 'product', ''))), '');
+    if v_prod !~ '^[a-z0-9][a-z0-9-]{0,79}$' then v_prod := null; end if;
+    update public.s3d_tracker set status = 'live', product_id = coalesce(product_id, v_prod),
+      colour = coalesce(colour, public.s3d_clean(e ->> 'colour', 120))
+      where id = (e ->> 'id')::bigint and status <> 'live';
+    if found then n := n + 1; end if;
+  end loop;
+  perform set_config('s3d.how', '', true);
+  return n;
+end $$;
+
+-- "Past its due date" notices: each item not built yet (not started, in progress or blocked) whose due date has
+-- passed, once per due date, to its owner (nobody owns it: admins and managers). The admin calls it when someone
+-- opens it; pg_cron calls it every hour too where the project has pg_cron (the end of this file).
+create or replace function public.s3d_tracker_due() returns int
+language plpgsql security definer set search_path = public as $$
+declare
+  t public.s3d_tracker;
+  v_today date := (now() at time zone 'Asia/Kolkata')::date;
+  n int := 0;
+begin
+  if auth.uid() is not null then perform public.s3d_need(); end if;   -- signed-in staff, or the database itself
+  for t in select * from public.s3d_tracker
+    where due_on < v_today and status in ('not_started', 'in_progress', 'blocked') and due_told is distinct from due_on
+    order by id for update skip locked
+  loop
+    n := n + public.s3d_notify(case when t.assignee is not null then array[t.assignee] else public.s3d_leads() end, 'due',
+      public.s3d_tracker_name(t) || ' is past its due date',
+      'It was due on ' || to_char(t.due_on, 'FMDD Mon YYYY') || ' and is “' || public.s3d_tracker_label(t.status) || '”.',
+      '#/tracker/' || t.id, t.id, true);
+    update public.s3d_tracker set due_told = t.due_on where id = t.id;
+  end loop;
+  return n;
+end $$;
+
+-- Mark the signed-in person's notifications read: one (p_id), or all of them (null). Returns how many.
+create or replace function public.s3d_notify_read(p_id bigint default null) returns int
+language plpgsql security definer set search_path = public as $$
+declare
+  n int;
+begin
+  if auth.uid() is null then raise exception 'Not signed in' using errcode = '28000'; end if;
+  update public.s3d_notifications set read_at = now()
+    where recipient = auth.uid() and read_at is null and (p_id is null or id = p_id);
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+-- The kinds the signed-in staff member turns off (the others stay on).
+create or replace function public.s3d_notify_settings_set(p_off text[]) returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  v_off text[] := coalesce((select array_agg(distinct x order by x) from unnest(coalesce(p_off, '{}')) x), '{}');
+  r public.s3d_notify_settings;
+begin
+  perform public.s3d_need();
+  if not v_off <@ array['live', 'blocked', 'status', 'assigned', 'comment', 'due', 'import', 'feedback'] then
+    raise exception 'Unknown kind of notification.' using errcode = 'P0001';
+  end if;
+  insert into public.s3d_notify_settings (user_id, off) values (auth.uid(), v_off)
+    on conflict (user_id) do update set off = excluded.off, updated_at = now()
+    returning * into r;
+  return row_to_json(r);
+end $$;
+
+-- ── the tracker and notifications: row level security and grants ───────────────────────────────────────
+
+drop policy if exists s3d_tracker_read on public.s3d_tracker;
+create policy s3d_tracker_read on public.s3d_tracker for select to authenticated
+  using ((select public.s3d_role()) is not null);
+drop policy if exists s3d_tracker_log_read on public.s3d_tracker_log;
+create policy s3d_tracker_log_read on public.s3d_tracker_log for select to authenticated
+  using ((select public.s3d_role()) is not null);
+drop policy if exists s3d_tracker_imports_read on public.s3d_tracker_imports;
+create policy s3d_tracker_imports_read on public.s3d_tracker_imports for select to authenticated
+  using ((select public.s3d_role()) is not null);
+-- each person reads only their own notifications and settings
+drop policy if exists s3d_notifications_read on public.s3d_notifications;
+create policy s3d_notifications_read on public.s3d_notifications for select to authenticated
+  using (recipient = (select auth.uid()));
+drop policy if exists s3d_notify_settings_read on public.s3d_notify_settings;
+create policy s3d_notify_settings_read on public.s3d_notify_settings for select to authenticated
+  using (user_id = (select auth.uid()));
+
+revoke all on table public.s3d_tracker, public.s3d_tracker_log, public.s3d_tracker_imports, public.s3d_notifications,
+  public.s3d_notify_settings from public, anon, authenticated, service_role;
+grant select, insert, update, delete on table public.s3d_tracker, public.s3d_tracker_log, public.s3d_tracker_imports,
+  public.s3d_notifications, public.s3d_notify_settings to service_role;
+-- the browser reads (row level security above); every write goes through the functions. Identity ids: no sequence grants.
+grant select on table public.s3d_tracker, public.s3d_tracker_log, public.s3d_tracker_imports, public.s3d_notifications,
+  public.s3d_notify_settings to authenticated;
+
+revoke all on function public.s3d_clean(text, int, boolean) from public, anon, authenticated;
+revoke all on function public.s3d_need(text[]) from public, anon, authenticated;
+revoke all on function public.s3d_tracker_label(text) from public, anon, authenticated;
+revoke all on function public.s3d_leads() from public, anon, authenticated;
+revoke all on function public.s3d_watchers(bigint) from public, anon, authenticated;
+revoke all on function public.s3d_notify(uuid[], text, text, text, text, bigint, boolean) from public, anon, authenticated;
+revoke all on function public.s3d_tracker_name(public.s3d_tracker) from public, anon, authenticated;
+revoke all on function public.s3d_tracker_touch() from public, anon, authenticated;
+revoke all on function public.s3d_tracker_trg() from public, anon, authenticated;
+revoke all on function public.s3d_tracker_comment_trg() from public, anon, authenticated;
+revoke all on function public.s3d_tracker_import_trg() from public, anon, authenticated;
+revoke all on function public.s3d_feedback_notify() from public, anon, authenticated;
+revoke all on function public.s3d_staff() from public, anon, authenticated;
+revoke all on function public.s3d_tracker_update(bigint, jsonb) from public, anon, authenticated;
+revoke all on function public.s3d_tracker_comment(bigint, text) from public, anon, authenticated;
+revoke all on function public.s3d_tracker_import(jsonb, text) from public, anon, authenticated;
+revoke all on function public.s3d_tracker_live(jsonb) from public, anon, authenticated;
+revoke all on function public.s3d_tracker_due() from public, anon, authenticated;
+revoke all on function public.s3d_notify_read(bigint) from public, anon, authenticated;
+revoke all on function public.s3d_notify_settings_set(text[]) from public, anon, authenticated;
+-- signed-in staff (each function checks the role itself)
+grant execute on function public.s3d_staff() to authenticated, service_role;
+grant execute on function public.s3d_tracker_update(bigint, jsonb) to authenticated, service_role;
+grant execute on function public.s3d_tracker_comment(bigint, text) to authenticated, service_role;
+grant execute on function public.s3d_tracker_import(jsonb, text) to authenticated, service_role;
+grant execute on function public.s3d_tracker_live(jsonb) to authenticated, service_role;
+grant execute on function public.s3d_tracker_due() to authenticated, service_role;
+grant execute on function public.s3d_notify_read(bigint) to authenticated, service_role;
+grant execute on function public.s3d_notify_settings_set(text[]) to authenticated, service_role;
+-- the helpers run only inside the functions and triggers above (their owner calls them)
+grant execute on function public.s3d_clean(text, int, boolean) to service_role;
+grant execute on function public.s3d_need(text[]) to service_role;
+grant execute on function public.s3d_tracker_label(text) to service_role;
+grant execute on function public.s3d_leads() to service_role;
+grant execute on function public.s3d_watchers(bigint) to service_role;
+grant execute on function public.s3d_notify(uuid[], text, text, text, text, bigint, boolean) to service_role;
+grant execute on function public.s3d_tracker_name(public.s3d_tracker) to service_role;
+
+-- Live notifications: Supabase Realtime sends each new row to its recipient's open admin (it applies the read policy
+-- above). Supabase makes the publication supabase_realtime; the table is added to it once, so a re-run doesn't fail,
+-- and a database without it (not Supabase) is left alone.
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 's3d_notifications') then
+    execute 'alter publication supabase_realtime add table public.s3d_notifications';
+  end if;
+end $$;
+
+-- "Past its due date" every hour, where the project has the pg_cron extension switched on (Database → Extensions).
+-- One job, named s3d-tracker-due; scheduling it again replaces it. Without pg_cron the admin checks when it is opened.
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    execute $c$select cron.schedule('s3d-tracker-due', '20 * * * *', 'select public.s3d_tracker_due()')$c$;
+  end if;
+end $$;
 
 commit;
 

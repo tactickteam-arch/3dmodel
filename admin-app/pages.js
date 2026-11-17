@@ -590,6 +590,8 @@ export const PERMISSIONS = [
   { group: "Products", what: "Testing: approve or decline a product, mark feedback fixed", cells: AM("no") },
   { group: "Products", what: "Requests: ask for a new product, comment on any request", cells: ALL("yes") },
   { group: "Products", what: "Requests: accept, move along, mark live, or say why it isn’t possible", cells: AM("view") },
+  { group: "Products", what: "Tracker: see every item and its history, comment on one, export CSV", cells: ALL("yes") },
+  { group: "Products", what: "Tracker: change an item’s status, owner, due date and priority; import the tracker spreadsheet", cells: AM("view") },
   { group: "Stores and screens", what: "Stores: add, edit, delete", cells: AM("view") },
   { group: "Stores and screens", what: "Devices: add, edit, delete, pair", cells: AM("view") },
   { group: "Stores and screens", what: "Devices: show a product or play a playlist on a paired device", cells: AM("view") },
@@ -599,6 +601,7 @@ export const PERMISSIONS = [
   { group: "Access", what: "Roles", cells: ALL("view") },
   { group: "Access", what: "Audit log", cells: { admin: "yes", manager: "no", viewer: "no" } },
   { group: "Access", what: "Your profile: your name and your password", cells: ALL("yes") },
+  { group: "Access", what: "Notifications: your own, and which ones you get", cells: ALL("yes") },
 ];
 
 export async function rolesPage(ctx) {
@@ -608,8 +611,8 @@ export async function rolesPage(ctx) {
   if (!ctx.alive()) return;
   const roles = [
     ["admin", "orange", "Everything: users, invites, roles and the audit log, as well as all a manager can do."],
-    ["manager", "blue", "Runs the stores and their screens: stores, devices, playlists and what each device shows. Approves or declines new products, and accepts and moves along product requests. Reads the analytics."],
-    ["viewer", "", "Looks, tests and asks: reads the dashboard, analytics, products, stores and devices; tests new products (feedback and the checklist); asks for new products and comments on requests."],
+    ["manager", "blue", "Runs the stores and their screens: stores, devices, playlists and what each device shows. Approves or declines new products, and accepts and moves along product requests. Runs the 3D tracker: assigns items, sets their status and due dates, imports the tracker spreadsheet. Reads the analytics."],
+    ["viewer", "", "Looks, tests and asks: reads the dashboard, analytics, products, stores and devices; tests new products (feedback and the checklist); asks for new products and comments on requests and tracker items."],
   ];
   const cell = { yes: `<td class="yes">${icon("check")}<span class="sr">Yes</span></td>`, no: `<td class="no">—<span class="sr">No</span></td>`, view: `<td class="part">View</td>` };
   const groups = [...new Set(PERMISSIONS.map((p) => p.group))];
