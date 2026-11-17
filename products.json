@@ -5980,7 +5980,8 @@
           "usdz": "/models/usdz/samsung-rs76cg8113slhl-ez-clean-steel.usdz",
           "altCodes": [
             "RS76CG8113SLHL D"
-          ]
+          ],
+          "itemCode": "RS76CG8113SLHL D"
         },
         {
           "name": "Black DOI",
@@ -7863,7 +7864,8 @@
           "code": "RT40H28U2PHL",
           "altCodes": [
             "RT40H28U2PHL D"
-          ]
+          ],
+          "itemCode": "RT40H28U2PHL D"
         },
         {
           "name": "Black DOI",
@@ -7894,7 +7896,8 @@
           "code": "RT40H28U2PRHL",
           "altCodes": [
             "RT40H28U2PRHL DD"
-          ]
+          ],
+          "itemCode": "RT40H28U2PRHL DD"
         }
       ],
       "parts": [
@@ -15709,7 +15712,7 @@
           "usdz": "/models/usdz/lloyd-gls18i3aschc-white-and-grey.usdz",
           "variant": "White and grey",
           "code": "GLS18I3ASCHC",
-          "itemCode": "GLS18I3ASCHC",
+          "itemCode": "GLS18I3ASCHC ODU",
           "sangeethaUrl": "https://www.sangeetha.com/product-details/lloyd-classic-series-inverter-split-ac-1-5-or-3-star-gls18i3aschc/20486",
           "altCodes": [
             "GLS18I3ASCHC IDU",

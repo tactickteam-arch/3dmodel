@@ -31,7 +31,7 @@
     --copper-bg: #FDEBDC;
     --slate: #5E6066;
     --hair: #E3E3E6;
-    --stage: #E7E7EA;
+    --stage: #CDD2D9;   /* a studio grey, so a white AC or washer stands out (Sangeetha, 17 Nov) */
     --serif: Outfit, -apple-system, Arial, sans-serif;
     --sans: Outfit, -apple-system, Arial, sans-serif;
     --shadow: 0 8px 24px rgba(18,34,58,.12);
@@ -72,7 +72,7 @@
 
   /* layout */
   main { display: grid; grid-template-columns: minmax(0, 1fr) 440px; height: calc(100vh - 64px); min-height: 620px; }
-  .stage { position: relative; min-height: 0; background: radial-gradient(ellipse at 50% 42%, #FBFBFC 0%, var(--stage) 75%); overflow: hidden; }
+  .stage { position: relative; min-height: 0; background: radial-gradient(ellipse at 50% 42%, #EEF0F3 0%, var(--stage) 78%); overflow: hidden; }
   model-viewer { width: 100%; height: 100%; --poster-color: transparent; --progress-bar-color: transparent; --min-hotspot-opacity: 0; background: transparent; }
   model-viewer:focus { outline: none; }
   model-viewer::part(default-progress-bar) { display: none; }
@@ -581,10 +581,11 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { esc, cm, partAt, hotspotShown, fitCheck, finishSlug, finishIndexOf } from "/site.js";
+import { esc, cm, partAt, hotspotShown, fitCheck, finishSlug, finishIndexOf, finishPath } from "/site.js";
 import { loadCatalogue } from "/live.js";
 import { initRoom } from "/room.js";
 import { initOrganise } from "/organise.js";
+import { studioLight } from "/light.js";
 import { SITE } from "/site-config.js";
 const $ = (id) => document.getElementById(id);
 const mv = $("viewer");
@@ -628,7 +629,8 @@ const I = {
   box: svg('<path d="M12 3 3 7.5v9L12 21l9-4.5v-9z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>'),
 };
 
-// ── which product: /p/<id>, /p/<item code> (a colour's maker code, as Sangeetha's sheets have it), or ?id=<id> ──
+// ── which product: /p/<id>, /p/<item code> (a colour's code, as Sangeetha's sheets have it), /p/<item code>/<colour>
+// (a colour that isn't in Sangeetha's item master, under its product's code), or ?id=<id> ──
 const opened = decodeURIComponent((location.pathname.match(/\/p\/(.+?)\/?$/) || [])[1] || new URLSearchParams(location.search).get("id") || "");
 const id = opened.toLowerCase();
 // on show: products.json's "hidden" flag, unless the team approved or declined the product in the admin (live.js).
@@ -637,10 +639,23 @@ const PREVIEW = new URLSearchParams(location.search).get("preview") === "1";
 const catalogue = await loadCatalogue();
 const open = (p) => PREVIEW || catalogue.isShown(p);
 const codeKey = (c) => String(c).toUpperCase().replace(/[^A-Z0-9]+/g, "");
-let product = catalogue.products.find((p) => p.id === id && open(p)), codeFinish = -1;
-if (!product && opened) for (const p of catalogue.products.filter(open)) {
-  const i = (p.finishes || []).findIndex((f) => [f.itemCode, f.code, ...(f.altCodes || [])].some((c) => c && codeKey(c) === codeKey(opened)));
-  if (i >= 0) { product = p; codeFinish = i; break; }
+// the product (and colour) an id or a code names; a code is matched ignoring case and punctuation
+const lookUp = (at) => {
+  const byId = catalogue.products.find((p) => p.id === at.toLowerCase() && open(p));
+  if (byId) return [byId, -1];
+  for (const p of catalogue.products.filter(open)) {
+    const i = (p.finishes || []).findIndex((f) => [f.itemCode, f.code, ...(f.altCodes || [])].some((c) => c && codeKey(c) === codeKey(at)));
+    if (i >= 0) return [p, i];
+  }
+  return [null, -1];
+};
+let [product, codeFinish] = opened ? lookUp(opened) : [null, -1];
+// /p/<item code>/<colour>: the last part names the colour (an item code can hold a "/" itself, so the whole was tried first)
+if (!product && opened.includes("/")) {
+  const cut = opened.lastIndexOf("/"), colour = finishSlug(opened.slice(cut + 1));
+  [product, codeFinish] = lookUp(opened.slice(0, cut));
+  const named = product ? product.finishes.findIndex((f) => finishSlug(f.name) === colour) : -1;
+  if (named >= 0) codeFinish = named;
 }
 if (PREVIEW) {
   const robots = document.createElement("meta");
@@ -654,14 +669,14 @@ if (!product) {
   document.title = "Product not found";
   await new Promise(() => {}); // nothing below applies to a missing product
 }
-// ?finish=<slug> opens that colour (an old or mistyped one opens the first), and so does a colour's item code
-// (Sangeetha's `itemCode` or the maker's `code`). On /p/ the address then names the colour's item code
-// (/p/HRB-3752BNSA-P; Sangeetha's when its listing gives one), so the link people copy, share or scan is the store's; a colour without a code keeps /p/<id>?finish=<slug>.
+// ?finish=<slug> opens that colour (an old or mistyped one opens the first), and so does a colour's code. On /p/ the
+// address then names the colour as Sangeetha's item master does (finishPath in site.js): /p/<item code>, or for a colour
+// that isn't in the master /p/<product's item code>/<colour>; so the link people copy, share or scan is the store's.
 let finishIndex = codeFinish >= 0 && !new URLSearchParams(location.search).get("finish") ? codeFinish : finishIndexOf(product, new URLSearchParams(location.search).get("finish"));
 function addressFor(i) {
-  const f = product.finishes?.[i], u = new URL(location.href), code = String(f?.itemCode || f?.code || "").trim(); // Sangeetha's item code first
+  const u = new URL(location.href), code = finishPath(product, i);
   if (!u.pathname.startsWith("/p/")) { if ((product.finishes || []).length > 1) u.searchParams.set("finish", finishSlug(product.finishes[i].name)); return u; }
-  u.pathname = code ? `/p/${encodeURI(code)}` : `/p/${product.id}`;
+  u.pathname = code ? encodeURI(code) : `/p/${product.id}`;
   if (code) u.searchParams.delete("finish");
   else if ((product.finishes || []).length > 1) u.searchParams.set("finish", finishSlug(product.finishes[i].name));
   return u;
@@ -1002,6 +1017,9 @@ let goal = null, goalAt = 0, minRadius = 0, maxRadius = Infinity, baseFov = 30, 
 // fn runs on every model load, and also once now if the model already loaded while this module waited for the headset
 // check above: on a slow phone "load" can come first, and then the doors, Fill and the fit were never set up
 function onLoad(fn) { mv.addEventListener("load", fn); if (mv.loaded) setTimeout(fn); }
+// the studio light turns with the camera, and the key light's shadow with it (light.js); set up once, at the opening view
+let lit = false;
+onLoad(() => { if (!lit) { lit = true; requestAnimationFrame(() => studioLight(mv, { wall: onWall })); } });
 onLoad(() => {
   // the same limits model-viewer itself uses: 2.2 x the bounding sphere, up to 300% of the start distance
   const d = mv.getDimensions();

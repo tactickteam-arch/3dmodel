@@ -13,6 +13,7 @@ import crypto from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import { finishPath } from "../../site.js";
 
 const SITE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const B3D = `${SITE}/pipeline/build3d`, SCR = `${SITE}/pipeline/scripts`;
@@ -77,8 +78,9 @@ const parts = entry.parts || [];
   const badParts = parts.filter((p) => !p.key || !p.node || !p.zone?.closed || !p.zone?.open || !(p.axis || p.slide));
   record("parts", parts.length >= 1 && parts.length <= 4 && !badParts.length && parts.some((p) => p.hint), `${parts.length} moving parts (${parts.map((p) => p.key + (p.needs ? `<${p.needs}` : "")).join(" ")})${badParts.length ? `, ${badParts.length} without node, axis or zones` : ""}${parts.some((p) => p.hint) ? "" : ", no hint part"}`);
   record("source", /^https:\/\//.test(entry.source || ""), `maker page: ${entry.source || "none"}`);
-  // STANDARD 2: each colour's link is /p/<item code>, the maker's code exactly as written (make_pages.mjs writes the page)
-  const codes = (entry.finishes || []).map((f) => String(f.itemCode || f.code || "").trim()); // Sangeetha's item code first
+  // STANDARD 2: a colour in Sangeetha's item master links as /p/<its item code>, one that isn't as /p/<product's item code>/<colour>
+  // (finishPath in site.js; make_pages.mjs writes the page)
+  const codes = (entry.finishes || []).map((_, i) => String(finishPath(entry, i) || "").slice(3));
   const badCode = codes.filter((c) => c && (!/^[\w .\-]+(\/[\w .\-]+)*$/.test(c) || /(^|\/)\.\.?(\/|$)/.test(c)));
   record("item-links", codes.length > 0 && codes.every(Boolean) && !badCode.length && new Set(codes).size === codes.length,
     codes.every(Boolean) ? `${codes.length} colours: ${codes.map((c) => `/p/${c}`).join(", ")}${badCode.length ? `; can't be a link: ${badCode.join(", ")}` : ""}${new Set(codes).size < codes.length ? "; a code is repeated" : ""}`

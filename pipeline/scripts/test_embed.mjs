@@ -6,12 +6,13 @@
 // usage: node test_embed.mjs <site base url> <host page url> <out dir> [product id]
 import fs from "node:fs";
 import { launch, sleep } from "./cdp.mjs";
+import { finishPath } from "../../site.js";
 
 const [base, host, out, id = "lg-glt3426snpz"] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
-// the page shows the first colour's item code in the address bar (STANDARD.md section 2), so that is where it lands
-const first = JSON.parse(fs.readFileSync(new URL("../../products.json", import.meta.url), "utf8")).products.find((p) => p.id === id)?.finishes?.[0];
-const at = `/p/${encodeURI(String(first?.itemCode || first?.code || id).trim())}`;
+// the page shows the first colour's address in the address bar (STANDARD.md section 2), so that is where it lands
+const shown = JSON.parse(fs.readFileSync(new URL("../../products.json", import.meta.url), "utf8")).products.find((p) => p.id === id);
+const at = encodeURI((shown && finishPath(shown, 0)) || `/p/${id}`);
 let failed = 0;
 const check = (ok, msg) => { console.log(`  ${ok ? "ok  " : "FAIL"} ${msg}`); if (!ok) failed++; };
 const b = await launch({ profile: `${out}/prof`, port: +(process.env.PORT || 9471) });

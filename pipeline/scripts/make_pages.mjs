@@ -24,7 +24,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { finishSlug, productIdOf } from "../../site.js";
+import { finishSlug, finishPath, productIdOf } from "../../site.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -123,6 +123,12 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
   for (const p of shown) for (const fin of p.finishes || []) for (const code of new Set([fin.itemCode, fin.code, ...(fin.altCodes || [])].map((c) => String(c || "").trim()).filter(Boolean))) {
     if (!/^[\w .\-]+(\/[\w .\-]+)*$/.test(code) || /(^|\/)\.\.?(\/|$)/.test(code)) { notes.push(`item code "${code}" can't be a link; left out`); continue; }
     page(p, code, code);
+  }
+  // and one per colour that isn't in Sangeetha's item master, at its product's item code and its name
+  // (/p/RR21H2H25BR/HL/begonia-blue; finishPath in site.js); its own maker's code above still opens it
+  for (const p of shown) for (const [i, fin] of (p.finishes || []).entries()) {
+    const at = finishPath(p, i);
+    if (!fin.itemCode && at && at.split("/").length > 3) page(p, at.slice(3), fin.code || p.model);
   }
 
   // 2. short links by Sangeetha's Product ID (a product's, and each colour's)

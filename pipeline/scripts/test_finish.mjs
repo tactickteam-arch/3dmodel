@@ -18,6 +18,7 @@ import { spawn, execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { launch, sleep } from "./cdp.mjs";
 import { build } from "./make_pages.mjs";
+import { finishPath } from "../../site.js";
 import { SITE } from "../../site-config.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -48,7 +49,7 @@ const scratch = path.join(out, "products.json");
 fs.writeFileSync(scratch, JSON.stringify(cat, null, 2));
 check(read("products.json") === real && scratch !== path.join(root, "products.json"), "the scratch catalogue is a copy; the real products.json is untouched");
 const first = F.finishes[0], firstSlug = first.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const FIRST_AT = first.itemCode || first.code ? `/p/${encodeURI(first.itemCode || first.code)}` : null; // Sangeetha's item code first
+const FIRST_AT = finishPath(F, 0) ? encodeURI(finishPath(F, 0)) : null; // the item master's code (site.js)
 console.log(`  (scratch: ${F.id} gets "${gold.name}" with ID ${PID} and ${G.id}'s USDZ; ${G.id}'s colour repeats ${PID})`);
 
 console.log("\n[make_pages.mjs build()]");

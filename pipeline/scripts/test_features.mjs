@@ -4,6 +4,7 @@
 // usage: node test_features.mjs <baseUrl> <outDir>
 import fs from "node:fs";
 import { launch, sleep } from "./cdp.mjs";
+import { finishPath } from "../../site.js";
 
 const [base, out] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
@@ -115,7 +116,7 @@ for (const p of products) {
 
   const wa = await b.evalJS(`document.getElementById("btnWhatsApp").href`);
   // the shared link is the first colour's item link (STANDARD 2), or /p/<id> for a colour without a code
-  const at = `/p/${encodeURI(p.finishes?.[0]?.itemCode || p.finishes?.[0]?.code || p.id)}`;
+  const at = encodeURI(finishPath(p, 0) || `/p/${p.id}`);
   check(wa.startsWith("https://wa.me/?text=") && decodeURIComponent(wa).includes(new URL(at, "https://x").pathname), `WhatsApp link ${wa.slice(0, 60)}… shares ${decodeURI(at)}`);
 
   // phone

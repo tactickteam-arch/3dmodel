@@ -15,6 +15,19 @@ export const CATEGORIES = [
 export const finishSlug = (name) => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 // the finish a ?finish= value names, or the first one when it names none
 export const finishIndexOf = (product, slug) => Math.max(0, slug ? product.finishes.findIndex((f) => finishSlug(f.name) === finishSlug(slug)) : 0);
+// A colour's address on /p/ (STANDARD.md section 2), not URI-encoded. A colour in Sangeetha's item master has its
+// master item code as `itemCode`, exactly as written there, and opens at /p/<item code>. A colour that isn't in the
+// master has no code of its own: it opens at the product's master code and its name, /p/<item code>/<colour>.
+// A product with no master code at all keeps the maker's code; null means /p/<id>?finish=<colour>.
+export function finishPath(product, i) {
+  const fins = product.finishes || [], f = fins[i];
+  const own = String(f?.itemCode || "").trim();
+  if (own) return `/p/${own}`;
+  const base = fins.map((x) => String(x.itemCode || "").trim()).find(Boolean);
+  if (base && f) return `/p/${base}/${finishSlug(f.name)}`;
+  const code = String(f?.code || "").trim();
+  return code ? `/p/${code}` : null;
+}
 // Sangeetha's Product ID at the end of a sangeetha.com address, or null
 export const productIdOf = (url) => String(url || "").match(/\/(\d+)\/?$/)?.[1] || null;
 
