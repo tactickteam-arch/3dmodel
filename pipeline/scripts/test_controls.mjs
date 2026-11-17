@@ -93,7 +93,8 @@ for (const id of ids) {
   c = await cam();
   check(near(c.theta, home.theta + 20, 1) && near(c.phi, home.phi - 10, 1) && c.r < home.r, "arrow keys turn and + zooms");
   await key("0", "Digit0", 48);
-  c = await cam();
+  // the camera glides home, slower on a busy machine
+  c = await camUntil((c) => near(c.theta, home.theta, 0.5) && near(c.r, home.r, 0.01));
   check(near(c.theta, home.theta, 0.5) && near(c.r, home.r, 0.01), "0 puts the view back");
 
   // a click on the empty background used to zoom all the way out

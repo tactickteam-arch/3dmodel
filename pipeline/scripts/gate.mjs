@@ -103,6 +103,10 @@ if (doc) {
   const size = fs.statSync(file(entry.glb)).size;
   record("glb-size", size / 1048576 <= BUDGET.glb, `${MB(size)} MB (budget ${BUDGET.glb} MB)`);
   for (const t of doc.getRoot().listTextures()) glbHashes.add(crypto.createHash("sha1").update(t.getImage()).digest("hex"));
+  // the Khronos validator, as Android's viewer and WebXR read the file: no errors (missing tangents are only warnings)
+  const vr = (await req("gltf-validator").validateBytes(new Uint8Array(fs.readFileSync(file(entry.glb))), { maxIssues: 1000 })).issues;
+  const errs = [...new Set(vr.messages.filter((x) => x.severity === 0).map((x) => `${x.code} at ${x.pointer}`))];
+  record("gltf-valid", !vr.numErrors, `${vr.numErrors} errors, ${vr.numWarnings} warnings${errs.length ? `: ${errs.slice(0, 4).join("; ")}` : ""}`);
 
   // every vertex at rest against the published box; parts listed in gate.json "sticksOut" may pass it (cord, plug, hoses...)
   const S = ["w", "h", "d"].map((k) => cm(entry.size[k]));

@@ -92,6 +92,7 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 | entry, specs, hotspots, parts, source | All entry fields are present. There are at least 8 spec rows, exactly 4 complete feature callouts, 1 to 4 parts (each with its node, axis or slide and zones, and one marked `hint`) and the maker's page as `source`. |
 | photos, files | 4 photos at 900 × 900, plus the model, thumbnail, logo, Quick Look banner and every Apple file, including the `-free` copies. |
 | glb-size, usdz-size | Within the budget (section 10). |
+| gltf-valid | The GLB has 0 errors in the Khronos glTF validator, which reads it as Android's viewer and WebXR do. Missing tangents are only warnings. |
 | dims | No point is more than 3 mm outside the published W × H × D, and the body is no more than 3 mm short of it. Parts that really stick out are listed with their source (section 8). |
 | stands | Lowest point within 2 mm of the floor. A floor product is centred within 5 mm on x and 2 cm on z. A wall unit's back is at z 0. |
 | clips | `Rest` comes first, then the one-part moves. |

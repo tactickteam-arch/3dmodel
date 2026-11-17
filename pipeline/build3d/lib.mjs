@@ -174,6 +174,8 @@ function grainUVs(root, materials) {
       uv[2 * i + 1] = b / tile;
     }
     o.geometry.setAttribute("uv1", new THREE.BufferAttribute(uv, 2));
+    // glTF numbers UV sets from 0 with no gaps (a TEXCOORD_1 alone is invalid, and Android's viewer may refuse it)
+    if (!o.geometry.attributes.uv) o.geometry.setAttribute("uv", new THREE.BufferAttribute(uv.slice(), 2));
   });
 }
 

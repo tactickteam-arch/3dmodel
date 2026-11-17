@@ -30,6 +30,8 @@ const drawn = async () => JSON.parse(await b.evalJS(`JSON.stringify((() => { con
     return [p.key, +moved.toFixed(2), st[p.key] ? moved > 0.98 : moved < 0.02]; }); })())`));
 const center = async (sel) => JSON.parse(await b.evalJS(`(() => { const r = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return JSON.stringify({ x: r.x + r.width / 2, y: r.y + r.height / 2 }); })()`));
 const tap = async (sel, touch) => { const c = await center(sel); if (touch) { await b.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: c.x, y: c.y }] }); await sleep(40); await b.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); } else { await b.send("Input.dispatchMouseEvent", { type: "mousePressed", ...c, button: "left", clickCount: 1 }); await b.send("Input.dispatchMouseEvent", { type: "mouseReleased", ...c, button: "left", clickCount: 1 }); } };
+// wait for every part to finish moving (a slow machine takes longer than any fixed pause), then a moment more
+const settle = async () => { await sleep(500); await b.waitFor("window.__demo.idle()", 30000); await sleep(300); };
 const st = async () => JSON.parse(await b.evalJS("JSON.stringify(window.__demo.state)"));
 const barFits = async () => JSON.parse(await b.evalJS(`(() => { const s = document.getElementById('stage').getBoundingClientRect(); const bs = [...document.querySelectorAll('#parts button')].map((x) => x.getBoundingClientRect());
   return JSON.stringify({ below: document.getElementById('stage').classList.contains('parts-below'), inside: bs.every((r) => r.left >= s.left - 1 && r.right <= s.right + 1 && r.bottom <= Math.min(s.bottom, innerHeight) + 1), n: bs.length }); })()`));
@@ -53,19 +55,19 @@ await b.shot(`${out}/ipad-land-fridge.png`);
 await b.viewport(1280, 800, false);
 await load("haier-hes-690gk");
 await b.evalJS(restAt);
-await tap("#part-freezer"); await sleep(300); await tap("#part-fridge"); await sleep(3500);
+await tap("#part-freezer"); await sleep(300); await tap("#part-fridge"); await settle();
 let s = await st(), d = await drawn();
 check(s.freezer && s.fridge && d.every((x) => x[2]), `freezer, then fridge 300 ms later: both open and drawn so (${d.map((x) => `${x[0]} ${Math.round(x[1] * 100)}%`).join(", ")})`);
-await tap("#part-fridge"); await sleep(150); await tap("#part-fridge"); await sleep(2500);
+await tap("#part-fridge"); await sleep(150); await tap("#part-fridge"); await settle();
 s = await st(); d = await drawn();
 check(!s.fridge && s.freezer && d.every((x) => x[2]), `two presses on "Close fridge" 150 ms apart close it once (fridge open: ${s.fridge})`);
-await tap("#part-freezer"); await sleep(2000);
-await tap("#part-organise"); await sleep(300); await tap("#part-trays"); await sleep(9000);
+await tap("#part-freezer"); await settle();
+await tap("#part-organise"); await sleep(300); await tap("#part-trays"); await settle();
 s = await st(); d = await drawn();
 const full = await b.evalJS("window.__organise.isFull()");
 check(full && s.trays && s.fridge && s.freezer && d.every((x) => x[2]), `Fill, then "Take out trays" 300 ms later: full, trays out, doors open (${JSON.stringify(s)})`);
 await b.shot(`${out}/fill-trays.png`);
-await tap("#part-freezer"); await sleep(250); await tap("#part-freezerDrawer"); await sleep(4000);
+await tap("#part-freezer"); await sleep(250); await tap("#part-freezerDrawer"); await settle();
 s = await st(); d = await drawn();
 check(d.every((x) => x[2]), `Close freezer, then freezer drawers 250 ms later: every part drawn as the page says (${JSON.stringify(s)})`);
 
