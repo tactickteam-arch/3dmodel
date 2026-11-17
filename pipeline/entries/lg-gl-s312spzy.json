@@ -1,0 +1,166 @@
+{
+  "products": [
+    {
+      "id": "lg-gl-s312spzy",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GL-S312SPZY",
+      "name": "LG 272 L double-door convertible refrigerator with Smart Inverter Compressor",
+      "shortName": "272 L double-door refrigerator",
+      "summary": "Open the freezer, slide the ice maker out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-gl-s312spzy.glb",
+      "thumb": "/photos/lg-gl-s312spzy/0.jpg",
+      "photos": ["/photos/lg-gl-s312spzy/0.jpg", "/photos/lg-gl-s312spzy/1.jpg", "/photos/lg-gl-s312spzy/2.jpg", "/photos/lg-gl-s312spzy/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 132%",
+      "finishes": [
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#b4b5b7",
+          "usdz": "/models/usdz/lg-gl-s312spzy-shiny-steel.usdz",
+          "itemCode": "S312SPZY",
+          "code": "GL-S312SPZY",
+          "altCodes": ["GL-S312SPZY.APZZEBN"]
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [-0.273, 1.194, 0.193],
+              [0.277, 1.68, 0.319]
+            ],
+            "open": [
+              [0.256, 1.194, 0.242],
+              [0.699, 1.68, 0.684]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.16],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.192, 1.259, -0.022],
+              [-0.016, 1.398, 0.187]
+            ],
+            "open": [
+              [-0.192, 1.259, 0.138],
+              [-0.016, 1.398, 0.347]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.274, 0.032, 0.168],
+              [0.278, 1.18, 0.319]
+            ],
+            "open": [
+              [0.246, 0.032, 0.242],
+              [0.699, 1.18, 0.695]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.52],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.238, 0.086, -0.243],
+              [0.238, 1.041, 0.166]
+            ],
+            "open": [
+              [-0.238, 0.086, 0.277],
+              [0.238, 1.041, 0.686]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55.5 cm",
+        "h": "168 cm",
+        "d": "63.7 cm"
+      },
+      "sizeNote": "LG's manual lists 99.9 cm total depth and 95.3 cm total width with a door open",
+      "specs": [
+        ["Total capacity", "272 L (freezer 58 L, fridge 214 L)"],
+        ["Type", "Frost free, double door"],
+        ["Convertible", "Yes"],
+        ["Energy rating", "1 star, 271 units a year (BEE's register, 2026-28 label; LG's page still shows 2 star, its 2023-25 label)"],
+        ["Compressor", "Smart Inverter, 10 years on the compressor"],
+        ["Cooling", "Multi Air Flow, LINEAR Cooling"],
+        ["Fresh Zone", "1 vegetable box (Moist Balance Crisper)"],
+        ["Shelves", "Toughened glass (fridge), clear GPPS (freezer)"],
+        ["Door baskets", "2 in the freezer, 4 in the fridge, transparent"],
+        ["Ice maker", "Manual (Moving Icemaker)"],
+        ["Control", "Internal LED display, Express Freeze, door alarm"],
+        ["Door", "PET, Pocket Handle"],
+        ["Light", "Fridge light"],
+        ["Power cuts", "Auto Smart Connect (inverter-compatible)"],
+        ["Smart Diagnosis", "Yes"],
+        ["Refrigerant", "R-600a"],
+        ["Weight", "52 kg"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-272l-double-door-refrigerator-s312spzy/21469",
+      "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/gl-s312spzy/",
+      "hotspots": [
+        {
+          "title": "Convertible",
+          "text": "Convert a section of the freezer to more refrigeration as needed, to keep foods fresher for longer.",
+          "pos": [0.07, 1.49, -0.2455],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Smart Diagnosis™",
+          "text": "A fast and easy way to troubleshoot: call LG's helpline and place the phone on the appliance, which then gets a diagnosis within seconds.",
+          "pos": [0.17, 1.681, 0.24],
+          "normal": [0, 1, 0],
+          "show": "always"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Multiple cooling air vents distribute and circulate cool air to every corner of the refrigerator, so every food item is properly cooled.",
+          "pos": [0.1, 1.575, -0.2385],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Higher energy efficiency and super silent operation, with a 10-year warranty on the compressor.",
+          "pos": [0.08, 0.72, 0.3185],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ],
+      "fit": {
+        "front": 36,
+        "sides": 30,
+        "back": 30,
+        "note": "From LG's owner's manual for this model: allow over 30 cm clearance from each adjacent wall. The manual gives 99.9 cm total depth with a door open, which is 36 cm in front of the fridge."
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+ "edge_highlight_taken_out": [
+  108.3,
+  105.3
+ ],
+ "streak_contrast": 5.41,
+ "door_photo_median": [
+  131,
+  132,
+  136
+ ],
+ "mark_photo": [
+  196,
+  197,
+  201
+ ],
+ "mark_ground_photo": [
+  138,
+  139,
+  143
+ ],
+ "lgmark_aspect": 2.1812,
+ "panel_mm": [
+  65,
+  93
+ ],
+ "knob_mm": [
+  32.5,
+  45.1
+ ]
+}

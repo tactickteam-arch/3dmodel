@@ -136,3 +136,4 @@ log("\nerrors:", errs.length ? "\n" + errs.join("\n") : "none");
 log(`\n${fails} failed checks`);
 fs.writeFileSync(`${out}/report.txt`, report.join("\n"));
 b.close();
+process.exit(fails ? 1 : 0); // the gate reads the exit status

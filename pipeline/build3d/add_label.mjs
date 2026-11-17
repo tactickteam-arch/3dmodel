@@ -7,7 +7,8 @@
 // part's front, from the left and from the top; top: or the label's top edge this far below the part's top.
 // finishes: a colour with its own label (another model code), or null for a colour whose label isn't confirmed.
 // The label lies 0.7 mm proud of whatever surface is under all four corners, found by casting rays at the front.
-// usage: node add_label.mjs <model.glb> <productId> [labels.json]   (a product with no entry is left as it is)
+// usage: node add_label.mjs <model.glb> <productId> [labels.json]   (a product with no entry is left as it is;
+// a product not yet promoted can keep its entry in pipeline/entries/<id>.label.json, the same shape)
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,7 +18,9 @@ import * as THREE from "three";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const [glb, id, cfgPath = path.join(HERE, "../entries/labels.json")] = process.argv.slice(2);
-const spec = JSON.parse(fs.readFileSync(cfgPath, "utf8"))[id];
+// a product being built keeps its entry in pipeline/entries/<id>.label.json until it is promoted into labels.json
+const own = path.join(HERE, `../entries/${id}.label.json`);
+const spec = JSON.parse(fs.readFileSync(cfgPath, "utf8"))[id] ?? (fs.existsSync(own) ? JSON.parse(fs.readFileSync(own, "utf8")) : undefined);
 if (!spec) { console.log(id, "no label entry"); process.exit(0); }
 const TEX = path.join(HERE, "../tex");
 const png = (f) => fs.readFileSync(path.join(TEX, f));

@@ -1,0 +1,213 @@
+{
+  "products": [
+    {
+      "id": "samsung-rr20c1823cr",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RR20C1823CR/HL",
+      "name": "Samsung 183 L single-door refrigerator, Stylish Grandé design with Base Stand Drawer",
+      "shortName": "183 L single-door refrigerator",
+      "summary": "Open the door and the freezer box, slide out the trays and the base drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/samsung-rr20c1823cr.glb",
+      "thumb": "/photos/samsung-rr20c1823cr/0.jpg",
+      "photos": ["/photos/samsung-rr20c1823cr/0.jpg", "/photos/samsung-rr20c1823cr/1.jpg", "/photos/samsung-rr20c1823cr/2.jpg", "/photos/samsung-rr20c1823cr/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Camellia Purple",
+          "swatchColor": "#5f2f3b",
+          "variant": "Camellia Purple",
+          "itemCode": "RR20c1823cr/hl",
+          "code": "RR20C1823CR/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-camellia-purple.usdz"
+        },
+        {
+          "name": "Camellia Blue",
+          "swatchColor": "#003997",
+          "variant": "Camellia Blue",
+          "code": "RR20C1823CU/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-camellia-blue.usdz"
+        },
+        {
+          "name": "Camellia Black",
+          "swatchColor": "#000000",
+          "variant": "Camellia Black",
+          "code": "RR20C1823CB/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-camellia-black.usdz"
+        },
+        {
+          "name": "Blooming Saffron Red",
+          "swatchColor": "#96002c",
+          "variant": "Blooming Saffron Red",
+          "code": "RR20C1823R8/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-blooming-saffron-red.usdz"
+        },
+        {
+          "name": "Blooming Saffron Blue",
+          "swatchColor": "#0a3369",
+          "variant": "Blooming Saffron Blue",
+          "code": "RR20C1823U8/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-blooming-saffron-blue.usdz"
+        },
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#dbdbdb",
+          "variant": "Elegant Inox",
+          "code": "RR20C1823S8/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-elegant-inox.usdz"
+        },
+        {
+          "name": "Urban Tropical Blue",
+          "swatchColor": "#000080",
+          "variant": "Urban Tropical Blue",
+          "code": "RR20C1823VB/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-urban-tropical-blue.usdz"
+        },
+        {
+          "name": "Urban Tropical Red",
+          "swatchColor": "#581c28",
+          "variant": "Urban Tropical Red",
+          "code": "RR20C1823VF/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-urban-tropical-red.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 127,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.267, 0.172, 0.117],
+              [0.267, 1.3, 0.321]
+            ],
+            "open": [
+              [0.21, 0.172, 0.185],
+              [0.646, 1.3, 0.68]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": 90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.206, 1.047, 0.097],
+              [0.179, 1.204, 0.125]
+            ],
+            "open": [
+              [0.161, 1.047, 0.114],
+              [0.189, 1.204, 0.5]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.3],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.23, 0.22, -0.262],
+              [0.23, 0.998, 0.13]
+            ],
+            "open": [
+              [-0.23, 0.22, 0.038],
+              [0.23, 0.998, 0.43]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "base drawer",
+          "node": "BaseDrawer",
+          "slide": [0, 0, 0.25],
+          "zone": {
+            "closed": [
+              [-0.273, 0.013, -0.286],
+              [0.273, 0.166, 0.285]
+            ],
+            "open": [
+              [-0.273, 0.013, -0.036],
+              [0.273, 0.166, 0.535]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.9 cm",
+        "h": "130 cm",
+        "d": "64 cm"
+      },
+      "sizeNote": "Samsung India gives 54.9 × 130 × 64 cm (W × H × D, with the hinge, the base stand and the handle) and 62 cm deep without the handle; its manual: the door opens to 127°, and leave 100 mm behind",
+      "fit": {
+        "back": 10,
+        "note": "Samsung's manual for this range (RR19 to RR24): 100 mm between the back of the fridge and the wall; the door opens to 127°"
+      },
+      "specs": [
+        ["Total capacity", "183 L (fridge 165 L, freezer 18 L)"],
+        ["Type", "Direct cool, single door"],
+        ["Energy rating", "3 star"],
+        ["Compressor", "Digital Inverter Compressor"],
+        ["Power cuts", "Stabilizer Free Operation, 100 to 300 V"],
+        ["Controls", "Knob"],
+        ["Shelves", "2 toughened glass"],
+        ["Door storage", "5 transparent door pockets, egg tray"],
+        ["Vegetable box", "1, transparent"],
+        ["Freezer", "Ice tray"],
+        ["Base stand drawer", "For food that needs no cooling, such as onions and potatoes"],
+        ["Light", "Clear View Lamp (bulb)"],
+        ["Handle", "Bar, with lock and key"],
+        ["Refrigerant", "R-600a"],
+        ["Colours", "Camellia Purple, Camellia Blue, Camellia Black, Blooming Saffron Red, Blooming Saffron Blue, Elegant Inox, Urban Tropical Blue, Urban Tropical Red"],
+        ["Weight", "36 kg"],
+        ["Warranty", "1 year on the product, 10 years on the Digital Inverter Compressor"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-183-l-stylish-grand-design-single-door-refrigerator-rr20c1823cr-hl/21519",
+      "source": "https://www.samsung.com/in/refrigerators/one-door/rr20c1823u8-183l-blue-rr20c1823u8-hl/",
+      "hotspots": [
+        {
+          "title": "Stylish design",
+          "text": "Has a truly distinctive Grandé door design available in a choice of various colours. It enhances the look of refrigerator with a fine line aesthetically placed towards the bottom.",
+          "pos": [0.1, 0.9, 0.301],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "The Digital Inverter Compressor automatically adjusts its speed in response to cooling demand. So it is quiet, uses power efficiently and keeps working for long, backed up by a 10 year warranty on the compressor.",
+          "pos": [0.197, 1.235, 0.301],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Base Stand Drawer",
+          "text": "There is a large Base Stand Drawer in the lower part of the refrigerator. It is a convenient place to store all of your food items that don't need cooling, such as onions and potatoes.",
+          "pos": [0.17, 0.07, 0.286],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Toughened Glass",
+          "text": "The Toughened Glass shelves are designed and tested to withstand a huge weight of up to 175kg.",
+          "pos": [0.17, 0.775, 0.09],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}

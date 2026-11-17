@@ -105,3 +105,4 @@ const errs = b.logs.filter((l) => /EXCEPTION|LOG |\[error\]/.test(l));
 log("\nerrors:", errs.length ? "\n" + errs.join("\n") : "none");
 fs.writeFileSync(`${out}/report.txt`, report.join("\n"));
 b.close();
+process.exit(errs.length ? 1 : 0); // the gate reads the exit status

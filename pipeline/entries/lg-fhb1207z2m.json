@@ -1,0 +1,147 @@
+{
+  "products": [
+    {
+      "id": "lg-fhb1207z2m",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "FHB1207Z2M",
+      "name": "LG 7 kg front-load washing machine with Inverter Direct Drive and Steam",
+      "shortName": "7 kg front-load washer",
+      "summary": "Open the door to see the drum, slide out the detergent drawer and open the pump-filter cover, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the small cover at the bottom right to open it",
+      "glb": "/models/lg-fhb1207z2m.glb",
+      "thumb": "/photos/lg-fhb1207z2m/0.jpg",
+      "photos": ["/photos/lg-fhb1207z2m/0.jpg", "/photos/lg-fhb1207z2m/1.jpg", "/photos/lg-fhb1207z2m/2.jpg", "/photos/lg-fhb1207z2m/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Middle Black",
+          "swatchColor": "#3a3a3c",
+          "usdz": "/models/usdz/lg-fhb1207z2m-middle-black.usdz",
+          "itemCode": "FHB1207Z2M.AMBQEIL",
+          "code": "FHB1207Z2M"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.2],
+          "zone": {
+            "closed": [
+              [-0.3, 0.731, -0.012],
+              [-0.087, 0.819, 0.22]
+            ],
+            "open": [
+              [-0.3, 0.731, 0.188],
+              [-0.087, 0.819, 0.42]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.247, 0.206, 0.167],
+              [0.251, 0.705, 0.27]
+            ],
+            "open": [
+              [-0.628, 0.206, 0.218],
+              [-0.218, 0.705, 0.572]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter cover",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 95,
+          "zone": {
+            "closed": [
+              [0.122, 0.035, 0.216],
+              [0.267, 0.135, 0.221]
+            ],
+            "open": [
+              [0.122, 0.022, 0.216],
+              [0.267, 0.035, 0.316]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "44 cm"
+      },
+      "sizeNote": "49 cm deep with the door, 89 cm with the door open at 90 degrees",
+      "fit": {
+        "front": 45,
+        "sides": 2,
+        "back": 10,
+        "top": 0.5,
+        "note": "From LG's owner's manual: at least 2 cm at each side, 10 cm behind for the hoses, 0.5 cm above, and 89 cm of depth in total with the door open at 90 degrees."
+      },
+      "specs": [
+        ["Capacity", "7 kg"],
+        ["Type", "Front load, freestanding"],
+        ["Max spin", "1200 rpm (1200 / 1000 / 800 / 600 / 400 / no spin)"],
+        ["Motor", "Inverter Direct Drive, 6 Motion Direct Drive"],
+        ["Drum", "Stainless steel, embossed, with plastic lifters"],
+        ["Energy", "5 star, 0.06 kWh/kg/cycle"],
+        ["Steam", "Steam with Allergy Care"],
+        ["Programmes", "Cotton, Cotton+, Mixed Fabric, Quick 30, Allergy Care, Activewear, Hand/Wool, Delicates, Tub Clean, Rinse+Spin"],
+        ["Temperatures", "Cold, 20, 30, 40, 60 and 95 °C"],
+        ["Display", "Dial, touch buttons and LED display"],
+        ["Delay timer", "3 to 19 hours"],
+        ["Door", "Black tinted round cover"],
+        ["Water", "Cold fill, automatic water level"],
+        ["Smart", "Smart Diagnosis, LoadSense, foam detection"],
+        ["Supply", "230 V, 50 Hz"],
+        ["Weight", "59 kg"],
+        ["Warranty", "10 years on the motor (LG)"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-7kg-front-load-washing-machine-inverter-direct-drive-6-motion-direct-drive-5-star-or-middle-black-fhb1207z2mambqeil/21212",
+      "source": "https://www.lg.com/in/laundry/front-loading-washing-machines/fhb1207z2m/",
+      "hotspots": [
+        {
+          "title": "6 Motion Direct Drive",
+          "text": "Six wash motions, each made for a different fabric, for a better wash with less vibration and less noise.",
+          "pos": [-0.12, 0.62, 0.266],
+          "normal": [0, 0, 1],
+          "show": "!door"
+        },
+        {
+          "title": "Inverter Direct Drive",
+          "text": "The motor drives the drum directly. LG gives a 10 year warranty on the motor.",
+          "pos": [0.265, 0.7145, 0.2205],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Steam with Allergy Care",
+          "text": "Steam activates the Allergy Care programme, which removes allergens.",
+          "pos": [-0.05, 0.7545, 0.2205],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Smart Diagnosis",
+          "text": "Quickly troubleshoot the machine with Smart Diagnosis.",
+          "pos": [0.2515, 0.766, 0.2205],
+          "normal": [0, 0, 1],
+          "show": "always"
+        }
+      ]
+    }
+  ]
+}

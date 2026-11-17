@@ -1,0 +1,146 @@
+{
+  "products": [
+    {
+      "id": "lg-gl-b211hpzd",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GL-B211HPZD",
+      "name": "LG 201 L direct-cool single-door refrigerator, Shiny Steel",
+      "shortName": "201 L single-door refrigerator",
+      "summary": "Open the door and the freezer, slide out the shelves and the vegetable box, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/lg-gl-b211hpzd.glb",
+      "thumb": "/photos/lg-gl-b211hpzd/0.jpg",
+      "photos": ["/photos/lg-gl-b211hpzd/0.jpg", "/photos/lg-gl-b211hpzd/1.jpg", "/photos/lg-gl-b211hpzd/2.jpg", "/photos/lg-gl-b211hpzd/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#9fa0a4",
+          "code": "GL-B211HPZD",
+          "itemCode": "GL-B211HPZD",
+          "usdz": "/models/usdz/lg-gl-b211hpzd-shiny-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 126,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.281, 0.06, 0.118],
+              [0.283, 1.217, 0.35]
+            ],
+            "open": [
+              [0.224, 0.06, 0.177],
+              [0.685, 1.217, 0.707]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": 90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.227, 0.918, 0.124],
+              [0.227, 1.095, 0.135]
+            ],
+            "open": [
+              [0.226, 0.918, 0.124],
+              [0.238, 1.095, 0.577]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.2],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.235, 0.137, -0.254],
+              [0.234, 0.908, 0.119]
+            ],
+            "open": [
+              [-0.235, 0.137, -0.054],
+              [0.234, 0.908, 0.319]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "56.5 cm",
+        "h": "121.7 cm",
+        "d": "70 cm"
+      },
+      "sizeNote": "LG gives 565 × 1217 × 700 mm (W × H × D), the depth with the handle and the condenser on the back; its manual gives 44.5 cm more in front with the door at 90° and asks for over 50 mm behind",
+      "fit": {
+        "front": 44.5,
+        "back": 5,
+        "note": "LG's manual: 1145 mm from the back to the door's edge with the door open at 90° (44.5 cm past the closed handle), and over 50 mm between the back of the fridge and the wall"
+      },
+      "specs": [
+        ["Total capacity", "201 L (freezer 19 L)"],
+        ["Type", "Direct cool, single door"],
+        ["Energy rating", "3 star, 169 units a year"],
+        ["Compressor", "Reciprocating compressor"],
+        ["Controls", "Knob dial, 1 to 7, with a defrost button"],
+        ["Shelves", "2 toughened glass"],
+        ["Door storage", "4 transparent door baskets"],
+        ["Vegetable box", "1, 16 litres"],
+        ["Freezer", "19 L, double layered freezer door"],
+        ["Gasket", "Anti-bacterial"],
+        ["Light", "Bulb"],
+        ["Handle", "Bar, with door lock"],
+        ["Door", "PET, Shiny Steel"],
+        ["Weight", "38 kg"],
+        ["Made in", "India"]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/single-door-refrigerators/gl-b211hpzd/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-201l-3-star-shiny-steel-finish-direct-cool-single-door-refrigerator-gl-b211hpzd/20093",
+      "hotspots": [
+        {
+          "title": "Stylish Door Lock",
+          "text": "Stylish door lock gives a clean and elegant look to your refrigerator.",
+          "pos": [-0.2, 0.55, 0.33],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Bigger Freezer and Stronger Door",
+          "text": "With 19 litres capacity, it is one of the biggest freezers in its segment, and its double layered freezer door retains cooling.",
+          "pos": [0.1, 1, 0.13],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Bigger Vegetable Basket",
+          "text": "A large vegetable basket with a capacity of 16 litres provides a convenient space to store all of your fresh vegetables and fruits.",
+          "pos": [0.12, 0.2, 0.112],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Anti-Bacterial Gasket",
+          "text": "This door seal encloses freshness inside and keeps bacteria, mildew and dust particles outside.",
+          "pos": [0.283, 0.62, 0.226],
+          "normal": [1, 0, 0],
+          "show": "!fridge"
+        }
+      ]
+    }
+  ]
+}

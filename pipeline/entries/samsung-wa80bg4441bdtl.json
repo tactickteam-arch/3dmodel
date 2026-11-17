@@ -1,0 +1,138 @@
+{
+  "products": [
+    {
+      "id": "samsung-wa80bg4441bdtl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Washing machine",
+      "model": "WA80BG4441BDTL",
+      "name": "Samsung 8 kg Ecobubble top-load washing machine",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-8-0-5-star-fully-automatic-top-load-washing-machine-wa80bg4441bdtl/21744",
+      "shortName": "8 kg Ecobubble top-load washer",
+      "summary": "Lift the soft-closing glass lid, pull out the detergent box and look into the diamond drum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/samsung-wa80bg4441bdtl.glb",
+      "thumb": "/photos/samsung-wa80bg4441bdtl/0.jpg",
+      "photos": ["/photos/samsung-wa80bg4441bdtl/0.jpg", "/photos/samsung-wa80bg4441bdtl/1.jpg", "/photos/samsung-wa80bg4441bdtl/2.jpg", "/photos/samsung-wa80bg4441bdtl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Versailles Gray",
+          "swatchColor": "#444447",
+          "usdz": "/models/usdz/samsung-wa80bg4441bdtl-versailles-gray.usdz",
+          "variant": "Versailles Gray",
+          "itemCode": "WA80BG4441BDTL",
+          "code": "WA80BG4441BDTL"
+        },
+        {
+          "name": "Light Gray",
+          "swatchColor": "#acadb0",
+          "usdz": "/models/usdz/samsung-wa80bg4441bdtl-light-gray.usdz",
+          "variant": "Light Gray",
+          "code": "WA80BG4441BGTL"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -100,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.258, 0.853, -0.125],
+              [0.258, 0.932, 0.278]
+            ],
+            "open": [
+              [-0.258, 0.934, -0.193],
+              [0.258, 1.343, -0.056]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent box",
+          "node": "DetergentBox",
+          "slide": [0, 0, 0.06],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [-0.09, 0.837, -0.131],
+              [0.09, 0.902, -0.048]
+            ],
+            "open": [
+              [-0.09, 0.837, -0.071],
+              [0.09, 0.902, 0.012]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "98.8 cm",
+        "d": "56.8 cm"
+      },
+      "sizeNote": "Body only, 98.8 cm tall; with the lid open it is about 134 cm",
+      "specs": [
+        ["Capacity", "8 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star, 0.0083 kWh/kg/cycle"],
+        ["Motor", "Digital Inverter, 10 years on the motor"],
+        ["Spin speed", "700 rpm"],
+        ["Technology", "Ecobubble, BubbleStorm, Dual Storm"],
+        ["Drum", "Diamond drum"],
+        ["Programmes", "Normal, Quick Wash, Delicates, Bedding, Jeans, Energy Saving, Rinse+Spin, Eco Tub Clean"],
+        ["Water levels", "5"],
+        ["Display", "Red LED, rear control panel"],
+        ["Lid", "Soft closing, tempered glass"],
+        ["Filter", "Magic Filter"],
+        ["Extras", "Delay End, Child Lock, Auto Restart"],
+        ["Colour", "Versailles Gray or Light Gray, black lid"],
+        ["Weight", "28.5 kg"],
+        ["Power", "230 V, 50 Hz"],
+        ["Warranty", "2 years on the machine, 10 years on the motor"]
+      ],
+      "source": "https://www.samsung.com/in/support/model/WA80BG4441BDTL/",
+      "hotspots": [
+        {
+          "title": "Rear control panel",
+          "text": "The slanted panel sits at the back, where it is easy to read and out of the way of splashes.",
+          "pos": [-0.12, 0.9617, -0.1784],
+          "normal": [0, 0.886, 0.464],
+          "show": "always"
+        },
+        {
+          "title": "Ecobubble",
+          "text": "Turns detergent into bubbles that soak into fabric fast: up to 73% less energy and 19% less water, and BubbleStorm gets detergent into the fabric 2.5x faster (Samsung's tests).",
+          "pos": [-0.13, 0.8375, -0.086],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "Magic Filter",
+          "text": "A dual mesh at the front and back gathers lint, fluff and particles from the wash, and it opens 180 degrees to empty.",
+          "pos": [0.182, 0.66, 0.059],
+          "normal": [-1, 0, 0],
+          "show": "lid"
+        },
+        {
+          "title": "Soft closing lid",
+          "text": "A damper lets the lid shut slowly and quietly, and the tempered glass window lets you watch the wash without lifting it.",
+          "pos": [0, 0.884, 0.254],
+          "normal": [0, 0.9916, 0.1295],
+          "show": "!lid"
+        }
+      ],
+      "fit": {
+        "sides": 10,
+        "back": 10,
+        "top": 36,
+        "note": "From Samsung's user manual: keep the machine 10 cm from each adjacent wall. The lid swings up and back: with it open, this model is about 134 cm tall (the opening angle is estimated), so keep 36 cm free above it."
+      }
+    }
+  ]
+}

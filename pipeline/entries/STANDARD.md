@@ -62,7 +62,12 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 2. **Research** (BENCHMARK 1): Sangeetha's listing and photos, the maker's page and its largest images, the maker's manual PDF, the energy label. In NOTES.md, tag every number VERIFIED (a published source, named), ESTIMATED (measured off a photo; say how) or UNVERIFIED.
 3. **Textures:** `pipeline/scripts/tex_<slug>.py` writes to `pipeline/tex/<slug>/`. Re-set all text sharp. Look at each texture next to its source.
 4. **Builder:** `pipeline/build3d/make_<slug>.mjs`, copied from its category's reference builder, writing `pipeline/entries/<id>.json`. Fridges stock through `stock_lg.mjs` and `food.mjs`, with `fit: true`. Never run a builder against the real `products.json`.
-5. **Apple files:** `make_usdz.mjs` then `package_usdz.py`, for each colour and its `-free` copy.
+5. **Apple files:** `make_usdz.mjs` then `package_usdz.py`, for each colour and its `-free` copy. `build_product.sh` does steps 4 and 5 (and the label, 5a) in one go.
+5a. **Energy label** (17 Nov 2026, Sangeetha: "stickers not showing"). Find this model's own BEE star label: the maker's gallery, Sangeetha's listing images, BEE's register (beestarlabel.com). Use it only if its Model line names this model (per colour when the colours have their own codes) and its label period is current. When none of those has it, a label image the brand put on a marketplace listing may be used if BEE's register confirms its figures (Haier HW70, 18 Nov); name only the brand in committed files.
+    - Cut it out with `tex_bee_label.py` (64-colour PNG) into `pipeline/tex/<slug>/bee_label*.png`, or redraw it from the register with a same-series template only when the register has every field the label prints (`tex_godrej_eon366_label.py`).
+    - Add `<id>` to `pipeline/entries/labels.json`: the part it sits on, size (fridge labels 90 mm wide, washer labels 64 mm, AC labels from the photo), and where. Put it where a maker, Sangeetha or store photo shows it; otherwise the top door's upper corner (fridge) or the front's top right clear of the door (washer), and say so in NOTES.md.
+    - No current label of this model: no label, and the note says what is missing (a store photo of the sticker settles it).
+5b. **Looks that come with every product, nothing to do:** the studio light that turns with the product and the grey stage (`light.js`, the pages); the clear tint on shelves, bins and covers (`clear_look.mjs` in `exportGLB`; name clear parts `Glass`/`TemperedGlass`, `Bin`/`ClearPlastic`, `ClearLight`/`ClearPlasticLight`, `Frosted` so they get it); the item-code address (`finishPath`, section 2). Check them in the renders.
 6. **Page files:** 4 photos, the banner and the logo (if it's a new brand).
 7. **Gate:** `node pipeline/scripts/gate.mjs <id>` (section 5). Repeat steps 3 to 7 until nothing fails.
 8. **Review:** tick every line of the gate's REVIEW.md (section 7). Anything wrong goes back to step 3.
@@ -70,6 +75,7 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 10. **Promote:**
     - Insert the entry into `products.json` with a `json.dumps(indent=2, ensure_ascii=False)` round trip.
     - Run `make_pages.mjs`, then the site suite (section 6).
+    - Update the tracker and the master sheet: `EXCEL FOR MODELS/TRACKER/make_tracker.py` (private) rewrites "3D Model Progress Tracker.xlsx" and "Item Master List by Category.xlsx" from `products.json`; the admin tracker imports the same Excel.
     - Commit. Push only when told.
 
 ## 4. The rules that never bend

@@ -12394,7 +12394,10 @@
           "swatchColor": "#3c3f46",
           "usdz": "/models/usdz/haier-hwd120-dm14f11bku1-black.usdz",
           "itemCode": "HWD120-DM14F11BKU1",
-          "code": "HWD120-DM14F11BKU1"
+          "code": "HWD120-DM14F11BKU1",
+          "altCodes": [
+            "HW90-DM14929ECBK"
+          ]
         }
       ],
       "parts": [
@@ -15017,6 +15020,1620 @@
       ]
     },
     {
+      "id": "lg-gl-b211hpzd",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GL-B211HPZD",
+      "name": "LG 201 L direct-cool single-door refrigerator, Shiny Steel",
+      "shortName": "201 L single-door refrigerator",
+      "summary": "Open the door and the freezer, slide out the shelves and the vegetable box, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/lg-gl-b211hpzd.glb",
+      "thumb": "/photos/lg-gl-b211hpzd/0.jpg",
+      "photos": [
+        "/photos/lg-gl-b211hpzd/0.jpg",
+        "/photos/lg-gl-b211hpzd/1.jpg",
+        "/photos/lg-gl-b211hpzd/2.jpg",
+        "/photos/lg-gl-b211hpzd/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#9fa0a4",
+          "code": "GL-B211HPZD",
+          "itemCode": "GL-B211HPZD",
+          "usdz": "/models/usdz/lg-gl-b211hpzd-shiny-steel.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 126,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.281,
+                0.06,
+                0.118
+              ],
+              [
+                0.283,
+                1.217,
+                0.35
+              ]
+            ],
+            "open": [
+              [
+                0.224,
+                0.06,
+                0.177
+              ],
+              [
+                0.685,
+                1.217,
+                0.707
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": 90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.227,
+                0.918,
+                0.124
+              ],
+              [
+                0.227,
+                1.095,
+                0.135
+              ]
+            ],
+            "open": [
+              [
+                0.226,
+                0.918,
+                0.124
+              ],
+              [
+                0.238,
+                1.095,
+                0.577
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.2
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.235,
+                0.137,
+                -0.254
+              ],
+              [
+                0.234,
+                0.908,
+                0.119
+              ]
+            ],
+            "open": [
+              [
+                -0.235,
+                0.137,
+                -0.054
+              ],
+              [
+                0.234,
+                0.908,
+                0.319
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "56.5 cm",
+        "h": "121.7 cm",
+        "d": "70 cm"
+      },
+      "sizeNote": "LG gives 565 × 1217 × 700 mm (W × H × D), the depth with the handle and the condenser on the back; its manual gives 44.5 cm more in front with the door at 90° and asks for over 50 mm behind",
+      "fit": {
+        "front": 44.5,
+        "back": 5,
+        "note": "LG's manual: 1145 mm from the back to the door's edge with the door open at 90° (44.5 cm past the closed handle), and over 50 mm between the back of the fridge and the wall"
+      },
+      "specs": [
+        [
+          "Total capacity",
+          "201 L (freezer 19 L)"
+        ],
+        [
+          "Type",
+          "Direct cool, single door"
+        ],
+        [
+          "Energy rating",
+          "3 star, 169 units a year"
+        ],
+        [
+          "Compressor",
+          "Reciprocating compressor"
+        ],
+        [
+          "Controls",
+          "Knob dial, 1 to 7, with a defrost button"
+        ],
+        [
+          "Shelves",
+          "2 toughened glass"
+        ],
+        [
+          "Door storage",
+          "4 transparent door baskets"
+        ],
+        [
+          "Vegetable box",
+          "1, 16 litres"
+        ],
+        [
+          "Freezer",
+          "19 L, double layered freezer door"
+        ],
+        [
+          "Gasket",
+          "Anti-bacterial"
+        ],
+        [
+          "Light",
+          "Bulb"
+        ],
+        [
+          "Handle",
+          "Bar, with door lock"
+        ],
+        [
+          "Door",
+          "PET, Shiny Steel"
+        ],
+        [
+          "Weight",
+          "38 kg"
+        ],
+        [
+          "Made in",
+          "India"
+        ]
+      ],
+      "source": "https://www.lg.com/in/refrigerators/single-door-refrigerators/gl-b211hpzd/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-201l-3-star-shiny-steel-finish-direct-cool-single-door-refrigerator-gl-b211hpzd/20093",
+      "hotspots": [
+        {
+          "title": "Stylish Door Lock",
+          "text": "Stylish door lock gives a clean and elegant look to your refrigerator.",
+          "pos": [
+            -0.2,
+            0.55,
+            0.33
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Bigger Freezer and Stronger Door",
+          "text": "With 19 litres capacity, it is one of the biggest freezers in its segment, and its double layered freezer door retains cooling.",
+          "pos": [
+            0.1,
+            1,
+            0.13
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Bigger Vegetable Basket",
+          "text": "A large vegetable basket with a capacity of 16 litres provides a convenient space to store all of your fresh vegetables and fruits.",
+          "pos": [
+            0.12,
+            0.2,
+            0.112
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Anti-Bacterial Gasket",
+          "text": "This door seal encloses freshness inside and keeps bacteria, mildew and dust particles outside.",
+          "pos": [
+            0.283,
+            0.62,
+            0.226
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
+      "id": "lg-gl-s312spzy",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GL-S312SPZY",
+      "name": "LG 272 L double-door convertible refrigerator with Smart Inverter Compressor",
+      "shortName": "272 L double-door refrigerator",
+      "summary": "Open the freezer, slide the ice maker out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-gl-s312spzy.glb",
+      "thumb": "/photos/lg-gl-s312spzy/0.jpg",
+      "photos": [
+        "/photos/lg-gl-s312spzy/0.jpg",
+        "/photos/lg-gl-s312spzy/1.jpg",
+        "/photos/lg-gl-s312spzy/2.jpg",
+        "/photos/lg-gl-s312spzy/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 132%",
+      "finishes": [
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#b4b5b7",
+          "usdz": "/models/usdz/lg-gl-s312spzy-shiny-steel.usdz",
+          "itemCode": "S312SPZY",
+          "code": "GL-S312SPZY",
+          "altCodes": [
+            "GL-S312SPZY.APZZEBN"
+          ]
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [
+                -0.273,
+                1.194,
+                0.193
+              ],
+              [
+                0.277,
+                1.68,
+                0.319
+              ]
+            ],
+            "open": [
+              [
+                0.256,
+                1.194,
+                0.242
+              ],
+              [
+                0.699,
+                1.68,
+                0.684
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.16
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.192,
+                1.259,
+                -0.022
+              ],
+              [
+                -0.016,
+                1.398,
+                0.187
+              ]
+            ],
+            "open": [
+              [
+                -0.192,
+                1.259,
+                0.138
+              ],
+              [
+                -0.016,
+                1.398,
+                0.347
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.274,
+                0.032,
+                0.168
+              ],
+              [
+                0.278,
+                1.18,
+                0.319
+              ]
+            ],
+            "open": [
+              [
+                0.246,
+                0.032,
+                0.242
+              ],
+              [
+                0.699,
+                1.18,
+                0.695
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.52
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.238,
+                0.086,
+                -0.243
+              ],
+              [
+                0.238,
+                1.041,
+                0.166
+              ]
+            ],
+            "open": [
+              [
+                -0.238,
+                0.086,
+                0.277
+              ],
+              [
+                0.238,
+                1.041,
+                0.686
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55.5 cm",
+        "h": "168 cm",
+        "d": "63.7 cm"
+      },
+      "sizeNote": "LG's manual lists 99.9 cm total depth and 95.3 cm total width with a door open",
+      "specs": [
+        [
+          "Total capacity",
+          "272 L (freezer 58 L, fridge 214 L)"
+        ],
+        [
+          "Type",
+          "Frost free, double door"
+        ],
+        [
+          "Convertible",
+          "Yes"
+        ],
+        [
+          "Energy rating",
+          "1 star, 271 units a year (BEE's register, 2026-28 label; LG's page still shows 2 star, its 2023-25 label)"
+        ],
+        [
+          "Compressor",
+          "Smart Inverter, 10 years on the compressor"
+        ],
+        [
+          "Cooling",
+          "Multi Air Flow, LINEAR Cooling"
+        ],
+        [
+          "Fresh Zone",
+          "1 vegetable box (Moist Balance Crisper)"
+        ],
+        [
+          "Shelves",
+          "Toughened glass (fridge), clear GPPS (freezer)"
+        ],
+        [
+          "Door baskets",
+          "2 in the freezer, 4 in the fridge, transparent"
+        ],
+        [
+          "Ice maker",
+          "Manual (Moving Icemaker)"
+        ],
+        [
+          "Control",
+          "Internal LED display, Express Freeze, door alarm"
+        ],
+        [
+          "Door",
+          "PET, Pocket Handle"
+        ],
+        [
+          "Light",
+          "Fridge light"
+        ],
+        [
+          "Power cuts",
+          "Auto Smart Connect (inverter-compatible)"
+        ],
+        [
+          "Smart Diagnosis",
+          "Yes"
+        ],
+        [
+          "Refrigerant",
+          "R-600a"
+        ],
+        [
+          "Weight",
+          "52 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-272l-double-door-refrigerator-s312spzy/21469",
+      "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/gl-s312spzy/",
+      "hotspots": [
+        {
+          "title": "Convertible",
+          "text": "Convert a section of the freezer to more refrigeration as needed, to keep foods fresher for longer.",
+          "pos": [
+            0.07,
+            1.49,
+            -0.2455
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Smart Diagnosis™",
+          "text": "A fast and easy way to troubleshoot: call LG's helpline and place the phone on the appliance, which then gets a diagnosis within seconds.",
+          "pos": [
+            0.17,
+            1.681,
+            0.24
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Multiple cooling air vents distribute and circulate cool air to every corner of the refrigerator, so every food item is properly cooled.",
+          "pos": [
+            0.1,
+            1.575,
+            -0.2385
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Higher energy efficiency and super silent operation, with a 10-year warranty on the compressor.",
+          "pos": [
+            0.08,
+            0.72,
+            0.3185
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ],
+      "fit": {
+        "front": 36,
+        "sides": 30,
+        "back": 30,
+        "note": "From LG's owner's manual for this model: allow over 30 cm clearance from each adjacent wall. The manual gives 99.9 cm total depth with a door open, which is 36 cm in front of the fridge."
+      }
+    },
+    {
+      "id": "samsung-rt28c3053s8",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT28C3053S8",
+      "name": "Samsung 236 L double-door refrigerator, Elegant Inox",
+      "shortName": "236 L Digital Inverter refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, slide out the shelves and the ice tray, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt28c3053s8.glb",
+      "thumb": "/photos/samsung-rt28c3053s8/0.jpg",
+      "photos": [
+        "/photos/samsung-rt28c3053s8/0.jpg",
+        "/photos/samsung-rt28c3053s8/1.jpg",
+        "/photos/samsung-rt28c3053s8/2.jpg",
+        "/photos/samsung-rt28c3053s8/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#8f9296",
+          "usdz": "/models/usdz/samsung-rt28c3053s8-elegant-inox.usdz",
+          "variant": "Elegant Inox",
+          "code": "RT28C3053S8",
+          "itemCode": "RT28C3053S8",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-236-l-digital-inverter-technology-double-door-refrigerator-rt28c3053s8/18185"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [
+                -0.275,
+                1.018,
+                0.161
+              ],
+              [
+                0.277,
+                1.535,
+                0.318
+              ]
+            ],
+            "open": [
+              [
+                0.248,
+                1.018,
+                0.21
+              ],
+              [
+                0.712,
+                1.535,
+                0.674
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.197,
+                1.066,
+                -0.044
+              ],
+              [
+                -0.02,
+                1.238,
+                0.143
+              ]
+            ],
+            "open": [
+              [
+                -0.197,
+                1.066,
+                0.076
+              ],
+              [
+                -0.02,
+                1.238,
+                0.263
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.275,
+                0.036,
+                0.146
+              ],
+              [
+                0.277,
+                1.004,
+                0.315
+              ]
+            ],
+            "open": [
+              [
+                0.237,
+                0.036,
+                0.21
+              ],
+              [
+                0.712,
+                1.004,
+                0.685
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.02,
+            0,
+            0.5
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.243,
+                0.081,
+                -0.283
+              ],
+              [
+                0.243,
+                0.992,
+                0.139
+              ]
+            ],
+            "open": [
+              [
+                -0.263,
+                0.081,
+                0.217
+              ],
+              [
+                0.223,
+                0.992,
+                0.639
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55.5 cm",
+        "h": "154.5 cm",
+        "d": "63.7 cm"
+      },
+      "sizeNote": "Samsung's manual lists 114.1 cm total depth and 96.4 cm total width with the doors open at 135°; Samsung's size picture rounds the height to 1.54 m",
+      "specs": [
+        [
+          "Total capacity",
+          "236 L (fridge 183 L, freezer 53 L)"
+        ],
+        [
+          "Type",
+          "Frost free, double door"
+        ],
+        [
+          "Energy rating",
+          "3 star, 229 units a year"
+        ],
+        [
+          "Compressor",
+          "Digital Inverter"
+        ],
+        [
+          "Cooling",
+          "All-around Cooling"
+        ],
+        [
+          "Stabilizer free",
+          "100-300 V"
+        ],
+        [
+          "Shelves",
+          "3 glass, Easy Slide Shelf (fridge), 1 Cool Pack (freezer)"
+        ],
+        [
+          "Storage",
+          "Fresh Room, MoistFresh Zone vegetable drawer, 4 door pockets (fridge), 2 (freezer)"
+        ],
+        [
+          "Extras",
+          "Movable (twist) Ice Maker, Cool Pack, deodorizer, LED light"
+        ],
+        [
+          "Controls",
+          "Temperature knob"
+        ],
+        [
+          "Door",
+          "Recessed handles"
+        ],
+        [
+          "Warranty",
+          "20 years on the compressor"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-236-l-digital-inverter-technology-double-door-refrigerator-rt28c3053s8/18185",
+      "source": "https://www.samsung.com/in/support/model/RT28C3053S8/HL/",
+      "hotspots": [
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "The Digital Inverter Compressor automatically adjusts its speed in response to cooling demand, so it is quiet, uses power efficiently and keeps working for long.",
+          "pos": [
+            0.16,
+            1.03,
+            0.319
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!freezer"
+        },
+        {
+          "title": "Movable Ice Maker",
+          "text": "A simple twist of the Movable Ice Maker is all it takes to dispense a large quantity of ice. When there's not much need for ice, you can easily remove it and create more space in the freezer.",
+          "pos": [
+            -0.108,
+            1.14,
+            0.138
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Easy Slide Shelf",
+          "text": "The Easy Slide Shelf is built on rolling hinges and simply slides in and out, so you can easily reach things at the back and in every corner without items getting squashed or broken.",
+          "pos": [
+            0.15,
+            0.66,
+            0.1375
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Cool Pack",
+          "text": "When electricity outages happen, a Cool Pack in the freezer keeps food frozen at below 0°C for up to 12 hours, so it doesn't go to waste.",
+          "pos": [
+            0.15,
+            1.303,
+            0.1525
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        }
+      ],
+      "fit": {
+        "front": 50,
+        "sides": 5,
+        "back": 5,
+        "top": 10,
+        "note": "From Samsung's user manual for the RT28 series: at least 5 cm at each side, 5 cm behind it, 10 cm above, and 114.1 cm of depth in total with the doors open (both open to 135°)."
+      }
+    },
+    {
+      "id": "samsung-rr20c1823cr",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RR20C1823CR/HL",
+      "name": "Samsung 183 L single-door refrigerator, Stylish Grandé design with Base Stand Drawer",
+      "shortName": "183 L single-door refrigerator",
+      "summary": "Open the door and the freezer box, slide out the trays and the base drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/samsung-rr20c1823cr.glb",
+      "thumb": "/photos/samsung-rr20c1823cr/0.jpg",
+      "photos": [
+        "/photos/samsung-rr20c1823cr/0.jpg",
+        "/photos/samsung-rr20c1823cr/1.jpg",
+        "/photos/samsung-rr20c1823cr/2.jpg",
+        "/photos/samsung-rr20c1823cr/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Camellia Purple",
+          "swatchColor": "#5f2f3b",
+          "variant": "Camellia Purple",
+          "itemCode": "RR20c1823cr/hl",
+          "code": "RR20C1823CR/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-camellia-purple.usdz"
+        },
+        {
+          "name": "Camellia Blue",
+          "swatchColor": "#003997",
+          "variant": "Camellia Blue",
+          "code": "RR20C1823CU/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-camellia-blue.usdz"
+        },
+        {
+          "name": "Camellia Black",
+          "swatchColor": "#000000",
+          "variant": "Camellia Black",
+          "code": "RR20C1823CB/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-camellia-black.usdz"
+        },
+        {
+          "name": "Blooming Saffron Red",
+          "swatchColor": "#96002c",
+          "variant": "Blooming Saffron Red",
+          "code": "RR20C1823R8/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-blooming-saffron-red.usdz"
+        },
+        {
+          "name": "Blooming Saffron Blue",
+          "swatchColor": "#0a3369",
+          "variant": "Blooming Saffron Blue",
+          "code": "RR20C1823U8/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-blooming-saffron-blue.usdz"
+        },
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#dbdbdb",
+          "variant": "Elegant Inox",
+          "code": "RR20C1823S8/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-elegant-inox.usdz"
+        },
+        {
+          "name": "Urban Tropical Blue",
+          "swatchColor": "#000080",
+          "variant": "Urban Tropical Blue",
+          "code": "RR20C1823VB/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-urban-tropical-blue.usdz"
+        },
+        {
+          "name": "Urban Tropical Red",
+          "swatchColor": "#581c28",
+          "variant": "Urban Tropical Red",
+          "code": "RR20C1823VF/HL",
+          "usdz": "/models/usdz/samsung-rr20c1823cr-urban-tropical-red.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 127,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.267,
+                0.172,
+                0.117
+              ],
+              [
+                0.267,
+                1.3,
+                0.321
+              ]
+            ],
+            "open": [
+              [
+                0.21,
+                0.172,
+                0.185
+              ],
+              [
+                0.646,
+                1.3,
+                0.68
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": 90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.206,
+                1.047,
+                0.097
+              ],
+              [
+                0.179,
+                1.204,
+                0.125
+              ]
+            ],
+            "open": [
+              [
+                0.161,
+                1.047,
+                0.114
+              ],
+              [
+                0.189,
+                1.204,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            0,
+            0,
+            0.3
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.23,
+                0.22,
+                -0.262
+              ],
+              [
+                0.23,
+                0.998,
+                0.13
+              ]
+            ],
+            "open": [
+              [
+                -0.23,
+                0.22,
+                0.038
+              ],
+              [
+                0.23,
+                0.998,
+                0.43
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "base drawer",
+          "node": "BaseDrawer",
+          "slide": [
+            0,
+            0,
+            0.25
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.273,
+                0.013,
+                -0.286
+              ],
+              [
+                0.273,
+                0.166,
+                0.285
+              ]
+            ],
+            "open": [
+              [
+                -0.273,
+                0.013,
+                -0.036
+              ],
+              [
+                0.273,
+                0.166,
+                0.535
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.9 cm",
+        "h": "130 cm",
+        "d": "64 cm"
+      },
+      "sizeNote": "Samsung India gives 54.9 × 130 × 64 cm (W × H × D, with the hinge, the base stand and the handle) and 62 cm deep without the handle; its manual: the door opens to 127°, and leave 100 mm behind",
+      "fit": {
+        "back": 10,
+        "note": "Samsung's manual for this range (RR19 to RR24): 100 mm between the back of the fridge and the wall; the door opens to 127°"
+      },
+      "specs": [
+        [
+          "Total capacity",
+          "183 L (fridge 165 L, freezer 18 L)"
+        ],
+        [
+          "Type",
+          "Direct cool, single door"
+        ],
+        [
+          "Energy rating",
+          "3 star"
+        ],
+        [
+          "Compressor",
+          "Digital Inverter Compressor"
+        ],
+        [
+          "Power cuts",
+          "Stabilizer Free Operation, 100 to 300 V"
+        ],
+        [
+          "Controls",
+          "Knob"
+        ],
+        [
+          "Shelves",
+          "2 toughened glass"
+        ],
+        [
+          "Door storage",
+          "5 transparent door pockets, egg tray"
+        ],
+        [
+          "Vegetable box",
+          "1, transparent"
+        ],
+        [
+          "Freezer",
+          "Ice tray"
+        ],
+        [
+          "Base stand drawer",
+          "For food that needs no cooling, such as onions and potatoes"
+        ],
+        [
+          "Light",
+          "Clear View Lamp (bulb)"
+        ],
+        [
+          "Handle",
+          "Bar, with lock and key"
+        ],
+        [
+          "Refrigerant",
+          "R-600a"
+        ],
+        [
+          "Colours",
+          "Camellia Purple, Camellia Blue, Camellia Black, Blooming Saffron Red, Blooming Saffron Blue, Elegant Inox, Urban Tropical Blue, Urban Tropical Red"
+        ],
+        [
+          "Weight",
+          "36 kg"
+        ],
+        [
+          "Warranty",
+          "1 year on the product, 10 years on the Digital Inverter Compressor"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-183-l-stylish-grand-design-single-door-refrigerator-rr20c1823cr-hl/21519",
+      "source": "https://www.samsung.com/in/refrigerators/one-door/rr20c1823u8-183l-blue-rr20c1823u8-hl/",
+      "hotspots": [
+        {
+          "title": "Stylish design",
+          "text": "Has a truly distinctive Grandé door design available in a choice of various colours. It enhances the look of refrigerator with a fine line aesthetically placed towards the bottom.",
+          "pos": [
+            0.1,
+            0.9,
+            0.301
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "The Digital Inverter Compressor automatically adjusts its speed in response to cooling demand. So it is quiet, uses power efficiently and keeps working for long, backed up by a 10 year warranty on the compressor.",
+          "pos": [
+            0.197,
+            1.235,
+            0.301
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Base Stand Drawer",
+          "text": "There is a large Base Stand Drawer in the lower part of the refrigerator. It is a convenient place to store all of your food items that don't need cooling, such as onions and potatoes.",
+          "pos": [
+            0.17,
+            0.07,
+            0.286
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Toughened Glass",
+          "text": "The Toughened Glass shelves are designed and tested to withstand a huge weight of up to 175kg.",
+          "pos": [
+            0.17,
+            0.775,
+            0.09
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        }
+      ]
+    },
+    {
+      "id": "haier-hrd-2103pmg-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRD-2103PMG-P",
+      "name": "Haier 190 L single-door refrigerator with base drawer, glass door",
+      "shortName": "190 L single-door refrigerator",
+      "summary": "Open the door and the freezer flap, slide out the trays and the base drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/haier-hrd-2103pmg-p.glb",
+      "thumb": "/photos/haier-hrd-2103pmg-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrd-2103pmg-p/0.jpg",
+        "/photos/haier-hrd-2103pmg-p/1.jpg",
+        "/photos/haier-hrd-2103pmg-p/2.jpg",
+        "/photos/haier-hrd-2103pmg-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Mirror Glass",
+          "swatchColor": "#889696",
+          "variant": "Mirror Glass",
+          "code": "HRD-2103PMG-P",
+          "usdz": "/models/usdz/haier-hrd-2103pmg-p-mirror-glass.usdz",
+          "itemCode": "HRD-2103PMG-P"
+        },
+        {
+          "name": "Wave Glass",
+          "swatchColor": "#3c203a",
+          "variant": "Wave Glass",
+          "code": "HRD-2103PWG-P",
+          "usdz": "/models/usdz/haier-hrd-2103pmg-p-wave-glass.usdz",
+          "itemCode": "HRD-2103PWG-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.265,
+                0.14,
+                0.093
+              ],
+              [
+                0.265,
+                1.313,
+                0.286
+              ]
+            ],
+            "open": [
+              [
+                0.22,
+                0.14,
+                0.154
+              ],
+              [
+                0.693,
+                1.313,
+                0.626
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "x",
+          "angle": -90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.191,
+                1.104,
+                0.073
+              ],
+              [
+                0.171,
+                1.24,
+                0.087
+              ]
+            ],
+            "open": [
+              [
+                -0.191,
+                1.234,
+                0.079
+              ],
+              [
+                0.171,
+                1.248,
+                0.215
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.04,
+            0,
+            0.24
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.232,
+                0.202,
+                -0.223
+              ],
+              [
+                0.232,
+                1.078,
+                0.105
+              ]
+            ],
+            "open": [
+              [
+                -0.272,
+                0.202,
+                0.017
+              ],
+              [
+                0.192,
+                1.078,
+                0.345
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "base drawer",
+          "node": "BaseDrawer",
+          "slide": [
+            0,
+            0,
+            0.25
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.263,
+                0.006,
+                -0.145
+              ],
+              [
+                0.263,
+                0.13,
+                0.285
+              ]
+            ],
+            "open": [
+              [
+                -0.263,
+                0.006,
+                0.105
+              ],
+              [
+                0.263,
+                0.13,
+                0.535
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "53 cm",
+        "h": "131.3 cm",
+        "d": "57 cm"
+      },
+      "sizeNote": "Haier gives 530 × 570 × 1313 mm (W × D × H) for both colours; packed, 575 × 680 × 1385 mm",
+      "specs": [
+        [
+          "Total capacity",
+          "190 L"
+        ],
+        [
+          "Type",
+          "Direct cool, single door"
+        ],
+        [
+          "Energy rating",
+          "3 star"
+        ],
+        [
+          "Energy consumption",
+          "136 (as Haier lists it)"
+        ],
+        [
+          "Freezing",
+          "One Hour Icing Technology"
+        ],
+        [
+          "Power cuts",
+          "Auto Connect Home Inverter, Stabilizer Free Operation"
+        ],
+        [
+          "Shelves",
+          "3 toughened glass"
+        ],
+        [
+          "Vegetable case",
+          "Yes"
+        ],
+        [
+          "Egg tray",
+          "Yes"
+        ],
+        [
+          "Base drawer",
+          "Yes"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Glass"
+        ],
+        [
+          "Handle",
+          "Recess"
+        ],
+        [
+          "Lock",
+          "Yes"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Colours",
+          "Mirror Glass, Wave Glass"
+        ],
+        [
+          "Weight",
+          "44 kg"
+        ],
+        [
+          "Warranty",
+          "10 Year Warranty, as Haier's page headlines it"
+        ]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/190-litres-direct-cool-refrigerator-mirror-glass-hrd-2103pmg-p.shtml",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-190-l-3-star-mirror-glass-finish-direct-cool-single-door-refrigerator-with-base-drawer-hrd-2103pmg-p/21357",
+      "hotspots": [
+        {
+          "title": "1 Hour Icing Technology",
+          "text": "Rapidly freezes items in just one hour, ensuring quick and efficient ice production.",
+          "pos": [
+            -0.1,
+            1.17,
+            0.0815
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "3 Toughened Glass Shelves",
+          "text": "Sturdy, spill-resistant shelves that offer reliable support and easy cleaning.",
+          "pos": [
+            0.15,
+            0.728,
+            0.0815
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Auto Connect Home Inverter",
+          "text": "Automatically connects to the home inverter during power outages to ensure continuous operation.",
+          "pos": [
+            -0.08,
+            0.25,
+            -0.166
+          ],
+          "normal": [
+            0,
+            0,
+            -1
+          ]
+        },
+        {
+          "title": "Clean Back",
+          "text": "Smooth, easy-to-clean back panel that prevents dust and debris buildup.",
+          "pos": [
+            0,
+            0.85,
+            -0.2855
+          ],
+          "normal": [
+            0,
+            0,
+            -1
+          ]
+        }
+      ]
+    },
+    {
       "id": "bluestar-ia318exu",
       "brand": "Blue Star",
       "brandLogo": "/logos/bluestar.png",
@@ -16576,6 +18193,1304 @@
             1
           ],
           "show": "door"
+        }
+      ]
+    },
+    {
+      "id": "lg-t70ajmb1z",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "T70AJMB1Z",
+      "name": "LG 7 kg Smart Inverter top-load washing machine with Auto Tub Clean",
+      "shortName": "7 kg Smart Inverter top-load washer",
+      "summary": "Lift the tempered glass lid, pull out the detergent drawer and look into the TurboDrum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/lg-t70ajmb1z.glb",
+      "thumb": "/photos/lg-t70ajmb1z/0.jpg",
+      "photos": [
+        "/photos/lg-t70ajmb1z/0.jpg",
+        "/photos/lg-t70ajmb1z/1.jpg",
+        "/photos/lg-t70ajmb1z/2.jpg",
+        "/photos/lg-t70ajmb1z/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Middle Black",
+          "swatchColor": "#323232",
+          "usdz": "/models/usdz/lg-t70ajmb1z-middle-black.usdz",
+          "itemCode": "T70AJMB1Z.ABMQEIL",
+          "code": "T70AJMB1Z"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.269,
+                0.844,
+                -0.118
+              ],
+              [
+                0.269,
+                0.885,
+                0.182
+              ]
+            ],
+            "open": [
+              [
+                -0.269,
+                0.87,
+                -0.133
+              ],
+              [
+                0.269,
+                1.17,
+                -0.092
+              ]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent drawer",
+          "node": "DetergentDrawer",
+          "slide": [
+            0,
+            0,
+            0.08
+          ],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [
+                -0.075,
+                0.807,
+                -0.221
+              ],
+              [
+                0.075,
+                0.849,
+                -0.095
+              ]
+            ],
+            "open": [
+              [
+                -0.075,
+                0.807,
+                -0.141
+              ],
+              [
+                0.075,
+                0.849,
+                -0.015
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "88.5 cm",
+        "d": "56 cm"
+      },
+      "sizeNote": "88.5 cm tall with the lid shut, as LG's owner's manual gives it; LG's product page says 92.5 cm",
+      "specs": [
+        [
+          "Capacity",
+          "7 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Energy rating",
+          "5 star, 0.0083 kWh/kg/cycle"
+        ],
+        [
+          "Motor",
+          "Smart Inverter, 10 years on the motor"
+        ],
+        [
+          "Wash",
+          "TurboDrum, Smart Motion, Jet Spray+, Side Water Fall, TurboWash"
+        ],
+        [
+          "Drum",
+          "Punch + 3, embossed inner drum"
+        ],
+        [
+          "Programmes",
+          "Normal, Pre Wash + Normal, Quick Wash, Rinse + Spin, Tub Clean, Wool"
+        ],
+        [
+          "Water levels",
+          "10"
+        ],
+        [
+          "Display",
+          "LED with hard buttons"
+        ],
+        [
+          "Lid",
+          "Tempered glass, soft closing"
+        ],
+        [
+          "Filter",
+          "Lint filter"
+        ],
+        [
+          "Extras",
+          "Auto Tub Clean, Smart Diagnosis, Child Lock, Auto Restart, Foam detection, LoadSense, Air Dry, Aqua Reserve, Soak, Spin Only"
+        ],
+        [
+          "Water inlet",
+          "Cold only"
+        ],
+        [
+          "Colour",
+          "Middle Black"
+        ],
+        [
+          "Weight",
+          "32 kg"
+        ]
+      ],
+      "source": "https://www.lg.com/in/laundry/top-loading-washing-machines/t70ajmb1z/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-7kg-top-load-washing-machine-in-top-load-t70ajmb1zabmqeil/21766",
+      "hotspots": [
+        {
+          "title": "Smart Inverter",
+          "text": "An energy-saving motor that cuts wasted operation. LG says its water-proof motor doesn't corrode, and the motor carries a 10-year warranty.",
+          "pos": [
+            0.205,
+            0.83,
+            0.2117
+          ],
+          "normal": [
+            0,
+            0.921,
+            0.391
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Smart Diagnosis",
+          "text": "If an error occurs, use the LG app or call the LG service centre: the machine can be diagnosed over the phone, saving time and needless visits.",
+          "pos": [
+            0.126,
+            0.8289,
+            0.2146
+          ],
+          "normal": [
+            0,
+            0.921,
+            0.391
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Auto Tub Clean",
+          "text": "The tub is cleaned automatically after every wash cycle.",
+          "pos": [
+            -0.12,
+            0.804,
+            0.128
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "TurboDrum",
+          "text": "The drum and the pulsator turn in opposite directions, for a strong water stream that takes out the toughest dirt.",
+          "pos": [
+            0,
+            0.371,
+            0.095
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        }
+      ],
+      "fit": {
+        "sides": 2,
+        "back": 10,
+        "top": 34,
+        "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 122.5 cm, so keep 34 cm free above it."
+      }
+    },
+    {
+      "id": "samsung-wa80bg4441bdtl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Washing machine",
+      "model": "WA80BG4441BDTL",
+      "name": "Samsung 8 kg Ecobubble top-load washing machine",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-8-0-5-star-fully-automatic-top-load-washing-machine-wa80bg4441bdtl/21744",
+      "shortName": "8 kg Ecobubble top-load washer",
+      "summary": "Lift the soft-closing glass lid, pull out the detergent box and look into the diamond drum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/samsung-wa80bg4441bdtl.glb",
+      "thumb": "/photos/samsung-wa80bg4441bdtl/0.jpg",
+      "photos": [
+        "/photos/samsung-wa80bg4441bdtl/0.jpg",
+        "/photos/samsung-wa80bg4441bdtl/1.jpg",
+        "/photos/samsung-wa80bg4441bdtl/2.jpg",
+        "/photos/samsung-wa80bg4441bdtl/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Versailles Gray",
+          "swatchColor": "#444447",
+          "usdz": "/models/usdz/samsung-wa80bg4441bdtl-versailles-gray.usdz",
+          "variant": "Versailles Gray",
+          "itemCode": "WA80BG4441BDTL",
+          "code": "WA80BG4441BDTL"
+        },
+        {
+          "name": "Light Gray",
+          "swatchColor": "#acadb0",
+          "usdz": "/models/usdz/samsung-wa80bg4441bdtl-light-gray.usdz",
+          "variant": "Light Gray",
+          "code": "WA80BG4441BGTL"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -100,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.258,
+                0.853,
+                -0.125
+              ],
+              [
+                0.258,
+                0.932,
+                0.278
+              ]
+            ],
+            "open": [
+              [
+                -0.258,
+                0.934,
+                -0.193
+              ],
+              [
+                0.258,
+                1.343,
+                -0.056
+              ]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent box",
+          "node": "DetergentBox",
+          "slide": [
+            0,
+            0,
+            0.06
+          ],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [
+                -0.09,
+                0.837,
+                -0.131
+              ],
+              [
+                0.09,
+                0.902,
+                -0.048
+              ]
+            ],
+            "open": [
+              [
+                -0.09,
+                0.837,
+                -0.071
+              ],
+              [
+                0.09,
+                0.902,
+                0.012
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "98.8 cm",
+        "d": "56.8 cm"
+      },
+      "sizeNote": "Body only, 98.8 cm tall; with the lid open it is about 134 cm",
+      "specs": [
+        [
+          "Capacity",
+          "8 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Energy rating",
+          "5 star, 0.0083 kWh/kg/cycle"
+        ],
+        [
+          "Motor",
+          "Digital Inverter, 10 years on the motor"
+        ],
+        [
+          "Spin speed",
+          "700 rpm"
+        ],
+        [
+          "Technology",
+          "Ecobubble, BubbleStorm, Dual Storm"
+        ],
+        [
+          "Drum",
+          "Diamond drum"
+        ],
+        [
+          "Programmes",
+          "Normal, Quick Wash, Delicates, Bedding, Jeans, Energy Saving, Rinse+Spin, Eco Tub Clean"
+        ],
+        [
+          "Water levels",
+          "5"
+        ],
+        [
+          "Display",
+          "Red LED, rear control panel"
+        ],
+        [
+          "Lid",
+          "Soft closing, tempered glass"
+        ],
+        [
+          "Filter",
+          "Magic Filter"
+        ],
+        [
+          "Extras",
+          "Delay End, Child Lock, Auto Restart"
+        ],
+        [
+          "Colour",
+          "Versailles Gray or Light Gray, black lid"
+        ],
+        [
+          "Weight",
+          "28.5 kg"
+        ],
+        [
+          "Power",
+          "230 V, 50 Hz"
+        ],
+        [
+          "Warranty",
+          "2 years on the machine, 10 years on the motor"
+        ]
+      ],
+      "source": "https://www.samsung.com/in/support/model/WA80BG4441BDTL/",
+      "hotspots": [
+        {
+          "title": "Rear control panel",
+          "text": "The slanted panel sits at the back, where it is easy to read and out of the way of splashes.",
+          "pos": [
+            -0.12,
+            0.9617,
+            -0.1784
+          ],
+          "normal": [
+            0,
+            0.886,
+            0.464
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Ecobubble",
+          "text": "Turns detergent into bubbles that soak into fabric fast: up to 73% less energy and 19% less water, and BubbleStorm gets detergent into the fabric 2.5x faster (Samsung's tests).",
+          "pos": [
+            -0.13,
+            0.8375,
+            -0.086
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "Magic Filter",
+          "text": "A dual mesh at the front and back gathers lint, fluff and particles from the wash, and it opens 180 degrees to empty.",
+          "pos": [
+            0.182,
+            0.66,
+            0.059
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "Soft closing lid",
+          "text": "A damper lets the lid shut slowly and quietly, and the tempered glass window lets you watch the wash without lifting it.",
+          "pos": [
+            0,
+            0.884,
+            0.254
+          ],
+          "normal": [
+            0,
+            0.9916,
+            0.1295
+          ],
+          "show": "!lid"
+        }
+      ],
+      "fit": {
+        "sides": 10,
+        "back": 10,
+        "top": 36,
+        "note": "From Samsung's user manual: keep the machine 10 cm from each adjacent wall. The lid swings up and back: with it open, this model is about 134 cm tall (the opening angle is estimated), so keep 36 cm free above it."
+      }
+    },
+    {
+      "id": "ifb-senator-mbn-8012-cms",
+      "brand": "IFB",
+      "brandLogo": "/logos/ifb.png",
+      "category": "Washing machine",
+      "model": "SENATOR MBN 8012 CMS",
+      "name": "IFB Senator 8 kg front-load washing machine with Ai, Power Steam and Eco Inverter Motor",
+      "shortName": "8 kg Senator front-load washer",
+      "summary": "Open the door to see the drum, pull out the detergent drawer and open the pump-filter door, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the round flap to open it",
+      "glb": "/models/ifb-senator-mbn-8012-cms.glb",
+      "thumb": "/photos/ifb-senator-mbn-8012-cms/0.jpg",
+      "photos": [
+        "/photos/ifb-senator-mbn-8012-cms/0.jpg",
+        "/photos/ifb-senator-mbn-8012-cms/1.jpg",
+        "/photos/ifb-senator-mbn-8012-cms/2.jpg",
+        "/photos/ifb-senator-mbn-8012-cms/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Mocha",
+          "swatchColor": "#5b4a42",
+          "usdz": "/models/usdz/ifb-senator-mbn-8012-cms-mocha.usdz",
+          "itemCode": "SENATOR MBN 8012 CMS",
+          "code": "SENATOR MBN 8012 CMS"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.19
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.299,
+                0.752,
+                0.061
+              ],
+              [
+                -0.1,
+                0.875,
+                0.309
+              ]
+            ],
+            "open": [
+              [
+                -0.299,
+                0.752,
+                0.251
+              ],
+              [
+                -0.1,
+                0.875,
+                0.499
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -130,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.26,
+                0.214,
+                0.213
+              ],
+              [
+                0.257,
+                0.731,
+                0.345
+              ]
+            ],
+            "open": [
+              [
+                -0.564,
+                0.214,
+                0.307
+              ],
+              [
+                -0.21,
+                0.731,
+                0.719
+              ]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter",
+          "node": "FilterFlap",
+          "axis": "y",
+          "angle": 100,
+          "zone": {
+            "closed": [
+              [
+                0.086,
+                0.039,
+                0.295
+              ],
+              [
+                0.229,
+                0.182,
+                0.301
+              ]
+            ],
+            "open": [
+              [
+                0.226,
+                0.039,
+                0.3
+              ],
+              [
+                0.256,
+                0.182,
+                0.441
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.8 cm",
+        "h": "87.5 cm",
+        "d": "61.8 cm"
+      },
+      "sizeNote": "IFB gives 61.8 cm deep and does not say if that includes the door; here the door stands about 4 cm in front of it",
+      "specs": [
+        [
+          "Capacity",
+          "8 kg"
+        ],
+        [
+          "Type",
+          "Front load"
+        ],
+        [
+          "Max spin",
+          "1200 rpm (No Spin, 400, 600, 800, 1000, 1200)"
+        ],
+        [
+          "Motor",
+          "Eco Inverter Motor, 10 years motor warranty"
+        ],
+        [
+          "Energy",
+          "5 star (BEE), 0.057 kWh/kg/cycle on its energy label"
+        ],
+        [
+          "Water",
+          "8.3 L/kg/cycle on its energy label"
+        ],
+        [
+          "Programmes",
+          "10 on the panel (My IFB, Express 15', Bulky, CradleWash, Spin Dry/Rinse, Mix/Daily, Cotton, Synthetic, Baby Wear, Refresh) plus 12 in the My IFB app"
+        ],
+        [
+          "Features",
+          "Ai, Power Steam, Steam Refresh, 9 Swirl Wash, Warm Soak, Time Saver, Aqua Energie, Laundry Add, Crescent Moon Drum, Auto Tub Clean"
+        ],
+        [
+          "Smart",
+          "Wi-Fi and voice through the My IFB app"
+        ],
+        [
+          "Temperatures",
+          "Cold, 30, 40, 60 and 95 °C"
+        ],
+        [
+          "Controls",
+          "Touch keys with a Program Navigator key, touch power button, LED 7-segment display"
+        ],
+        [
+          "Door",
+          "Black with a chrome ring, hinged on the left, 320 mm opening"
+        ],
+        [
+          "Colour",
+          "Mocha body, black control panel"
+        ],
+        [
+          "Safety",
+          "Child lock, protective rat mesh, auto imbalance vibration control, foam detection"
+        ],
+        [
+          "Supply",
+          "220-240 V, single phase, 50 Hz, 16 A; 2000 W heater"
+        ],
+        [
+          "Weight",
+          "71 kg"
+        ],
+        [
+          "Warranty",
+          "4 years on the machine, 10 years on the motor, 10 years spare parts support"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/ifb-senator-8-kg-front-load-washing-machine-or-ai-or-power-steam-or-eco-inverter-motor-or-senator-mbn-8012-cms-senator-mbn-8012-cms/21209",
+      "source": "https://www.ifbappliances.com/senator-mbn-8012-cms",
+      "hotspots": [
+        {
+          "title": "Powered by Ai",
+          "text": "Ai detects the weight and type of the fabric, then tailors the wash cycle by optimising the water level, wash motions and time to suit the load.",
+          "pos": [
+            -0.04,
+            0.84,
+            0.309
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Power Steam",
+          "text": "Steam twice in the wash: at the start to dislodge dirt and kill 99.99% of germs, and at the end to reduce wrinkles and keep clothes soft.",
+          "pos": [
+            0.013,
+            0.789,
+            0.309
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "9 Swirl Wash",
+          "text": "Mimics hand wash motions to give your clothes the care they deserve.",
+          "pos": [
+            0.08,
+            0.4,
+            -0.157
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        },
+        {
+          "title": "Eco Inverter Motor",
+          "text": "Consumes up to 40% less energy, and the washer operates quietly with minimal vibration.",
+          "pos": [
+            0.297,
+            0.45,
+            -0.05
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "show": "always"
+        }
+      ],
+      "fit": {
+        "back": 10,
+        "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
+      }
+    },
+    {
+      "id": "haier-hw70-im12929bk",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HW70-IM12929BK",
+      "name": "Haier 929 series 7 kg front-load washer with PuriSteam",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-7-kg-front-load-washing-machine-or-hw70-im12929bk-hw70-im12929bk/20616",
+      "shortName": "7 kg 929 front-load washer",
+      "summary": "Open the door to see the 525 mm Super Drum and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/haier-hw70-im12929bk.glb",
+      "thumb": "/photos/haier-hw70-im12929bk/0.jpg",
+      "photos": [
+        "/photos/haier-hw70-im12929bk/0.jpg",
+        "/photos/haier-hw70-im12929bk/1.jpg",
+        "/photos/haier-hw70-im12929bk/2.jpg",
+        "/photos/haier-hw70-im12929bk/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#232836",
+          "usdz": "/models/usdz/haier-hw70-im12929bk-black.usdz",
+          "itemCode": "HW70-IM12929BK",
+          "code": "HW70-IM12929BK"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.22
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.295,
+                0.738,
+                -0.028
+              ],
+              [
+                -0.117,
+                0.85,
+                0.234
+              ]
+            ],
+            "open": [
+              [
+                -0.295,
+                0.738,
+                0.192
+              ],
+              [
+                -0.117,
+                0.85,
+                0.454
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -122,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.278,
+                0.183,
+                0.147
+              ],
+              [
+                0.278,
+                0.738,
+                0.262
+              ]
+            ],
+            "open": [
+              [
+                -0.554,
+                0.183,
+                0.235
+              ],
+              [
+                -0.215,
+                0.738,
+                0.715
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.5 cm",
+        "h": "85 cm",
+        "d": "46.8 cm"
+      },
+      "sizeNote": "About 50 cm deep with the door",
+      "specs": [
+        [
+          "Capacity",
+          "7 kg"
+        ],
+        [
+          "Type",
+          "Front-load washer, fully automatic"
+        ],
+        [
+          "Max spin",
+          "1200 rpm"
+        ],
+        [
+          "Motor",
+          "Inverter BLDC motor"
+        ],
+        [
+          "Drum",
+          "525 mm Super Drum, pillow-shape drum, 2.2 mm holes"
+        ],
+        [
+          "Controls",
+          "Chrome programme knob, LED display"
+        ],
+        [
+          "Programmes",
+          "15: Cotton, Synthetics, Mix, Allergen, Baby Care, Daily, Delicate, Refresh, Quick 15', Sportswear, Jeans, Duvet, Self Clean, Shirts, Spin"
+        ],
+        [
+          "Features",
+          "PuriSteam, Dual Spray, Refresh, Anti-Bacterial Treatment on the gasket and the dispenser"
+        ],
+        [
+          "Energy",
+          "5 star, 0.0450 kWh per kg per cycle"
+        ],
+        [
+          "Water",
+          "7.43 litres per kg per cycle"
+        ],
+        [
+          "Noise",
+          "Wash 50 dB(A), spin 70 dB(A)"
+        ],
+        [
+          "Supply",
+          "220 V, 50 Hz, 10 A, 1800 W"
+        ],
+        [
+          "Door",
+          "Hinged on the left, half-transparent glass with black, silver rim"
+        ],
+        [
+          "Gasket",
+          "Dark grey"
+        ],
+        [
+          "Warranty",
+          "4 years comprehensive, 12 years on the motor"
+        ]
+      ],
+      "source": "https://www.haier.com/in/washing-machines/front-load-fully-automatic-hw70-im12929bk.shtml",
+      "hotspots": [
+        {
+          "title": "PuriSteam",
+          "text": "Effectively eliminates bacteria and mites with continuous high temperature.",
+          "pos": [
+            -0.0405,
+            0.787,
+            0.2277
+          ],
+          "normal": [
+            0,
+            0.5,
+            0.866
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Inverter BLDC motor",
+          "text": "Simple, efficient, durable, with a 12-year warranty on the motor.",
+          "pos": [
+            -0.241,
+            0.813,
+            0.2128
+          ],
+          "normal": [
+            0,
+            0.5,
+            0.866
+          ],
+          "show": "always"
+        },
+        {
+          "title": "15 programmes",
+          "text": "Turn the chrome knob to pick one of 15 programmes, from Cotton and Baby Care to Quick 15' and Self Clean.",
+          "pos": [
+            0.2155,
+            0.81,
+            0.2145
+          ],
+          "normal": [
+            0,
+            0.5,
+            0.866
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Super Drum 525",
+          "text": "A 525 mm drum with a pillow-shape wall, 560 protrusions and 720 micro-holes, that provides utmost care for delicate fabrics.",
+          "pos": [
+            0.1,
+            0.51,
+            -0.151
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        }
+      ]
+    },
+    {
+      "id": "lg-fhb1207z2m",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "FHB1207Z2M",
+      "name": "LG 7 kg front-load washing machine with Inverter Direct Drive and Steam",
+      "shortName": "7 kg front-load washer",
+      "summary": "Open the door to see the drum, slide out the detergent drawer and open the pump-filter cover, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the small cover at the bottom right to open it",
+      "glb": "/models/lg-fhb1207z2m.glb",
+      "thumb": "/photos/lg-fhb1207z2m/0.jpg",
+      "photos": [
+        "/photos/lg-fhb1207z2m/0.jpg",
+        "/photos/lg-fhb1207z2m/1.jpg",
+        "/photos/lg-fhb1207z2m/2.jpg",
+        "/photos/lg-fhb1207z2m/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Middle Black",
+          "swatchColor": "#3a3a3c",
+          "usdz": "/models/usdz/lg-fhb1207z2m-middle-black.usdz",
+          "itemCode": "FHB1207Z2M.AMBQEIL",
+          "code": "FHB1207Z2M"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.2
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.3,
+                0.731,
+                -0.012
+              ],
+              [
+                -0.087,
+                0.819,
+                0.22
+              ]
+            ],
+            "open": [
+              [
+                -0.3,
+                0.731,
+                0.188
+              ],
+              [
+                -0.087,
+                0.819,
+                0.42
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.247,
+                0.206,
+                0.167
+              ],
+              [
+                0.251,
+                0.705,
+                0.27
+              ]
+            ],
+            "open": [
+              [
+                -0.628,
+                0.206,
+                0.218
+              ],
+              [
+                -0.218,
+                0.705,
+                0.572
+              ]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter cover",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 95,
+          "zone": {
+            "closed": [
+              [
+                0.122,
+                0.035,
+                0.216
+              ],
+              [
+                0.267,
+                0.135,
+                0.221
+              ]
+            ],
+            "open": [
+              [
+                0.122,
+                0.022,
+                0.216
+              ],
+              [
+                0.267,
+                0.035,
+                0.316
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "44 cm"
+      },
+      "sizeNote": "49 cm deep with the door, 89 cm with the door open at 90 degrees",
+      "fit": {
+        "front": 45,
+        "sides": 2,
+        "back": 10,
+        "top": 0.5,
+        "note": "From LG's owner's manual: at least 2 cm at each side, 10 cm behind for the hoses, 0.5 cm above, and 89 cm of depth in total with the door open at 90 degrees."
+      },
+      "specs": [
+        [
+          "Capacity",
+          "7 kg"
+        ],
+        [
+          "Type",
+          "Front load, freestanding"
+        ],
+        [
+          "Max spin",
+          "1200 rpm (1200 / 1000 / 800 / 600 / 400 / no spin)"
+        ],
+        [
+          "Motor",
+          "Inverter Direct Drive, 6 Motion Direct Drive"
+        ],
+        [
+          "Drum",
+          "Stainless steel, embossed, with plastic lifters"
+        ],
+        [
+          "Energy",
+          "5 star, 0.06 kWh/kg/cycle"
+        ],
+        [
+          "Steam",
+          "Steam with Allergy Care"
+        ],
+        [
+          "Programmes",
+          "Cotton, Cotton+, Mixed Fabric, Quick 30, Allergy Care, Activewear, Hand/Wool, Delicates, Tub Clean, Rinse+Spin"
+        ],
+        [
+          "Temperatures",
+          "Cold, 20, 30, 40, 60 and 95 °C"
+        ],
+        [
+          "Display",
+          "Dial, touch buttons and LED display"
+        ],
+        [
+          "Delay timer",
+          "3 to 19 hours"
+        ],
+        [
+          "Door",
+          "Black tinted round cover"
+        ],
+        [
+          "Water",
+          "Cold fill, automatic water level"
+        ],
+        [
+          "Smart",
+          "Smart Diagnosis, LoadSense, foam detection"
+        ],
+        [
+          "Supply",
+          "230 V, 50 Hz"
+        ],
+        [
+          "Weight",
+          "59 kg"
+        ],
+        [
+          "Warranty",
+          "10 years on the motor (LG)"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-7kg-front-load-washing-machine-inverter-direct-drive-6-motion-direct-drive-5-star-or-middle-black-fhb1207z2mambqeil/21212",
+      "source": "https://www.lg.com/in/laundry/front-loading-washing-machines/fhb1207z2m/",
+      "hotspots": [
+        {
+          "title": "6 Motion Direct Drive",
+          "text": "Six wash motions, each made for a different fabric, for a better wash with less vibration and less noise.",
+          "pos": [
+            -0.12,
+            0.62,
+            0.266
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!door"
+        },
+        {
+          "title": "Inverter Direct Drive",
+          "text": "The motor drives the drum directly. LG gives a 10 year warranty on the motor.",
+          "pos": [
+            0.265,
+            0.7145,
+            0.2205
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Steam with Allergy Care",
+          "text": "Steam activates the Allergy Care programme, which removes allergens.",
+          "pos": [
+            -0.05,
+            0.7545,
+            0.2205
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Smart Diagnosis",
+          "text": "Quickly troubleshoot the machine with Smart Diagnosis.",
+          "pos": [
+            0.2515,
+            0.766,
+            0.2205
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
         }
       ]
     }

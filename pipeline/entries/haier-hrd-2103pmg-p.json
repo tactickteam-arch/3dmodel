@@ -1,0 +1,167 @@
+{
+  "products": [
+    {
+      "id": "haier-hrd-2103pmg-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRD-2103PMG-P",
+      "name": "Haier 190 L single-door refrigerator with base drawer, glass door",
+      "shortName": "190 L single-door refrigerator",
+      "summary": "Open the door and the freezer flap, slide out the trays and the base drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/haier-hrd-2103pmg-p.glb",
+      "thumb": "/photos/haier-hrd-2103pmg-p/0.jpg",
+      "photos": ["/photos/haier-hrd-2103pmg-p/0.jpg", "/photos/haier-hrd-2103pmg-p/1.jpg", "/photos/haier-hrd-2103pmg-p/2.jpg", "/photos/haier-hrd-2103pmg-p/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Mirror Glass",
+          "swatchColor": "#889696",
+          "variant": "Mirror Glass",
+          "code": "HRD-2103PMG-P",
+          "usdz": "/models/usdz/haier-hrd-2103pmg-p-mirror-glass.usdz",
+          "itemCode": "HRD-2103PMG-P"
+        },
+        {
+          "name": "Wave Glass",
+          "swatchColor": "#3c203a",
+          "variant": "Wave Glass",
+          "code": "HRD-2103PWG-P",
+          "usdz": "/models/usdz/haier-hrd-2103pmg-p-wave-glass.usdz",
+          "itemCode": "HRD-2103PWG-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.265, 0.14, 0.093],
+              [0.265, 1.313, 0.286]
+            ],
+            "open": [
+              [0.22, 0.14, 0.154],
+              [0.693, 1.313, 0.626]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "x",
+          "angle": -90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.191, 1.104, 0.073],
+              [0.171, 1.24, 0.087]
+            ],
+            "open": [
+              [-0.191, 1.234, 0.079],
+              [0.171, 1.248, 0.215]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.04, 0, 0.24],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.232, 0.202, -0.223],
+              [0.232, 1.078, 0.105]
+            ],
+            "open": [
+              [-0.272, 0.202, 0.017],
+              [0.192, 1.078, 0.345]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "base drawer",
+          "node": "BaseDrawer",
+          "slide": [0, 0, 0.25],
+          "zone": {
+            "closed": [
+              [-0.263, 0.006, -0.145],
+              [0.263, 0.13, 0.285]
+            ],
+            "open": [
+              [-0.263, 0.006, 0.105],
+              [0.263, 0.13, 0.535]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "53 cm",
+        "h": "131.3 cm",
+        "d": "57 cm"
+      },
+      "sizeNote": "Haier gives 530 × 570 × 1313 mm (W × D × H) for both colours; packed, 575 × 680 × 1385 mm",
+      "specs": [
+        ["Total capacity", "190 L"],
+        ["Type", "Direct cool, single door"],
+        ["Energy rating", "3 star"],
+        ["Energy consumption", "136 (as Haier lists it)"],
+        ["Freezing", "One Hour Icing Technology"],
+        ["Power cuts", "Auto Connect Home Inverter, Stabilizer Free Operation"],
+        ["Shelves", "3 toughened glass"],
+        ["Vegetable case", "Yes"],
+        ["Egg tray", "Yes"],
+        ["Base drawer", "Yes"],
+        ["Light", "LED"],
+        ["Door", "Glass"],
+        ["Handle", "Recess"],
+        ["Lock", "Yes"],
+        ["Refrigerant", "R600a"],
+        ["Colours", "Mirror Glass, Wave Glass"],
+        ["Weight", "44 kg"],
+        ["Warranty", "10 Year Warranty, as Haier's page headlines it"]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/190-litres-direct-cool-refrigerator-mirror-glass-hrd-2103pmg-p.shtml",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-190-l-3-star-mirror-glass-finish-direct-cool-single-door-refrigerator-with-base-drawer-hrd-2103pmg-p/21357",
+      "hotspots": [
+        {
+          "title": "1 Hour Icing Technology",
+          "text": "Rapidly freezes items in just one hour, ensuring quick and efficient ice production.",
+          "pos": [-0.1, 1.17, 0.0815],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "3 Toughened Glass Shelves",
+          "text": "Sturdy, spill-resistant shelves that offer reliable support and easy cleaning.",
+          "pos": [0.15, 0.728, 0.0815],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Auto Connect Home Inverter",
+          "text": "Automatically connects to the home inverter during power outages to ensure continuous operation.",
+          "pos": [-0.08, 0.25, -0.166],
+          "normal": [0, 0, -1]
+        },
+        {
+          "title": "Clean Back",
+          "text": "Smooth, easy-to-clean back panel that prevents dust and debris buildup.",
+          "pos": [0, 0.85, -0.2855],
+          "normal": [0, 0, -1]
+        }
+      ]
+    }
+  ]
+}

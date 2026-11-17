@@ -1,0 +1,55 @@
+{
+ "fronts": {
+  "camellia_purple": {
+   "edge": "#6c465d"
+  },
+  "camellia_blue": {
+   "edge": "#5e5b6b"
+  },
+  "camellia_black": {
+   "edge": "#4d4d4f"
+  },
+  "blooming_saffron_red": {
+   "edge": "#a67286"
+  },
+  "blooming_saffron_blue": {
+   "edge": "#808592"
+  },
+  "elegant_inox": {
+   "edge": "#5c5e66"
+  },
+  "urban_tropical_blue": {
+   "edge": "#333a66"
+  },
+  "urban_tropical_red": {
+   "edge": "#8f6a73"
+  }
+ },
+ "mark": {
+  "ink": {
+   "light": [
+    230,
+    232,
+    235
+   ],
+   "dark": [
+    146,
+    148,
+    157
+   ]
+  },
+  "aspect": 6.4865,
+  "padded": [
+   500,
+   94
+  ]
+ },
+ "badge": {
+  "w_mm": 65.0,
+  "aspect": 1.5,
+  "padded": [
+   800,
+   540
+  ]
+ }
+}

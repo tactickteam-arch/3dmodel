@@ -1,0 +1,5 @@
+{
+  "sticksOut": {
+    "Door[A-Z]\\w*|Knob[A-Z]\\w*|Flap[A-Z]\\w*|LockSlot|HingePlate": "LG's manual gives D 440 mm for the cabinet and D' 490 mm to the door (owner's manual MFL72036418 p.11, LG India's spec table). The door, its hinge and lock, the dial and the filter flap stand in front of the cabinet."
+  }
+}

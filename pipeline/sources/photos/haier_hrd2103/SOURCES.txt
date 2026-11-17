@@ -1,0 +1,6 @@
+Haier India gallery, HRD-2103PMG-P (Mirror Glass): https://www.haier.com/in/refrigerators/190-litres-direct-cool-refrigerator-mirror-glass-hrd-2103pmg-p.shtml
+  pmg_g01_front, pmg_g02_34right, pmg_g03_34left, pmg_g04_drawer, pmg_g05_rear (1200 x 1200)
+Haier India gallery, HRD-2103PWG-P (Wave Glass), page as archived 7 Dec 2025 (the live page is gone); images from Haier's own image server:
+  https://www.haier.com/in/refrigerators/190-litres-direct-cool-refrigerator-wave-glass-hrd-2103pwg-p.shtml
+  pwg_g02..g09 (1200 x 1200; g04 open empty, g05-g08 open stocked, g09 rear); pwg_g01_front_350 (Haier serves the front only at 350 px)
+Sangeetha listing 21357 (HRD-2103PMG-P): sangeetha_21357_0.png

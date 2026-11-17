@@ -1,0 +1,121 @@
+{
+  "products": [
+    {
+      "id": "haier-hw70-im12929bk",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HW70-IM12929BK",
+      "name": "Haier 929 series 7 kg front-load washer with PuriSteam",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-7-kg-front-load-washing-machine-or-hw70-im12929bk-hw70-im12929bk/20616",
+      "shortName": "7 kg 929 front-load washer",
+      "summary": "Open the door to see the 525 mm Super Drum and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/haier-hw70-im12929bk.glb",
+      "thumb": "/photos/haier-hw70-im12929bk/0.jpg",
+      "photos": ["/photos/haier-hw70-im12929bk/0.jpg", "/photos/haier-hw70-im12929bk/1.jpg", "/photos/haier-hw70-im12929bk/2.jpg", "/photos/haier-hw70-im12929bk/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#232836",
+          "usdz": "/models/usdz/haier-hw70-im12929bk-black.usdz",
+          "itemCode": "HW70-IM12929BK",
+          "code": "HW70-IM12929BK"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.22],
+          "zone": {
+            "closed": [
+              [-0.295, 0.738, -0.028],
+              [-0.117, 0.85, 0.234]
+            ],
+            "open": [
+              [-0.295, 0.738, 0.192],
+              [-0.117, 0.85, 0.454]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -122,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.278, 0.183, 0.147],
+              [0.278, 0.738, 0.262]
+            ],
+            "open": [
+              [-0.554, 0.183, 0.235],
+              [-0.215, 0.738, 0.715]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.5 cm",
+        "h": "85 cm",
+        "d": "46.8 cm"
+      },
+      "sizeNote": "About 50 cm deep with the door",
+      "specs": [
+        ["Capacity", "7 kg"],
+        ["Type", "Front-load washer, fully automatic"],
+        ["Max spin", "1200 rpm"],
+        ["Motor", "Inverter BLDC motor"],
+        ["Drum", "525 mm Super Drum, pillow-shape drum, 2.2 mm holes"],
+        ["Controls", "Chrome programme knob, LED display"],
+        ["Programmes", "15: Cotton, Synthetics, Mix, Allergen, Baby Care, Daily, Delicate, Refresh, Quick 15', Sportswear, Jeans, Duvet, Self Clean, Shirts, Spin"],
+        ["Features", "PuriSteam, Dual Spray, Refresh, Anti-Bacterial Treatment on the gasket and the dispenser"],
+        ["Energy", "5 star, 0.0450 kWh per kg per cycle"],
+        ["Water", "7.43 litres per kg per cycle"],
+        ["Noise", "Wash 50 dB(A), spin 70 dB(A)"],
+        ["Supply", "220 V, 50 Hz, 10 A, 1800 W"],
+        ["Door", "Hinged on the left, half-transparent glass with black, silver rim"],
+        ["Gasket", "Dark grey"],
+        ["Warranty", "4 years comprehensive, 12 years on the motor"]
+      ],
+      "source": "https://www.haier.com/in/washing-machines/front-load-fully-automatic-hw70-im12929bk.shtml",
+      "hotspots": [
+        {
+          "title": "PuriSteam",
+          "text": "Effectively eliminates bacteria and mites with continuous high temperature.",
+          "pos": [-0.0405, 0.787, 0.2277],
+          "normal": [0, 0.5, 0.866],
+          "show": "always"
+        },
+        {
+          "title": "Inverter BLDC motor",
+          "text": "Simple, efficient, durable, with a 12-year warranty on the motor.",
+          "pos": [-0.241, 0.813, 0.2128],
+          "normal": [0, 0.5, 0.866],
+          "show": "always"
+        },
+        {
+          "title": "15 programmes",
+          "text": "Turn the chrome knob to pick one of 15 programmes, from Cotton and Baby Care to Quick 15' and Self Clean.",
+          "pos": [0.2155, 0.81, 0.2145],
+          "normal": [0, 0.5, 0.866],
+          "show": "always"
+        },
+        {
+          "title": "Super Drum 525",
+          "text": "A 525 mm drum with a pillow-shape wall, 560 protrusions and 720 micro-holes, that provides utmost care for delicate fabrics.",
+          "pos": [0.1, 0.51, -0.151],
+          "normal": [0, 0, 1],
+          "show": "door"
+        }
+      ]
+    }
+  ]
+}

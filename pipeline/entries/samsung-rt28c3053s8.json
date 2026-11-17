@@ -1,0 +1,163 @@
+{
+  "products": [
+    {
+      "id": "samsung-rt28c3053s8",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT28C3053S8",
+      "name": "Samsung 236 L double-door refrigerator, Elegant Inox",
+      "shortName": "236 L Digital Inverter refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, slide out the shelves and the ice tray, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt28c3053s8.glb",
+      "thumb": "/photos/samsung-rt28c3053s8/0.jpg",
+      "photos": ["/photos/samsung-rt28c3053s8/0.jpg", "/photos/samsung-rt28c3053s8/1.jpg", "/photos/samsung-rt28c3053s8/2.jpg", "/photos/samsung-rt28c3053s8/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#8f9296",
+          "usdz": "/models/usdz/samsung-rt28c3053s8-elegant-inox.usdz",
+          "variant": "Elegant Inox",
+          "code": "RT28C3053S8",
+          "itemCode": "RT28C3053S8",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-236-l-digital-inverter-technology-double-door-refrigerator-rt28c3053s8/18185"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [-0.275, 1.018, 0.161],
+              [0.277, 1.535, 0.318]
+            ],
+            "open": [
+              [0.248, 1.018, 0.21],
+              [0.712, 1.535, 0.674]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.197, 1.066, -0.044],
+              [-0.02, 1.238, 0.143]
+            ],
+            "open": [
+              [-0.197, 1.066, 0.076],
+              [-0.02, 1.238, 0.263]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.275, 0.036, 0.146],
+              [0.277, 1.004, 0.315]
+            ],
+            "open": [
+              [0.237, 0.036, 0.21],
+              [0.712, 1.004, 0.685]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.02, 0, 0.5],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.243, 0.081, -0.283],
+              [0.243, 0.992, 0.139]
+            ],
+            "open": [
+              [-0.263, 0.081, 0.217],
+              [0.223, 0.992, 0.639]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55.5 cm",
+        "h": "154.5 cm",
+        "d": "63.7 cm"
+      },
+      "sizeNote": "Samsung's manual lists 114.1 cm total depth and 96.4 cm total width with the doors open at 135°; Samsung's size picture rounds the height to 1.54 m",
+      "specs": [
+        ["Total capacity", "236 L (fridge 183 L, freezer 53 L)"],
+        ["Type", "Frost free, double door"],
+        ["Energy rating", "3 star, 229 units a year"],
+        ["Compressor", "Digital Inverter"],
+        ["Cooling", "All-around Cooling"],
+        ["Stabilizer free", "100-300 V"],
+        ["Shelves", "3 glass, Easy Slide Shelf (fridge), 1 Cool Pack (freezer)"],
+        ["Storage", "Fresh Room, MoistFresh Zone vegetable drawer, 4 door pockets (fridge), 2 (freezer)"],
+        ["Extras", "Movable (twist) Ice Maker, Cool Pack, deodorizer, LED light"],
+        ["Controls", "Temperature knob"],
+        ["Door", "Recessed handles"],
+        ["Warranty", "20 years on the compressor"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-236-l-digital-inverter-technology-double-door-refrigerator-rt28c3053s8/18185",
+      "source": "https://www.samsung.com/in/support/model/RT28C3053S8/HL/",
+      "hotspots": [
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "The Digital Inverter Compressor automatically adjusts its speed in response to cooling demand, so it is quiet, uses power efficiently and keeps working for long.",
+          "pos": [0.16, 1.03, 0.319],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Movable Ice Maker",
+          "text": "A simple twist of the Movable Ice Maker is all it takes to dispense a large quantity of ice. When there's not much need for ice, you can easily remove it and create more space in the freezer.",
+          "pos": [-0.108, 1.14, 0.138],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Easy Slide Shelf",
+          "text": "The Easy Slide Shelf is built on rolling hinges and simply slides in and out, so you can easily reach things at the back and in every corner without items getting squashed or broken.",
+          "pos": [0.15, 0.66, 0.1375],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Cool Pack",
+          "text": "When electricity outages happen, a Cool Pack in the freezer keeps food frozen at below 0°C for up to 12 hours, so it doesn't go to waste.",
+          "pos": [0.15, 1.303, 0.1525],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        }
+      ],
+      "fit": {
+        "front": 50,
+        "sides": 5,
+        "back": 5,
+        "top": 10,
+        "note": "From Samsung's user manual for the RT28 series: at least 5 cm at each side, 5 cm behind it, 10 cm above, and 114.1 cm of depth in total with the doors open (both open to 135°)."
+      }
+    }
+  ]
+}

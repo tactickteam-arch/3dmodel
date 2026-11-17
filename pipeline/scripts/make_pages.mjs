@@ -117,11 +117,12 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
       .replace(HEAD, tags.join("\n") + "\n"));
   };
   for (const p of shown) page(p, p.id, p.model);
-  // and one per colour at its item code; a code with anything but letters, digits, spaces, "." "-" "_" and "/" is left out
+  // and one per colour at its item code; a code with anything but letters, digits, spaces (a no-break space too: Sangeetha has
+  // one in "CE10T IDU Plus ODU"), "." "-" "_" and "/" is left out
   // (Sangeetha's own item code, `itemCode`, from its listing; the maker's `code`; and `altCodes`, other codes Sangeetha's
   // sheets give for that row)
   for (const p of shown) for (const fin of p.finishes || []) for (const code of new Set([fin.itemCode, fin.code, ...(fin.altCodes || [])].map((c) => String(c || "").trim()).filter(Boolean))) {
-    if (!/^[\w .\-]+(\/[\w .\-]+)*$/.test(code) || /(^|\/)\.\.?(\/|$)/.test(code)) { notes.push(`item code "${code}" can't be a link; left out`); continue; }
+    if (!/^[\w .\-\u00a0]+(\/[\w .\-\u00a0]+)*$/.test(code) || /(^|\/)\.\.?(\/|$)/.test(code)) { notes.push(`item code "${code}" can't be a link; left out`); continue; }
     page(p, code, code);
   }
   // and one per colour that isn't in Sangeetha's item master, at its product's item code and its name

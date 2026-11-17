@@ -1,0 +1,128 @@
+{
+  "products": [
+    {
+      "id": "lg-t70ajmb1z",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "T70AJMB1Z",
+      "name": "LG 7 kg Smart Inverter top-load washing machine with Auto Tub Clean",
+      "shortName": "7 kg Smart Inverter top-load washer",
+      "summary": "Lift the tempered glass lid, pull out the detergent drawer and look into the TurboDrum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/lg-t70ajmb1z.glb",
+      "thumb": "/photos/lg-t70ajmb1z/0.jpg",
+      "photos": ["/photos/lg-t70ajmb1z/0.jpg", "/photos/lg-t70ajmb1z/1.jpg", "/photos/lg-t70ajmb1z/2.jpg", "/photos/lg-t70ajmb1z/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Middle Black",
+          "swatchColor": "#323232",
+          "usdz": "/models/usdz/lg-t70ajmb1z-middle-black.usdz",
+          "itemCode": "T70AJMB1Z.ABMQEIL",
+          "code": "T70AJMB1Z"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.269, 0.844, -0.118],
+              [0.269, 0.885, 0.182]
+            ],
+            "open": [
+              [-0.269, 0.87, -0.133],
+              [0.269, 1.17, -0.092]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent drawer",
+          "node": "DetergentDrawer",
+          "slide": [0, 0, 0.08],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [-0.075, 0.807, -0.221],
+              [0.075, 0.849, -0.095]
+            ],
+            "open": [
+              [-0.075, 0.807, -0.141],
+              [0.075, 0.849, -0.015]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "88.5 cm",
+        "d": "56 cm"
+      },
+      "sizeNote": "88.5 cm tall with the lid shut, as LG's owner's manual gives it; LG's product page says 92.5 cm",
+      "specs": [
+        ["Capacity", "7 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star, 0.0083 kWh/kg/cycle"],
+        ["Motor", "Smart Inverter, 10 years on the motor"],
+        ["Wash", "TurboDrum, Smart Motion, Jet Spray+, Side Water Fall, TurboWash"],
+        ["Drum", "Punch + 3, embossed inner drum"],
+        ["Programmes", "Normal, Pre Wash + Normal, Quick Wash, Rinse + Spin, Tub Clean, Wool"],
+        ["Water levels", "10"],
+        ["Display", "LED with hard buttons"],
+        ["Lid", "Tempered glass, soft closing"],
+        ["Filter", "Lint filter"],
+        ["Extras", "Auto Tub Clean, Smart Diagnosis, Child Lock, Auto Restart, Foam detection, LoadSense, Air Dry, Aqua Reserve, Soak, Spin Only"],
+        ["Water inlet", "Cold only"],
+        ["Colour", "Middle Black"],
+        ["Weight", "32 kg"]
+      ],
+      "source": "https://www.lg.com/in/laundry/top-loading-washing-machines/t70ajmb1z/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-7kg-top-load-washing-machine-in-top-load-t70ajmb1zabmqeil/21766",
+      "hotspots": [
+        {
+          "title": "Smart Inverter",
+          "text": "An energy-saving motor that cuts wasted operation. LG says its water-proof motor doesn't corrode, and the motor carries a 10-year warranty.",
+          "pos": [0.205, 0.83, 0.2117],
+          "normal": [0, 0.921, 0.391],
+          "show": "always"
+        },
+        {
+          "title": "Smart Diagnosis",
+          "text": "If an error occurs, use the LG app or call the LG service centre: the machine can be diagnosed over the phone, saving time and needless visits.",
+          "pos": [0.126, 0.8289, 0.2146],
+          "normal": [0, 0.921, 0.391],
+          "show": "always"
+        },
+        {
+          "title": "Auto Tub Clean",
+          "text": "The tub is cleaned automatically after every wash cycle.",
+          "pos": [-0.12, 0.804, 0.128],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "TurboDrum",
+          "text": "The drum and the pulsator turn in opposite directions, for a strong water stream that takes out the toughest dirt.",
+          "pos": [0, 0.371, 0.095],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        }
+      ],
+      "fit": {
+        "sides": 2,
+        "back": 10,
+        "top": 34,
+        "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 122.5 cm, so keep 34 cm free above it."
+      }
+    }
+  ]
+}
