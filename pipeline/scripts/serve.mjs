@@ -17,7 +17,7 @@ http.createServer((req, res) => {
   // SITE_CONFIG=<file> serves another /site-config.js (test_store_bridge.mjs: the store app bridge switched on)
   if (p === "/site-config.js" && process.env.SITE_CONFIG) { res.writeHead(200, { "Content-Type": TYPES[".js"] }); fs.createReadStream(process.env.SITE_CONFIG).pipe(res); return; }
   if (extra && p.startsWith("/__test/")) { base = extra; p = p.slice(7); }
-  else if (/^\/p\/[^/]+\/?$/.test(p)) { const own = `/p/${p.split("/")[2]}.html`; p = fs.existsSync(path.join(root, own)) ? own : "/product.html"; }
+  else if (/^\/p\/.+$/.test(p)) { const own = `/p/${p.slice(3).replace(/\/$/, "")}.html`; p = fs.existsSync(path.join(root, own)) ? own : "/product.html"; }
   else if (p === "/") p = "/index.html";
   else if (/^\/(compare|showroom)\/[^.]*$/.test(p)) p = `/${p.split("/")[1]}.html`;
   else if (!path.extname(p) && fs.existsSync(path.join(root, p + ".html"))) p += ".html";
