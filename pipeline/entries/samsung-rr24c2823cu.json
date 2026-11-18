@@ -1,0 +1,186 @@
+{
+  "products": [
+    {
+      "id": "samsung-rr24c2823cu",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RR24C2823CU/NL",
+      "name": "Samsung 223 L single-door refrigerator, Stylish Grandé design with Base Stand Drawer",
+      "shortName": "223 L single-door refrigerator",
+      "summary": "Open the door and the freezer box, slide out the trays and the base drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/samsung-rr24c2823cu.glb",
+      "thumb": "/photos/samsung-rr24c2823cu/0.jpg",
+      "photos": ["/photos/samsung-rr24c2823cu/0.jpg", "/photos/samsung-rr24c2823cu/1.jpg", "/photos/samsung-rr24c2823cu/2.jpg", "/photos/samsung-rr24c2823cu/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 118%",
+      "finishes": [
+        {
+          "name": "Camellia Blue",
+          "swatchColor": "#0f5eb9",
+          "variant": "Camellia Blue",
+          "itemCode": "RR24C2823CU/NL",
+          "code": "RR24C2823CU/NL",
+          "usdz": "/models/usdz/samsung-rr24c2823cu-camellia-blue.usdz"
+        },
+        {
+          "name": "Camellia Purple",
+          "swatchColor": "#653038",
+          "variant": "Camellia Purple",
+          "code": "RR24C2823CR/NL",
+          "usdz": "/models/usdz/samsung-rr24c2823cu-camellia-purple.usdz"
+        },
+        {
+          "name": "Luxe Brown",
+          "swatchColor": "#5f4e4b",
+          "variant": "Luxe Brown",
+          "code": "RR24C2823DX/NL",
+          "usdz": "/models/usdz/samsung-rr24c2823cu-luxe-brown.usdz"
+        },
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#989898",
+          "variant": "Elegant Inox",
+          "code": "RR24C2823S8/NL",
+          "usdz": "/models/usdz/samsung-rr24c2823cu-elegant-inox.usdz"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 127,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.267, 0.173, 0.104],
+              [0.267, 1.52, 0.333]
+            ],
+            "open": [
+              [0.21, 0.173, 0.172],
+              [0.662, 1.52, 0.667]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerFlap",
+          "axis": "y",
+          "angle": 90,
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.213, 1.239, 0.084],
+              [0.185, 1.414, 0.112]
+            ],
+            "open": [
+              [0.167, 1.239, 0.102],
+              [0.195, 1.414, 0.5]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.3],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.238, 0.236, -0.275],
+              [0.238, 1.178, 0.117]
+            ],
+            "open": [
+              [-0.238, 0.236, 0.025],
+              [0.238, 1.178, 0.417]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "base drawer",
+          "node": "BaseDrawer",
+          "slide": [0, 0, 0.25],
+          "zone": {
+            "closed": [
+              [-0.273, 0.013, -0.299],
+              [0.273, 0.163, 0.272]
+            ],
+            "open": [
+              [-0.273, 0.013, -0.049],
+              [0.273, 0.163, 0.522]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55 cm",
+        "h": "152 cm",
+        "d": "66.5 cm"
+      },
+      "sizeNote": "Samsung's manual for the RR23/24 with the base stand gives 55.0 × 152 × 66.5 cm (W × H × D); Samsung's page gives 53.6 cm wide (the cabinet, without the stand's flare), 54 cm deep without the door and 108 cm deep with the door open at 90°; its manual: the door opens to 127°, and leave 100 mm behind",
+      "fit": {
+        "front": 41.5,
+        "back": 10,
+        "note": "Samsung's page: 108 cm deep with the door open at 90° (66.5 cm shut); its manual: 100 mm between the back and the wall"
+      },
+      "specs": [
+        ["Total capacity", "223 L (fridge 205 L, freezer 18 L)"],
+        ["Type", "Direct cool, single door"],
+        ["Energy rating", "3 star"],
+        ["Compressor", "Digital Inverter Compressor"],
+        ["Power cuts", "Stabilizer Free Operation, 100 to 300 V"],
+        ["Controls", "Knob"],
+        ["Shelves", "3 toughened glass"],
+        ["Door storage", "6 transparent door pockets, Deep Door Guard, egg tray"],
+        ["Vegetable box", "1, transparent, 1.5 L more space"],
+        ["Freezer", "Ice tray"],
+        ["Base stand drawer", "For food that needs no cooling, such as onions and potatoes"],
+        ["Light", "Clear View Lamp"],
+        ["Handle", "Bar, with lock and key"],
+        ["Refrigerant", "R-600a"],
+        ["Colours", "Camellia Blue, Camellia Purple, Luxe Brown, Elegant Inox"],
+        ["Weight", "34.6 kg"],
+        ["Warranty", "1 year on the product, 10 years on the Digital Inverter Compressor"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-223l-3-star-inverter-direct-cool-single-door-refrigerator-rr24c2823cu-nl/21508",
+      "source": "https://www.samsung.com/in/support/model/RR24C2823CU/NL/",
+      "hotspots": [
+        {
+          "title": "Stylish design",
+          "text": "Has a truly distinctive Grandé door design available in a choice of various colours. It enhances the look of refrigerator with a fine line aesthetically placed towards the bottom.",
+          "pos": [0.1, 0.9, 0.2875],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Digital Inverter Compressor",
+          "text": "The Digital Inverter Compressor automatically adjusts its speed in response to cooling demand. So it is quiet, uses power efficiently and keeps working for long, backed-up by a 10 year warranty on the compressor.",
+          "pos": [0.1975, 1.4635, 0.2885],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Base Stand Drawer",
+          "text": "There is a large Base Stand Drawer in the lower part of the refrigerator. It is a convenient place to store all of your food items that don't need cooling, such as onions and potatoes.",
+          "pos": [0.17, 0.07, 0.27],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Toughened Glass",
+          "text": "The Toughened Glass shelves are designed and tested to withstand a huge weight of up to 175kg.",
+          "pos": [0.17, 0.79, 0.09],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+ "fronts": {
+  "camellia_blue": {
+   "edge": "#524e62"
+  },
+  "camellia_purple": {
+   "edge": "#613b53"
+  },
+  "luxe_brown": {
+   "edge": "#574b44"
+  },
+  "elegant_inox": {
+   "edge": "#44464f"
+  }
+ },
+ "mark": {
+  "ink": [
+   233,
+   235,
+   237
+  ],
+  "inks": {
+   "camellia_blue": [
+    233,
+    235,
+    237
+   ],
+   "camellia_purple": [
+    235,
+    233,
+    235
+   ],
+   "luxe_brown": [
+    230,
+    232,
+    235
+   ],
+   "elegant_inox": [
+    219,
+    223,
+    226
+   ]
+  },
+  "aspect": 6.4865,
+  "padded": [
+   500,
+   94
+  ]
+ },
+ "badge": {
+  "w_mm": 67.0,
+  "aspect": 1.4944,
+  "padded": [
+   824,
+   558
+  ]
+ }
+}
