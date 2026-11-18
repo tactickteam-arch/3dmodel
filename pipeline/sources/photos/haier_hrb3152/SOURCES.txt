@@ -1,0 +1,18 @@
+Haier India gallery images (1200 px), downloaded 18 Nov 2026.
+pmg_*: https://www.haier.com/in/refrigerators/265-litres-frost-free-bottom-mounted-refrigerator-hrb-3152pmg-p.shtml
+  g01 https://image.haier.com/in/refrigerators/W020250426528503704967_1200.jpg
+  g02 https://image.haier.com/in/refrigerators/W020250426528503948347_1200.jpg
+  g03 https://image.haier.com/in/refrigerators/W020250426528504179649_1200.jpg
+  g04 https://image.haier.com/in/refrigerators/W020250426528504403838_1200.jpg
+  g05 https://image.haier.com/in/refrigerators/W020250426528504647368_1200.jpg
+  g06 https://image.haier.com/in/refrigerators/W020250426528504913019_1200.jpg
+  g07 https://image.haier.com/in/refrigerators/W020250426528505170823_1200.jpg
+  g08 https://image.haier.com/in/refrigerators/W020250426528505460536_1200.jpg
+  g09 https://image.haier.com/in/refrigerators/W020250426528505776562_1200.jpg
+pkg_*: https://www.haier.com/in/refrigerators/265-litres-frost-free-bottom-mounted-refrigerator-hrb-3152pkg-p.shtml
+  g01 https://image.haier.com/in/refrigerators/W020250812766319798258_1200.jpg
+  g02 https://image.haier.com/in/refrigerators/W020250812766319929014_1200.jpg
+  g03 https://image.haier.com/in/refrigerators/W020250812766320033932_1200.jpg
+  g04 https://image.haier.com/in/refrigerators/W020250925473850192052_1200.jpg
+  g05 https://image.haier.com/in/refrigerators/W020250925473850340369_1200.jpg
+  g06 https://image.haier.com/in/refrigerators/W020250812766320148790_1200.jpg

@@ -1,0 +1,165 @@
+{
+  "products": [
+    {
+      "id": "haier-hrb-3152pmg-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRB-3152PMG-P",
+      "name": "Haier 265 L bottom-mount refrigerator",
+      "shortName": "265 L bottom-mount refrigerator",
+      "summary": "Open the glass-door fridge on top and the freezer below, take out the trays and the freezer drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrb-3152pmg-p.glb",
+      "thumb": "/photos/haier-hrb-3152pmg-p/0.jpg",
+      "photos": ["/photos/haier-hrb-3152pmg-p/0.jpg", "/photos/haier-hrb-3152pmg-p/1.jpg", "/photos/haier-hrb-3152pmg-p/2.jpg", "/photos/haier-hrb-3152pmg-p/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-265-litres-2-star-mirror-glass-frost-free-bottom-mount-refrigerator-hrb-3152pmg-p/21338",
+      "finishes": [
+        {
+          "name": "Mirror Glass",
+          "swatchColor": "#cdcdcd",
+          "variant": "Mirror Glass",
+          "code": "HRB-3152PMG-P",
+          "usdz": "/models/usdz/haier-hrb-3152pmg-p-mirror-glass.usdz",
+          "itemCode": "HRB-3152PMG-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-265-litres-2-star-mirror-glass-frost-free-bottom-mount-refrigerator-hrb-3152pmg-p/21338"
+        },
+        {
+          "name": "Black Glass",
+          "swatchColor": "#0c0c0d",
+          "variant": "Black Glass",
+          "code": "HRB-3152PKG-P",
+          "usdz": "/models/usdz/haier-hrb-3152pmg-p-black-glass.usdz",
+          "itemCode": "HRB-3152PKG-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-265l-bottom-mount-refrigerator-or-black-glass-or-2-star-hrb-3152pkg-p/21323"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 125,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.272, 0.697, 0.106],
+              [0.274, 1.685, 0.308]
+            ],
+            "open": [
+              [0.197, 0.697, 0.189],
+              [0.649, 1.685, 0.715]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.015, 0, 0.4],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.239, 0.737, -0.255],
+              [0.239, 1.56, 0.133]
+            ],
+            "open": [
+              [-0.254, 0.737, 0.145],
+              [0.224, 1.56, 0.533]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 125,
+          "zone": {
+            "closed": [
+              [-0.272, 0.045, 0.216],
+              [0.274, 0.698, 0.308]
+            ],
+            "open": [
+              [0.265, 0.045, 0.189],
+              [0.649, 0.698, 0.684]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "freezer drawer",
+          "node": "FreezerDrawer",
+          "slide": [0, 0, 0.28],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.239, 0.138, -0.248],
+              [0.239, 0.423, 0.201]
+            ],
+            "open": [
+              [-0.239, 0.138, 0.032],
+              [0.239, 0.423, 0.481]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "168.5 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier gives 54.8 × 61.5 × 168.5 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "265 L (fridge 199 L, freezer 66 L)"],
+        ["Type", "Frost free, bottom-mount double door"],
+        ["Convertible", "8 in 1 convertible modes"],
+        ["Energy rating", "2 star, 266 units a year"],
+        ["Features", "Turbo Icing, Twin Energy Saving Mode, Jhukna Mat"],
+        ["Shelves", "Toughened glass"],
+        ["Storage", "Fruit case, vegetable case (2X Bigger Veg Box), egg tray"],
+        ["Ice", "Twist ice maker"],
+        ["Light", "LED"],
+        ["Door", "Glass, Mirror Glass or Black Glass, recess handle"],
+        ["Refrigerant", "R600a"],
+        ["Weight", "64 kg"]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/265-litres-frost-free-bottom-mounted-refrigerator-hrb-3152pmg-p.shtml",
+      "hotspots": [
+        {
+          "title": "8 in 1 Convertible",
+          "text": "Convert your fridge to 8 different modes as per your requirement and keep your food fresh for long.",
+          "pos": [0.2015, 0.7215, 0.3085],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Jhukna Mat",
+          "text": "Jhukna Mat with bottom mounted refrigerators: the fridge on top, the freezer below, so the fridge stays conveniently accessible.",
+          "pos": [-0.12, 1.2, 0.3085],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "2X Bigger Veg Box",
+          "text": "The 2X bigger vegetable box provides extra vegetable storage.",
+          "pos": [0.15, 0.85, 0.0995],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo Icing makes ice faster.",
+          "pos": [-0.1315, 0.551, 0.1855],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "products": [
+    {
+      "id": "lg-t80spmb1z",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "T80SPMB1Z",
+      "name": "LG 8 kg Smart Inverter top-load washing machine with TurboDrum",
+      "shortName": "8 kg Smart Inverter top-load washer",
+      "summary": "Lift the tempered glass lid, pull out the detergent drawer and look into the TurboDrum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/lg-t80spmb1z.glb",
+      "thumb": "/photos/lg-t80spmb1z/0.jpg",
+      "photos": ["/photos/lg-t80spmb1z/0.jpg", "/photos/lg-t80spmb1z/1.jpg", "/photos/lg-t80spmb1z/2.jpg", "/photos/lg-t80spmb1z/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Middle Black",
+          "swatchColor": "#323232",
+          "usdz": "/models/usdz/lg-t80spmb1z-middle-black.usdz",
+          "itemCode": "T80SPMB1Z",
+          "code": "T80SPMB1Z"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.269, 0.884, -0.118],
+              [0.269, 0.925, 0.182]
+            ],
+            "open": [
+              [-0.269, 0.91, -0.133],
+              [0.269, 1.21, -0.092]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent drawer",
+          "node": "DetergentDrawer",
+          "slide": [0, 0, 0.08],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [-0.075, 0.847, -0.221],
+              [0.075, 0.889, -0.095]
+            ],
+            "open": [
+              [-0.075, 0.847, -0.141],
+              [0.075, 0.889, -0.015]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "92.5 cm",
+        "d": "56 cm"
+      },
+      "sizeNote": "92.5 cm tall with the lid shut, as LG's page and owner's manual give it; 122.5 cm with the lid open",
+      "specs": [
+        ["Capacity", "8 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star, 0.0079 kWh/kg/cycle"],
+        ["Motor", "Smart Inverter, 10 years on the motor"],
+        ["Wash", "TurboDrum, Side Water Fall, Punch + 3"],
+        ["Drum", "Embossed inner drum"],
+        ["Programmes", "Normal, Pre Wash + Normal, Quick Wash, Tub Clean, Wool"],
+        ["Water levels", "6, and Auto"],
+        ["Rinse and spin", "3 rinses, 3 spin levels"],
+        ["Display", "LED with hard buttons, 18:88 time display"],
+        ["Lid", "Tempered glass, soft closing"],
+        ["Filter", "Lint filter"],
+        ["Extras", "Smart Diagnosis, Child Lock, Delay timer 3-19 hours, Auto Restart, Foam detection, LoadSense, Aqua Reserve, Soak, Spin Only"],
+        ["Water inlet", "Cold only"],
+        ["Colour", "Middle Black"],
+        ["Weight", "32 kg"]
+      ],
+      "source": "https://www.lg.com/in/laundry/top-loading-washing-machines/t80spmb1z/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-8-kg-top-load-washing-machine-with-smart-inverter-motor-turbodrum-or-middle-black-or-5-star-t80spmb1z/20639",
+      "hotspots": [
+        {
+          "title": "Smart Inverter",
+          "text": "An energy-saving motor that cuts wasted operation. LG says its water-proof motor doesn't corrode, and the motor carries a 10-year warranty.",
+          "pos": [0.205, 0.8685, 0.2141],
+          "normal": [0, 0.921, 0.391],
+          "show": "always"
+        },
+        {
+          "title": "Smart Diagnosis",
+          "text": "If an error occurs, use the LG app or call the LG service centre: the machine can be diagnosed over the phone, saving time and needless visits.",
+          "pos": [0.129, 0.8671, 0.2177],
+          "normal": [0, 0.921, 0.391],
+          "show": "always"
+        },
+        {
+          "title": "Tub Clean",
+          "text": "A special programme that cleans the inside of the drum, chosen with the Program 2 key.",
+          "pos": [-0.12, 0.8445, 0.128],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "TurboDrum",
+          "text": "The drum and the pulsator turn in opposite directions, for a strong water stream that takes out the toughest dirt.",
+          "pos": [0, 0.371, 0.092],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        }
+      ],
+      "fit": {
+        "sides": 2,
+        "back": 10,
+        "top": 30,
+        "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 122.5 cm, so keep 30 cm free above it."
+      }
+    }
+  ]
+}

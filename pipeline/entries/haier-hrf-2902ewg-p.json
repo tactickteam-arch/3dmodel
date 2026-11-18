@@ -1,0 +1,155 @@
+{
+  "products": [
+    {
+      "id": "haier-hrf-2902ewg-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-2902EWG-P",
+      "name": "Haier 240 L double-door refrigerator, Wave Glass",
+      "shortName": "240 L Wave Glass refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, take out the ice maker and the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-2902ewg-p.glb",
+      "thumb": "/photos/haier-hrf-2902ewg-p/0.jpg",
+      "photos": ["/photos/haier-hrf-2902ewg-p/0.jpg", "/photos/haier-hrf-2902ewg-p/1.jpg", "/photos/haier-hrf-2902ewg-p/2.jpg", "/photos/haier-hrf-2902ewg-p/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Wave Glass",
+          "swatchColor": "#1a1426",
+          "usdz": "/models/usdz/haier-hrf-2902ewg-p-wave-glass.usdz",
+          "itemCode": "HRF-2902EWG-P",
+          "code": "HRF-2902EWG-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [-0.273, 1.073, 0.141],
+              [0.274, 1.56, 0.308]
+            ],
+            "open": [
+              [0.254, 1.073, 0.175],
+              [0.74, 1.56, 0.621]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.234, 1.109, -0.035],
+              [-0.11, 1.165, 0.118]
+            ],
+            "open": [
+              [-0.234, 1.109, 0.085],
+              [-0.11, 1.165, 0.238]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.273, 0.041, 0.116],
+              [0.274, 1.061, 0.308]
+            ],
+            "open": [
+              [0.238, 0.041, 0.175],
+              [0.74, 1.061, 0.64]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.01, 0, 0.5],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.239, 0.098, -0.258],
+              [0.239, 0.999, 0.109]
+            ],
+            "open": [
+              [-0.249, 0.098, 0.242],
+              [0.229, 0.999, 0.609]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "156 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier gives 54.8 × 61.5 × 156 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        ["Total capacity", "240 L"],
+        ["Type", "Frost free, top-mount double door"],
+        ["Energy rating", "2 star, 270 units a year"],
+        ["Features", "Cool Pad, Turbo Icing, Twin Energy Saving modes"],
+        ["Stabilizer free", "Yes"],
+        ["Shelves", "Toughened glass (refrigerator)"],
+        ["Storage", "Vegetable case, egg tray, detachable ice maker"],
+        ["Light", "LED"],
+        ["Door", "Glass door, Wave Glass finish, recess handle"],
+        ["Lock", "No"],
+        ["Refrigerant", "R600a"],
+        ["Weight", "60 kg"],
+        ["Warranty", "2 years on the product, 10 years on the compressor"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-240l-frost-free-double-door-refrigerator-or-cool-pad-or-wave-glass-or-2-star-hrf-2902ewg-p/21522",
+      "source": "https://www.haier.com/in/refrigerators/240-litres-frost-free-twin-energy-saving-top-mount-refrigerator-hrf-2902ewg-p.shtml",
+      "hotspots": [
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo icing technology accelerates the time needed to freeze products in the freezer section.",
+          "pos": [0.115, 1.19, -0.2615],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Cool Pad Technology",
+          "text": "Helps maintain a cooler environment inside the refrigerator, keeping stored food and beverages fresh for longer.",
+          "pos": [0.12, 1.295, 0.1315],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Toughened Glass",
+          "text": "Toughened glass shelves can bear heavyweight up to 120 kg easily.",
+          "pos": [0.17, 0.695, 0.1065],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Twin Energy Saving Modes",
+          "text": "Choose from dedicated energy-saving modes to optimise power consumption during daily use.",
+          "pos": [-0.12, 0.75, 0.3075],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ]
+    }
+  ]
+}

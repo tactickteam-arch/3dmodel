@@ -16979,6 +16979,617 @@
       ]
     },
     {
+      "id": "haier-hrf-2902ewg-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRF-2902EWG-P",
+      "name": "Haier 240 L double-door refrigerator, Wave Glass",
+      "shortName": "240 L Wave Glass refrigerator",
+      "summary": "Open the freezer and the fridge one at a time, take out the ice maker and the trays, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrf-2902ewg-p.glb",
+      "thumb": "/photos/haier-hrf-2902ewg-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrf-2902ewg-p/0.jpg",
+        "/photos/haier-hrf-2902ewg-p/1.jpg",
+        "/photos/haier-hrf-2902ewg-p/2.jpg",
+        "/photos/haier-hrf-2902ewg-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Wave Glass",
+          "swatchColor": "#1a1426",
+          "usdz": "/models/usdz/haier-hrf-2902ewg-p-wave-glass.usdz",
+          "itemCode": "HRF-2902EWG-P",
+          "code": "HRF-2902EWG-P"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 140,
+          "zone": {
+            "closed": [
+              [
+                -0.273,
+                1.073,
+                0.141
+              ],
+              [
+                0.274,
+                1.56,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.254,
+                1.073,
+                0.175
+              ],
+              [
+                0.74,
+                1.56,
+                0.621
+              ]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [
+            0,
+            0,
+            0.12
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.234,
+                1.109,
+                -0.035
+              ],
+              [
+                -0.11,
+                1.165,
+                0.118
+              ]
+            ],
+            "open": [
+              [
+                -0.234,
+                1.109,
+                0.085
+              ],
+              [
+                -0.11,
+                1.165,
+                0.238
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 140,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.273,
+                0.041,
+                0.116
+              ],
+              [
+                0.274,
+                1.061,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.238,
+                0.041,
+                0.175
+              ],
+              [
+                0.74,
+                1.061,
+                0.64
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.01,
+            0,
+            0.5
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.239,
+                0.098,
+                -0.258
+              ],
+              [
+                0.239,
+                0.999,
+                0.109
+              ]
+            ],
+            "open": [
+              [
+                -0.249,
+                0.098,
+                0.242
+              ],
+              [
+                0.229,
+                0.999,
+                0.609
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "156 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier gives 54.8 × 61.5 × 156 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "240 L"
+        ],
+        [
+          "Type",
+          "Frost free, top-mount double door"
+        ],
+        [
+          "Energy rating",
+          "2 star, 270 units a year"
+        ],
+        [
+          "Features",
+          "Cool Pad, Turbo Icing, Twin Energy Saving modes"
+        ],
+        [
+          "Stabilizer free",
+          "Yes"
+        ],
+        [
+          "Shelves",
+          "Toughened glass (refrigerator)"
+        ],
+        [
+          "Storage",
+          "Vegetable case, egg tray, detachable ice maker"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Glass door, Wave Glass finish, recess handle"
+        ],
+        [
+          "Lock",
+          "No"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "60 kg"
+        ],
+        [
+          "Warranty",
+          "2 years on the product, 10 years on the compressor"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-240l-frost-free-double-door-refrigerator-or-cool-pad-or-wave-glass-or-2-star-hrf-2902ewg-p/21522",
+      "source": "https://www.haier.com/in/refrigerators/240-litres-frost-free-twin-energy-saving-top-mount-refrigerator-hrf-2902ewg-p.shtml",
+      "hotspots": [
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo icing technology accelerates the time needed to freeze products in the freezer section.",
+          "pos": [
+            0.115,
+            1.19,
+            -0.2615
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Cool Pad Technology",
+          "text": "Helps maintain a cooler environment inside the refrigerator, keeping stored food and beverages fresh for longer.",
+          "pos": [
+            0.12,
+            1.295,
+            0.1315
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        },
+        {
+          "title": "Toughened Glass",
+          "text": "Toughened glass shelves can bear heavyweight up to 120 kg easily.",
+          "pos": [
+            0.17,
+            0.695,
+            0.1065
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Twin Energy Saving Modes",
+          "text": "Choose from dedicated energy-saving modes to optimise power consumption during daily use.",
+          "pos": [
+            -0.12,
+            0.75,
+            0.3075
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        }
+      ]
+    },
+    {
+      "id": "haier-hrb-3152pmg-p",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Refrigerator",
+      "model": "HRB-3152PMG-P",
+      "name": "Haier 265 L bottom-mount refrigerator",
+      "shortName": "265 L bottom-mount refrigerator",
+      "summary": "Open the glass-door fridge on top and the freezer below, take out the trays and the freezer drawer, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/haier-hrb-3152pmg-p.glb",
+      "thumb": "/photos/haier-hrb-3152pmg-p/0.jpg",
+      "photos": [
+        "/photos/haier-hrb-3152pmg-p/0.jpg",
+        "/photos/haier-hrb-3152pmg-p/1.jpg",
+        "/photos/haier-hrb-3152pmg-p/2.jpg",
+        "/photos/haier-hrb-3152pmg-p/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-265-litres-2-star-mirror-glass-frost-free-bottom-mount-refrigerator-hrb-3152pmg-p/21338",
+      "finishes": [
+        {
+          "name": "Mirror Glass",
+          "swatchColor": "#cdcdcd",
+          "variant": "Mirror Glass",
+          "code": "HRB-3152PMG-P",
+          "usdz": "/models/usdz/haier-hrb-3152pmg-p-mirror-glass.usdz",
+          "itemCode": "HRB-3152PMG-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-265-litres-2-star-mirror-glass-frost-free-bottom-mount-refrigerator-hrb-3152pmg-p/21338"
+        },
+        {
+          "name": "Black Glass",
+          "swatchColor": "#0c0c0d",
+          "variant": "Black Glass",
+          "code": "HRB-3152PKG-P",
+          "usdz": "/models/usdz/haier-hrb-3152pmg-p-black-glass.usdz",
+          "itemCode": "HRB-3152PKG-P",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-265l-bottom-mount-refrigerator-or-black-glass-or-2-star-hrb-3152pkg-p/21323"
+        }
+      ],
+      "parts": [
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 125,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                0.697,
+                0.106
+              ],
+              [
+                0.274,
+                1.685,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.197,
+                0.697,
+                0.189
+              ],
+              [
+                0.649,
+                1.685,
+                0.715
+              ]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": [
+            "Take out trays",
+            "Put trays back"
+          ],
+          "node": "FridgeTrays",
+          "slide": [
+            -0.015,
+            0,
+            0.4
+          ],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [
+                -0.239,
+                0.737,
+                -0.255
+              ],
+              [
+                0.239,
+                1.56,
+                0.133
+              ]
+            ],
+            "open": [
+              [
+                -0.254,
+                0.737,
+                0.145
+              ],
+              [
+                0.224,
+                1.56,
+                0.533
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 125,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                0.045,
+                0.216
+              ],
+              [
+                0.274,
+                0.698,
+                0.308
+              ]
+            ],
+            "open": [
+              [
+                0.265,
+                0.045,
+                0.189
+              ],
+              [
+                0.649,
+                0.698,
+                0.684
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "freezer drawer",
+          "node": "FreezerDrawer",
+          "slide": [
+            0,
+            0,
+            0.28
+          ],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [
+                -0.239,
+                0.138,
+                -0.248
+              ],
+              [
+                0.239,
+                0.423,
+                0.201
+              ]
+            ],
+            "open": [
+              [
+                -0.239,
+                0.138,
+                0.032
+              ],
+              [
+                0.239,
+                0.423,
+                0.481
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.8 cm",
+        "h": "168.5 cm",
+        "d": "61.5 cm"
+      },
+      "sizeNote": "Haier gives 54.8 × 61.5 × 168.5 cm (W × D × H) and publishes no door swing or clearances",
+      "specs": [
+        [
+          "Total capacity",
+          "265 L (fridge 199 L, freezer 66 L)"
+        ],
+        [
+          "Type",
+          "Frost free, bottom-mount double door"
+        ],
+        [
+          "Convertible",
+          "8 in 1 convertible modes"
+        ],
+        [
+          "Energy rating",
+          "2 star, 266 units a year"
+        ],
+        [
+          "Features",
+          "Turbo Icing, Twin Energy Saving Mode, Jhukna Mat"
+        ],
+        [
+          "Shelves",
+          "Toughened glass"
+        ],
+        [
+          "Storage",
+          "Fruit case, vegetable case (2X Bigger Veg Box), egg tray"
+        ],
+        [
+          "Ice",
+          "Twist ice maker"
+        ],
+        [
+          "Light",
+          "LED"
+        ],
+        [
+          "Door",
+          "Glass, Mirror Glass or Black Glass, recess handle"
+        ],
+        [
+          "Refrigerant",
+          "R600a"
+        ],
+        [
+          "Weight",
+          "64 kg"
+        ]
+      ],
+      "source": "https://www.haier.com/in/refrigerators/265-litres-frost-free-bottom-mounted-refrigerator-hrb-3152pmg-p.shtml",
+      "hotspots": [
+        {
+          "title": "8 in 1 Convertible",
+          "text": "Convert your fridge to 8 different modes as per your requirement and keep your food fresh for long.",
+          "pos": [
+            0.2015,
+            0.7215,
+            0.3085
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "Jhukna Mat",
+          "text": "Jhukna Mat with bottom mounted refrigerators: the fridge on top, the freezer below, so the fridge stays conveniently accessible.",
+          "pos": [
+            -0.12,
+            1.2,
+            0.3085
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "!fridge"
+        },
+        {
+          "title": "2X Bigger Veg Box",
+          "text": "The 2X bigger vegetable box provides extra vegetable storage.",
+          "pos": [
+            0.15,
+            0.85,
+            0.0995
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "fridge"
+        },
+        {
+          "title": "Turbo Icing",
+          "text": "Turbo Icing makes ice faster.",
+          "pos": [
+            -0.1315,
+            0.551,
+            0.1855
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "freezer"
+        }
+      ]
+    },
+    {
       "id": "bluestar-ia318exu",
       "brand": "Blue Star",
       "brandLogo": "/logos/bluestar.png",
@@ -19838,6 +20449,252 @@
           "show": "always"
         }
       ]
+    },
+    {
+      "id": "lg-t80spmb1z",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "T80SPMB1Z",
+      "name": "LG 8 kg Smart Inverter top-load washing machine with TurboDrum",
+      "shortName": "8 kg Smart Inverter top-load washer",
+      "summary": "Lift the tempered glass lid, pull out the detergent drawer and look into the TurboDrum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/lg-t80spmb1z.glb",
+      "thumb": "/photos/lg-t80spmb1z/0.jpg",
+      "photos": [
+        "/photos/lg-t80spmb1z/0.jpg",
+        "/photos/lg-t80spmb1z/1.jpg",
+        "/photos/lg-t80spmb1z/2.jpg",
+        "/photos/lg-t80spmb1z/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Middle Black",
+          "swatchColor": "#323232",
+          "usdz": "/models/usdz/lg-t80spmb1z-middle-black.usdz",
+          "itemCode": "T80SPMB1Z",
+          "code": "T80SPMB1Z"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.269,
+                0.884,
+                -0.118
+              ],
+              [
+                0.269,
+                0.925,
+                0.182
+              ]
+            ],
+            "open": [
+              [
+                -0.269,
+                0.91,
+                -0.133
+              ],
+              [
+                0.269,
+                1.21,
+                -0.092
+              ]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent drawer",
+          "node": "DetergentDrawer",
+          "slide": [
+            0,
+            0,
+            0.08
+          ],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [
+                -0.075,
+                0.847,
+                -0.221
+              ],
+              [
+                0.075,
+                0.889,
+                -0.095
+              ]
+            ],
+            "open": [
+              [
+                -0.075,
+                0.847,
+                -0.141
+              ],
+              [
+                0.075,
+                0.889,
+                -0.015
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "92.5 cm",
+        "d": "56 cm"
+      },
+      "sizeNote": "92.5 cm tall with the lid shut, as LG's page and owner's manual give it; 122.5 cm with the lid open",
+      "specs": [
+        [
+          "Capacity",
+          "8 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Energy rating",
+          "5 star, 0.0079 kWh/kg/cycle"
+        ],
+        [
+          "Motor",
+          "Smart Inverter, 10 years on the motor"
+        ],
+        [
+          "Wash",
+          "TurboDrum, Side Water Fall, Punch + 3"
+        ],
+        [
+          "Drum",
+          "Embossed inner drum"
+        ],
+        [
+          "Programmes",
+          "Normal, Pre Wash + Normal, Quick Wash, Tub Clean, Wool"
+        ],
+        [
+          "Water levels",
+          "6, and Auto"
+        ],
+        [
+          "Rinse and spin",
+          "3 rinses, 3 spin levels"
+        ],
+        [
+          "Display",
+          "LED with hard buttons, 18:88 time display"
+        ],
+        [
+          "Lid",
+          "Tempered glass, soft closing"
+        ],
+        [
+          "Filter",
+          "Lint filter"
+        ],
+        [
+          "Extras",
+          "Smart Diagnosis, Child Lock, Delay timer 3-19 hours, Auto Restart, Foam detection, LoadSense, Aqua Reserve, Soak, Spin Only"
+        ],
+        [
+          "Water inlet",
+          "Cold only"
+        ],
+        [
+          "Colour",
+          "Middle Black"
+        ],
+        [
+          "Weight",
+          "32 kg"
+        ]
+      ],
+      "source": "https://www.lg.com/in/laundry/top-loading-washing-machines/t80spmb1z/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-8-kg-top-load-washing-machine-with-smart-inverter-motor-turbodrum-or-middle-black-or-5-star-t80spmb1z/20639",
+      "hotspots": [
+        {
+          "title": "Smart Inverter",
+          "text": "An energy-saving motor that cuts wasted operation. LG says its water-proof motor doesn't corrode, and the motor carries a 10-year warranty.",
+          "pos": [
+            0.205,
+            0.8685,
+            0.2141
+          ],
+          "normal": [
+            0,
+            0.921,
+            0.391
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Smart Diagnosis",
+          "text": "If an error occurs, use the LG app or call the LG service centre: the machine can be diagnosed over the phone, saving time and needless visits.",
+          "pos": [
+            0.129,
+            0.8671,
+            0.2177
+          ],
+          "normal": [
+            0,
+            0.921,
+            0.391
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Tub Clean",
+          "text": "A special programme that cleans the inside of the drum, chosen with the Program 2 key.",
+          "pos": [
+            -0.12,
+            0.8445,
+            0.128
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "TurboDrum",
+          "text": "The drum and the pulsator turn in opposite directions, for a strong water stream that takes out the toughest dirt.",
+          "pos": [
+            0,
+            0.371,
+            0.092
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        }
+      ],
+      "fit": {
+        "sides": 2,
+        "back": 10,
+        "top": 30,
+        "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 122.5 cm, so keep 30 cm free above it."
+      }
     }
   ]
 }
