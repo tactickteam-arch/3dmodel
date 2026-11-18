@@ -1,0 +1,164 @@
+{
+  "products": [
+    {
+      "id": "lg-gl-t2926pdpz",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Refrigerator",
+      "model": "GLT2926PDPZ",
+      "name": "LG 288 L double-door convertible refrigerator with Smart Inverter Compressor",
+      "shortName": "288 L double-door refrigerator",
+      "summary": "Open the freezer, slide the ice maker out and open the fridge, take the trays out, look inside, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/lg-gl-t2926pdpz.glb",
+      "thumb": "/photos/lg-gl-t2926pdpz/0.jpg",
+      "photos": ["/photos/lg-gl-t2926pdpz/0.jpg", "/photos/lg-gl-t2926pdpz/1.jpg", "/photos/lg-gl-t2926pdpz/2.jpg", "/photos/lg-gl-t2926pdpz/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 132%",
+      "finishes": [
+        {
+          "name": "Shiny Steel",
+          "swatchColor": "#b4b5b7",
+          "usdz": "/models/usdz/lg-gl-t2926pdpz-shiny-steel.usdz",
+          "itemCode": "GL-T2926PDPZ",
+          "code": "GLT2926PDPZ",
+          "altCodes": ["GLT2926PDPZ.APZZEBN"]
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 135,
+          "zone": {
+            "closed": [
+              [-0.288, 1.201, 0.209],
+              [0.292, 1.675, 0.335]
+            ],
+            "open": [
+              [0.271, 1.201, 0.258],
+              [0.735, 1.675, 0.722]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice maker",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.16],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.193, 1.254, -0.006],
+              [-0.017, 1.386, 0.195]
+            ],
+            "open": [
+              [-0.193, 1.254, 0.154],
+              [-0.017, 1.386, 0.355]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 135,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.288, 0.027, 0.184],
+              [0.292, 1.197, 0.335]
+            ],
+            "open": [
+              [0.261, 0.027, 0.258],
+              [0.735, 1.197, 0.732]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [0, 0, 0.52],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.252, 0.083, -0.259],
+              [0.252, 1.089, 0.184]
+            ],
+            "open": [
+              [-0.252, 0.083, 0.261],
+              [0.252, 1.089, 0.704]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "58.5 cm",
+        "h": "167.5 cm",
+        "d": "66.9 cm"
+      },
+      "sizeNote": "LG's manual lists 120 cm total depth and 99.1 cm total width with a door open",
+      "specs": [
+        ["Total capacity", "288 L (freezer 59 L, fridge 229 L)"],
+        ["Type", "Frost free, double door"],
+        ["Convertible", "Yes"],
+        ["Energy rating", "2 star, 238 units a year (2026-28 label)"],
+        ["Compressor", "Smart Inverter (BLDC), 10 years on the compressor"],
+        ["Cooling", "Multi Air Flow"],
+        ["Shelves", "4 toughened glass shelves (fridge)"],
+        ["Vegetable box", "1 (Fresh Zone)"],
+        ["Door baskets", "2 in the freezer; 3 full and 2 half in the fridge, transparent"],
+        ["Ice maker", "Manual, 2 lever 2 tray"],
+        ["Control", "Inner dot LED display, Express Freeze, door alarm"],
+        ["Door", "PET, Shiny Steel; pocket handle with black décor"],
+        ["Light", "Top LED (fridge)"],
+        ["Power cuts", "Auto Smart Connect (inverter-compatible)"],
+        ["Smart Diagnosis", "Yes"],
+        ["Weight", "56 kg"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-288-l-double-door-refrigerator-convertible-multi-air-flow-or-shiny-steel-or-2-star-gl-t2926pdpz/21326",
+      "source": "https://www.lg.com/in/refrigerators/double-door-refrigerators/glt2926pdpz/",
+      "hotspots": [
+        {
+          "title": "Convertible",
+          "text": "Convert a section of the freezer to more refrigeration as needed, to keep foods fresher for longer.",
+          "pos": [0.1, 1.47, -0.2539],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Multi Air Flow",
+          "text": "Circulates cool air evenly through multiple vents, keeping food fresher for longer.",
+          "pos": [-0.1, 1, -0.2534],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Toughened Glass Shelves",
+          "text": "Holds heavier loads without cracking, so you can store more with confidence.",
+          "pos": [0.17, 0.852, 0.1722],
+          "normal": [0, 0, 1],
+          "show": "fridge"
+        },
+        {
+          "title": "Smart Inverter Compressor",
+          "text": "Adjusts power based on cooling needs, cutting energy bills while running quieter, with a 10-year warranty on the compressor.",
+          "pos": [0.08, 0.72, 0.335],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        }
+      ],
+      "fit": {
+        "front": 53,
+        "back": 5,
+        "note": "From LG's owner's manual for this model: allow over 5 cm between the back and the wall. The manual gives 120 cm total depth with a door open, which is 53 cm in front of the fridge."
+      }
+    }
+  ]
+}

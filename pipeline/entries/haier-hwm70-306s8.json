@@ -1,0 +1,221 @@
+{
+  "products": [
+    {
+      "id": "haier-hwm70-306s8",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HWM70-306S8",
+      "name": "Haier 7 kg top-load washing machine with Ultra Fresh Air",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-7-kg-top-load-washing-machine-with-ultra-fresh-air-or-hwm70-306s8-hwm70-306s8/19888",
+      "shortName": "7 kg Ultra Fresh Air top-load washer",
+      "summary": "Lift the glass lid to see the pillow drum and the blue pulsator, read the front control panel, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/haier-hwm70-306s8.glb",
+      "thumb": "/photos/haier-hwm70-306s8/0.jpg",
+      "photos": [
+        "/photos/haier-hwm70-306s8/0.jpg",
+        "/photos/haier-hwm70-306s8/1.jpg",
+        "/photos/haier-hwm70-306s8/2.jpg",
+        "/photos/haier-hwm70-306s8/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Dark Jade Silver",
+          "swatchColor": "#55575b",
+          "usdz": "/models/usdz/haier-hwm70-306s8-dark-jade-silver.usdz",
+          "itemCode": "HWM70-306S8",
+          "code": "HWM70-306S8"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -86,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.247,
+                0.848,
+                -0.18
+              ],
+              [
+                0.247,
+                0.878,
+                0.184
+              ]
+            ],
+            "open": [
+              [
+                -0.247,
+                0.876,
+                -0.18
+              ],
+              [
+                0.247,
+                1.242,
+                -0.125
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "52 cm",
+        "h": "90.5 cm",
+        "d": "54 cm"
+      },
+      "sizeNote": "Body only, 90.5 cm tall at the back; with the lid open it is about 125 cm",
+      "specs": [
+        [
+          "Capacity",
+          "7 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Energy rating",
+          "5 star, 0.0064 kWh/kg/cycle"
+        ],
+        [
+          "Water use",
+          "20.15 L/kg/cycle"
+        ],
+        [
+          "Spin speed",
+          "800 rpm"
+        ],
+        [
+          "Technology",
+          "Ultra Fresh Air, NZP (Near Zero Pressure), Oceanus Wave"
+        ],
+        [
+          "Drum",
+          "Pillow drum with 2.2 mm holes"
+        ],
+        [
+          "Pulsator",
+          "Balance Clean pulsator"
+        ],
+        [
+          "Programmes",
+          "Smart, Soak, Delicate, Quick, with Wash, Rinse, Spin and Tub Dry steps"
+        ],
+        [
+          "Water levels",
+          "8, from 15 L to 54 L"
+        ],
+        [
+          "Water pressure",
+          "0.01 to 1.0 MPa"
+        ],
+        [
+          "Display",
+          "Digital, front control panel"
+        ],
+        [
+          "Lid",
+          "Toughened glass, soft falling"
+        ],
+        [
+          "Filter",
+          "2 x Magic filter"
+        ],
+        [
+          "Extras",
+          "Delay, Child Lock, Auto Restart"
+        ],
+        [
+          "Colour",
+          "Dark Jade Silver, black lid and panel"
+        ],
+        [
+          "Power",
+          "220 V, 50 Hz"
+        ],
+        [
+          "Warranty",
+          "2 years comprehensive, 10 years on the motor"
+        ]
+      ],
+      "source": "https://www.haier.com/in/washing-machines/top-load-fully-automatic-hwm70-306s8.shtml",
+      "hotspots": [
+        {
+          "title": "Ultra Fresh Air",
+          "text": "Fresh laundry after every wash: Ultra Fresh Air helps remove odour and moisture, for hygienic, anti-bacteria freshness.",
+          "pos": [
+            -0.025,
+            0.8762,
+            -0.1909
+          ],
+          "normal": [
+            0,
+            0.457,
+            0.889
+          ],
+          "show": "always"
+        },
+        {
+          "title": "NZP, Near Zero Pressure",
+          "text": "The wash doesn't stop when water pressure is low: Haier's Near Zero Pressure technology works down to 0.01 MPa, for flats with low water pressure or a low storage tank.",
+          "pos": [
+            0.17,
+            0.8567,
+            0.2114
+          ],
+          "normal": [
+            0,
+            0.981,
+            0.192
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Pillow Drum",
+          "text": "Pillow-shaped bulges scrub gently, and the 2.2 mm holes between them push clothes softly, reducing wear, tear and abrasion on delicate fabrics.",
+          "pos": [
+            0,
+            0.62,
+            0.226
+          ],
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "Bionic filter",
+          "text": "Two Magic filters with Haier's \"Venous valve\" design collect lint, so it doesn't jam the machine and your clothes stay clean.",
+          "pos": [
+            0.12,
+            0.66,
+            0.1538
+          ],
+          "normal": [
+            -0.682,
+            0,
+            -0.732
+          ],
+          "show": "lid"
+        }
+      ],
+      "fit": {
+        "sides": 2,
+        "back": 2,
+        "top": 35,
+        "note": "From Haier's user manual for the 306 series: keep at least 20 mm between the machine and the wall. The lid swings up and back: with it open the machine is about 125 cm tall (the opening angle is estimated from Haier's photos), so keep about 35 cm free above it."
+      }
+    }
+  ]
+}

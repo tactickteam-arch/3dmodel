@@ -1,0 +1,155 @@
+{
+  "products": [
+    {
+      "id": "samsung-ww70fg4s02abtl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Washing machine",
+      "model": "WW70FG4S02ABTL",
+      "name": "Samsung 7 kg front-load washing machine with Hygiene Steam and Digital Inverter",
+      "shortName": "7 kg Hygiene Steam front-load washer",
+      "summary": "Open the door to see the diamond drum, pull out the detergent drawer and open the filter cover, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the filter cover to open it",
+      "glb": "/models/samsung-ww70fg4s02abtl.glb",
+      "thumb": "/photos/samsung-ww70fg4s02abtl/0.jpg",
+      "photos": ["/photos/samsung-ww70fg4s02abtl/0.jpg", "/photos/samsung-ww70fg4s02abtl/1.jpg", "/photos/samsung-ww70fg4s02abtl/2.jpg", "/photos/samsung-ww70fg4s02abtl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 114%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#2b2c2f",
+          "usdz": "/models/usdz/samsung-ww70fg4s02abtl-black.usdz",
+          "variant": "Black",
+          "itemCode": "WW70FG4S02ABTL",
+          "code": "WW70FG4S02ABTL"
+        },
+        {
+          "name": "Refined Inox",
+          "swatchColor": "#55524f",
+          "usdz": "/models/usdz/samsung-ww70fg4s02abtl-refined-inox.usdz",
+          "variant": "Refined Inox",
+          "code": "WW70FG4S02AXTL"
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "49 cm"
+      },
+      "sizeNote": "51 cm deep with the hoses at the back, 98 cm with the door open at 90 degrees",
+      "specs": [
+        ["Capacity", "7 kg"],
+        ["Type", "Front load, fully automatic"],
+        ["Max spin", "1200 rpm"],
+        ["Energy", "5 star (2024-26 label), 0.05 kWh/kg/cycle"],
+        ["Motor", "Digital Inverter Technology, 10-year warranty on the motor"],
+        ["Wash", "Hygiene Steam, Quick Wash 15', Drum Clean"],
+        ["Drum", "Diamond drum"],
+        ["Programmes", "Cotton, eCotton, Synthetics, Hygiene Steam, Rinse+Spin, Drum Clean, Mixed Load, Quick Wash 15', Bedding, Colors, Wool/Delicates, Towels"],
+        ["Options", "Delay End, Pre Wash, Intensive, Soak, Extra Rinse, Smart Check, Child Lock"],
+        ["Drawer", "StayClean Drawer"],
+        ["Display", "LED"],
+        ["Door", "Black, hinged on the left"],
+        ["Water inlet", "Cold"],
+        ["Supply", "220-240 V, 50 Hz, 1900-2300 W"],
+        ["Water pressure", "50-780 kPa"],
+        ["Weight", "51 kg"],
+        ["Warranty", "2 years on the product, 10 years on the motor"],
+        ["Made in", "India"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-7-0-kg-front-load-washing-machine-with-diamond-drum-or-black-or-ww70fg4s02ab-ww70fg4s02abtl/21223",
+      "source": "https://www.samsung.com/in/washers-and-dryers/washing-machines/ww4100f-5-star-energy-rating-7kg-black-ww70fg4s02abtl/",
+      "hotspots": [
+        {
+          "title": "Quick Wash 15'",
+          "text": "Clean lightly soiled clothes quickly and efficiently. The Quick Wash program can get small loads of washing (less than 2 kg) clean in just 15 minutes.",
+          "pos": [-0.06, 0.815, 0.195],
+          "normal": [0, 0.25, 1]
+        },
+        {
+          "title": "Hygiene Steam",
+          "text": "Give clothes a deep and hygienic clean. Hygiene Steam releases steam from the bottom of the drum. It removes grime and 99.9% of certain bacteria and inactivates allergens derived from house dust mites.",
+          "pos": [0.0035, 0.32, 0.03],
+          "normal": [0, 0.4, 1],
+          "show": "door"
+        },
+        {
+          "title": "StayClean Drawer",
+          "text": "The StayClean Drawer ensures that more of the detergent is washed away with a specially designed water flushing system. So there is less unsightly soap residue and the tray stays clean and hygienic.",
+          "pos": [-0.19, 0.79, 0.25],
+          "normal": [0, 1, 0],
+          "show": "drawer"
+        },
+        {
+          "title": "Digital Inverter Motor",
+          "text": "Purchase with confidence any Samsung Washer model with a Digital Inverter Motor and receive a 10-year warranty on the motor.",
+          "pos": [-0.21, 0.8, 0.198],
+          "normal": [0, 0.25, 1],
+          "show": "!drawer"
+        }
+      ],
+      "fit": {
+        "front": 55,
+        "sides": 2.5,
+        "top": 2.5,
+        "back": 5,
+        "note": "From Samsung's manual (DC68-04378C): at least 25 mm at the sides and top, 50 mm behind and 550 mm in front when it stands in an alcove or closet. Samsung gives 49 cm deep, 51 cm with the hoses at the back and 98 cm with the door open at 90 degrees."
+      },
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.2],
+          "zone": {
+            "closed": [
+              [-0.298, 0.723, -0.078],
+              [-0.084, 0.849, 0.211]
+            ],
+            "open": [
+              [-0.298, 0.723, 0.122],
+              [-0.084, 0.849, 0.411]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -125,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.247, 0.229, 0.135],
+              [0.254, 0.729, 0.245]
+            ],
+            "open": [
+              [-0.534, 0.229, 0.234],
+              [-0.21, 0.729, 0.661]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "filter cover",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 90,
+          "zone": {
+            "closed": [
+              [0.092, 0.033, 0.192],
+              [0.245, 0.148, 0.209]
+            ],
+            "open": [
+              [0.092, 0.017, 0.193],
+              [0.245, 0.034, 0.308]
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

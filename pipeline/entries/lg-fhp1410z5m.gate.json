@@ -1,0 +1,5 @@
+{
+  "sticksOut": {
+    "Door[A-Z]\\w*|Knob[A-Z]\\w*|DialRing|\\w*Button(Ring|Cap|Face)|Flap[A-Z]\\w*|LockSlot|HingePlate": "LG India gives D 565 mm for the cabinet and D' 615 mm to the door (spec table for FHP1410Z5M). The door, its hinge and lock, the dial, the two buttons and the filter flap stand in front of the cabinet."
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "products": [
+    {
+      "id": "bosch-wga1220sin",
+      "brand": "Bosch",
+      "brandLogo": "/logos/bosch.png",
+      "category": "Washing machine",
+      "model": "WGA1220SIN",
+      "name": "Bosch Series 4 front-load 7 kg washing machine with SpeedPerfect",
+      "shortName": "7 kg Series 4 front-load washer",
+      "summary": "Open the door to see the Vario Drum, pull out the detergent drawer and open the pump filter, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the round flap to open it",
+      "glb": "/models/bosch-wga1220sin.glb",
+      "thumb": "/photos/bosch-wga1220sin/0.jpg",
+      "photos": ["/photos/bosch-wga1220sin/0.jpg", "/photos/bosch-wga1220sin/1.jpg", "/photos/bosch-wga1220sin/2.jpg", "/photos/bosch-wga1220sin/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Silver",
+          "swatchColor": "#8c8c8c",
+          "usdz": "/models/usdz/bosch-wga1220sin-silver.usdz",
+          "variant": "Silver",
+          "itemCode": "WGA1220SIN",
+          "code": "WGA1220SIN"
+        },
+        {
+          "name": "Dark Lake",
+          "swatchColor": "#2c343c",
+          "usdz": "/models/usdz/bosch-wga1220sin-dark-lake.usdz",
+          "variant": "Dark Lake",
+          "itemCode": "WGA12208IN",
+          "code": "WGA12208IN",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/bosch-series-4-front-load-7-kg-washing-machine-or-silver-or-wga12208in-wga12208in/21201"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.19],
+          "zone": {
+            "closed": [
+              [-0.263, 0.746, 0.085],
+              [-0.092, 0.823, 0.301]
+            ],
+            "open": [
+              [-0.263, 0.746, 0.275],
+              [-0.092, 0.823, 0.491]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -100,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.247, 0.215, 0.205],
+              [0.247, 0.709, 0.341]
+            ],
+            "open": [
+              [-0.383, 0.215, 0.277],
+              [-0.183, 0.709, 0.769]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 90,
+          "zone": {
+            "closed": [
+              [0.117, 0.027, 0.295],
+              [0.27, 0.179, 0.303]
+            ],
+            "open": [
+              [0.117, 0.019, 0.295],
+              [0.27, 0.027, 0.448]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.8 cm",
+        "h": "84.8 cm",
+        "d": "59 cm"
+      },
+      "sizeNote": "63.6 cm deep with the door, 107.3 cm with the door open at 90 degrees",
+      "specs": [
+        ["Capacity", "7 kg, 53 L drum"],
+        ["Type", "Front load, freestanding"],
+        ["Max spin", "1200 rpm"],
+        ["Motor", "EcoSilence Drive (SilentPowerDrive)"],
+        ["Energy rating", "5 star (BEE's register)"],
+        ["Speed", "SpeedPerfect, up to 65% less time"],
+        ["Anti Stain", "Earth and sand, sweat, cooking fat and oil, tea"],
+        ["Programmes", "Cottons, Cottons 60° Label, Synthetics, Mix Load, Delicates/Silk, Wool, Drum Descale, Quick 15/30 min, Steam/Anti Bacteria, Jeans/Dark Wash, Sportswear, Shirts, Rinse, Spin/Drain"],
+        ["Options", "Anti Stain, Temp. °C, Spin Speed, Pretreatment, Anti Tangle, Anti Wrinkle, Ready In (up to 24 hours), Speed Perfect, child lock"],
+        ["Display", "LED display with countdown"],
+        ["Smart", "Loading sensor, reload function, balance control, multiple water protection"],
+        ["Side panels", "Anti-Vibration side panels"],
+        ["Door", "Hinged on the left"],
+        ["Noise", "53 dB(A) washing"],
+        ["Supply", "220-240 V, 2300 W, 160 cm cord"],
+        ["Weight", "72.1 kg"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/bosch-series-4-front-load-7-kg-washing-machine-or-wga1220sin-wga1220sin/21202",
+      "source": "https://www.bosch-home.in/en/product/washer-dryer/washing-machines/front-loading-washing-machines/WGA1220SIN",
+      "hotspots": [
+        {
+          "title": "Anti Stain",
+          "text": "Choose the stain, earth and sand, sweat, cooking fat or tea, and the temperature, drum movement and soaking are set to suit it.",
+          "pos": [0.1009, 0.755, 0.298],
+          "normal": [0, 0, 1],
+          "show": "!door"
+        },
+        {
+          "title": "SpeedPerfect",
+          "text": "Washes in a shorter time with the cleaning results of the standard programme.",
+          "pos": [0.2504, 0.755, 0.298],
+          "normal": [0, 0, 1],
+          "show": "!door"
+        },
+        {
+          "title": "7 kg Vario Drum",
+          "text": "A gentle, efficient wash with even water distribution and without creasing garments.",
+          "pos": [0.08, 0.4, -0.095],
+          "normal": [0, 0, 1],
+          "show": "door"
+        },
+        {
+          "title": "Anti-Vibration side panels",
+          "text": "The side walls reduce vibration and give more stability during the wash and the spin.",
+          "pos": [0.299, 0.43, -0.02],
+          "normal": [1, 0, 0],
+          "show": "always"
+        }
+      ],
+      "fit": {
+        "front": 48,
+        "note": "From Bosch: 63.6 cm deep with the door closed and 107.3 cm with the door open at 90 degrees. Bosch's page and manual publish no side or back gaps; leave room for the hoses and the plug."
+      }
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "products": [
+    {
+      "id": "samsung-rt34dg5a2bs8hl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Refrigerator",
+      "model": "RT34DG5A2BS8HL",
+      "name": "Samsung 330 L Bespoke AI double-door refrigerator, Digital Inverter",
+      "shortName": "330 L Bespoke AI refrigerator, Digital Inverter",
+      "summary": "Open the freezer and the fridge one at a time, slide out the shelves and the ice tray, pick its colour, then stand it in your kitchen at its real size.",
+      "arTip": "Tap a door to open it",
+      "glb": "/models/samsung-rt34dg5a2bs8hl.glb",
+      "thumb": "/photos/samsung-rt34dg5a2bs8hl/0.jpg",
+      "photos": ["/photos/samsung-rt34dg5a2bs8hl/0.jpg", "/photos/samsung-rt34dg5a2bs8hl/1.jpg", "/photos/samsung-rt34dg5a2bs8hl/2.jpg", "/photos/samsung-rt34dg5a2bs8hl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-28deg 78deg 122%",
+      "finishes": [
+        {
+          "name": "Elegant Inox",
+          "swatchColor": "#76787b",
+          "usdz": "/models/usdz/samsung-rt34dg5a2bs8hl-elegant-inox.usdz",
+          "variant": "Elegant Inox",
+          "code": "RT34DG5A2BS8HL",
+          "itemCode": "RT34DG5A2BS8HL",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-330-l-bespoke-ai-double-door-refrigerator-rt34dg5a2bs8-rt34dg5a2bs8hl/20094"
+        },
+        {
+          "name": "Luxe Black",
+          "swatchColor": "#4a4b4e",
+          "usdz": "/models/usdz/samsung-rt34dg5a2bs8hl-luxe-black.usdz",
+          "variant": "Luxe Black",
+          "code": "RT34DG5A2BBXHL"
+        },
+        {
+          "name": "EZ Clean Steel",
+          "swatchColor": "#9a9a98",
+          "usdz": "/models/usdz/samsung-rt34dg5a2bs8hl-ez-clean-steel.usdz",
+          "variant": "EZ Clean Steel",
+          "code": "RT34DG5A2BSLHL"
+        }
+      ],
+      "parts": [
+        {
+          "key": "freezer",
+          "label": "freezer",
+          "node": "FreezerDoor",
+          "axis": "y",
+          "angle": 110,
+          "zone": {
+            "closed": [
+              [-0.315, 1.147, 0.215],
+              [0.316, 1.711, 0.367]
+            ],
+            "open": [
+              [0.242, 1.147, 0.298],
+              [0.578, 1.711, 0.906]
+            ]
+          }
+        },
+        {
+          "key": "icemaker",
+          "label": "ice tray",
+          "node": "IceMaker",
+          "slide": [0, 0, 0.12],
+          "needs": "freezer",
+          "zone": {
+            "closed": [
+              [-0.214, 1.206, -0.03],
+              [-0.041, 1.376, 0.178]
+            ],
+            "open": [
+              [-0.214, 1.206, 0.09],
+              [-0.041, 1.376, 0.298]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "fridge",
+          "node": "FridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.315, 0.039, 0.2],
+              [0.316, 1.143, 0.367]
+            ],
+            "open": [
+              [0.237, 0.039, 0.294],
+              [0.627, 1.143, 0.885]
+            ]
+          }
+        },
+        {
+          "key": "trays",
+          "label": "trays",
+          "text": ["Take out trays", "Put trays back"],
+          "node": "FridgeTrays",
+          "slide": [-0.03, 0, 0.66],
+          "needs": "fridge",
+          "zone": {
+            "closed": [
+              [-0.275, 0.075, -0.33],
+              [0.275, 0.957, 0.197]
+            ],
+            "open": [
+              [-0.305, 0.075, 0.33],
+              [0.245, 0.957, 0.857]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "63 cm",
+        "h": "171 cm",
+        "d": "73.2 cm"
+      },
+      "sizeNote": "Samsung's manual lists 129.4 cm total depth and 91.3 cm total width with the doors open (freezer 110°, fridge 115°)",
+      "specs": [
+        ["Total capacity", "330 L (fridge 255 L, freezer 75 L)"],
+        ["Type", "Frost free, double door"],
+        ["Convertible", "5-in-1"],
+        ["Energy rating", "2 star"],
+        ["Compressor", "Digital Inverter, 20-year warranty on the compressor"],
+        ["Cooling", "Twin Cooling Plus, Multi Flow"],
+        ["Smart features", "Wi-Fi, SmartThings, AI Energy Mode"],
+        ["Shelves", "2 tempered glass (fridge), 1 plastic (freezer)"],
+        ["Door pockets", "4 (fridge), 2 (freezer)"],
+        ["Extras", "Twist ice maker, Fresh Room, deodorizer, Power Cool and Power Freeze"],
+        ["Door", "Flat, recessed handles"],
+        ["Weight", "61 kg"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/samsung-330-l-bespoke-ai-double-door-refrigerator-rt34dg5a2bs8-rt34dg5a2bs8hl/20094",
+      "source": "https://www.samsung.com/in/support/model/RT34DG5A2BS8HL/",
+      "hotspots": [
+        {
+          "title": "Convertible 5-in-1",
+          "text": "Using Twin Cooling technology, the Convertible 5-in-1 feature lets you switch between 5 smart modes, so the freezer can become a fridge.",
+          "pos": [-0.06, 1.46, 0.366],
+          "normal": [0, 0, 1],
+          "show": "!freezer"
+        },
+        {
+          "title": "Wi-Fi with SmartThings",
+          "text": "Control the cooling mode, change the temperature and get alerts if the door is left open, from the SmartThings app.",
+          "pos": [-0.06, 0.78, 0.366],
+          "normal": [0, 0, 1],
+          "show": "!fridge"
+        },
+        {
+          "title": "Twin Cooling Plus",
+          "text": "Independent evaporators, fans and vents in the fridge and freezer keep food moist and stop odours mixing between them.",
+          "pos": [0, 1.46, -0.319],
+          "normal": [0, 0, 1],
+          "show": "freezer"
+        },
+        {
+          "title": "Power Cool and Power Freeze",
+          "text": "At the touch of a button, Power Cool blows intensely cold air into the fridge and Power Freeze into the freezer.",
+          "pos": [0.283, 0.87, 0.176],
+          "normal": [-1, 0, 0],
+          "show": "fridge"
+        }
+      ],
+      "fit": {
+        "front": 56,
+        "sides": 5,
+        "back": 5,
+        "note": "From Samsung's user manual for the RT34D range: at least 5 cm at each side, more than 5 cm behind it, and 129.4 cm of depth in total with the doors open (they open to 110° for the freezer and 115° for the fridge)."
+      }
+    }
+  ]
+}
