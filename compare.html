@@ -174,7 +174,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { esc, cm, partAt, finishSlug, finishIndexOf, CATEGORIES } from "/site.js";
+import { esc, cm, partAt, needsOf, finishSlug, finishIndexOf, CATEGORIES } from "/site.js";
 import { shownProducts } from "/live.js";
 import { studioLight } from "/light.js";
 const $ = (id) => document.getElementById(id);
@@ -341,7 +341,7 @@ function makeSide(side, p) {
     if (busy || !(key in state) || !mv.loaded) return;
     // a part inside another opens its outer part first; every open part inside one shuts before it does
     const self = parts.find((x) => x.key === key);
-    const first = self?.needs && !state[key] && !state[self.needs] ? [self.needs] : state[key] ? parts.filter((x) => x.needs === key && state[x.key]).map((x) => x.key) : [];
+    const first = !state[key] ? needsOf(self).filter((k) => !state[k]) : parts.filter((x) => needsOf(x).includes(key) && state[x.key]).map((x) => x.key);
     for (const k of first) { await togglePart(k); await sleep(950); }
     busy = true;
     await clipEnded();

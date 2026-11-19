@@ -1,0 +1,1 @@
+logos/cellecor.png: the logo on the cover of Cellecor annual report FY23-24 (https://cdn.shopify.com/s/files/1/0755/1575/6864/files/Cellecor_Annual_Report_FY23-24.pdf, page 1, rendered at 1000 dpi): C mark + CELLECOR wordmark, as on the AC front; tagline left off. The site header logo (WEBSITE_HEDWR_LOGO.png) is only 300 x 40.

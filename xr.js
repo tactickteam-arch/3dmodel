@@ -10,7 +10,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { partAt, hotspotShown } from "/site.js";
+import { partAt, needsOf, hotspotShown } from "/site.js";
 
 // Sangeetha colours: black, white and the logo orange
 const NAVY = "#0E0E0F", PAPER = "#FFFFFF", COPPER = "#F58A29", COPPER_DK = "#B85A12", SLATE = "#5E6066", HAIR = "#E3E3E6";
@@ -172,8 +172,8 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     const s = moving.get(key);
     if (!s) return;
     // a part inside another (the ice tray behind the freezer door) opens its outer part with it, and shuts before the outer part does
-    if (!s.isOpen && s.part.needs && !moving.get(s.part.needs)?.isOpen) togglePart(s.part.needs);
-    if (s.isOpen) for (const [k, o] of moving) if (o.part.needs === key && o.isOpen) togglePart(k);
+    if (!s.isOpen) for (const k of needsOf(s.part)) if (!moving.get(k)?.isOpen) togglePart(k);
+    if (s.isOpen) for (const [k, o] of moving) if (needsOf(o.part).includes(key) && o.isOpen) togglePart(k);
     s.isOpen = !s.isOpen;
     s.from = s.t;
     s.to = s.isOpen ? 1 : 0;
@@ -595,7 +595,8 @@ export function makeTooltip() {
 }
 
 function makePanel(ctx) {
-  const W = 1024, H = 1400, M = 0.44 / W; // canvas px -> metres
+  const W = 1024, M = 0.44 / W; // canvas px -> metres
+  let H = 1400; // grows (see draw) when the parts, colours and hint need more room
   const c = document.createElement("canvas");
   c.width = W; c.height = H;
   const g = c.getContext("2d");
@@ -715,6 +716,14 @@ function makePanel(ctx) {
       (p.placement === "wall" ? "Point at a wall to hang it there." : "Point at the floor to move it. Hold grip and sweep to turn it.");
     for (const line of wrapText(g, hint, W - 128)) { g.fillText(line, 64, y + 10); y += 44; }
 
+    // five doors and four colours don't fit the usual height: the panel grows downwards instead of writing under Exit
+    const need = y + 40 + bh + 64;
+    if (need > H) {
+      H = need; c.height = H;
+      tex.dispose();
+      mesh.geometry.dispose(); mesh.geometry = new THREE.PlaneGeometry(W * M, H * M);
+      return draw();
+    }
     button(64, H - 64 - bh, W - 128, bh, "Exit", { type: "exit" });
     tex.needsUpdate = true;
   }

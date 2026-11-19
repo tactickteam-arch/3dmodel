@@ -12,8 +12,8 @@
 // and the crisper cover, two crispers. In the freezer: the ice twister and ice bank on a tray, two drawers; in the
 // convertible: a tray, a shallow tray and a drawer. Clear bins on every door (7 on the fridge doors, 3 on each lower door).
 // Stocked for a south Indian kitchen.
-// Moving parts (STANDARD.md allows four): the fridge doors (FridgeDoorL, with FridgeDoorR through `also`: they open
-// together), the two crispers with their food (FridgeTrays), the freezer door and the convertible door.
+// Moving parts, one per door as on the real one: the left and right fridge doors (each opens on its own), the two crispers
+// with their food (FridgeTrays: they span both doors, so they need both open), the freezer door and the convertible door.
 // usage: node make_whirlpool_22457.mjs <products.json> <tex dir> <out.glb>
 import fs from "node:fs";
 import { THREE, mat, mesh, box, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
@@ -581,8 +581,10 @@ const fridgeDoorL = door("FridgeDoorL", -1, secU, yUf, H, doorL, lipM, (g, { xH,
   gaskets(ls, -0.026, -0.010, -0.44, -0.424, yFrFloor + 0.006, yTop - 0.004);
   ls("DoorLinerPlate", -0.424, -0.026, yU0 + 0.012, yTop - 0.02, zDoor - 0.002, zDoor - 0.0002, doorBack);
   ls("FrDoorDykeL", -0.37, -0.03, yDy0, yDy1, zDoor - dykeU, zDoor - 0.002, doorBack);
-  // the seam's fin at the back of the gap (the display panel fills the rest of the door's inner edge)
-  fin(g, xH, "SeamFin", -seam - 0.0015, -0.0008, yU0 + 0.0005, H - 0.0005, zDoor + 0.001, zDoor + 0.007);
+  // the seam's fin at the back of the gap (the display panel fills the rest of the door's inner edge), to 0.2 mm short of
+  // the middle; the right door's fin stands at the same depth from 0.2 mm past it. Each door opens on its own: a fin
+  // behind the hinges creeps toward the seam as its door turns, but only 0.3 mm before it has swung clear of the other
+  fin(g, xH, "SeamFin", -seam - 0.0015, -0.0002, yU0 + 0.0005, H - 0.0005, zDoor + 0.001, zDoor + 0.007);
   // the door display on the inner edge (64 x 250 mm, 1386 to 1636 mm: open photos), hidden while the doors are shut
   g.add(mesh("DoorDisplay", flipV(new THREE.PlaneGeometry(0.064, 0.25)), panelM, -seam + 0.0007 - xH, 1.511, zF0 - 0.009 - 0.032 - zPiv).rotateY(Math.PI / 2));
   // the 6th Sense mark at the top left (3/4 photos: 20 x 25 mm, its middle 27 mm in from the edge, 53 mm under the top)
@@ -601,8 +603,8 @@ const fridgeDoorR = door("FridgeDoorR", 1, secU, yUf, H, doorR, lipM, (g, { xH, 
   gaskets(ls, 0.010, 0.026, 0.424, 0.44, yFrFloor + 0.006, yTop - 0.004);
   ls("DoorLinerPlate", 0.026, 0.424, yU0 + 0.012, yTop - 0.02, zDoor - 0.002, zDoor - 0.0002, doorBack);
   ls("FrDoorDykeR", 0.03, 0.37, yDy0, yDy1, zDoor - dykeU, zDoor - 0.002, doorBack);
-  // its fin at the hinges' depth, across the middle of the seam
-  fin(g, xH, "SeamFin", -0.0018, seam + 0.0015, yU0 + 0.0005, H - 0.0005, zPiv - 0.003, zPiv + 0.003);
+  // its fin at the back of the gap with the left door's (see there)
+  fin(g, xH, "SeamFin", 0.0002, seam + 0.0015, yU0 + 0.0005, H - 0.0005, zDoor + 0.001, zDoor + 0.007);
   // the Whirlpool mark at the top right (front photo: 69 mm wide, its middle 366 mm right of centre, at 1793 mm)
   g.add(plane("WhirlpoolMarkDecal", 0.069, 0.023, logoM, 0.3667 - xH, 1.793, zF0 + 0.0007 - zPiv));
   const bs = BIN_R.map(([y, h], i) => basket(g, xH, `FrBinR${i + 1}`, 0.04, 0.365, y, bDep, h, dykeU));
@@ -659,8 +661,8 @@ const parts = productParts(PRODUCTS, ID);
 {
   const AXY = new THREE.Vector3(0, 1, 0);
   for (const p of parts.filter((q) => q.slide)) {
-    const outer = parts.find((q) => q.key === p.needs), sn = root.getObjectByName(p.node);
-    const moving = [[outer.node, outer.angle], ...(outer.also || []).map((a) => [a.node, a.angle])].map(([n, a]) => [root.getObjectByName(n), a]);
+    const outers = parts.filter((q) => [].concat(p.needs).includes(q.key)), sn = root.getObjectByName(p.node);
+    const moving = outers.flatMap((o) => [[o.node, o.angle], ...(o.also || []).map((a) => [a.node, a.angle])]).map(([n, a]) => [root.getObjectByName(n), a]);
     for (const [dn, a] of moving) dn.quaternion.setFromAxisAngle(AXY, THREE.MathUtils.degToRad(a));
     root.updateMatrixWorld(true);
     const pts = [];
@@ -676,7 +678,7 @@ const parts = productParts(PRODUCTS, ID);
     root.updateMatrixWorld(true);
     let max = 1;
     for (const a of own) for (const v of pts) if (v.x > a.min.x - 0.002 && v.x < a.max.x + 0.002 && v.y > a.min.y - 0.002 && v.y < a.max.y + 0.002 && v.z >= a.max.z - 0.001) max = Math.min(max, v.z - a.max.z);
-    console.log(`slide ${p.key}: ${p.slide[2]} m set, ${max.toFixed(3)} m before it meets the open ${outer.key} doors`);
+    console.log(`slide ${p.key}: ${p.slide[2]} m set, ${max.toFixed(3)} m before it meets the open ${outers.map((o) => o.key).join(" and ")} doors`);
   }
 }
 const clips = stateClips(root, parts);

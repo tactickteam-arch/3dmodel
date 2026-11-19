@@ -40,6 +40,8 @@ export async function launch({ port = 9444, profile, flags = [] } = {}) {
   });
   await send("Runtime.enable");
   await send("Page.enable");
+  // the product page's slow turn would move every view a test shoots or taps; a test that wants it adds ?spin=1
+  await send("Page.addScriptToEvaluateOnNewDocument", { source: "window.__noSpin = true;" });
   await send("Log.enable");
   const evalJS = async (expression) => {
     const r = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true, userGesture: true });

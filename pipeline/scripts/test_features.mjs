@@ -51,15 +51,15 @@ for (const p of products) {
   await sleep(700);
   for (const part of p.parts || []) {
     if (!part.zone) { check(false, `${part.key}: no zone`); continue; }
-    if (part.needs) { // lives behind another part: it cannot be tapped while closed, but opening it opens the outer part too
-      const was = await state();
-      await b.evalJS(`window.__demo.togglePart("${part.key}")`); await sleep(2800);
+    if (part.needs) { // lives behind another part (or both French doors): it cannot be tapped while closed, but opening it opens those first
+      const outer = [].concat(part.needs), wait = 2800 + 2000 * (outer.length - 1);
+      await b.evalJS(`window.__demo.togglePart("${part.key}")`); await sleep(wait);
       const now = await state();
-      check(now[part.key] && now[part.needs], `${part.key} opens ${part.needs} first (${JSON.stringify(now)})`);
-      await b.evalJS(`window.__demo.togglePart("${part.needs}")`); await sleep(2800);
+      check(now[part.key] && outer.every((k) => now[k]), `${part.key} opens ${outer.join(" and ")} first (${JSON.stringify(now)})`);
+      await b.evalJS(`window.__demo.togglePart("${outer[0]}")`); await sleep(2800);
       const closed = await state();
-      check(!closed[part.key] && !closed[part.needs], `closing ${part.needs} closes ${part.key} first (${JSON.stringify(closed)})`);
-      void was;
+      check(!closed[part.key] && !closed[outer[0]], `closing ${outer[0]} closes ${part.key} first (${JSON.stringify(closed)})`);
+      for (const k of outer.slice(1)) { await b.evalJS(`window.__demo.togglePart("${k}")`); await sleep(2800); }
       continue;
     }
     const [a, z] = part.zone.closed;

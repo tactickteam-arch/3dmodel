@@ -10,9 +10,9 @@
 // on the back wall, two tempered glass shelves, the bottom shelf over the two Big Fresh Zone boxes, the Fresh Converter+
 // pantry drawer under them, the control panel on the right wall and three clear baskets on each door. In each half of the
 // freezer, a sliding tray over a drawer. Stocked for a south Indian kitchen.
-// Moving parts (STANDARD.md allows four): both fridge doors, the right Big Fresh Zone box with its food (FridgeTrays: the
-// only tray that can come out with one French door open; the shelves and the pantry drawer span both doors) and both
-// freezer doors: the `freezer` part swings FreezerDoorL and, through its `also`, FreezerDoorR on its own hinge.
+// Moving parts, one per door as on the real one: both fridge doors, the right Big Fresh Zone box with its food (FridgeTrays:
+// the only tray that can come out with one French door open; the shelves and the pantry drawer span both doors) and the
+// left and right freezer doors, each on its own hinge either side of the fixed divider.
 // usage: node make_lg_gvb23.mjs <products.json> <tex dir> <out.glb>
 import fs from "node:fs";
 import { THREE, mat, mesh, box, faced, group, flipV, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";

@@ -12,12 +12,7 @@
       "arTip": "Tap the louvre to open it",
       "glb": "/models/bluestar-ia318exu.glb",
       "thumb": "/photos/bluestar-ia318exu/0.jpg",
-      "photos": [
-        "/photos/bluestar-ia318exu/0.jpg",
-        "/photos/bluestar-ia318exu/1.jpg",
-        "/photos/bluestar-ia318exu/2.jpg",
-        "/photos/bluestar-ia318exu/3.jpg"
-      ],
+      "photos": ["/photos/bluestar-ia318exu/0.jpg", "/photos/bluestar-ia318exu/1.jpg", "/photos/bluestar-ia318exu/2.jpg", "/photos/bluestar-ia318exu/3.jpg"],
       "placement": "wall",
       "arLabel": "View on your wall",
       "orbit": "-22deg 82deg 128%",
@@ -28,9 +23,7 @@
           "usdz": "/models/usdz/bluestar-ia318exu-basic-white.usdz",
           "code": "IA318EXU",
           "itemCode": "IA318EXU ODU",
-          "altCodes": [
-            "IA318EXU IDU"
-          ]
+          "altCodes": ["IA318EXU IDU"]
         }
       ],
       "parts": [
@@ -39,32 +32,16 @@
           "label": "louvre",
           "node": "Louvre",
           "axis": "x",
-          "angle": -50,
+          "angle": 50,
           "hint": true,
           "zone": {
             "closed": [
-              [
-                -0.407,
-                0,
-                0.176
-              ],
-              [
-                0.407,
-                0.045,
-                0.227
-              ]
+              [-0.407, 0, 0.176],
+              [0.407, 0.045, 0.227]
             ],
             "open": [
-              [
-                -0.407,
-                -0.023,
-                0.194
-              ],
-              [
-                0.407,
-                0.045,
-                0.261
-              ]
+              [-0.407, -0.039, 0.176],
+              [0.407, 0.029, 0.243]
             ]
           }
         }
@@ -76,54 +53,18 @@
       },
       "sizeNote": "Indoor unit. Outdoor unit 83.5 x 59.6 x 29.8 cm",
       "specs": [
-        [
-          "Capacity",
-          "1.5 ton (1.44 TR), 5050 W"
-        ],
-        [
-          "Energy rating",
-          "3 star, ISEER 4.35"
-        ],
-        [
-          "Compressor",
-          "Inverter rotary, with acoustic jacket"
-        ],
-        [
-          "Cooling modes",
-          "5-in-1 Convertible Cooling, Turbo Cool, Comfort Sleep"
-        ],
-        [
-          "Swing",
-          "4-way, motorised horizontal and vertical"
-        ],
-        [
-          "Filters",
-          "PM2.5 filter with activated carbon, high density dust filter"
-        ],
-        [
-          "Airflow",
-          "630 / 470 / 410 / 350 CFM"
-        ],
-        [
-          "Indoor noise",
-          "54 / 48 / 44 / 40 dBA"
-        ],
-        [
-          "Outdoor cooling",
-          "Works up to 52 degrees C outdoors"
-        ],
-        [
-          "Condenser",
-          "100% copper, R32 refrigerant"
-        ],
-        [
-          "Remote",
-          "LCD remote with display, night glow buttons"
-        ],
-        [
-          "Indoor unit weight",
-          "11 kg"
-        ]
+        ["Capacity", "1.5 ton (1.44 TR), 5050 W"],
+        ["Energy rating", "3 star, ISEER 4.35"],
+        ["Compressor", "Inverter rotary, with acoustic jacket"],
+        ["Cooling modes", "5-in-1 Convertible Cooling, Turbo Cool, Comfort Sleep"],
+        ["Swing", "4-way, motorised horizontal and vertical"],
+        ["Filters", "PM2.5 filter with activated carbon, high density dust filter"],
+        ["Airflow", "630 / 470 / 410 / 350 CFM"],
+        ["Indoor noise", "54 / 48 / 44 / 40 dBA"],
+        ["Outdoor cooling", "Works up to 52 degrees C outdoors"],
+        ["Condenser", "100% copper, R32 refrigerant"],
+        ["Remote", "LCD remote with display, night glow buttons"],
+        ["Indoor unit weight", "11 kg"]
       ],
       "sangeethaUrl": "https://www.sangeetha.com/product-details/blue-star-inverter-split-ac-or-1-5-ton-or-3-star-or-2026-bee-label-ia318exu-odu/21038",
       "source": "https://consumer.bluestarindia.com/products/premium-inverter-ac-e-series-1-5-ton-5-star",
@@ -131,61 +72,29 @@
         {
           "title": "5-in-1 Convertible Cooling",
           "text": "Runs your AC at 5 different capacities as per the desired comfort, optimising power use in real time.",
-          "pos": [
-            -0.2,
-            0.17,
-            0.236
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [-0.2, 0.17, 0.236],
+          "normal": [0, 0, 1],
           "show": "always"
         },
         {
           "title": "Turbo Cool",
           "text": "A pre-set mode to instantly cool the room during extreme summers.",
-          "pos": [
-            0.25,
-            0.2,
-            0.236
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [0.25, 0.2, 0.236],
+          "normal": [0, 0, 1],
           "show": "always"
         },
         {
           "title": "4-Way Swing",
           "text": "A motorised horizontal and vertical swing ensures uniform cooling across the room.",
-          "pos": [
-            0.3,
-            0.03,
-            0.215
-          ],
-          "normal": [
-            0,
-            -0.6,
-            0.8
-          ],
+          "pos": [0.3, 0.03, 0.215],
+          "normal": [0, -0.6, 0.8],
           "show": "!louvre"
         },
         {
           "title": "DigiQ Hepta Sensors",
           "text": "Intelligent digital sensors optimise cooling in varying load conditions and protect critical electronic components.",
-          "pos": [
-            0.4656,
-            0.2,
-            0.12
-          ],
-          "normal": [
-            1,
-            0,
-            0
-          ],
+          "pos": [0.4656, 0.2, 0.12],
+          "normal": [1, 0, 0],
           "show": "always"
         }
       ],

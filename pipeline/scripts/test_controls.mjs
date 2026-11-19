@@ -151,6 +151,26 @@ for (const id of ids) {
   }
   // a single click on a part still opens it: test_features.mjs taps every part with real clicks
 
+  // the slow turn (off in tests unless ?spin=1): it turns on its own once loaded, a key or a click stops it at once,
+  // and it picks up again after 8 s with nobody touching anything
+  await b.go(`${base}/p/${id}?spin=1`);
+  await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 90000);
+  const spinning = () => b.evalJS("window.__spin.spinning()");
+  check(await b.waitFor("window.__spin?.spinning()", 8000), "the view starts turning on its own once the model is in");
+  // (headless Chrome draws in software, a frame can take seconds, and each frame turns at most 0.1 s worth: so this waits
+  // for the turn instead of timing it)
+  const s0 = JSON.parse(await b.evalJS(CAM)), t0 = Date.now();
+  const s1 = await camUntil((c) => Math.abs(c.theta - s0.theta) > 1, 30000);
+  const turned = s1.theta - s0.theta, rate = turned / ((Date.now() - t0) / 1000);
+  check(turned > 1 && rate <= 12.5 && near(s1.phi, s0.phi, 0.5) && near(s1.r, s0.r, 0.01), `it turns slowly round the product (${turned.toFixed(1)} degrees, ${rate.toFixed(1)} degrees a second at most 12; tilt and distance kept)`);
+  await key("Shift", "ShiftLeft", 16);
+  const k0 = JSON.parse(await b.evalJS(CAM)); await sleep(3000); const k1 = JSON.parse(await b.evalJS(CAM));
+  check(!(await spinning()) && near(k1.theta, k0.theta, 0.5), `a key stops it, and it stays still (${(k1.theta - k0.theta).toFixed(1)} degrees in 3 s)`);
+  check(await b.waitFor("window.__spin.spinning()", 9000), "with nobody touching anything it turns again after 8 s");
+  for (const type of ["mousePressed", "mouseReleased"]) await b.send("Input.dispatchMouseEvent", { type, x: r.x + 8, y: r.y + 8, button: "left", clickCount: 1 });
+  await sleep(300);
+  check(!(await spinning()), "a click stops it again");
+
   const errors = b.logs.filter((l) => /EXC|error/i.test(l));
   check(errors.length === 0, `no console errors${errors.length ? ": " + errors.join(" | ") : ""}`);
 }

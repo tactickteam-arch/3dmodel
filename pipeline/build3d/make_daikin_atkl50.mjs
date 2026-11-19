@@ -208,13 +208,14 @@ fp.add(decal("DaikinMarkDecal", 0.048 * 784 / 768, 0.048 * 177 / 768, logoMat, -
 fp.add(decal("InverterDecal", 0.053 * 864 / 848, 0.0086 * 154 / 138, badgeMat, 0.399, 0.0765 - pv[1], zF + 0.0006 - pv[0]));
 root.add(fp);
 
-// ── the two flaps (horizontal blades) over the outlet: the upper one hangs from its top edge and swings its lower edge
-// out; the lower one, under the unit, pivots at its back edge and drops its front edge (angles ESTIMATED) ──
+// ── the two flaps (horizontal blades) over the outlet, both opening top-down like every split AC's: the upper one pivots
+// at its lower edge and tips its top edge out and down; the lower one, under the unit, pivots at its back edge and drops
+// its front edge (angles ESTIMATED) ──
 // front photo: dark gap, the upper flap's thin white edge, dark gap, the lower flap
 const upA = onLower("y", 0.0300), upB = onLower("y", 0.0235);
 const loA = onLower("y", 0.0180);
-const upper = group("FlapUpper", 0, upA[1], upA[0]);
-upper.add(shell("FlapU", span(upA, upB).map(([z, y]) => [z - upA[0], y - upA[1]]), 0.003, xO0 + 0.001, xO1 - 0.001, flapMat, flapIn, flapMat));
+const upper = group("FlapUpper", 0, upB[1], upB[0]);
+upper.add(shell("FlapU", span(upA, upB).map(([z, y]) => [z - upB[0], y - upB[1]]), 0.003, xO0 + 0.001, xO1 - 0.001, flapMat, flapIn, flapMat));
 root.add(upper);
 const lp = onLower("z", 0.170);
 const lowerFlap = group("FlapLower", 0, lp[1], lp[0]);

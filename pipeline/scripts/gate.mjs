@@ -76,7 +76,7 @@ const parts = entry.parts || [];
   const badHs = hs.filter((h) => !h.title || !h.text || h.pos?.length !== 3 || h.normal?.length !== 3);
   record("hotspots", hs.length === 4 && !badHs.length, `${hs.length} feature callouts (need 4)${badHs.length ? `, ${badHs.length} incomplete` : ""}`);
   const badParts = parts.filter((p) => !p.key || !p.node || !p.zone?.closed || !p.zone?.open || !(p.axis || p.slide));
-  record("parts", parts.length >= 1 && parts.length <= 4 && !badParts.length && parts.some((p) => p.hint), `${parts.length} moving parts (${parts.map((p) => p.key + (p.needs ? `<${p.needs}` : "")).join(" ")})${badParts.length ? `, ${badParts.length} without node, axis or zones` : ""}${parts.some((p) => p.hint) ? "" : ", no hint part"}`);
+  record("parts", parts.length >= 1 && parts.length <= 5 && !badParts.length && parts.some((p) => p.hint), `${parts.length} moving parts (${parts.map((p) => p.key + (p.needs ? `<${[].concat(p.needs).join("+")}` : "")).join(" ")})${badParts.length ? `, ${badParts.length} without node, axis or zones` : ""}${parts.some((p) => p.hint) ? "" : ", no hint part"}`);
   record("source", /^https:\/\//.test(entry.source || ""), `maker page: ${entry.source || "none"}`);
   // STANDARD 2: a colour in Sangeetha's item master links as /p/<its item code>, one that isn't as /p/<product's item code>/<colour>
   // (finishPath in site.js; make_pages.mjs writes the page)
@@ -255,7 +255,7 @@ if (!fast) {
   const orbit = entry.orbit, [th, ph, rad] = orbit.split(" ");
   const bits = (on) => parts.map((q) => (on.includes(q.key) ? 1 : 0)).join("");
   const views = [`${orbit}`, `0deg ${ph} ${rad}`, `-40deg ${ph} ${rad}`, `90deg ${ph} ${rad}`, `180deg ${ph} ${rad}`, `0deg 10deg ${rad}`];
-  for (const q of parts) { const outer = parts.filter((o) => o.key === q.needs).map((o) => o.key); views.push(`${orbit}|S${bits(outer)}_${bits([...outer, q.key])}`); }
+  for (const q of parts) { const outer = parts.filter((o) => [].concat(q.needs || []).includes(o.key)).map((o) => o.key); views.push(`${orbit}|S${bits(outer)}_${bits([...outer, q.key])}`); }
   const r = run("node", [`${SCR}/compare.mjs`, base, entry.glb, `${OUT}/look`, "900", "1100", ...views], { env: { PORT: String(++p) }, timeout: 600000 });
   const shots = fs.existsSync(`${OUT}/look`) ? fs.readdirSync(`${OUT}/look`).filter((f) => f.endsWith(".png")) : [];
   record("renders", shots.length === views.length, `${shots.length} of ${views.length} views rendered in look/ ${r.status ? tail(r.stderr) : ""}`);

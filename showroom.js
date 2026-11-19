@@ -19,7 +19,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { esc, cm, partAt, CATEGORIES } from "/site.js";
+import { esc, cm, partAt, needsOf, CATEGORIES } from "/site.js";
 import { shownProducts } from "/live.js";
 import { radialTexture, roundRect, wrapText, makeTooltip, makeCard } from "/xr.js";
 
@@ -531,8 +531,8 @@ function togglePart(s, key) {
   const m = s.moving.get(key);
   if (!m) return;
   // a part inside another opens its outer part with it, and shuts before the outer part does
-  if (!m.isOpen && m.part.needs && !s.moving.get(m.part.needs)?.isOpen) togglePart(s, m.part.needs);
-  if (m.isOpen) for (const [k, o] of s.moving) if (o.part.needs === key && o.isOpen) togglePart(s, k);
+  if (!m.isOpen) for (const k of needsOf(m.part)) if (!s.moving.get(k)?.isOpen) togglePart(s, k);
+  if (m.isOpen) for (const [k, o] of s.moving) if (needsOf(o.part).includes(key) && o.isOpen) togglePart(s, k);
   m.isOpen = !m.isOpen;
   s.state[key] = m.isOpen;
   m.from = m.t; m.to = m.isOpen ? 1 : 0; m.start = performance.now();

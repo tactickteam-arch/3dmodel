@@ -95,6 +95,10 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
 
   // 1. a page per product on show
   if (!HEAD.test(productHtml)) throw new Error("product.html: the <title> and description lines have changed; update make_pages.mjs");
+  // the model's address as product.html asks for it (its ?v= cache-breaker), so the page's own early fetch is the one used
+  const modelV = productHtml.match(/const model = \(url\) => `\$\{url\}\?v=(\w+)`;/)?.[1];
+  if (!modelV) throw new Error("product.html: the model address (const model = ...?v=) has changed; update make_pages.mjs");
+  if (!productHtml.includes('<model-viewer id="viewer"\n')) throw new Error("product.html: the <model-viewer id=\"viewer\" line has changed; update make_pages.mjs");
   const page = (p, at, model) => {
     const url = `${ORIGIN}/p/${encodeURI(at)}`;
     const tags = [
@@ -109,6 +113,9 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
       `<meta property="og:image" content="${ORIGIN}${p.thumb}">`,
       `<meta property="og:image:alt" content="${attr(p.name)}">`,
       `<meta name="twitter:card" content="summary">`, // the photos are square
+      // speed: the model and its photo start downloading with the page, not after its scripts and products.json
+      `<link rel="preload" href="${attr(`${p.glb}?v=${modelV}`)}" as="fetch" crossorigin>`,
+      `<link rel="preload" href="${attr(p.thumb)}" as="image">`,
     ];
     const f = `p/${at}.html`;
     if (files.has(f)) return notes.push(`/p/${at} is both ${p.id} and another product or colour; it opens the first`);
@@ -116,7 +123,9 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
     taken.add(f.toLowerCase());
     files.set(f, productHtml
       .replace("<!doctype html>\n", "<!doctype html>\n<!-- made from product.html by pipeline/scripts/make_pages.mjs: edit product.html, then run it -->\n")
-      .replace(HEAD, tags.join("\n") + "\n"));
+      .replace(HEAD, tags.join("\n") + "\n")
+      // the photo shows in the viewer from the first paint until the model is in
+      .replace('<model-viewer id="viewer"\n', `<model-viewer id="viewer" poster="${attr(p.thumb)}"\n`));
   };
   for (const p of shown) page(p, p.id, p.model);
   // and one per colour at its item code; a code with anything but letters, digits, spaces (a no-break space too: Sangeetha has

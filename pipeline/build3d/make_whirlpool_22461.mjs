@@ -14,8 +14,8 @@
 // cover over two crisper drawers; four baskets on the left door, three on the right. In the freezer: the ice twister over
 // its ice bank on the top tray, a deep drawer and a bottom drawer; in the convertible: the beverage rack on the top tray, a
 // shallow tray and a bottom drawer; three baskets on each lower door. Stocked for a south Indian kitchen.
-// Moving parts (STANDARD.md allows four): both fridge doors on one button (`fridge`: LeftFridgeDoor and, through its
-// `also`, RightFridgeDoor on its own hinge), the two crisper drawers with their food (FridgeTrays), the freezer door and the
+// Moving parts, one per door as on the real one: the left and right fridge doors (each opens on its own), the two crisper
+// drawers with their food (FridgeTrays: they span both doors, so they need both open), the freezer door and the
 // convertible door.
 // usage: node make_whirlpool_22461.mjs <products.json> <tex dir> <out.glb>
 import fs from "node:fs";
@@ -707,8 +707,8 @@ const parts = productParts(PRODUCTS, ID);
 {
   const AXY = new THREE.Vector3(0, 1, 0);
   for (const p of parts.filter((q) => q.slide)) {
-    const outer = parts.find((q) => q.key === p.needs);
-    const moved = [[outer.node, outer.angle], ...(outer.also || []).map((a) => [a.node, a.angle])].map(([n, a]) => [root.getObjectByName(n), a]);
+    const outers = parts.filter((q) => [].concat(p.needs).includes(q.key));
+    const moved = outers.flatMap((o) => [[o.node, o.angle], ...(o.also || []).map((a) => [a.node, a.angle])]).map(([n, a]) => [root.getObjectByName(n), a]);
     const sn = root.getObjectByName(p.node);
     for (const [dn, a] of moved) dn.quaternion.setFromAxisAngle(AXY, THREE.MathUtils.degToRad(a));
     root.updateMatrixWorld(true);
@@ -725,7 +725,7 @@ const parts = productParts(PRODUCTS, ID);
     root.updateMatrixWorld(true);
     let m = 1;
     for (const a of own) for (const v of pts) if (v.x > a.min.x - 0.002 && v.x < a.max.x + 0.002 && v.y > a.min.y - 0.002 && v.y < a.max.y + 0.002 && v.z >= a.max.z - 0.001) m = Math.min(m, v.z - a.max.z);
-    console.log(`slide ${p.key}: ${p.slide[2]} m set, ${m.toFixed(3)} m before it meets the open ${outer.key} doors`);
+    console.log(`slide ${p.key}: ${p.slide[2]} m set, ${m.toFixed(3)} m before it meets the open ${outers.map((o) => o.key).join(" and ")} doors`);
   }
 }
 const clips = stateClips(root, parts);

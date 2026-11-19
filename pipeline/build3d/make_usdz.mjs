@@ -345,7 +345,7 @@ for (const finish of finishes) {
     });
     // a part inside this one (the trays behind the fridge door, the ice tray behind the freezer's) goes back in at
     // once before this one closes; both moves are absolute, so nothing happens if it is already in
-    const inner = [...partInfo.values()].filter((i) => i.part.needs === info.part.key);
+    const inner = [...partInfo.values()].filter((i) => [].concat(i.part.needs || []).includes(info.part.key));
     const putBack = inner.length ? [{ name: "PutBack", write: () => group("PutBack", "parallel", inner.flatMap((i, k) => [
       { name: `In${k}Place`, write: () => transform(`In${k}Place`, i.closedPath, i.poseClosed, 0) },
       { name: `In${k}Park`, write: () => transform(`In${k}Park`, i.openPath, i.poseParked, 0) },

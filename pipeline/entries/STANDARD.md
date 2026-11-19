@@ -49,7 +49,7 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 
 | | Fridge | Front-load washer | Top-load washer | Split AC |
 |---|---|---|---|---|
-| **Moving parts** | Each door, hinged on its real side, opening to the maker's angle. The ice tray if it has one (`needs` its door). The trays as one part that slides out (`needs` the fridge door, with its own button words). | The door at its real hinge and angle, the detergent drawer, and the pump-filter flap if the maker shows it. | The lid hinged at the back to the maker's angle, and the detergent box inside (`needs` the lid). | The louvre on its real axis, and the front panel if the maker shows it lifted. |
+| **Moving parts** | Each door, hinged on its real side, opening to the maker's angle, on its own button: four doors are four parts, and French doors or a pair of freezer doors open one at a time, as on the real one (never one button for two doors). The ice tray if it has one (`needs` its door). The trays as one part that slides out (`needs` the fridge door, with its own button words; crispers that span both French doors need both: `"needs": ["fridgeL", "fridge"]`). | The door at its real hinge and angle, the detergent drawer, and the pump-filter flap if the maker shows it. | The lid hinged at the back to the maker's angle, and the detergent box inside (`needs` the lid). | The louvre on its real axis, and the front panel if the maker shows it lifted. |
 | **Inside** | Every shelf, bin, drawer, light, vent and label in the maker's open-door photos, with the maker's names. | Drum pattern, lifters, gasket folds, and the drawer's real compartments. | Drum, pulsator, lint filter, and the box's compartments. | Filters, coil fins, and the display window. |
 | **Stock** | South Indian kitchen: vegetarian plus eggs, real brands' packs, food from `food.mjs`. Fitted to its trays (BENCHMARK 13). Every item tagged, so Fill and Empty work. Empty in the web view, full in AR. | none | none | none |
 | **Back and underside** | Cord with Indian 3-pin plug, compressor bay, rating plate, feet and rollers. | Cord and plug, inlet and hose, drain hose, transit bolts, feet. | Cord and plug, valves, drain hose, feet. | Pipe bundle as a showroom unit has it, mounting-plate hooks. |
@@ -96,7 +96,7 @@ From those, the page gives it the studio-lit 3D view, a button per moving part, 
 
 | Check | Passes when |
 |---|---|
-| entry, specs, hotspots, parts, source | All entry fields are present. There are at least 8 spec rows, exactly 4 complete feature callouts, 1 to 4 parts (each with its node, axis or slide and zones, and one marked `hint`) and the maker's page as `source`. |
+| entry, specs, hotspots, parts, source | All entry fields are present. There are at least 8 spec rows, exactly 4 complete feature callouts, 1 to 5 parts (each door its own part; each with its node, axis or slide and zones, and one marked `hint`) and the maker's page as `source`. |
 | photos, files | 4 photos at 900 × 900, plus the model, thumbnail, logo, Quick Look banner and every Apple file, including the `-free` copies. |
 | glb-size, usdz-size | Within the budget (section 10). |
 | gltf-valid | The GLB has 0 errors in the Khronos glTF validator, which reads it as Android's viewer and WebXR do. Missing tangents are only warnings. |

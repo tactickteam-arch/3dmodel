@@ -334,7 +334,7 @@ await b.waitFor(`window.__kiosk?.state().playing === ${js(A.id)} && document.get
 let k = await kstate();
 const frameInfo = JSON.parse(await b.evalJS(`JSON.stringify((() => { const f = document.querySelector('#stage iframe'); const d = f.contentDocument; return { embed: d.documentElement.classList.contains('embed'), hint: getComputedStyle(d.querySelector('.hint') || d.body).display, open: d.getElementById('embedOpen') ? getComputedStyle(d.getElementById('embedOpen')).display : 'none', turning: d.getElementById('viewer').autoRotate === true }; })())`));
 check(k.count === 3 && k.frames === 1, `plays the 3 products on show, skipping the hidden one and the unknown id (${k.count} of ${H ? 5 : 4})`);
-check(k.src === `/p/${A.id}?embed&kiosk=1&finish=${fin}` && frameInfo.embed && frameInfo.hint === "none" && frameInfo.open === "none", `the product page in a frame, viewer only, in its colour (${k.src})`);
+check(k.src === `/p/${A.id}?embed&kiosk=1&spin=0&finish=${fin}` && frameInfo.embed && frameInfo.hint === "none" && frameInfo.open === "none", `the product page in a frame, viewer only, in its colour (${k.src})`);
 check(frameInfo.turning, "Turn slowly: the product turns");
 check(k.qr === `https://3dmodel-chi-nine.vercel.app/p/${A.id}?finish=${fin}` || k.qr === `${base}/p/${A.id}?finish=${fin}`, `the corner QR code opens it on a phone (${k.qr})`);
 check(/See it in your room/.test(await b.evalJS("document.getElementById('qr').innerText")) && (await b.evalJS(`document.getElementById('name').innerText.includes(${js(A.finishes[1].name)})`)), "the name, model and colour beside it");

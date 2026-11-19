@@ -88,21 +88,23 @@ const fp = group("FrontPanel", 0, H, D);
 }
 root.add(fp);
 
-// ── louvre: the wide flap over the outlet, hinged along its top edge ──
+// ── louvre: the wide flap over the outlet, hinged along its bottom edge so it opens top-down, as in Carrier's open photos
+// (9, 10): the upper edge swings out and down and the outlet opens above it ──
 // its top edge sits 4 mm under the panel: Carrier's front photo shows a dark slot of about that size between them (ESTIMATED)
-const lv = group("Louvre", 0, outY1 - 0.004, D - 0.004);
+const louvreH = outY1 - outY0 - 0.006;
+const lv = group("Louvre", 0, outY1 - 0.004 - louvreH, D - 0.004);
 { // a thin flap bowed outward by 6 mm, like the one in Carrier's photos: white body plus the textured outer skin
-  const fw = W - 0.07, fh = outY1 - outY0 - 0.006, thick = 0.004, bulge = 0.006, N = 12;
+  const fw = W - 0.07, fh = louvreH, thick = 0.004, bulge = 0.006, N = 12;
   const zf = (t) => -0.002 + bulge * Math.sin(Math.PI * t) - 0.002;        // outer surface z at t = 0 (top) .. 1 (bottom)
   const prof = new THREE.Shape();                                              // shape x = -z, y = height
-  for (let i = 0; i <= N; i++) { const t = i / N; i === 0 ? prof.moveTo(-zf(t), -t * fh) : prof.lineTo(-zf(t), -t * fh); }
-  for (let i = N; i >= 0; i--) { const t = i / N; prof.lineTo(-(zf(t) - thick), -t * fh); }
+  for (let i = 0; i <= N; i++) { const t = i / N; i === 0 ? prof.moveTo(-zf(t), (1 - t) * fh) : prof.lineTo(-zf(t), (1 - t) * fh); }
+  for (let i = N; i >= 0; i--) { const t = i / N; prof.lineTo(-(zf(t) - thick), (1 - t) * fh); }
   const bg = new THREE.ExtrudeGeometry(prof, { depth: fw, bevelEnabled: false });
   bg.rotateY(Math.PI / 2); bg.translate(-fw / 2, 0, 0);
   lv.add(mesh("LouvreBody", bg, white));
   const sk = new THREE.PlaneGeometry(fw, fh, 1, N);
   const pos = sk.attributes.position, uv = sk.attributes.uv;
-  for (let i = 0; i < pos.count; i++) { const t = (fh / 2 - pos.getY(i)) / fh; pos.setZ(i, zf(t) + 0.0004); pos.setY(i, -t * fh); uv.setY(i, 1 - uv.getY(i)); }
+  for (let i = 0; i < pos.count; i++) { const t = (fh / 2 - pos.getY(i)) / fh; pos.setZ(i, zf(t) + 0.0004); pos.setY(i, (1 - t) * fh); uv.setY(i, 1 - uv.getY(i)); }
   sk.computeVertexNormals();
   lv.add(mesh("LouvreFace", sk, louvreFront));
 }

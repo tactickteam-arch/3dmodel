@@ -31,6 +31,10 @@ export function finishPath(product, i) {
 // Sangeetha's Product ID at the end of a sangeetha.com address, or null
 export const productIdOf = (url) => String(url || "").match(/\/(\d+)\/?$/)?.[1] || null;
 
+// The parts a part sits behind (`needs`): one key, or a list when it needs more than one door open (crispers
+// that span both French doors)
+export const needsOf = (part) => [].concat(part?.needs || []);
+
 // Each part carries its bounding box closed and open (`zone`, written by the builders).
 // A tap inside a box picks that part; where boxes overlap the smallest wins (a flap
 // inside a door). A tap just off every box picks the nearest; a tap on the cabinet's

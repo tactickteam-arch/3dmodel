@@ -9398,21 +9398,48 @@
           }
         },
         {
-          "key": "freezer",
-          "label": "freezer doors",
+          "key": "freezerL",
+          "label": "left freezer door",
           "node": "FreezerDoorL",
           "axis": "y",
           "angle": -115,
-          "also": [
-            {
-              "node": "FreezerDoorR",
-              "angle": 115
-            }
-          ],
           "zone": {
             "closed": [
               [
                 -0.418,
+                0.028,
+                0.249
+              ],
+              [
+                0.001,
+                0.664,
+                0.368
+              ]
+            ],
+            "open": [
+              [
+                -0.645,
+                0.028,
+                0.275
+              ],
+              [
+                -0.385,
+                0.664,
+                0.691
+              ]
+            ]
+          }
+        },
+        {
+          "key": "freezer",
+          "label": "right freezer door",
+          "node": "FreezerDoorR",
+          "axis": "y",
+          "angle": 115,
+          "zone": {
+            "closed": [
+              [
+                0,
                 0.028,
                 0.249
               ],
@@ -9424,7 +9451,7 @@
             ],
             "open": [
               [
-                -0.645,
+                0.385,
                 0.028,
                 0.275
               ],
@@ -9565,7 +9592,7 @@
             0,
             1
           ],
-          "show": "!freezer"
+          "show": "!freezerL"
         }
       ],
       "fit": {
@@ -10230,22 +10257,49 @@
       ],
       "parts": [
         {
-          "key": "fridge",
-          "label": "fridge doors",
+          "key": "fridgeL",
+          "label": "left fridge door",
           "node": "FridgeDoorL",
           "axis": "y",
           "angle": -115,
-          "also": [
-            {
-              "node": "FridgeDoorR",
-              "angle": 115
-            }
-          ],
-          "hint": true,
           "zone": {
             "closed": [
               [
                 -0.455,
+                0.856,
+                0.152
+              ],
+              [
+                0,
+                1.862,
+                0.375
+              ]
+            ],
+            "open": [
+              [
+                -0.694,
+                0.856,
+                0.285
+              ],
+              [
+                -0.338,
+                1.862,
+                0.755
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "right fridge door",
+          "node": "FridgeDoorR",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                0,
                 0.856,
                 0.152
               ],
@@ -10257,7 +10311,7 @@
             ],
             "open": [
               [
-                -0.694,
+                0.338,
                 0.856,
                 0.285
               ],
@@ -10282,7 +10336,10 @@
             0,
             0.27
           ],
-          "needs": "fridge",
+          "needs": [
+            "fridgeL",
+            "fridge"
+          ],
           "zone": {
             "closed": [
               [
@@ -10486,7 +10543,7 @@
             0,
             1
           ],
-          "show": "fridge"
+          "show": "fridgeL"
         },
         {
           "title": "Thoughtfully Designed Freezer space",
@@ -10559,22 +10616,49 @@
       ],
       "parts": [
         {
-          "key": "fridge",
-          "label": "fridge doors",
+          "key": "fridgeL",
+          "label": "left fridge door",
           "node": "LeftFridgeDoor",
           "axis": "y",
           "angle": -115,
-          "also": [
-            {
-              "node": "RightFridgeDoor",
-              "angle": 115
-            }
-          ],
-          "hint": true,
           "zone": {
             "closed": [
               [
                 -0.454,
+                0.845,
+                0.162
+              ],
+              [
+                0.001,
+                1.862,
+                0.375
+              ]
+            ],
+            "open": [
+              [
+                -0.699,
+                0.845,
+                0.277
+              ],
+              [
+                -0.353,
+                1.862,
+                0.742
+              ]
+            ]
+          }
+        },
+        {
+          "key": "fridge",
+          "label": "right fridge door",
+          "node": "RightFridgeDoor",
+          "axis": "y",
+          "angle": 115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                0.001,
                 0.845,
                 0.162
               ],
@@ -10586,7 +10670,7 @@
             ],
             "open": [
               [
-                -0.699,
+                0.353,
                 0.845,
                 0.277
               ],
@@ -10611,7 +10695,10 @@
             0,
             0.27
           ],
-          "needs": "fridge",
+          "needs": [
+            "fridgeL",
+            "fridge"
+          ],
           "zone": {
             "closed": [
               [
@@ -10815,7 +10902,7 @@
             0,
             1
           ],
-          "show": "fridge"
+          "show": "fridgeL"
         },
         {
           "title": "Thoughtfully Designed Freezer space",

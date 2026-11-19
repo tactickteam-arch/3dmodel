@@ -209,7 +209,7 @@ function dropFrame() {
 function newFrame(x) {
   dropFrame();
   const f = document.createElement("iframe");
-  const u = new URLSearchParams({ embed: "", kiosk: "1" });
+  const u = new URLSearchParams({ embed: "", kiosk: "1", spin: "0" });   // the kiosk turns the view itself
   const fin = x.p.finishes[finishIndexOf(x.p, x.finish)];
   if (x.finish && finishIndexOf(x.p, x.finish) > 0) u.set("finish", finishSlug(fin.name));
   f.src = `/p/${encodeURIComponent(x.p.id)}?${u.toString().replace("embed=&", "embed&")}`;

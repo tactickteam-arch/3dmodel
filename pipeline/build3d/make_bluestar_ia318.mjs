@@ -215,9 +215,10 @@ panel.add(decal("PrintBadge", 0.092, 0.0194, badgeMat, -0.365, H - 0.0739, D + 0
 panel.add(decal("PrintDisplay", 0.056, 0.032, dispMat, 0.798 - XH, H - 0.135, D + 0.0008));
 root.add(panel);
 
-// ── louvre: the curved flap over the outlet, on the body's lower curve; hinged along its top edge ──
+// ── louvre: the curved flap over the outlet, on the body's lower curve; hinged along its back (lower) edge, so it opens
+// top-down like every split AC's: the upper edge swings out and down and the outlet opens above it ──
 const flapOuter = arc(zE, yE, zL1 - zE, yE, -2.5, -89, 18);
-const hp = flapOuter[0];
+const hp = flapOuter[flapOuter.length - 1];
 const lv = group("Louvre", 0, hp[1], hp[0]);
 lv.add(shell("Flap", flapOuter.map(([z, y]) => [z - hp[0], y - hp[1]]), 0.003, -(xL - 0.0015), xL - 0.0015, louvreMat, louvreIn, louvreMat));
 // three small lugs on its lower edge, at photo cols 173, 570 and 900 (ESTIMATED shape: 4 x 1.2 x 2 mm)
