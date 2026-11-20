@@ -1,0 +1,19 @@
+{
+ "_about": "Samsung RT80H51C2BHL: Samsung India's picture of this code's own label (bhl_label_553849677.jpg), as cut out before.",
+ "template": "samsung2026",
+ "src": "pipeline/sources/photos/samsung_rt80/bee_cut_label_b.png",
+ "out": "pipeline/tex/samsung_rt80/label_b.png",
+ "width_mm": 130,
+ "words": {
+  "series": "2026 - 28",
+  "head": "ANNUAL ENERGY CONSUMPTION",
+  "unit": "units/yr",
+  "kind": "Refrigerator",
+  "brand": "SAMSUNG",
+  "country": "INDIA",
+  "value": "258",
+  "type": "Frost Free",
+  "volume_line": "Total Volume : 467 (Ltr)",
+  "model": "RT80H51C2BHL"
+ }
+}
