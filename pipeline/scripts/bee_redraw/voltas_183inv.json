@@ -1,0 +1,76 @@
+{
+  "_about": "Voltas 183INV Vertis AI Zest Gold: Voltas's own label image for this model (2026-27 Power Savings Guide), as cut out before with its callouts painted out (bee_cut_bee_label.png).",
+  "template": "acpsg",
+  "src": "pipeline/sources/photos/voltas_183inv/bee_cut_bee_label.png",
+  "out": "pipeline/tex/voltas_183inv/bee_label.png",
+  "width_mm": 91.9,
+  "words": {
+    "iseer": "4.30",
+    "y0": "2026",
+    "y1": "2027",
+    "brand": "VOLTAS",
+    "model": "183INV VERTIS AI ZEST GOLD(4504075)/2026",
+    "cc100": "5100 (W)",
+    "cc50": "2550 (W)",
+    "elec": "918.84 Units Per Year",
+    "comp": "Variable Speed",
+    "hp": "No",
+    "reg": "BEE/AAP/02/016/10"
+  },
+  "items": [
+    {
+      "key": "t2b",
+      "win": [
+        0.519,
+        0.6955,
+        0.975,
+        0.714
+      ]
+    },
+    {
+      "key": "t7a",
+      "win": [
+        0.17,
+        0.8125,
+        0.5,
+        0.8298
+      ],
+      "clip": true
+    },
+    {
+      "key": "foot1",
+      "win": [
+        0.03,
+        0.9552,
+        0.985,
+        0.9745
+      ],
+      "clip": true
+    },
+    {
+      "key": "foot2",
+      "win": [
+        0.03,
+        0.9745,
+        0.985,
+        0.99
+      ],
+      "clip": true
+    }
+  ],
+  "patches": [
+    {
+      "box": [
+        0.846,
+        0.562,
+        0.89,
+        0.602
+      ],
+      "to": "cream",
+      "only": [
+        "green",
+        "black"
+      ]
+    }
+  ]
+}
