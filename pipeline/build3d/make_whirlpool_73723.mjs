@@ -75,7 +75,7 @@ const meshM = mat("LampCover", 0xd9dde1, { rough: 0.5 });
 const PR = {};
 for (const k of ["magic", "veggie", "airflow", "bigbottle"]) PR[k] = mat("Print_" + k, 0xffffff, { rough: 0.5, opacity: 0.999 });
 const comb = mat("Honeycomb", 0xffffff, { rough: 0.2, opacity: 0.999, side: THREE.DoubleSide });
-const aspect = { magic: 11.62, veggie: 12.95, airflow: 18.75, bigbottle: 15.34 };
+const aspect = { magic: 11.77, veggie: 13.08, airflow: 18.75, bigbottle: 15.34 };   // the images' own (magic and veggie set at 136 px capitals)
 
 const root = group("Whirlpool73723");
 const cab = group("Cabinet");

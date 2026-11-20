@@ -134,8 +134,9 @@ def main():
     pr = door()
     logo()
     prints = {
-        "print_magic": spaced("MAGIC CHILL", 60, (70, 74, 82)),
-        "print_veggie": spaced("VEGGIE FRESH", 60, (40, 112, 172)),
+        # the two at the front of the shelves set at 136 px capitals (12.5 px per mm on the model; 60 gave 5.5-5.7)
+        "print_magic": spaced("MAGIC CHILL", 136, (70, 74, 82)),
+        "print_veggie": spaced("VEGGIE FRESH", 136, (40, 112, 172)),
         "print_airflow": spaced("ADVANCED AIR FLOW", 60, (176, 182, 188), track=0.3),
         "print_bigbottle": spaced("BIG BOTTLE RACK", 60, (150, 156, 164), track=0.3),
     }
