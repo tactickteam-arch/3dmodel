@@ -53,7 +53,7 @@ def paint(w, h, base, grain=1.0, gradient=None):
 
 
 # ───────────────────────── control panel ─────────────────────────
-PX_PER_CROP = 3                        # texture px per px of Samsung's overhead panel photo (1.56 px/mm there -> 4.7 px/mm here)
+PX_PER_CROP = 6.4                      # texture px per px of Samsung's overhead panel photo (1.56 px/mm there -> 10 px/mm here)
 CROP_W, CROP_H = 844, 205              # the panel strip in the photo: full deck width, and from its top edge to just above the lid
 
 
@@ -98,7 +98,7 @@ def build_panel():
     # Samsung's overhead photo: ring centre (423,107) crop px, the manual's at about (1550,414) full-res px; crop = a + 0.1667 * manual
     k = 0.30 / 1.8
     ox, oy = 423 - 1548 * k, 107 - 413 * k
-    cw, ch = CROP_W * PX_PER_CROP, CROP_H * PX_PER_CROP
+    cw, ch = int(round(CROP_W * PX_PER_CROP)), int(round(CROP_H * PX_PER_CROP))
     # a dark glossy panel: near black with a faint top-down sheen
     base = np.zeros((ch, cw, 3), np.float32)
     yy = np.linspace(0, 1, ch)[:, None]
@@ -185,7 +185,10 @@ def panel_final():
     d.text((55 * P, 153 * P), "BubbleStorm™  Digital Inverter", font=font(int(7.2 * P), 5), fill=(124, 125, 132), anchor="lm")
     d.text((803 * P, 150 * P), "7", font=font(int(15 * P), 7), fill=(222, 222, 226), anchor="rm")
     d.text((806 * P, 153 * P), "kg", font=font(int(8 * P), 7), fill=(222, 222, 226), anchor="lm")
-    save(img, "panel.jpg", 92)
+    # two halves (each under 4096 px): the model's panel is two planes side by side
+    half = img.width // 2
+    save(img.crop((0, 0, half, img.height)), "panel_l.jpg", 92)
+    save(img.crop((half, 0, img.width, img.height)), "panel_r.jpg", 92)
     return img
 
 
@@ -262,24 +265,74 @@ def main():
     save(Image.fromarray(drum.clip(0, 255).astype(np.uint8)), "drum.jpg", 86)
     # pulsator fins and the small water holes: flat grey with a rim
     save(paint(128, 128, (200, 202, 207), 0.8), "pulsator.jpg", 85)
-    # printed lines inside: "DETERGENT Ecobubble" on the box, "Magic Filter" on the filter
-    img = Image.new("RGB", (640, 220), (176, 178, 184))
+    detergent()
+    magic_filter()
+
+
+# ───────────────────────── the prints inside, sharp (12 px per mm on the model) ─────────────────────────
+PRINT_K = 12
+
+
+def detergent():
+    """The detergent box lid (182 x 66 mm in the model): the pouring-cup icon, DETERGENT, and Ecobubble(TM) in a grey box.
+    Placed by the ink boxes on Samsung's photo 4.jpg, where the lid spans x 380-698, rows 518-623 (fractions of that box);
+    the words as printed there, set in Avenir Next (the print's own face is a similar rounded grotesque)."""
+    W, H, ss = round(182 * PRINT_K), round(66 * PRINT_K), 3
+    U = lambda x: (x - 380) / 318 * W * ss
+    V = lambda y: (y - 518) / 105 * H * ss
+    img = Image.new("RGB", (W * ss, H * ss), (176, 178, 184))
     d = ImageDraw.Draw(img)
-    d.text((330, 78), "DETERGENT", font=font(46, 5), fill=(70, 72, 78), anchor="mm")
-    d.rounded_rectangle([228, 118, 440, 158], 4, fill=(130, 132, 140))
-    d.text((334, 138), "Ecobubble™", font=font(28, 5), fill=(236, 236, 240), anchor="mm")
-    # the little powder-and-drops icon at the left
-    d.polygon([(110, 95), (150, 95), (140, 130), (122, 130)], outline=(70, 72, 78))
-    for i, (px_, py_) in enumerate([(106, 138), (118, 146), (130, 140), (142, 148), (154, 140)]):
-        d.ellipse([px_ - 2, py_ - 2, px_ + 2, py_ + 2], fill=(70, 72, 78))
-    save(img, "detergent.jpg", 90)
-    img = Image.new("RGB", (256, 640), (150, 152, 158))
+    ink, boxc = (72, 74, 80), (112, 114, 121)
+
+    def fit(text, face, x0, y0, x1, y1, colour):
+        f = font(400, face)
+        bb = d.textbbox((0, 0), text, font=f)
+        lay = Image.new("L", (bb[2] - bb[0] + 8, bb[3] - bb[1] + 8), 0)
+        ImageDraw.Draw(lay).text((4 - bb[0], 4 - bb[1]), text, font=f, fill=255)
+        a = np.asarray(lay); ys, xs = np.where(a > 40)
+        lay = Image.fromarray(a[ys.min():ys.max() + 1, xs.min():xs.max() + 1])
+        w, h = round(U(x1) - U(x0)), round(V(y1) - V(y0))
+        lay = lay.resize((w, h), Image.LANCZOS)
+        img.paste(Image.new("RGB", lay.size, colour), (round(U(x0)), round(V(y0))), lay)
+
+    # ink boxes read on the photo enlarged 10 x (x 486-600, rows 562-600)
+    fit("DETERGENT", 5, 519, 570, 587, 579, ink)
+    d.rectangle([U(520), V(586), U(586), V(595.5)], fill=boxc)         # the grey box
+    fit("Ecobubble", 5, 531.5, 588.2, 574, 593.2, (236, 236, 240))     # the word inside it
+    fit("TM", 5, 574.3, 588.4, 575.9, 589.4, (236, 236, 240))
+    # the icon: a cup tipped to the left, its lip line, the level inside, and four drops under the lip (photo x 488-514)
+    q = lambda cx, cy: (U(486 + cx / 10), V(562 + cy / 10))
+    lw = round(0.75 * PRINT_K * ss * 0.55)
+    d.line([q(80, 182), q(162, 198), q(196, 262), q(271, 183), q(181, 86)], fill=ink, width=lw, joint="curve")
+    d.line([q(166, 210), q(260, 206)], fill=ink, width=lw)
+    for cx, cy in ((86, 237), (86, 290), (119, 322), (160, 322)):
+        x, y = q(cx, cy); r = 0.55 * PRINT_K * ss
+        d.ellipse([x - r, y - r, x + r, y + r], fill=ink)
+    save(img.resize((W, H), Image.LANCZOS), "detergent.jpg", 90)
+
+
+def magic_filter():
+    """The Magic Filter on the drum wall (75 x 300 mm in the model): "Magic Filter" moulded over two columns of 15 mesh
+    slots, as Samsung's drum photo 6.jpg shows it (the body rows 324-624; the word's centre at 0.34 of the height, the slots
+    from 0.377 to 0.93; the columns at 0.15-0.47 and 0.53-0.85 of the width). The mesh inside the slots is too fine to read
+    on the photo: the slots are plain and darker."""
+    W, H = round(75 * PRINT_K * 0.85), round(300 * PRINT_K * 0.85)   # 10.2 px per mm
+    img = Image.new("RGB", (W, H), (150, 152, 158))
     d = ImageDraw.Draw(img)
-    d.text((128, 52), "Magic Filter", font=font(32, 5), fill=(54, 56, 62), anchor="mm")
-    for col in (62, 148):
-        for i in range(13):
-            y = 100 + i * 36
-            d.rounded_rectangle([col, y, col + 52, y + 14], 3, fill=(86, 88, 94))
+    f = font(400, 5)
+    text = "Magic Filter"
+    bb = d.textbbox((0, 0), text, font=f)
+    lay = Image.new("L", (bb[2] - bb[0] + 8, bb[3] - bb[1] + 8), 0)
+    ImageDraw.Draw(lay).text((4 - bb[0], 4 - bb[1]), text, font=f, fill=255)
+    tw = round(0.57 * W)
+    lay = lay.resize((tw, round(lay.height * tw / lay.width)), Image.LANCZOS)
+    img.paste(Image.new("RGB", lay.size, (100, 102, 108)), ((W - tw) // 2, round(0.34 * H - lay.height / 2)), lay)
+    top, bot, n = 0.377 * H, 0.93 * H, 15
+    pitch = (bot - top) / (n - 0.45)
+    for c0, c1 in ((0.15, 0.47), (0.53, 0.85)):
+        for i in range(n):
+            y = top + i * pitch
+            d.rounded_rectangle([c0 * W, y, c1 * W, y + 0.45 * pitch], radius=0.12 * pitch, fill=(92, 94, 100))
     save(img, "filter.jpg", 88)
 
 

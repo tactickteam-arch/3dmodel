@@ -43,7 +43,9 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.xr.enabled = true;
   renderer.xr.setReferenceSpaceType(spaceType);
-  renderer.xr.setFoveation?.(0.5);
+  // sharper than the headset's default buffer (one product, so it can afford it); less blur round the edge of view
+  renderer.xr.setFramebufferScaleFactor(1.25);
+  renderer.xr.setFoveation?.(0.25);
   await renderer.xr.setSession(session);
   const refSpace = () => renderer.xr.getReferenceSpace();
 
@@ -119,7 +121,10 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
   // ── product ──
   const gltf = await new GLTFLoader().loadAsync(product.glb);
   const model = gltf.scene;
-  model.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
+  // full anisotropic filtering: print, labels and grain stay sharp on a face seen at a slant (three.js's default is none)
+  const aniso = renderer.capabilities.getMaxAnisotropy();
+  const sharpen = (m) => { for (const k of ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap", "clearcoatNormalMap", "alphaMap"]) if (m[k]) m[k].anisotropy = aniso; };
+  model.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; [].concat(o.material).forEach(sharpen); } });
   mount.add(model);
   if (onWall) {
     mount.position.y = 2.05 - size.h / 2; // a typical mounting height
@@ -137,7 +142,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
       o.userData.originalMaterial ??= o.material;
       const mapping = ext.mappings.find((m) => m.variants.includes(vi));
       if (!mapping) { o.material = o.userData.originalMaterial; return; }
-      jobs.push(gltf.parser.getDependency("material", mapping.material).then((m) => { o.material = m; gltf.parser.assignFinalMaterial(o); }));
+      jobs.push(gltf.parser.getDependency("material", mapping.material).then((m) => { sharpen(m); o.material = m; gltf.parser.assignFinalMaterial(o); }));
     });
     await Promise.all(jobs);
     panel.draw();

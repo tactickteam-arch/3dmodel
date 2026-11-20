@@ -417,6 +417,9 @@ function inUse(root) {
 // a model, made ready for a room full of them
 async function prepare(s, gltf) {
   const root = gltf.scene;
+  // full anisotropic filtering on every texture, as xr.js: print and grain stay sharp at a slant
+  const aniso = renderer.capabilities.getMaxAnisotropy();
+  const sharpen = (m) => texturesOf(m).forEach((t) => (t.anisotropy = aniso));
   // its first finish, as the product page opens it (KHR_materials_variants, as xr.js)
   const variants = gltf.userData.gltfExtensions?.KHR_materials_variants?.variants?.map((v) => v.name) || [];
   const vi = variants.indexOf(s.p.finishes[0]?.variant);
@@ -429,6 +432,7 @@ async function prepare(s, gltf) {
     });
     await Promise.all(jobs);
   }
+  root.traverse((o) => { if (o.isMesh) [].concat(o.material).forEach(sharpen); });
   // the fridge's food ("Fill the fridge" on the product page) stays out of the showroom, as the page starts empty
   const stock = [];
   root.traverse((o) => { if (o.userData.stock) stock.push(o); });

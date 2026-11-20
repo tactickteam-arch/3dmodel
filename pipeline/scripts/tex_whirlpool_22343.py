@@ -262,6 +262,7 @@ class Panel:
 # ── the fridge door's top cap ──
 CAP_MM = (562, 20)
 CAP_PX_MM = 4
+PRINT_K = 48
 TIP = 230                                 # the silver's tip, mm from the door's left edge (front: x 225 px of 26-512)
 TIP_LEN = 33                              # it reaches the cap's full height 33 mm further right (x 253 px)
 
@@ -353,20 +354,23 @@ def main():
     pan = Panel().draw()
     pan.save(os.path.join(OUT, "panel.jpg"), quality=90, optimize=True)
     cap().save(os.path.join(OUT, "cap.jpg"), quality=90, optimize=True)
+    # PRINT_K px per mm of cap height scale: the builder lays each print about 3.8 x the size it is set at here (its
+    # width on the model), so 48 here gives 12-15 px per mm on the model (12 gave 3.1-3.9)
+    K = PRINT_K
     prints = {
-        "print_everyday": label([("EVERYDAY", True), ("FRESH", False)], 2.6),
-        "print_arctic": label([("ARCTIC", True), ("FRESH", False)], 1.6),
-        "print_convertible": stacked("CONVERTIBLE", "FREEZER", 2.0),
-        "print_frozen": label([("FROZEN", True), ("FOOD", False)], 2.4),
-        "print_easy": label([("EASY", True), ("RACK", False)], 2.6),
-        "print_bigbottle": label([("BIG BOTTLE", True), ("RACK", False)], 2.6),
-        "print_bottle": label([("BOTTLE", True), ("RACK", False)], 2.6),
-        "print_fruits": fruits(3.4),
+        "print_everyday": label([("EVERYDAY", True), ("FRESH", False)], 2.6, k=K),
+        "print_arctic": label([("ARCTIC", True), ("FRESH", False)], 1.6, k=K),
+        "print_convertible": stacked("CONVERTIBLE", "FREEZER", 2.0, k=K),
+        "print_frozen": label([("FROZEN", True), ("FOOD", False)], 2.4, k=K),
+        "print_easy": label([("EASY", True), ("RACK", False)], 2.6, k=K),
+        "print_bigbottle": label([("BIG BOTTLE", True), ("RACK", False)], 2.6, k=K),
+        "print_bottle": label([("BOTTLE", True), ("RACK", False)], 2.6, k=K),
+        "print_fruits": fruits(3.4, k=K),
     }
     sizes = {}
     for n, im in prints.items():
         im.save(os.path.join(OUT, n + ".png"), optimize=True)
-        sizes[n] = (round(im.width / 12, 1), round(im.height / 12, 1))
+        sizes[n] = (round(im.width / K, 1), round(im.height / K, 1))
     print("prints (mm):", sizes)
     if "--compare" in sys.argv:
         ph = Image.open(os.path.join(SRC, "feature_panel.jpg")).convert("RGB").crop((52, 40, 206, 453))

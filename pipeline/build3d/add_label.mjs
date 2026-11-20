@@ -93,6 +93,7 @@ const pics = {};   // one picture per file, shared by the colours that use it
 const labelMat = (name, file) => {
   const m = doc.createMaterial(name).setBaseColorFactor([1, 1, 1, 1]).setMetallicFactor(0).setRoughnessFactor(0.5).setAlphaMode("BLEND");
   if (file) m.setBaseColorTexture(pics[file] ||= doc.createTexture(name).setImage(new Uint8Array(png(file))).setMimeType("image/png"));
+  if (file) m.getBaseColorTextureInfo().setWrapS(33071).setWrapT(33071); // a die-cut sticker: clamped, no line of its opposite edge round it
   else m.setBaseColorFactor([1, 1, 1, 0]);    // a colour whose label isn't confirmed: nothing shows
   return m;
 };

@@ -204,6 +204,23 @@ function applyGrain(doc, { dir, materials }) {
   }
 }
 
+// A picture that covers its faces once (UVs inside 0..1) is clamped at its edges: with the default repeat, filtering
+// blends in the opposite edge, a faint line round a decal, a label or where two halves of a panel meet. Tiling
+// textures (grain) keep repeat. The Apple files copy the GLB's wrap (make_usdz.mjs).
+export function clampIfInside(doc, m) {
+  const info = m.getBaseColorTextureInfo();
+  if (!info) return;
+  const set = `TEXCOORD_${info.getTexCoord()}`;
+  for (const mesh of doc.getRoot().listMeshes()) for (const p of mesh.listPrimitives()) {
+    if (p.getMaterial() !== m) continue;
+    const uv = p.getAttribute(set);
+    if (!uv) continue;
+    const lo = uv.getMinNormalized([]), hi = uv.getMaxNormalized([]);
+    if (Math.min(...lo) < -0.002 || Math.max(...hi) > 1.002) return;
+  }
+  info.setWrapS(33071).setWrapT(33071); // CLAMP_TO_EDGE
+}
+
 // Exports the scene to GLB, then gives each named material its photo texture (and its grain).
 export async function exportGLB(root, clips, out, textures = {}, grain = null) {
   if (grain) grainUVs(root, grain.materials);
@@ -217,6 +234,7 @@ export async function exportGLB(root, clips, out, textures = {}, grain = null) {
     if (!file) continue;
     const tex = doc.createTexture(m.getName()).setImage(new Uint8Array(fs.readFileSync(file))).setMimeType(file.endsWith(".png") ? "image/png" : "image/jpeg");
     m.setBaseColorTexture(tex);
+    clampIfInside(doc, m);
     const c = m.getBaseColorFactor();
     m.setBaseColorFactor([1, 1, 1, c[3]]);
   }

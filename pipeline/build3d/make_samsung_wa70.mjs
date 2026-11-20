@@ -32,7 +32,9 @@ const blackGloss = mat("BlackGloss", 0x0d0d0f, { rough: 0.22 });
 const plinthM = mat("Plinth", 0x151517, { rough: 0.75 });
 const footM = mat("Foot", 0x101112, { rough: 0.8 });
 const glassM = mat("LidGlass", 0x0b0d10, { rough: 0.05, opacity: 0.34 });
+// the panel print is two textures side by side (each half 2701 px: 10 px per mm across the 540 mm panel)
 const panelM = mat("PanelFace", 0xffffff, { rough: 0.25 });
+const panelMR = mat("PanelFaceR", 0xffffff, { rough: 0.25 });
 const ringM = mat("PowerRing", 0xffffff, { rough: 0.3 });
 const labelM = mat("LabelBEE", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const tubGrey = mat("TubGrey", 0x9ea0a7, { rough: 0.5 });
@@ -193,9 +195,11 @@ root.add(lid);
   const pg = group("PanelPlane", 0, cy, cx);
   pg.rotation.x = ang;                      // face tilted up toward the back, so its normal leans toward the shopper
   pg.position.y += 0.0009; pg.position.z += 0.0;
-  const face = mesh("PanelFace", flipV(new THREE.PlaneGeometry(W, len)), panelM, 0, 0.0004, 0);
-  face.rotation.x = -Math.PI / 2;
-  pg.add(face);
+  for (const [nm, m, sx] of [["PanelFace", panelM, -1], ["PanelFaceR", panelMR, 1]]) {
+    const face = mesh(nm, flipV(new THREE.PlaneGeometry(W / 2, len)), m, sx * W / 4, 0.0004, 0);
+    face.rotation.x = -Math.PI / 2;
+    pg.add(face);
+  }
   // raised pads (1 mm): the ring, the cycle selector and the key bar, placed in the panel's own frame (x across, z down the slope)
   const mmPx = 1.563, cw = 844, ch = 205, sc = len / 0.131;
   const ux = (cxp) => (cxp - 422) / mmPx / 1000, uz = (cyp) => ((cyp - ch / 2) / mmPx / 1000) * sc;
@@ -237,7 +241,7 @@ const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
   Body: `${T}/body.jpg`, Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side.jpg`, TopPlate: `${T}/top.jpg`,
-  PanelFace: `${T}/panel.jpg`, LabelBEE: `${T}/label.png`, DiamondDrum: `${T}/drum.jpg`, Pulsator: `${T}/pulsator.jpg`,
+  PanelFace: `${T}/panel_l.jpg`, PanelFaceR: `${T}/panel_r.jpg`, LabelBEE: `${T}/label.png`, DiamondDrum: `${T}/drum.jpg`, Pulsator: `${T}/pulsator.jpg`,
   DetergentFace: `${T}/detergent.jpg`, MagicFilter: `${T}/filter.jpg`,
 }, { dir: `${TEX}/grain`, materials: {
   // Grain (BENCHMARK.md section 10): painted Lavender Gray body (factory paint is fine: the soft peel;

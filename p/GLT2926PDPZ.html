@@ -1032,6 +1032,22 @@ let goal = null, goalAt = 0, minRadius = 0, maxRadius = Infinity, baseFov = 30, 
 // fn runs on every model load, and also once now if the model already loaded while this module waited for the headset
 // check above: on a slow phone "load" can come first, and then the doors, Fill and the fit were never set up
 function onLoad(fn) { mv.addEventListener("load", fn); if (mv.loaded) setTimeout(fn); }
+// sharpness, here and in Android AR. model-viewer drops to half resolution when frames run slow (one step, 0.79, is
+// allowed), and loads every texture without anisotropic filtering, so print and grain blur on a face seen at a slant.
+// Each texture asks for 16 (three.js clamps it to what the device has); this reaches model-viewer 4.0.0's scene, as hookAR.
+customElements.whenDefined("model-viewer").then(() => { customElements.get("model-viewer").minimumRenderScale = 0.79; });
+function sharpen() {
+  const scene = mv[symbolOf(mv, "scene")];
+  scene?.traverse?.((o) => {
+    for (const m of o.isMesh ? [].concat(o.material) : []) for (const k of ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap", "clearcoatNormalMap", "alphaMap"]) {
+      const t = m[k];
+      if (t && t.anisotropy < 16) { t.anisotropy = 16; t.needsUpdate = true; }
+    }
+  });
+  scene?.queueRender?.();
+}
+onLoad(sharpen);
+mv.addEventListener("variant-applied", sharpen);
 // the studio light turns with the camera, and the key light's shadow with it (light.js); set up once, at the opening view
 let lit = false;
 onLoad(() => { if (!lit) { lit = true; requestAnimationFrame(() => studioLight(mv, { wall: onWall })); } });

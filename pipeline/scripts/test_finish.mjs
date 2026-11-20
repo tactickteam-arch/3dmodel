@@ -41,9 +41,10 @@ for (const p of [F, G, W]) delete p.hidden;
 const shown = cat.products.filter((p) => !p.hidden);
 const PID = "990001", OWN = F.sangeethaUrl.match(/(\d+)$/)[1];
 const gold = { name: "Gold, Matt White", swatchColor: "#d9c9a0", usdz: G.finishes[0].usdz, variant: "test-gold", code: "TEST-GMW", sangeethaUrl: `https://www.sangeetha.com/product-details/test-colour/${PID}` };
-// a colour with a maker code is shown at /p/<item code> (product.html); one without keeps /p/<id>?finish=<slug>
-const GOLD_AT = `/p/${encodeURI(gold.code)}`;
 F.finishes.push(gold);
+// the colour's address as site.js gives it (STANDARD.md section 2): not in the item master, so on a product with a master
+// code it opens at /p/<that code>/<colour>; on one without, at its maker code
+const GOLD_AT = encodeURI(finishPath(F, F.finishes.length - 1));
 G.finishes[0].sangeethaUrl = `https://www.sangeetha.com/product-details/test-clash/${PID}`;
 const scratch = path.join(out, "products.json");
 fs.writeFileSync(scratch, JSON.stringify(cat, null, 2));
