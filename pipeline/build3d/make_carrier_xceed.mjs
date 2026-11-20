@@ -17,6 +17,8 @@ const outY0 = 0.030, outY1 = panelY0;                          // air outlet beh
 
 const white = mat("Body", 0xf3f4f6, { rough: 0.32 });
 const panelFront = mat("PanelFront", 0xffffff, { rough: 0.28 });
+// the Carrier oval as its own decal, 12 px per mm (tex_carrier_xceed_print.py); the panel picture has its soft oval taken out
+const logoM = mat("PanelLogo", 0xffffff, { rough: 0.28, opacity: 0.999 });
 const louvreFront = mat("LouvreFront", 0xffffff, { rough: 0.3 });
 const filter = mat("Filter", 0xffffff, { rough: 0.7 });
 const coil = mat("Coil", 0x8d949b, { metal: 0.6, rough: 0.45 });
@@ -85,6 +87,9 @@ const fp = group("FrontPanel", 0, H, D);
   const sh = rrect(W, panelH, RT, RB);
   fp.add(mesh("PanelBody", new THREE.ExtrudeGeometry(rrect(W - 2 * BEV, panelH - 2 * BEV, RT - BEV, RB - BEV), { depth: panelT - 2 * BEV, bevelEnabled: true, bevelSize: BEV, bevelThickness: BEV, bevelSegments: 2, curveSegments: 10 }), white, 0, BEV - panelH, BEV - panelT));
   fp.add(picture("PanelFace", sh, W, panelH, panelFront, 0.0004).translateY(-panelH));
+  // the oval: 34 mm tall, centred across, its centre at 56% of the panel's height from the top (as prep_textures.py placed it)
+  const lgH = 0.034, lgW = lgH * 1031 / 409;
+  fp.add(mesh("PanelLogoDecal", flipV(new THREE.PlaneGeometry(lgW, lgH)), logoM, 0, -0.56 * panelH, 0.0011));
 }
 root.add(fp);
 
@@ -114,7 +119,8 @@ const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
-  PanelFront: `${TEX}/carrier/front.jpg`,
+  PanelFront: `${TEX}/carrier/front_print.jpg`,
+  PanelLogo: `${TEX}/carrier/logo.png`,
   LouvreFront: `${TEX}/carrier/louvre.jpg`,
   Filter: `${TEX}/carrier/filter.jpg`,
 }, { dir: `${TEX}/grain`, materials: {
