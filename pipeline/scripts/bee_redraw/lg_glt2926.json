@@ -1,0 +1,15 @@
+{
+ "_about": "LG GLT2926PDPZ: LG's own 2026-28 label for this model (LG's gallery GLT2926PDPZ-2010x1334-2-v.jpg; Model No. GLT292), as cut out before.",
+ "template": "lg2026b",
+ "src": "pipeline/sources/photos/lg_glt2926/bee_cut_bee_label.png",
+ "out": "pipeline/tex/lg_glt2926/bee_label.png",
+ "width_mm": 90,
+ "words": {
+  "series": "2026 - 28",
+  "value": "238",
+  "type": "Frost Free",
+  "volume": "288",
+  "model": "GLT292",
+  "country": "India"
+ }
+}

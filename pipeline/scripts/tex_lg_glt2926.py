@@ -97,8 +97,10 @@ def line(img, parts, cx, base, cap, col, width=None, gap=0.28, anchor="c"):
 
 def lgmark():
     """LG's mark, a mid grey darker than the door (the front photo: ink down to 96 on a door of about 170; the first value, 112, rendered far too pale)."""
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
-    a = np.asarray(lg).astype(float)
+    # drawn sharp from LG's vector mark (tex_lg_mark.py), 800 px across the 63 mm decal: 12.7 px per mm
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    a = np.asarray(tex_lg_mark.lg_hi(LOGOS, 800)).astype(float)
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (62, 64, 68)
     mark[..., 3] = (a[..., 3] * 0.95).clip(0, 255).astype(np.uint8)
@@ -135,7 +137,7 @@ def rear():
 
 def prints():
     ink = (52, 58, 70, 255)          # LG's dark slate print inside the cabinet (DZ-03, DZ-04)
-    S = 5                            # 5 px per mm
+    S = 12                           # 12 px per mm
     # "Convertible" on the freezer's back wall: 81 px wide on DZ-04 where the back wall reads about 1.55 mm a pixel,
     # so about 125 mm, medium weight
     img = Image.new("RGBA", (132 * S, 28 * S), (0, 0, 0, 0))
