@@ -5,6 +5,7 @@ usage: python tex_haier_hso52.py <photos dir> <logos dir> <out dir>
   photos: pipeline/sources/photos (reads haier_hso52/g16.jpg)
 Writes into <out dir>/haier_hso52/.
 """
+import json
 import math
 import os
 import sys
@@ -33,8 +34,9 @@ def save(img, name, quality=88):
 
 
 W_PX, H_PX = round(2 * XIN * 1000 * S), round((H - YG1) * 1000 * S)
-X = lambda mm: W_PX / 2 + mm * S
-Y = lambda m: (H - m) * 1000 * S
+OX = OY = 0.0                               # the drawing's origin: 0 for the whole panel, a print's box for its decal
+X = lambda mm: W_PX / 2 + mm * S - OX
+Y = lambda m: (H - m) * 1000 * S - OY
 
 
 def seven(d, cx, cy, h, w, ch, col, t):
@@ -59,9 +61,11 @@ def snowflake(d, cx, cy, r, col, t):
             d.line((mx, my, mx + 0.34 * r * math.cos(b), my - 0.34 * r * math.sin(b)), fill=col, width=round(t))
 
 
-def panel():
-    img = Image.new("RGB", (W_PX, H_PX), (247, 247, 248))
-    g = np.linspace(1.0, 0.985, H_PX)[:, None, None]
+def draw_panel(box=None):
+    """the panel's print at the current scale S; box = (x0, y0, x1, y1) in px at S draws only that part"""
+    bw, bh = (W_PX, H_PX) if box is None else (box[2] - box[0], box[3] - box[1])
+    img = Image.new("RGB", (bw, bh), (247, 247, 248))
+    g = (1.0 - 0.015 * (OY + np.arange(bh)) / (H_PX - 1))[:, None, None]
     img = Image.fromarray((np.asarray(img).astype(float) * g).clip(0, 255).astype(np.uint8))
     d = ImageDraw.Draw(img, "RGBA")
     # Haier wordmark from Haier's own logo file, tinted charcoal as on the unit
@@ -92,7 +96,38 @@ def panel():
     x0 = X(370.6) - tot / 2
     d.text((x0, Y(0.0922)), "DC", font=f1, fill=(52, 56, 62), anchor="lm")
     d.text((x0 + wdc - 1.5 * S, Y(0.0922)), "inverter", font=f2, fill=(52, 56, 62), anchor="lm")
-    save(img, "panel.jpg", 92)
+    return img
+
+
+# The prints again at 15 px per mm (12+ on the curved panel), each on its own decal over the panel: the box round each
+# print, in the panel texture's px (3 per mm), and the same box of the same drawing at 5 x (drawn at 15 x and reduced, so
+# the edges are smooth); the panel ground is in both, so the decal's edge doesn't show. decals.json gives each box as a
+# UV rectangle of the panel for the builder.
+DECAL_K, AA = 5, 3
+DECALS = {                                  # x from the centre (mm), height (m): each print with 4 mm round it
+    "wordmark": (-31.0, 31.0, 0.1922, 0.1702),
+    "display": (290.0, 360.0, 0.1992, 0.1632),
+    "badge": (318.0, 423.0, 0.1032, 0.0812),
+}
+
+
+def panel():
+    global S, W_PX, H_PX, OX, OY
+    save(draw_panel(), "panel.jpg", 92)
+    S0, W0, H0 = S, W_PX, H_PX
+    out = {}
+    for name, (x0, x1, y0, y1) in DECALS.items():
+        box = (math.floor(X(x0)), math.floor(Y(y0)), math.ceil(X(x1)), math.ceil(Y(y1)))
+        k = DECAL_K * AA
+        S, W_PX, H_PX = S0 * k, W0 * k, H0 * k
+        OX, OY = box[0] * k, box[1] * k
+        img = draw_panel(tuple(v * k for v in box))
+        S, W_PX, H_PX, OX, OY = S0, W0, H0, 0.0, 0.0
+        img = img.resize((img.width // AA, img.height // AA), Image.LANCZOS)
+        save(img, f"decal_{name}.jpg", 90)
+        out[name] = {"file": f"decal_{name}.jpg", "rect": [box[0] / W0, box[1] / H0, box[2] / W0, box[3] / H0]}
+    with open(os.path.join(OUT, PRODUCT, "decals.json"), "w") as f:
+        json.dump(out, f, indent=1)
 
 
 def filters():

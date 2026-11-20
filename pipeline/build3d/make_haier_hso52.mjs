@@ -6,6 +6,7 @@
 // the outlet with its vertical blades. The back sits at z = 0 so the unit hangs flat on a wall.
 // usage: node make_haier_hso52.mjs <entries json> <tex dir> <out.glb>
 import { THREE, mat, mesh, box, group, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
+import { uvDecals } from "./decal_curved.mjs";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "haier-hso52kucai3nb";
@@ -196,6 +197,9 @@ const lv = group("Louvre", 0, lp[1], lp[0]);
 lv.add(shell("Flap", louvreOuter.map(([z, y]) => [z - lp[0], y - lp[1]]), 0.004, -xL, xL, louvreMat, louvreIn, louvreMat));
 root.add(lv);
 
+// the prints again at 15 px per mm on curved decals over the panel (tex_haier_hso52.py draws them, decals.json places them)
+const printTex = uvDecals(fp.getObjectByName("PanelOuter"), `${TEX}/haier_hso52/decals.json`, (n) => mat(n, 0xffffff, { rough: 0.22 }));
+
 const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
@@ -203,6 +207,7 @@ await exportGLB(root, clips, OUT, {
   PanelFront: `${TEX}/haier_hso52/panel.jpg`,
   Filter: `${TEX}/haier_hso52/filter.jpg`,
   TopGrille: `${TEX}/haier_hso52/top.jpg`,
+  ...printTex,
 }, { dir: `${TEX}/grain`, materials: {
   // Grain (BENCHMARK.md section 10): glossy moulded white plastic, a faint ripple in the reflections.
   // Not on the front panel: it carries the printed logo, display and badge, and the ripple mottled the
