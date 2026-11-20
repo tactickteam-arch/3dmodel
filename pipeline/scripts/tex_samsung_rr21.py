@@ -356,12 +356,88 @@ def rear():
 
 
 def panel():
-    # the temperature-control panel right of the freezer box, on the empty open photo (x 974-1021, rows 352-512; about
-    # 0.94 px per mm, so its small print stays soft and is not re-set: NOTES.md)
-    src = Image.open(os.path.join(SRC, "cr_g_551075926.jpg")).convert("RGB")
-    p = src.crop((975, 352, 1021, 512))
-    save(p.resize((p.width * 3, p.height * 3), Image.LANCZOS), "panel.jpg", 86)
+    """The temperature-control panel right of the freezer box (52 x 191 mm), 10 px per mm.
 
+    Its ground and the small paragraphs come from the empty open-door photo (cr_g_551075926.jpg, x 974-1021, rows
+    337-512: the box's frame rows, about 0.9 px per mm); the paragraphs, the quick-ice figure, the warning's icon and its
+    Hindi lines cannot be read there, so they stay as the photo has them (soft). Re-set sharp over the photo, at the
+    places and sizes measured on it:
+      the three headings and the warning's two English lines, as the photo reads them: TEMPERATURE CONTROL, CONTROL GUIDE,
+      SAMSUNG RECOMMENDS, DO NOT USE SHARP OBJECT / TO REMOVE ICE (Arial Narrow Bold, fitted to each line's measured box);
+      the rules under the headings and the warning's frame;
+      the dial's print from Samsung's manual for this model (DA68-03960A-11, page 2, its dial figure rendered from the PDF
+      at 1200 dpi: manual_dial.png): the arcs, OFF, ON, 1-6, the snowflake with Winter / सर्दी, the sun with Summer / गर्मी,
+      the cloud with Monsoon / मानसून. The figure's knob (its knurled edge, rings and pointer) is left out: the knob is
+      modelled. The figure is scaled so its arc and numbers sit where the photo's do (32 figure px per mm, the arc 13.9 mm
+      out) and centred on the modelled knob (26 mm across, 55 mm down: 1.160 m)."""
+    from PIL import ImageDraw, ImageFont
+    K, SS = 10, 3                                  # px per mm, supersampling for the drawn ink
+    W_MM, H_MM = 52, 191
+    src = Image.open(os.path.join(SRC, "cr_g_551075926.jpg")).convert("RGB")
+    crop = src.crop((974, 337, 1021, 512))
+    base = np.asarray(crop.resize((W_MM * K, H_MM * K), Image.LANCZOS)).astype(np.float32)
+    # the photo's ink colour: the darkest tenth of the TEMPERATURE CONTROL line
+    hd = np.asarray(src.crop((979, 359, 1017, 362))).reshape(-1, 3).astype(np.float32)
+    ink_col = np.median(hd[hd.mean(1) <= np.percentile(hd.mean(1), 10)], 0) * 0.85
+    # the places the sharp print replaces the photo (mm: x0, y0, x1, y1)
+    mask = Image.new("L", (W_MM * K, H_MM * K), 0)
+    md = ImageDraw.Draw(mask)
+    rects = ((3.4, 20.8, 50.0, 30.6), (2.0, 30.6, 50.6, 86.2), (3.4, 86.2, 50.0, 91.4), (3.4, 135.0, 50.0, 140.4),
+                           (6.6, 170.9, 47.6, 177.4), (3.6, 158.9, 49.8, 161.2), (3.6, 186.0, 49.8, 188.4),
+                           (3.6, 158.9, 5.8, 188.4), (47.6, 158.9, 49.8, 188.4))
+    # each place gets the panel as it would be without its print: the photo with its dark print closed over (a 4 mm grey
+    # closing takes out strokes, which are under 2 mm) and smoothed (2 mm), set to the photo's own level where it is bare
+    ground = cv2.morphologyEx(base, cv2.MORPH_CLOSE, np.ones((4 * K + 1, 4 * K + 1), np.uint8))
+    ground = cv2.GaussianBlur(ground, (0, 0), sigmaX=2 * K)
+    bare = np.abs(base - ground).max(2) < 12
+    ground += np.median((base - ground)[bare], 0)
+    for x0, y0, x1, y1 in rects:
+        X0, Y0, X1, Y1 = (round(v * K) for v in (x0, y0, x1, y1))
+        md.rectangle([X0, Y0, X1, Y1], fill=255)
+    m = np.asarray(mask.filter(ImageFilter.GaussianBlur(0.25 * K)), np.float32)[..., None] / 255
+    img = base * (1 - m) + ground * m
+    # the sharp ink, drawn at SS x and brought down
+    S = K * SS
+    ink = Image.new("L", (W_MM * S, H_MM * S), 0)
+    dr = ImageDraw.Draw(ink)
+    face = "/System/Library/Fonts/Supplemental/Arial Narrow Bold.ttf"
+
+    def line(text, x0, y0, x1, y1):
+        f = ImageFont.truetype(face, 400)
+        t = Image.new("L", (int(f.getlength(text)) + 200, 600), 0)
+        ImageDraw.Draw(t).text((100, 100), text, font=f, fill=255)
+        t = t.crop(t.getbbox())
+        t = t.resize((round((x1 - x0) * S), round((y1 - y0) * S)), Image.LANCZOS)
+        ink.paste(255, (round(x0 * S), round(y0 * S)), t)
+
+    def rule(x0, x1, y, th):
+        dr.rectangle([x0 * S, (y - th / 2) * S, x1 * S, (y + th / 2) * S], fill=255)
+
+    line("TEMPERATURE CONTROL", 5.0, 24.1, 47.6, 27.2)
+    rule(4.3, 48.6, 22.45, 0.4)
+    rule(4.3, 48.6, 29.0, 0.6)
+    for x in (4.3, 48.6):
+        dr.rectangle([(x - 0.15) * S, 22.45 * S, (x + 0.15) * S, 29.0 * S], fill=255)
+    line("CONTROL GUIDE", 4.95, 87.25, 28.65, 89.05)
+    rule(4.2, 48.5, 90.5, 0.4)
+    line("SAMSUNG RECOMMENDS", 4.45, 136.05, 41.65, 137.95)
+    rule(4.2, 48.5, 139.5, 0.4)
+    line("DO NOT USE SHARP OBJECT", 7.3, 171.6, 46.1, 173.7)
+    line("TO REMOVE ICE", 7.9, 174.7, 28.7, 176.8)
+    dr.rounded_rectangle([4.7 * S, 160.0 * S, 48.7 * S, 187.2 * S], radius=1.5 * S, outline=255, width=round(0.4 * S))
+    # the dial from the manual figure: its ink outside the knob (radius 422 figure px; the arc starts at 425)
+    fig = np.asarray(Image.open(os.path.join(SRC, "manual_dial.png")).convert("L")).astype(np.float32)
+    fcx, fcy, FPX = 789.5, 674.5, 32.0             # the figure's centre and its px per mm on the panel
+    yy, xx = np.mgrid[0:fig.shape[0], 0:fig.shape[1]]
+    rr = np.hypot(xx - fcx, yy - fcy)
+    a = (255 - fig) * (rr > 422) * (rr < 800) * (xx > 45) * (xx < 1585) * (yy > 65) * (yy < 1455)   # not the figure's frame
+    a[(xx > 1120) & (xx < 1210) & (yy > 515) & (yy < 615) & (rr < 427)] = 0              # nor the tip of the knob's pointer
+    fs = S / FPX
+    a = Image.fromarray(a.clip(0, 255).astype(np.uint8)).resize((round(fig.shape[1] * fs), round(fig.shape[0] * fs)), Image.LANCZOS)
+    ink.paste(255, (round(26.0 * S - fcx * fs), round(55.0 * S - fcy * fs)), a)
+    al = np.asarray(ink.resize((W_MM * K, H_MM * K), Image.LANCZOS), np.float32)[..., None] / 255
+    img = img * (1 - al) + ink_col * al
+    save(Image.fromarray(img.clip(0, 255).astype(np.uint8)), "panel.jpg", 88)
 
 doors()
 mark()
@@ -374,3 +450,18 @@ panel()
 colours["mark_at"] = MARK_AT
 json.dump(colours, open(os.path.join(D, "colours.json"), "w"), indent=1)
 print(json.dumps(colours, indent=None)[:1500])
+
+
+# ── the SAMSUNG mark on the stand's drawer front: the photo's soft mark taken out of every stand texture (its box in
+# texture px, found as the mark's edges on all the colours' stands), and drawn sharp as one decal for all colours
+# (tex_samsung_standmark.py; 198 mm wide, the width of the photo's mark, and its height from the wordmark's own proportions) ──
+import glob as _glob  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tex_samsung_standmark as _sm  # noqa: E402
+for _f in sorted(_glob.glob(os.path.join(D, "stand_*.jpg"))):
+    _a = np.asarray(Image.open(_f).convert("RGB")).copy()
+    _sm.paint_out(_a, (158, 66, 353, 100), pad=4)
+    Image.fromarray(_a).save(_f, quality=88, optimize=True)
+    print("mark taken out of", os.path.basename(_f))
+_sm.decal(LOGOS, 198).save(os.path.join(D, "stand_mark.png"), optimize=True)
+print("wrote stand_mark.png")

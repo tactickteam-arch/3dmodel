@@ -105,6 +105,9 @@ const sidePaint = mat("SidePaint", F0.side, { metal: 0.3, rough: 0.45 });
 const topPaint = mat("TopPaint", F0.top, { metal: 0.15, rough: 0.6 });
 const standM = mat("StandPlastic", F0.stand, { rough: 0.55 });
 const standFront = mat("StandFront", 0xffffff, { rough: 0.5 });
+// the SAMSUNG mark sunk into the drawer front: a sharp decal of its light and shade (12 px per mm, the same on every colour;
+// tex_samsung_standmark.py), the photo's soft mark taken out of the stand texture
+const standMarkM = mat("StandMark", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const markM = mat("SamsungMark", 0xffffff, { rough: 0.45, opacity: 0.999 });
 const labelM = mat("LabelBEE", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const modelM = mat("LabelModel", 0xffffff, { rough: 0.5 });
@@ -358,6 +361,19 @@ const dTop = standTop - 0.002, dBot = standFoot + 0.002;
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
   drawer.add(mesh("DrawerFace", g, standFront));
+  // the mark: 198 mm wide (the photo's mark), centred, 61 mm up (the photo); a strip that follows the front's bow, 0.7 mm proud
+  {
+    const smW = 0.198 + 0.003, smH = 0.198 * 353 / 2304 + 0.003, yc = standTop - 0.6484 * (standTop - standFoot), n = 16;
+    const mp = [], mu = [], mi = [];
+    for (let j = 0; j <= 1; j++) for (let i = 0; i <= n; i++) {
+      const x = -smW / 2 + smW * i / n, y = yc - smH / 2 + smH * j;
+      mp.push(x, y, zf(x) + 0.0007); mu.push(i / n, 1 - j);
+    }
+    for (let i = 0; i < n; i++) mi.push(i, i + 1, i + n + 2, i, i + n + 2, i + n + 1);
+    const mg = new THREE.BufferGeometry();
+    mg.setAttribute("position", new THREE.Float32BufferAttribute(mp, 3)); mg.setAttribute("uv", new THREE.Float32BufferAttribute(mu, 2)); mg.setIndex(mi); mg.computeVertexNormals();
+    drawer.add(mesh("StandMarkDecal", mg, standMarkM));
+  }
   // the finger pocket's slot along the top (fronts: 400 mm wide, its dark line 112-118 mm up)
   drawer.add(box("DrawerSlot", 0.4, 0.006, 0.02, dark, 0, 0.115, zNose - 0.012));
   const zb = zNose - bow - 0.012;
@@ -688,7 +704,7 @@ const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 const textures = {
-  DoorFace: `${T}/door_${F0.slug}.jpg`, StandFront: `${T}/stand_${F0.slug}.jpg`, RearPlate: `${T}/rear.jpg`, Bay: `${T}/bay.jpg`,
+  DoorFace: `${T}/door_${F0.slug}.jpg`, StandFront: `${T}/stand_${F0.slug}.jpg`, StandMark: `${T}/stand_mark.png`, RearPlate: `${T}/rear.jpg`, Bay: `${T}/bay.jpg`,
   LabelBEE: `${T}/label.png`, LabelModel: `${T}/model_${F0.slug}.jpg`, SamsungMark: `${T}/mark_${F0.mark}.png`, PanelPrint: `${T}/panel.jpg`,
 };
 Object.assign(textures, stock.textures());

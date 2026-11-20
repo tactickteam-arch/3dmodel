@@ -1,0 +1,31 @@
+{
+ "_about": "Samsung RR21H2H25 (every colour): the label of Samsung India's pictures (each colour's own label names its code; the code itself is each colour's strip, LabelModel), as cut out before with the code taken out.",
+ "template": "samsung2026",
+ "src": "pipeline/sources/photos/samsung_rr21/bee_cut_label.png",
+ "out": "pipeline/tex/samsung_rr21/label.png",
+ "width_mm": 96.0,
+ "words": {
+  "series": "2026 - 28",
+  "head": "ANNUAL ENERGY CONSUMPTION",
+  "unit": "units/yr",
+  "kind": "Refrigerator",
+  "brand": "SAMSUNG",
+  "country": "INDIA",
+  "value": "115",
+  "type": "Direct Cool",
+  "volume_line": "Total Volume : 189 (Ltr)"
+ },
+ "items": [
+  {
+   "key": "model",
+   "t": "Model No.:"
+  }
+ ],
+ "rescale_json": {
+  "file": "pipeline/tex/samsung_rr21/colours.json",
+  "paths": [
+   "label.size",
+   "label.ink"
+  ]
+ }
+}
