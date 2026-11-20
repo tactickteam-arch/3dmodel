@@ -1,0 +1,15 @@
+{
+ "_about": "LG GV-B23FFGMB: LG's label image for this code (bm_energy_label.jpg), as cut out before.",
+ "template": "lg2026b",
+ "src": "pipeline/sources/photos/lg_gvb23/bee_cut_label_bm.png",
+ "out": "pipeline/tex/lg_gvb23/label_bm.png",
+ "width_mm": 90.8,
+ "words": {
+  "series": "2023 - 26",
+  "value": "510",
+  "type": "Multi Door",
+  "volume": "574",
+  "model": "GV-B23FFGMB",
+  "country": "Vietnam"
+ }
+}
