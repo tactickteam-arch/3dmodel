@@ -149,8 +149,10 @@ def label():
 
 
 def lgmark(name, rgb):
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
-    a = np.asarray(lg).astype(float)
+    # drawn sharp from LG's vector mark (tex_lg_mark.py), 800 px across the 64 mm decal: 12.5 px per mm
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    a = np.asarray(tex_lg_mark.lg_hi(LOGOS, 800)).astype(float)
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = rgb
     face = np.clip((a[..., 1] - 110) / 100, 0, 1)  # the white face in the red circle (green high); red and grey letters stay
@@ -193,13 +195,15 @@ def prints():
     text(img, "Maker", x0 + wi + gap + wm / 2, 32, 36, 7, (80, 82, 86, 255))
     save(img, "print_icemaker.png")
     # the trays' words, as LG prints them (DZ-07): "Fresh 0 Zone / Fish & Meat" and "Fresh Zone / Fruit & Vegetables"
-    img = Image.new("RGBA", (900, 200), (0, 0, 0, 0))
-    text(img, "Fresh 0 Zone", 450, 72, 48, 2, (60, 62, 66, 255))
-    text(img, "Fish & Meat", 450, 145, 24, 5, (90, 92, 98, 255))
+    # (drawn at 3 x the first layout: about 12.8 px per mm on the trays)
+    k = 3
+    img = Image.new("RGBA", (900 * k, 200 * k), (0, 0, 0, 0))
+    text(img, "Fresh 0 Zone", 450 * k, 72 * k, 48 * k, 2, (60, 62, 66, 255))
+    text(img, "Fish & Meat", 450 * k, 145 * k, 24 * k, 5, (90, 92, 98, 255))
     save(img, "print_fresh0.png")
-    img = Image.new("RGBA", (900, 220), (0, 0, 0, 0))
-    text(img, "Fresh Zone", 450, 82, 50, 2, (60, 62, 66, 255))
-    text(img, "Fruit & Vegetables", 450, 158, 25, 5, (90, 92, 98, 255))
+    img = Image.new("RGBA", (900 * k, 220 * k), (0, 0, 0, 0))
+    text(img, "Fresh Zone", 450 * k, 82 * k, 50 * k, 2, (60, 62, 66, 255))
+    text(img, "Fruit & Vegetables", 450 * k, 158 * k, 25 * k, 5, (90, 92, 98, 255))
     save(img, "print_freshzone.png")
 
 

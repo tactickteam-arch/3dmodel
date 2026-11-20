@@ -1,0 +1,15 @@
+{
+ "_about": "LG GLT4416CCES: LG's label image for this model (GLT4416CCES-2010x1334-2-v.jpg; it prints LG's family name GLT441), as cut out before.",
+ "template": "lg2026",
+ "src": "pipeline/sources/photos/lg_glt4416/bee_cut_label.png",
+ "out": "pipeline/tex/lg_glt4416/label.png",
+ "width_mm": 73,
+ "words": {
+  "series": "2026 - 28",
+  "value": "297",
+  "type": "Frost Free",
+  "volume": "446",
+  "model": "GLT441",
+  "country": "INDIA"
+ }
+}
