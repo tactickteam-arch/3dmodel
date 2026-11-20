@@ -5,7 +5,7 @@ The printing is redrawn crisp on flat white; the studio shading is not baked in.
 usage: python tex_voltas_183inv.py <photos dir> <out dir>
 Writes into <out dir>/voltas_183inv/.
 """
-import math, os, sys
+import json, math, os, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -24,12 +24,15 @@ def save(img, name, q=90):
     print("wrote", p, img.size)
 
 
+OX = OY = 0.0                # the drawing's origin: 0 for the panel, a print's box for its decal
+
+
 def X(xm):  # metres from centre -> px
-    return W_PX / 2 + xm * 1000 * S
+    return W_PX / 2 + xm * 1000 * S - OX
 
 
 def Y(ym):  # metres height -> px (top of panel = 0)
-    return (H - ym) * 1000 * S
+    return (H - ym) * 1000 * S - OY
 
 
 def font(mm, face=0):
@@ -56,6 +59,15 @@ def panel():
             pts.append((X((u - 0.5) * 2 * XIN * 0.985), Y(y)))
         d.line(pts, fill=(205, 208, 214, 150), width=3)
         d.line([(x, y + 3) for x, y in pts], fill=(255, 255, 255, 220), width=2)
+    ground = img.copy()
+    prints(img)
+    save(img, "panel.jpg", 92)
+    decals(img, ground)
+
+
+def prints(img):
+    """the printing at the current scale S (A TATA Product, VOLTAS, the Inverter badge, the faint 24)"""
+    d = ImageDraw.Draw(img, "RGBA")
     # A TATA Product (top left)
     f1, f2, f3 = font(7.0, 7), font(7.0, 8), font(7.0, 4)
     x0, y0 = X(-0.4285), Y(0.2865)
@@ -79,11 +91,42 @@ def panel():
     fi = ImageFont.truetype(FONT, round(10.5 * S), index=3)
     d.text((X(0.394), Y(0.1895)), "Inverter", font=fi, fill=(75, 78, 86), anchor="mm")
     cx, cy = X(0.394), Y(0.1865)
-    d.arc((cx - 19 * S, cy - 9 * S, cx + 19 * S, cy + 9 * S), 20, 160, fill=(95, 99, 108), width=5)
+    d.arc((cx - 19 * S, cy - 9 * S, cx + 19 * S, cy + 9 * S), 20, 160, fill=(95, 99, 108), width=round(5 * S / 3))
     # hidden display: a few very faint digits "24" in the middle top, as in the photo
     fd = ImageFont.truetype(FONT, round(9 * S), index=0)
     d.text((X(0), Y(0.222)), "24", font=fd, fill=(236, 237, 240), anchor="mm")
-    save(img, "panel.jpg", 92)
+
+
+# The printing again at 15 px per mm (12+ on the panel's curve), each print on its own decal over the panel: the box
+# round its ink (3 mm round it) on the panel as drawn, its ground the panel's own ground there enlarged 5 x (the wave ribs
+# included where they reach), the print drawn again at 5 x on it, so the decal's edge doesn't show. decals.json gives each
+# box as a UV rectangle of the panel for the builder. The wave ribs stay on the panel (they run its whole width).
+DECAL_K = 5
+WINDOWS = {"tata": (-0.4405, -0.30, 0.300, 0.272), "voltas": (-0.06, 0.06, 0.185, 0.143),
+           "inverter": (0.345, 0.442, 0.212, 0.168), "display": (-0.03, 0.03, 0.240, 0.204)}   # x0, x1, y top, y bottom (m)
+
+
+def decals(inked, ground):
+    global S, W_PX, H_PX, OX, OY
+    S0, W0, H0 = S, W_PX, H_PX
+    ink = np.abs(np.asarray(inked.convert("RGB")).astype(int) - np.asarray(ground.convert("RGB")).astype(int)).sum(2) > 6
+    out = {}
+    for name, (xa, xb, ya, yb) in WINDOWS.items():
+        x0, y0, x1, y1 = int(X(xa)), int(Y(ya)), int(X(xb)), int(Y(yb))
+        ys, xs = np.nonzero(ink[y0:y1, x0:x1])
+        m = 3 * S0
+        box = (int(max(0, x0 + xs.min() - m)), int(max(0, y0 + ys.min() - m)), int(min(W0, x0 + xs.max() + 1 + m)), int(min(H0, y0 + ys.max() + 1 + m)))
+        k = DECAL_K
+        g = ground.crop(box)
+        im = g.resize((g.width * k, g.height * k), Image.BICUBIC)
+        S, W_PX, H_PX = S0 * k, W0 * k, H0 * k
+        OX, OY = box[0] * k, box[1] * k
+        prints(im)
+        S, W_PX, H_PX, OX, OY = S0, W0, H0, 0.0, 0.0
+        save(im, f"decal_{name}.jpg", 90)
+        out[name] = {"file": f"decal_{name}.jpg", "rect": [box[0] / W0, box[1] / H0, box[2] / W0, box[3] / H0]}
+    with open(os.path.join(OUT, PRODUCT, "decals.json"), "w") as f:
+        json.dump(out, f, indent=1)
 
 
 def louvre():

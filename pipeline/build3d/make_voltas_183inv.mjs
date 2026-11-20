@@ -7,6 +7,7 @@
 // The back sits at z = 0 so the unit hangs flat on a wall.
 // usage: node make_voltas_183inv.mjs <products.json> <tex dir> <out.glb>
 import { THREE, mat, mesh, box, group, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
+import { uvDecals } from "./decal_curved.mjs";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "voltas-183inv-vertis-ai-zest-gold";
@@ -173,12 +174,16 @@ const lv = group("Louvre", 0, lp[1], lp[0]);
 lv.add(shell("Flap", louvreOuter.map(([z, y]) => [z - lp[0], y - lp[1]]), 0.004, -xL, xL, louvreMat, louvreIn, louvreMat));
 root.add(lv);
 
+// the printing again at 15 px per mm on curved decals over the panel (tex_voltas_183inv.py draws them, decals.json places them)
+const printTex = uvDecals(cab.getObjectByName("PanelOuter"), `${TEX}/voltas_183inv/decals.json`, (n) => mat(n, 0xffffff, { rough: 0.22 }));
+
 const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
   PanelFront: `${TEX}/voltas_183inv/panel.jpg`,
   Louvre: `${TEX}/voltas_183inv/louvre.jpg`,
+  ...printTex,
 }, { dir: `${TEX}/grain`, materials: {
   // Grain (BENCHMARK.md section 10): moulded white plastic, the gentlest ripple (peel_soft), as on the Haier AC.
   // Voltas does not publish the material, so this is ESTIMATED from its photos. Never on the front panel: it carries
