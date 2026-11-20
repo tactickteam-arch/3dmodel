@@ -1,0 +1,8 @@
+{
+  "_about": "Whirlpool 235 L (NDT23533IAQMC2PE, shared by every colour of the 235 L): Whirlpool's own 2026-28 label image on this product's page (image 176441), as cut out before (bee_cut_bee_label.png).",
+  "template": "wp2026",
+  "src": "pipeline/sources/photos/whirlpool_22343/bee_cut_bee_label.png",
+  "out": "pipeline/tex/whirlpool_22343/bee_label.png",
+  "width_mm": 90,
+  "words": { "series": "2026 - 28", "value": "230", "type": "Frost Free", "brand": "Whirlpool", "volume": "235", "model": "NDT23533IAQMC2PE", "country": "India" }
+}
