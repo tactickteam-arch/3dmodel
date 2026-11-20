@@ -1,0 +1,9 @@
+{
+  "_about": "Samsung RT45HG6A22SLHL: Samsung India's picture of this model's own label (label_553824071.jpg), as cut out before.",
+  "template": "samsung2026",
+  "src": "pipeline/sources/photos/samsung_rt45/bee_cut_label.png",
+  "out": "pipeline/tex/samsung_rt45/label.png",
+  "width_mm": 125,
+  "words": { "series": "2026 - 28", "head": "ANNUAL ENERGY CONSUMPTION", "value": "252", "unit": "units/yr", "kind": "Refrigerator", "type": "Frost Free",
+             "brand": "SAMSUNG", "volume_line": "Total Volume : 419 (Ltr)", "model": "RT45HG6A22SLHL", "country": "INDIA" }
+}
