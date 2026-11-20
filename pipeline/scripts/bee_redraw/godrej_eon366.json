@@ -1,0 +1,8 @@
+{
+  "_about": "Godrej RT EONVIBE 366BN RCIT (all three colours): the label drawn before from BEE's register entry for this model (2 star, 239 units a year, 330 L, valid to 31 Dec 2028) in the 2026-28 frost-free layout, as cut out (bee_cut_bee_label.png).",
+  "template": "wp2026",
+  "src": "pipeline/sources/photos/godrej_eon366/bee_cut_bee_label.png",
+  "out": "pipeline/tex/godrej_eon366/bee_label.png",
+  "width_mm": 90,
+  "words": { "series": "2026 - 28", "value": "239", "type": "Frost Free", "brand": "Godrej", "volume": "330", "model": "RT EONVIBE 366BN RCIT", "country": "India" }
+}
