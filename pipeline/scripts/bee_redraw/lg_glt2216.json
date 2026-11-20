@@ -1,0 +1,8 @@
+{
+  "_about": "LG GLT2216WY* (all five colours carry the same label): LG's 2026-28 label image for this model (LG's gallery, 2010x1334-2-v.jpg), as cut out before (bee_cut_label.png).",
+  "template": "lg2026",
+  "src": "pipeline/sources/photos/lg_glt2216/bee_cut_label.png",
+  "out": "pipeline/tex/lg_glt2216/label.png",
+  "width_mm": 71.4,
+  "words": { "series": "2026 - 28", "value": "264", "type": "Frost Free", "volume": "225", "model": "GLT221", "country": "INDIA" }
+}
