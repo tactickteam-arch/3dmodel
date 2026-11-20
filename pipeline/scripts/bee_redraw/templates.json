@@ -1,0 +1,4391 @@
+{
+ "_about": "Layouts shared by many labels, for tex_bee_redraw.py: windows (x0, y0, x1, y1) and points are fractions of the label's width and height in its source picture; {name} slots are filled by each label's own words.",
+ "lg2026": {
+  "_about": "LG's BEE refrigerator label, 2026-28 (and 2023-26) series: arch of five stars, black series band, green energy box, the model lines, green footer with the BEE logo.",
+  "palette": {
+   "red": [
+    [
+     0.08,
+     0.235
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.165
+    ],
+    [
+     0.3,
+     0.245
+    ]
+   ],
+   "black": [
+    [
+     0.03,
+     0.35
+    ],
+    [
+     0.97,
+     0.35
+    ]
+   ],
+   "cream": [
+    [
+     0.04,
+     0.6
+    ],
+    [
+     0.96,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.5,
+     0.537
+    ],
+    [
+     0.25,
+     0.925
+    ],
+    [
+     0.75,
+     0.99
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.163,
+     0.188,
+     0.08
+    ],
+    [
+     0.31,
+     0.105,
+     0.08
+    ],
+    [
+     0.52,
+     0.075,
+     0.08
+    ],
+    [
+     0.745,
+     0.11,
+     0.08
+    ],
+    [
+     0.865,
+     0.195,
+     0.08
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "not_star": [
+    "yellow",
+    "black"
+   ]
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.104,
+     0.955,
+     0.058
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.26,
+     0.183,
+     0.74,
+     0.213
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.26,
+     0.214,
+     0.74,
+     0.245
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.05,
+     0.285,
+     0.95,
+     0.378
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.378,
+     0.8,
+     0.428
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ANNUAL ENERGY CONSUMPTION",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.486,
+     0.95,
+     0.528
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}",
+    "font": "black",
+    "win": [
+     0.15,
+     0.553,
+     0.565,
+     0.636
+    ]
+   },
+   {
+    "key": "ast",
+    "t": "*",
+    "font": "bold",
+    "win": [
+     0.545,
+     0.544,
+     0.61,
+     0.594
+    ],
+    "inside": true
+   },
+   {
+    "key": "unit",
+    "t": "units/yr",
+    "font": "bold",
+    "win": [
+     0.585,
+     0.594,
+     0.86,
+     0.636
+    ]
+   },
+   {
+    "key": "kind",
+    "t": "Refrigerator",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.674,
+     0.36,
+     0.713
+    ]
+   },
+   {
+    "key": "type",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.52,
+     0.674,
+     0.9,
+     0.713
+    ]
+   },
+   {
+    "key": "brand",
+    "t": "LG",
+    "font": "reg",
+    "win": [
+     0.06,
+     0.726,
+     0.25,
+     0.761
+    ]
+   },
+   {
+    "key": "volume",
+    "t": "Total Volume : {volume} (Ltr)",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.774,
+     0.7,
+     0.811
+    ]
+   },
+   {
+    "key": "model",
+    "t": "Model No.: {model}",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.822,
+     0.7,
+     0.861
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "bold",
+    "win": [
+     0.35,
+     0.872,
+     0.65,
+     0.906
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with relevant standards. Actual energy consumption",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.925,
+     0.95,
+     0.989
+    ],
+    "clip": true,
+    "line": 0,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot2",
+    "t": "will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.25,
+     0.925,
+     0.9,
+     0.989
+    ],
+    "clip": true,
+    "line": 1,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot3",
+    "t": "1unit = 1kWh",
+    "font": "bold",
+    "win": [
+     0.4,
+     0.925,
+     0.62,
+     0.989
+    ],
+    "clip": true,
+    "line": 2,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot4",
+    "t": "Issued by Bureau of Energy Efficiency  www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0.925,
+     0.9,
+     0.989
+    ],
+    "clip": true,
+    "line": 3,
+    "of": 4,
+    "band": "footer"
+   }
+  ]
+ },
+ "samsung2026": {
+  "_about": "Samsung's BEE refrigerator label (2023-26 and 2026-28 series): a white die-cut margin round a black outline, the arch of five stars, black series band, green energy box, the model lines, green footer with the BEE logo.",
+  "palette": {
+   "red": [
+    [
+     0.075,
+     0.26
+    ]
+   ],
+   "white": [
+    [
+     0.012,
+     0.6
+    ],
+    [
+     0.988,
+     0.6
+    ]
+   ],
+   "yellow": [
+    [
+     0.5,
+     0.175
+    ],
+    [
+     0.3,
+     0.255
+    ]
+   ],
+   "black": [
+    [
+     0.06,
+     0.35
+    ],
+    [
+     0.94,
+     0.35
+    ]
+   ],
+   "cream": [
+    [
+     0.1,
+     0.66
+    ],
+    [
+     0.9,
+     0.78
+    ]
+   ],
+   "green": [
+    [
+     0.5,
+     0.536
+    ],
+    [
+     0.3,
+     0.918
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.164,
+     0.203,
+     0.075
+    ],
+    [
+     0.293,
+     0.113,
+     0.075
+    ],
+    [
+     0.498,
+     0.075,
+     0.075
+    ],
+    [
+     0.709,
+     0.111,
+     0.075
+    ],
+    [
+     0.832,
+     0.197,
+     0.075
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 3.2
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.123,
+     0.944,
+     0.052
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.26,
+     0.196,
+     0.74,
+     0.226
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.24,
+     0.226,
+     0.76,
+     0.256
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.06,
+     0.283,
+     0.94,
+     0.362
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.374,
+     0.8,
+     0.427
+    ]
+   },
+   {
+    "key": "head",
+    "t": "{head}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.489,
+     0.93,
+     0.529
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}",
+    "font": "black",
+    "win": [
+     0.12,
+     0.552,
+     0.535,
+     0.632
+    ]
+   },
+   {
+    "key": "ast",
+    "t": "*",
+    "font": "bold",
+    "win": [
+     0.514,
+     0.54,
+     0.575,
+     0.589
+    ],
+    "inside": true
+   },
+   {
+    "key": "unit",
+    "t": "{unit}",
+    "font": "bold",
+    "win": [
+     0.555,
+     0.593,
+     0.9,
+     0.633
+    ]
+   },
+   {
+    "key": "kind",
+    "t": "{kind}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.671,
+     0.4,
+     0.711
+    ]
+   },
+   {
+    "key": "type",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.5,
+     0.671,
+     0.93,
+     0.711
+    ]
+   },
+   {
+    "key": "brand",
+    "t": "{brand}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.721,
+     0.45,
+     0.759
+    ]
+   },
+   {
+    "key": "volume",
+    "t": "{volume_line}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.769,
+     0.8,
+     0.808
+    ]
+   },
+   {
+    "key": "model",
+    "t": "Model No.: {model}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.816,
+     0.9,
+     0.856
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.865,
+     0.7,
+     0.901
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with relevant standards. Actual energy consumption",
+    "font": "bold",
+    "win": [
+     0.18,
+     0.918,
+     0.94,
+     0.982
+    ],
+    "clip": true,
+    "line": 0,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot2",
+    "t": "will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.25,
+     0.918,
+     0.9,
+     0.982
+    ],
+    "clip": true,
+    "line": 1,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot3",
+    "t": "1unit = 1kWh",
+    "font": "bold",
+    "win": [
+     0.4,
+     0.918,
+     0.62,
+     0.982
+    ],
+    "clip": true,
+    "line": 2,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot4",
+    "t": "Issued by Bureau of Energy Efficiency  www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0.918,
+     0.9,
+     0.982
+    ],
+    "clip": true,
+    "line": 3,
+    "of": 4,
+    "band": "footer"
+   }
+  ]
+ },
+ "samsung2026b": {
+  "_about": "Samsung's BEE refrigerator label as on the RT40 / RR24 pictures (2026-28 series): the same parts as samsung2026, laid out a little differently, the model code set apart from 'Model No.:' in a lighter face.",
+  "palette": {
+   "red": [
+    [
+     0.08,
+     0.25
+    ]
+   ],
+   "white": [
+    [
+     0.02,
+     0.6
+    ],
+    [
+     0.98,
+     0.6
+    ]
+   ],
+   "yellow": [
+    [
+     0.5,
+     0.185
+    ],
+    [
+     0.32,
+     0.262
+    ]
+   ],
+   "black": [
+    [
+     0.06,
+     0.35
+    ],
+    [
+     0.94,
+     0.35
+    ]
+   ],
+   "cream": [
+    [
+     0.07,
+     0.66
+    ],
+    [
+     0.93,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.15,
+     0.53
+    ],
+    [
+     0.3,
+     0.908
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.174,
+     0.204,
+     0.075
+    ],
+    [
+     0.306,
+     0.123,
+     0.075
+    ],
+    [
+     0.501,
+     0.085,
+     0.075
+    ],
+    [
+     0.703,
+     0.123,
+     0.075
+    ],
+    [
+     0.822,
+     0.202,
+     0.075
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 3.2
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.132,
+     0.936,
+     0.055
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.26,
+     0.203,
+     0.74,
+     0.232
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.24,
+     0.232,
+     0.76,
+     0.262
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.08,
+     0.297,
+     0.92,
+     0.377
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.379,
+     0.8,
+     0.43
+    ]
+   },
+   {
+    "key": "head",
+    "t": "{head}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.49,
+     0.93,
+     0.527
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}",
+    "font": "black",
+    "win": [
+     0.15,
+     0.553,
+     0.548,
+     0.625
+    ]
+   },
+   {
+    "key": "ast",
+    "t": "*",
+    "font": "bold",
+    "win": [
+     0.545,
+     0.548,
+     0.585,
+     0.585
+    ],
+    "inside": true
+   },
+   {
+    "key": "unit",
+    "t": "{unit}",
+    "font": "bold",
+    "win": [
+     0.575,
+     0.585,
+     0.9,
+     0.626
+    ]
+   },
+   {
+    "key": "kind",
+    "t": "{kind}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.668,
+     0.4,
+     0.702
+    ]
+   },
+   {
+    "key": "type",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.5,
+     0.668,
+     0.93,
+     0.702
+    ]
+   },
+   {
+    "key": "brand",
+    "t": "{brand}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.713,
+     0.45,
+     0.748
+    ]
+   },
+   {
+    "key": "volume",
+    "t": "{volume_line}",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.761,
+     0.8,
+     0.797
+    ]
+   },
+   {
+    "key": "model",
+    "t": "Model No.:",
+    "font": "bold",
+    "win": [
+     0.07,
+     0.808,
+     0.285,
+     0.843
+    ]
+   },
+   {
+    "key": "model_code",
+    "t": "{model}",
+    "font": "reg",
+    "win": [
+     0.285,
+     0.808,
+     0.85,
+     0.843
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.856,
+     0.7,
+     0.889
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with relevant standards. Actual energy consumption",
+    "font": "bold",
+    "win": [
+     0.18,
+     0.907,
+     0.93,
+     0.969
+    ],
+    "clip": true,
+    "line": 0,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot2",
+    "t": "will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.25,
+     0.907,
+     0.85,
+     0.969
+    ],
+    "clip": true,
+    "line": 1,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot3",
+    "t": "1unit = 1kWh",
+    "font": "bold",
+    "win": [
+     0.4,
+     0.907,
+     0.62,
+     0.969
+    ],
+    "clip": true,
+    "line": 2,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot4",
+    "t": "Issued by Bureau of Energy Efficiency  www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0.907,
+     0.85,
+     0.969
+    ],
+    "clip": true,
+    "line": 3,
+    "of": 4,
+    "band": "footer"
+   }
+  ]
+ },
+ "lg2026b": {
+  "_about": "LG's BEE refrigerator label as on the GLT252 / GLT342 / GLT292 / GV-B23 pictures: the asterisk set close after the figure, the type at the right edge, 'India' in title case.",
+  "palette": {
+   "red": [
+    [
+     0.03,
+     0.24
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.16
+    ],
+    [
+     0.32,
+     0.245
+    ]
+   ],
+   "black": [
+    [
+     0.02,
+     0.32
+    ],
+    [
+     0.98,
+     0.32
+    ]
+   ],
+   "cream": [
+    [
+     0.06,
+     0.66
+    ],
+    [
+     0.94,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.5,
+     0.525
+    ],
+    [
+     0.2,
+     0.99
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.131,
+     0.184,
+     0.08
+    ],
+    [
+     0.284,
+     0.093,
+     0.08
+    ],
+    [
+     0.502,
+     0.054,
+     0.08
+    ],
+    [
+     0.723,
+     0.099,
+     0.08
+    ],
+    [
+     0.866,
+     0.182,
+     0.08
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 1.5
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.073,
+     0.959,
+     0.064
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.26,
+     0.174,
+     0.74,
+     0.207
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.24,
+     0.207,
+     0.76,
+     0.24
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.03,
+     0.275,
+     0.97,
+     0.362
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.18,
+     0.367,
+     0.82,
+     0.42
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ANNUAL ENERGY CONSUMPTION",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.48,
+     0.94,
+     0.52
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}*",
+    "font": "black",
+    "win": [
+     0.15,
+     0.555,
+     0.552,
+     0.62
+    ]
+   },
+   {
+    "key": "unit",
+    "t": "units/yr",
+    "font": "bold",
+    "win": [
+     0.552,
+     0.59,
+     0.85,
+     0.624
+    ]
+   },
+   {
+    "key": "kind",
+    "t": "Refrigerator",
+    "font": "bold",
+    "win": [
+     0.03,
+     0.672,
+     0.4,
+     0.706
+    ]
+   },
+   {
+    "key": "type",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.55,
+     0.672,
+     0.97,
+     0.706
+    ]
+   },
+   {
+    "key": "brand",
+    "t": "LG",
+    "font": "bold",
+    "win": [
+     0.03,
+     0.722,
+     0.2,
+     0.752
+    ]
+   },
+   {
+    "key": "volume",
+    "t": "Total Volume : {volume}(Ltr)",
+    "font": "bold",
+    "win": [
+     0.03,
+     0.77,
+     0.7,
+     0.806
+    ]
+   },
+   {
+    "key": "model",
+    "t": "Model No.: {model}",
+    "font": "bold",
+    "win": [
+     0.03,
+     0.83,
+     0.7,
+     0.866
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.876,
+     0.7,
+     0.91
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with relevant standards. Actual energy consumption",
+    "font": "bold",
+    "win": [
+     0.14,
+     0,
+     0.985,
+     0
+    ],
+    "band": "footer",
+    "line": 0,
+    "of": 4,
+    "clip": true
+   },
+   {
+    "key": "foot2",
+    "t": "will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.25,
+     0,
+     0.85,
+     0
+    ],
+    "band": "footer",
+    "line": 1,
+    "of": 4,
+    "clip": true
+   },
+   {
+    "key": "foot3",
+    "t": "1unit = 1kWh",
+    "font": "bold",
+    "win": [
+     0.4,
+     0,
+     0.65,
+     0
+    ],
+    "band": "footer",
+    "line": 2,
+    "of": 4,
+    "clip": true
+   },
+   {
+    "key": "foot4",
+    "t": "Issued by Bureau of Energy Efficiency  www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0,
+     0.85,
+     0
+    ],
+    "band": "footer",
+    "line": 3,
+    "of": 4,
+    "clip": true
+   }
+  ]
+ },
+ "wp2026": {
+  "_about": "The BEE 2026-28 refrigerator label as Whirlpool prints it (Godrej's register-backed label is drawn the same way): arch of five stars, black series band, green energy box with the asterisk apart, the model lines in a condensed bold, green footer with the BEE logo.",
+  "palette": {
+   "red": [
+    [
+     0.06,
+     0.24
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.255
+    ],
+    [
+     0.3,
+     0.25
+    ]
+   ],
+   "black": [
+    [
+     0.03,
+     0.35
+    ],
+    [
+     0.97,
+     0.35
+    ]
+   ],
+   "cream": [
+    [
+     0.5,
+     0.66
+    ],
+    [
+     0.9,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.5,
+     0.475
+    ],
+    [
+     0.5,
+     0.537
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.153,
+     0.197,
+     0.08
+    ],
+    [
+     0.294,
+     0.115,
+     0.08
+    ],
+    [
+     0.502,
+     0.069,
+     0.08
+    ],
+    [
+     0.711,
+     0.108,
+     0.08
+    ],
+    [
+     0.846,
+     0.19,
+     0.08
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 1.5
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.11,
+     0.957,
+     0.066
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.28,
+     0.19,
+     0.72,
+     0.218
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.28,
+     0.218,
+     0.72,
+     0.246
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.06,
+     0.29,
+     0.94,
+     0.362
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.378,
+     0.8,
+     0.422
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ANNUAL ENERGY CONSUMPTION",
+    "font": "black",
+    "win": [
+     0.05,
+     0.49,
+     0.95,
+     0.526
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}",
+    "font": "black",
+    "win": [
+     0.15,
+     0.558,
+     0.52,
+     0.635
+    ]
+   },
+   {
+    "key": "ast",
+    "t": "*",
+    "font": "black",
+    "win": [
+     0.52,
+     0.556,
+     0.62,
+     0.598
+    ]
+   },
+   {
+    "key": "unit",
+    "t": "units/yr",
+    "font": "black",
+    "win": [
+     0.6,
+     0.603,
+     0.87,
+     0.645
+    ]
+   },
+   {
+    "key": "kind",
+    "t": "Refrigerator",
+    "font": "narrowbold",
+    "win": [
+     0.04,
+     0.677,
+     0.4,
+     0.71
+    ]
+   },
+   {
+    "key": "type",
+    "t": "{type}",
+    "font": "narrowbold",
+    "win": [
+     0.6,
+     0.677,
+     0.95,
+     0.71
+    ]
+   },
+   {
+    "key": "brand",
+    "t": "{brand}",
+    "font": "narrowbold",
+    "win": [
+     0.04,
+     0.726,
+     0.4,
+     0.759
+    ]
+   },
+   {
+    "key": "volume",
+    "t": "Total Volume : {volume} (Ltr)",
+    "font": "narrowbold",
+    "win": [
+     0.04,
+     0.772,
+     0.7,
+     0.808
+    ]
+   },
+   {
+    "key": "model",
+    "t": "Model No. : {model}",
+    "font": "narrowbold",
+    "win": [
+     0.04,
+     0.821,
+     0.85,
+     0.857
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "narrowbold",
+    "win": [
+     0.35,
+     0.874,
+     0.65,
+     0.907
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with relevant standards. Actual energy consumption",
+    "font": "bold",
+    "win": [
+     0.17,
+     0,
+     0.985,
+     0
+    ],
+    "clip": true,
+    "line": 0,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot2",
+    "t": "will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.25,
+     0,
+     0.9,
+     0
+    ],
+    "clip": true,
+    "line": 1,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot3",
+    "t": "1unit = 1kWh",
+    "font": "bold",
+    "win": [
+     0.4,
+     0,
+     0.62,
+     0
+    ],
+    "clip": true,
+    "line": 2,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot4",
+    "t": "Issued by Bureau of Energy Efficiency  www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0,
+     0.9,
+     0
+    ],
+    "clip": true,
+    "line": 3,
+    "of": 4,
+    "band": "footer"
+   }
+  ]
+ },
+ "wp2026r": {
+  "_about": "The BEE 2026-28 refrigerator label as Whirlpool's DAS207 picture shows it: a white die-cut margin round a black outline, the same parts as wp2026, the footer's fine print set in four lines broken after 'standards.'",
+  "palette": {
+   "red": [
+    [
+     0.17,
+     0.258
+    ],
+    [
+     0.38,
+     0.05
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.258
+    ],
+    [
+     0.3,
+     0.255
+    ]
+   ],
+   "black": [
+    [
+     0.06,
+     0.35
+    ],
+    [
+     0.94,
+     0.35
+    ]
+   ],
+   "cream": [
+    [
+     0.5,
+     0.66
+    ],
+    [
+     0.9,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.5,
+     0.475
+    ],
+    [
+     0.5,
+     0.537
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.168,
+     0.202,
+     0.075
+    ],
+    [
+     0.3,
+     0.119,
+     0.075
+    ],
+    [
+     0.499,
+     0.09,
+     0.075
+    ],
+    [
+     0.709,
+     0.119,
+     0.075
+    ],
+    [
+     0.835,
+     0.202,
+     0.075
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 3.2
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.132,
+     0.942,
+     0.06
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.196,
+     0.7,
+     0.224
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.226,
+     0.7,
+     0.254
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.08,
+     0.292,
+     0.92,
+     0.376
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.38,
+     0.8,
+     0.423
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ANNUAL ENERGY CONSUMPTION",
+    "font": "black",
+    "win": [
+     0.06,
+     0.49,
+     0.94,
+     0.526
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}",
+    "font": "black",
+    "win": [
+     0.17,
+     0.56,
+     0.53,
+     0.632
+    ]
+   },
+   {
+    "key": "ast",
+    "t": "*",
+    "font": "black",
+    "win": [
+     0.53,
+     0.558,
+     0.6,
+     0.6
+    ]
+   },
+   {
+    "key": "unit",
+    "t": "units/yr",
+    "font": "black",
+    "win": [
+     0.59,
+     0.603,
+     0.86,
+     0.638
+    ]
+   },
+   {
+    "key": "kind",
+    "t": "Refrigerator",
+    "font": "narrowbold",
+    "win": [
+     0.06,
+     0.672,
+     0.4,
+     0.705
+    ]
+   },
+   {
+    "key": "type",
+    "t": "{type}",
+    "font": "narrowbold",
+    "win": [
+     0.6,
+     0.672,
+     0.92,
+     0.705
+    ]
+   },
+   {
+    "key": "brand",
+    "t": "{brand}",
+    "font": "narrowbold",
+    "win": [
+     0.06,
+     0.72,
+     0.4,
+     0.755
+    ]
+   },
+   {
+    "key": "volume",
+    "t": "Total Volume : {volume} (Ltr)",
+    "font": "narrowbold",
+    "win": [
+     0.06,
+     0.768,
+     0.7,
+     0.805
+    ]
+   },
+   {
+    "key": "model",
+    "t": "Model No. : {model}",
+    "font": "narrowbold",
+    "win": [
+     0.06,
+     0.815,
+     0.85,
+     0.851
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "narrowbold",
+    "win": [
+     0.38,
+     0.864,
+     0.62,
+     0.898
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with relevant standards.",
+    "font": "bold",
+    "win": [
+     0.197,
+     0,
+     0.957,
+     0
+    ],
+    "clip": true,
+    "line": 0,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot2",
+    "t": "Actual energy consumption will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.197,
+     0,
+     0.957,
+     0
+    ],
+    "clip": true,
+    "line": 1,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot3",
+    "t": "1unit = 1kWh",
+    "font": "bold",
+    "win": [
+     0.4,
+     0,
+     0.7,
+     0
+    ],
+    "clip": true,
+    "line": 2,
+    "of": 4,
+    "band": "footer"
+   },
+   {
+    "key": "foot4",
+    "t": "Issued by Bureau of Energy Efficiency www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0,
+     0.92,
+     0
+    ],
+    "clip": true,
+    "line": 3,
+    "of": 4,
+    "band": "footer"
+   }
+  ]
+ },
+ "sw2024": {
+  "_about": "Samsung's BEE washing-machine label, 2024-26 series: arch of five stars inside a black outline, black series band, green ENERGY CONSUMPTION box (kWh/kg/cycle), the model lines, green footer with the BEE logo and three lines of fine print.",
+  "palette": {
+   "red": [
+    [
+     0.08,
+     0.25
+    ],
+    [
+     0.36,
+     0.05
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.17
+    ],
+    [
+     0.3,
+     0.25
+    ]
+   ],
+   "black": [
+    [
+     0.03,
+     0.35
+    ],
+    [
+     0.97,
+     0.35
+    ]
+   ],
+   "cream": [
+    [
+     0.5,
+     0.66
+    ],
+    [
+     0.9,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.5,
+     0.47
+    ],
+    [
+     0.5,
+     0.53
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.149,
+     0.192,
+     0.075
+    ],
+    [
+     0.293,
+     0.109,
+     0.075
+    ],
+    [
+     0.502,
+     0.077,
+     0.075
+    ],
+    [
+     0.723,
+     0.109,
+     0.075
+    ],
+    [
+     0.854,
+     0.192,
+     0.075
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 1.5
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.125,
+     0.958,
+     0.062
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.188,
+     0.7,
+     0.218
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.28,
+     0.218,
+     0.72,
+     0.248
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.06,
+     0.288,
+     0.94,
+     0.366
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.377,
+     0.8,
+     0.418
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ENERGY CONSUMPTION",
+    "font": "black",
+    "win": [
+     0.06,
+     0.48,
+     0.94,
+     0.52
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}",
+    "font": "black",
+    "win": [
+     0.06,
+     0.558,
+     0.535,
+     0.628
+    ]
+   },
+   {
+    "key": "ast",
+    "t": "*",
+    "font": "bold",
+    "win": [
+     0.53,
+     0.55,
+     0.57,
+     0.575
+    ]
+   },
+   {
+    "key": "unit",
+    "t": "kWh/kg/cycle",
+    "font": "black",
+    "win": [
+     0.55,
+     0.6,
+     0.94,
+     0.628
+    ]
+   },
+   {
+    "key": "kind",
+    "t": "Washing Machine",
+    "font": "bold",
+    "win": [
+     0.05,
+     0.679,
+     0.45,
+     0.709
+    ]
+   },
+   {
+    "key": "type",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.55,
+     0.679,
+     0.9,
+     0.709
+    ]
+   },
+   {
+    "key": "brand",
+    "t": "Samsung",
+    "font": "bold",
+    "win": [
+     0.05,
+     0.727,
+     0.4,
+     0.76
+    ]
+   },
+   {
+    "key": "cap",
+    "t": "Load Capacity : {cap} (kg)",
+    "font": "bold",
+    "win": [
+     0.05,
+     0.775,
+     0.7,
+     0.808
+    ]
+   },
+   {
+    "key": "model",
+    "t": "Model No.: {model}",
+    "font": "bold",
+    "win": [
+     0.05,
+     0.826,
+     0.85,
+     0.857
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "bold",
+    "win": [
+     0.35,
+     0.877,
+     0.65,
+     0.908
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "* Under test conditions, when tested in accordance with relevant standards.",
+    "font": "bold",
+    "win": [
+     0.19,
+     0,
+     0.96,
+     0
+    ],
+    "clip": true,
+    "line": 0,
+    "of": 3,
+    "band": "footer"
+   },
+   {
+    "key": "foot2",
+    "t": "Actual energy consumption will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.19,
+     0,
+     0.96,
+     0
+    ],
+    "clip": true,
+    "line": 1,
+    "of": 3,
+    "band": "footer"
+   },
+   {
+    "key": "foot3",
+    "t": "Issued by Bureau of Energy Efficiency  www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0,
+     0.9,
+     0
+    ],
+    "clip": true,
+    "line": 2,
+    "of": 3,
+    "band": "footer"
+   }
+  ]
+ },
+ "ac2026": {
+  "_about": "The BEE room air conditioner label (2026-27 series) as Lloyd prints it: a white die-cut margin round a black outline, the arch of five stars, black series band, green ENERGY EFFICIENCY box with the ISEER, the rating rows in two columns, green footer with the BEE logo and three lines of fine print.",
+  "palette": {
+   "red": [
+    [
+     0.17,
+     0.262
+    ],
+    [
+     0.38,
+     0.06
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.175
+    ],
+    [
+     0.3,
+     0.262
+    ]
+   ],
+   "black": [
+    [
+     0.06,
+     0.35
+    ],
+    [
+     0.94,
+     0.35
+    ]
+   ],
+   "cream": [
+    [
+     0.5,
+     0.66
+    ],
+    [
+     0.3,
+     0.87
+    ]
+   ],
+   "green": [
+    [
+     0.5,
+     0.47
+    ],
+    [
+     0.5,
+     0.537
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.158,
+     0.206,
+     0.075
+    ],
+    [
+     0.297,
+     0.121,
+     0.075
+    ],
+    [
+     0.497,
+     0.084,
+     0.075
+    ],
+    [
+     0.703,
+     0.121,
+     0.075
+    ],
+    [
+     0.836,
+     0.206,
+     0.075
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 3.2
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.121,
+     0.948,
+     0.058
+    ]
+   }
+  ],
+  "rim": {
+   "px": 4,
+   "to": "white"
+  },
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.198,
+     0.7,
+     0.228
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.228,
+     0.7,
+     0.257
+    ]
+   },
+   {
+    "key": "series",
+    "t": "{series}",
+    "font": "black",
+    "win": [
+     0.08,
+     0.3,
+     0.92,
+     0.38
+    ]
+   },
+   {
+    "key": "labelseries",
+    "t": "Label Series",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.388,
+     0.8,
+     0.43
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ENERGY EFFICIENCY",
+    "font": "black",
+    "win": [
+     0.06,
+     0.482,
+     0.94,
+     0.527
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}",
+    "font": "bold",
+    "win": [
+     0.2,
+     0.57,
+     0.8,
+     0.62
+    ]
+   },
+   {
+    "key": "r1a",
+    "t": "Room Air Conditioner",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.68,
+     0.52,
+     0.712
+    ]
+   },
+   {
+    "key": "r1b",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.54,
+     0.68,
+     0.94,
+     0.712
+    ]
+   },
+   {
+    "key": "r2a",
+    "t": "{brand}",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.716,
+     0.52,
+     0.748
+    ]
+   },
+   {
+    "key": "r2b",
+    "t": "{tonnage}",
+    "font": "bold",
+    "win": [
+     0.54,
+     0.716,
+     0.94,
+     0.748
+    ]
+   },
+   {
+    "key": "r3",
+    "t": "{cooling}",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.754,
+     0.85,
+     0.79
+    ]
+   },
+   {
+    "key": "r4",
+    "t": "Model No.: {model}",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.795,
+     0.85,
+     0.826
+    ]
+   },
+   {
+    "key": "r5a",
+    "t": "{speed}",
+    "font": "bold",
+    "win": [
+     0.06,
+     0.832,
+     0.52,
+     0.865
+    ]
+   },
+   {
+    "key": "r5b",
+    "t": "{heatpump}",
+    "font": "bold",
+    "win": [
+     0.54,
+     0.832,
+     0.94,
+     0.865
+    ]
+   },
+   {
+    "key": "country",
+    "t": "{country}",
+    "font": "bold",
+    "win": [
+     0.35,
+     0.872,
+     0.65,
+     0.902
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with relevant standards.",
+    "font": "bold",
+    "win": [
+     0.19,
+     0,
+     0.955,
+     0
+    ],
+    "clip": true,
+    "line": 0,
+    "of": 3,
+    "band": "footer"
+   },
+   {
+    "key": "foot2",
+    "t": "Actual energy consumption will depend on how the appliance being used.",
+    "font": "bold",
+    "win": [
+     0.19,
+     0,
+     0.955,
+     0
+    ],
+    "clip": true,
+    "line": 1,
+    "of": 3,
+    "band": "footer"
+   },
+   {
+    "key": "foot3",
+    "t": "Issued by Bureau of Energy Efficiency  www.beeindia.gov.in",
+    "font": "bold",
+    "win": [
+     0.25,
+     0,
+     0.9,
+     0
+    ],
+    "clip": true,
+    "line": 2,
+    "of": 3,
+    "band": "footer"
+   }
+  ]
+ },
+ "wpsg": {
+  "_about": "The BEE 'Power Savings Guide' washing-machine label (label period 2024-26) as Whirlpool prints it: arch of five stars, black band with a chevron below, the emblem in a ring, the ENERGY CONSUMPTION box with its green figure bar and label period, the rating table, the BEE logo with its registration code, two lines of fine print.",
+  "palette": {
+   "red": [
+    [
+     0.35,
+     0.07
+    ],
+    [
+     0.65,
+     0.07
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.175
+    ],
+    [
+     0.32,
+     0.255
+    ]
+   ],
+   "black": [
+    [
+     0.05,
+     0.29
+    ],
+    [
+     0.95,
+     0.29
+    ]
+   ],
+   "cream": [
+    [
+     0.1,
+     0.6
+    ],
+    [
+     0.9,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.25,
+     0.58
+    ],
+    [
+     0.7,
+     0.58
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.157,
+     0.212,
+     0.078
+    ],
+    [
+     0.29,
+     0.118,
+     0.078
+    ],
+    [
+     0.495,
+     0.085,
+     0.078
+    ],
+    [
+     0.707,
+     0.118,
+     0.078
+    ],
+    [
+     0.833,
+     0.209,
+     0.078
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 2.5
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.499,
+     0.451,
+     0.131
+    ]
+   },
+   {
+    "circle": [
+     0.499,
+     0.881,
+     0.084
+    ]
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "black",
+    "win": [
+     0.3,
+     0.205,
+     0.7,
+     0.228
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "black",
+    "win": [
+     0.3,
+     0.228,
+     0.7,
+     0.252
+    ]
+   },
+   {
+    "key": "psg1",
+    "t": "POWER SAVINGS",
+    "font": "black",
+    "win": [
+     0.06,
+     0.286,
+     0.94,
+     0.332
+    ]
+   },
+   {
+    "key": "psg2",
+    "t": "GUIDE",
+    "font": "black",
+    "win": [
+     0.3,
+     0.338,
+     0.7,
+     0.38
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ENERGY CONSUMPTION",
+    "font": "black",
+    "win": [
+     0.2,
+     0.538,
+     0.8,
+     0.561
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}*",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.564,
+     0.7,
+     0.597
+    ]
+   },
+   {
+    "key": "unit",
+    "t": "KWh/kg/cycle",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.6,
+     0.7,
+     0.618
+    ]
+   },
+   {
+    "key": "lp1",
+    "t": "Label Period : 1",
+    "font": "narrowbold",
+    "win": [
+     0.17,
+     0.6225,
+     0.361,
+     0.6425
+    ]
+   },
+   {
+    "key": "lp2",
+    "t": "st",
+    "font": "narrowbold",
+    "win": [
+     0.359,
+     0.6235,
+     0.376,
+     0.634
+    ]
+   },
+   {
+    "key": "lp3",
+    "t": "January {y0} - 31",
+    "font": "narrowbold",
+    "win": [
+     0.378,
+     0.6225,
+     0.594,
+     0.6425
+    ]
+   },
+   {
+    "key": "lp4",
+    "t": "st",
+    "font": "narrowbold",
+    "win": [
+     0.589,
+     0.6235,
+     0.605,
+     0.634
+    ]
+   },
+   {
+    "key": "lp5",
+    "t": "December {y1}",
+    "font": "narrowbold",
+    "win": [
+     0.607,
+     0.6225,
+     0.8,
+     0.6425
+    ]
+   },
+   {
+    "key": "t0a",
+    "t": "Appliance",
+    "font": "bold",
+    "win": [
+     0.16,
+     0.6735,
+     0.48,
+     0.6925
+    ]
+   },
+   {
+    "key": "t0c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.487,
+     0.6735,
+     0.509,
+     0.6925
+    ]
+   },
+   {
+    "key": "t0b",
+    "t": "Washing Machine",
+    "font": "bold",
+    "win": [
+     0.51,
+     0.6735,
+     0.84,
+     0.6925
+    ]
+   },
+   {
+    "key": "t1a",
+    "t": "Brand",
+    "font": "bold",
+    "win": [
+     0.16,
+     0.698,
+     0.48,
+     0.7175
+    ]
+   },
+   {
+    "key": "t1c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.487,
+     0.698,
+     0.509,
+     0.7175
+    ]
+   },
+   {
+    "key": "t1b",
+    "t": "{brand}",
+    "font": "bold",
+    "win": [
+     0.51,
+     0.698,
+     0.84,
+     0.7175
+    ]
+   },
+   {
+    "key": "t2a",
+    "t": "Model / Year",
+    "font": "bold",
+    "win": [
+     0.16,
+     0.7215,
+     0.48,
+     0.742
+    ]
+   },
+   {
+    "key": "t2c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.487,
+     0.7215,
+     0.509,
+     0.742
+    ]
+   },
+   {
+    "key": "t2b",
+    "t": "{model}",
+    "font": "bold",
+    "win": [
+     0.51,
+     0.7215,
+     0.84,
+     0.742
+    ]
+   },
+   {
+    "key": "t3a",
+    "t": "Type",
+    "font": "bold",
+    "win": [
+     0.16,
+     0.747,
+     0.48,
+     0.767
+    ]
+   },
+   {
+    "key": "t3c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.487,
+     0.747,
+     0.509,
+     0.767
+    ]
+   },
+   {
+    "key": "t3b",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.51,
+     0.747,
+     0.84,
+     0.767
+    ]
+   },
+   {
+    "key": "t4a",
+    "t": "Load Capacity",
+    "font": "bold",
+    "win": [
+     0.16,
+     0.772,
+     0.48,
+     0.792
+    ]
+   },
+   {
+    "key": "t4c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.487,
+     0.772,
+     0.509,
+     0.792
+    ]
+   },
+   {
+    "key": "t4b",
+    "t": "{cap}",
+    "font": "bold",
+    "win": [
+     0.51,
+     0.772,
+     0.84,
+     0.792
+    ]
+   },
+   {
+    "key": "t5a",
+    "t": "Water Consumption",
+    "font": "bold",
+    "win": [
+     0.16,
+     0.7965,
+     0.48,
+     0.817
+    ]
+   },
+   {
+    "key": "t5c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.487,
+     0.7965,
+     0.509,
+     0.817
+    ]
+   },
+   {
+    "key": "t5b",
+    "t": "{water}",
+    "font": "bold",
+    "win": [
+     0.51,
+     0.7965,
+     0.84,
+     0.817
+    ]
+   },
+   {
+    "key": "reg",
+    "t": "{reg}",
+    "font": "bold",
+    "win": [
+     0.38,
+     0.941,
+     0.62,
+     0.9545
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with latest IEC 60456 standards.",
+    "font": "narrowbold",
+    "win": [
+     0.14,
+     0.959,
+     0.86,
+     0.9735
+    ]
+   },
+   {
+    "key": "foot2",
+    "t": "Actual energy consumption will depend on how the appliance is being used.",
+    "font": "narrowbold",
+    "win": [
+     0.14,
+     0.9738,
+     0.86,
+     0.988
+    ]
+   }
+  ],
+  "lines": [
+   {
+    "a": [
+     0.16,
+     0.6694
+    ],
+    "b": [
+     0.84,
+     0.6694
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.16,
+     0.6944
+    ],
+    "b": [
+     0.84,
+     0.6944
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.16,
+     0.7194
+    ],
+    "b": [
+     0.84,
+     0.7194
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.16,
+     0.7439
+    ],
+    "b": [
+     0.84,
+     0.7439
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.16,
+     0.7689
+    ],
+    "b": [
+     0.84,
+     0.7689
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.16,
+     0.7939
+    ],
+    "b": [
+     0.84,
+     0.7939
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.16,
+     0.8189
+    ],
+    "b": [
+     0.84,
+     0.8189
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.16,
+     0.9561
+    ],
+    "b": [
+     0.84,
+     0.9561
+    ],
+    "width": 0.3,
+    "color": "black",
+    "bg": "cream"
+   }
+  ]
+ },
+ "hpsg": {
+  "_about": "The BEE 'Power Savings Guide' washing-machine label (label period 2024-26) as Haier prints it: the Whirlpool layout's parts with Haier's spacing, 'Label Period : 1st Jan - 31st Dec' on one line, the registration code over a rule above the fine print.",
+  "palette": {
+   "red": [
+    [
+     0.35,
+     0.07
+    ],
+    [
+     0.65,
+     0.07
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.19
+    ],
+    [
+     0.35,
+     0.27
+    ]
+   ],
+   "black": [
+    [
+     0.05,
+     0.3
+    ],
+    [
+     0.95,
+     0.3
+    ]
+   ],
+   "cream": [
+    [
+     0.1,
+     0.6
+    ],
+    [
+     0.9,
+     0.75
+    ]
+   ],
+   "green": [
+    [
+     0.25,
+     0.575
+    ],
+    [
+     0.75,
+     0.575
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.181,
+     0.213,
+     0.071
+    ],
+    [
+     0.323,
+     0.121,
+     0.071
+    ],
+    [
+     0.504,
+     0.089,
+     0.071
+    ],
+    [
+     0.691,
+     0.124,
+     0.071
+    ],
+    [
+     0.808,
+     0.213,
+     0.071
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 3.0
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.5,
+     0.462,
+     0.103
+    ]
+   },
+   {
+    "circle": [
+     0.497,
+     0.877,
+     0.077
+    ]
+   }
+  ],
+  "lines": [
+   {
+    "a": [
+     0.182,
+     0.6578
+    ],
+    "b": [
+     0.818,
+     0.6578
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.182,
+     0.6828
+    ],
+    "b": [
+     0.818,
+     0.6828
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.182,
+     0.7078
+    ],
+    "b": [
+     0.818,
+     0.7078
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.182,
+     0.7312
+    ],
+    "b": [
+     0.818,
+     0.7312
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.182,
+     0.7563
+    ],
+    "b": [
+     0.818,
+     0.7563
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.182,
+     0.7797
+    ],
+    "b": [
+     0.818,
+     0.7797
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.182,
+     0.8047
+    ],
+    "b": [
+     0.818,
+     0.8047
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.182,
+     0.9375
+    ],
+    "b": [
+     0.818,
+     0.9375
+    ],
+    "width": 0.35,
+    "color": "black",
+    "bg": "cream"
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "black",
+    "win": [
+     0.3,
+     0.215,
+     0.7,
+     0.24
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "black",
+    "win": [
+     0.3,
+     0.24,
+     0.7,
+     0.262
+    ]
+   },
+   {
+    "key": "psg1",
+    "t": "POWER SAVINGS",
+    "font": "black",
+    "win": [
+     0.08,
+     0.296,
+     0.92,
+     0.342
+    ]
+   },
+   {
+    "key": "psg2",
+    "t": "GUIDE",
+    "font": "black",
+    "win": [
+     0.3,
+     0.347,
+     0.7,
+     0.39
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ENERGY CONSUMPTION",
+    "font": "black",
+    "win": [
+     0.2,
+     0.535,
+     0.8,
+     0.5575
+    ]
+   },
+   {
+    "key": "value",
+    "t": "{value}*",
+    "font": "bold",
+    "win": [
+     0.3,
+     0.561,
+     0.7,
+     0.589
+    ]
+   },
+   {
+    "key": "unit",
+    "t": "kWh/kg/cycle",
+    "font": "black",
+    "win": [
+     0.3,
+     0.593,
+     0.7,
+     0.6145
+    ]
+   },
+   {
+    "key": "lp",
+    "t": "Label Period : 1st Jan {y0} - 31st Dec {y1}",
+    "font": "bold",
+    "win": [
+     0.19,
+     0.619,
+     0.81,
+     0.6375
+    ]
+   },
+   {
+    "key": "t0a",
+    "t": "Appliance",
+    "font": "bold",
+    "win": [
+     0.185,
+     0.661,
+     0.47,
+     0.68
+    ]
+   },
+   {
+    "key": "t0c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.472,
+     0.661,
+     0.497,
+     0.68
+    ]
+   },
+   {
+    "key": "t0b",
+    "t": "Washing Machine",
+    "font": "bold",
+    "win": [
+     0.497,
+     0.661,
+     0.87,
+     0.68
+    ]
+   },
+   {
+    "key": "t1a",
+    "t": "Brand",
+    "font": "bold",
+    "win": [
+     0.185,
+     0.686,
+     0.47,
+     0.705
+    ]
+   },
+   {
+    "key": "t1c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.472,
+     0.686,
+     0.497,
+     0.705
+    ]
+   },
+   {
+    "key": "t1b",
+    "t": "{brand}",
+    "font": "bold",
+    "win": [
+     0.497,
+     0.686,
+     0.87,
+     0.705
+    ]
+   },
+   {
+    "key": "t2a",
+    "t": "Model/Year",
+    "font": "bold",
+    "win": [
+     0.185,
+     0.711,
+     0.47,
+     0.7285
+    ]
+   },
+   {
+    "key": "t2c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.472,
+     0.711,
+     0.497,
+     0.7285
+    ]
+   },
+   {
+    "key": "t2b",
+    "t": "{model}",
+    "font": "bold",
+    "win": [
+     0.497,
+     0.711,
+     0.87,
+     0.7285
+    ]
+   },
+   {
+    "key": "t3a",
+    "t": "Type",
+    "font": "bold",
+    "win": [
+     0.185,
+     0.735,
+     0.47,
+     0.7535
+    ]
+   },
+   {
+    "key": "t3c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.472,
+     0.735,
+     0.497,
+     0.7535
+    ]
+   },
+   {
+    "key": "t3b",
+    "t": "{type}",
+    "font": "bold",
+    "win": [
+     0.497,
+     0.735,
+     0.87,
+     0.7535
+    ]
+   },
+   {
+    "key": "t4a",
+    "t": "Load Capacity",
+    "font": "bold",
+    "win": [
+     0.185,
+     0.759,
+     0.47,
+     0.777
+    ]
+   },
+   {
+    "key": "t4c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.472,
+     0.759,
+     0.497,
+     0.777
+    ]
+   },
+   {
+    "key": "t4b",
+    "t": "{cap}",
+    "font": "bold",
+    "win": [
+     0.497,
+     0.759,
+     0.87,
+     0.777
+    ]
+   },
+   {
+    "key": "t5a",
+    "t": "Water Consumption",
+    "font": "bold",
+    "win": [
+     0.185,
+     0.783,
+     0.47,
+     0.802
+    ]
+   },
+   {
+    "key": "t5c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.472,
+     0.783,
+     0.497,
+     0.802
+    ]
+   },
+   {
+    "key": "t5b",
+    "t": "{water}",
+    "font": "bold",
+    "win": [
+     0.497,
+     0.783,
+     0.87,
+     0.802
+    ]
+   },
+   {
+    "key": "reg",
+    "t": "{reg}",
+    "font": "bold",
+    "win": [
+     0.41,
+     0.924,
+     0.59,
+     0.9358
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with latest IEC 60456 standards.",
+    "font": "narrowbold",
+    "win": [
+     0.16,
+     0.944,
+     0.84,
+     0.957
+    ]
+   },
+   {
+    "key": "foot2",
+    "t": "Actual energy consumption will depend on how the appliance is being used.",
+    "font": "narrowbold",
+    "win": [
+     0.16,
+     0.957,
+     0.84,
+     0.971
+    ]
+   }
+  ]
+ },
+ "acpsg": {
+  "_about": "The BEE 'Power Savings Guide' room air conditioner label (label period 2026-27): arch of five stars, black band with a chevron, the emblem in a ring, the ENERGY EFFICIENCY box with the ISEER in its green bar and the label period, the rating table, the BEE 'Energy is life' logo with the registration code, two lines of fine print.",
+  "palette": {
+   "red": [
+    [
+     0.09,
+     0.24
+    ],
+    [
+     0.42,
+     0.12
+    ]
+   ],
+   "white": {
+    "rgb": [
+     254,
+     254,
+     254
+    ]
+   },
+   "yellow": [
+    [
+     0.5,
+     0.16
+    ],
+    [
+     0.36,
+     0.24
+    ]
+   ],
+   "black": [
+    [
+     0.05,
+     0.27
+    ],
+    [
+     0.95,
+     0.27
+    ]
+   ],
+   "cream": [
+    [
+     0.1,
+     0.6
+    ],
+    [
+     0.9,
+     0.7
+    ]
+   ],
+   "green": [
+    [
+     0.2,
+     0.58
+    ],
+    [
+     0.8,
+     0.58
+    ]
+   ]
+  },
+  "stars": {
+   "at": [
+    [
+     0.164,
+     0.197,
+     0.079
+    ],
+    [
+     0.305,
+     0.095,
+     0.079
+    ],
+    [
+     0.5,
+     0.064,
+     0.079
+    ],
+    [
+     0.719,
+     0.102,
+     0.079
+    ],
+    [
+     0.84,
+     0.19,
+     0.079
+    ]
+   ],
+   "not_sector": [
+    "black",
+    "yellow",
+    "cream"
+   ],
+   "not_star": [
+    "yellow",
+    "black"
+   ],
+   "outline": {
+    "white": "auto"
+   },
+   "outline_w": 0.55,
+   "edge": 2.5
+  },
+  "pictures": [
+   {
+    "circle": [
+     0.502,
+     0.441,
+     0.104
+    ]
+   },
+   {
+    "box": [
+     0.425,
+     0.843,
+     0.595,
+     0.9415
+    ]
+   }
+  ],
+  "lines": [
+   {
+    "a": [
+     0.175,
+     0.6459
+    ],
+    "b": [
+     0.842,
+     0.6459
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.6687
+    ],
+    "b": [
+     0.842,
+     0.6687
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.6925
+    ],
+    "b": [
+     0.842,
+     0.6925
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.7153
+    ],
+    "b": [
+     0.842,
+     0.7153
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.7391
+    ],
+    "b": [
+     0.842,
+     0.7391
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.762
+    ],
+    "b": [
+     0.842,
+     0.762
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.7858
+    ],
+    "b": [
+     0.842,
+     0.7858
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.8087
+    ],
+    "b": [
+     0.842,
+     0.8087
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.175,
+     0.8317
+    ],
+    "b": [
+     0.842,
+     0.8317
+    ],
+    "width": 0.4,
+    "color": "black",
+    "bg": "cream"
+   },
+   {
+    "a": [
+     0.119,
+     0.9539
+    ],
+    "b": [
+     0.879,
+     0.9539
+    ],
+    "width": 0.25,
+    "color": "black",
+    "bg": "cream"
+   }
+  ],
+  "items": [
+   {
+    "key": "more1",
+    "t": "MORE STARS",
+    "font": "black",
+    "win": [
+     0.3,
+     0.19,
+     0.7,
+     0.212
+    ]
+   },
+   {
+    "key": "more2",
+    "t": "MORE SAVINGS",
+    "font": "black",
+    "win": [
+     0.3,
+     0.213,
+     0.7,
+     0.236
+    ]
+   },
+   {
+    "key": "psg1",
+    "t": "POWER SAVINGS",
+    "font": "black",
+    "win": [
+     0.06,
+     0.26,
+     0.94,
+     0.306
+    ]
+   },
+   {
+    "key": "psg2",
+    "t": "GUIDE",
+    "font": "black",
+    "win": [
+     0.3,
+     0.318,
+     0.7,
+     0.365
+    ]
+   },
+   {
+    "key": "head",
+    "t": "ENERGY EFFICIENCY",
+    "font": "black",
+    "win": [
+     0.2,
+     0.533,
+     0.8,
+     0.556
+    ],
+    "bg": "cream"
+   },
+   {
+    "key": "value",
+    "t": "ISEER - {iseer}*",
+    "font": "black",
+    "win": [
+     0.2,
+     0.562,
+     0.8,
+     0.596
+    ]
+   },
+   {
+    "key": "lp",
+    "t": "Label Period : 1st Jan {y0} - 31st Dec {y1}",
+    "font": "bold",
+    "win": [
+     0.19,
+     0.605,
+     0.83,
+     0.629
+    ]
+   },
+   {
+    "key": "t0a",
+    "t": "Appliance/Type",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.649,
+     0.5,
+     0.6675
+    ]
+   },
+   {
+    "key": "t0c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.649,
+     0.519,
+     0.6675
+    ]
+   },
+   {
+    "key": "t0b",
+    "t": "RAC/Split",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.649,
+     0.92,
+     0.6675
+    ]
+   },
+   {
+    "key": "t1a",
+    "t": "Brand",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.6715,
+     0.5,
+     0.6905
+    ]
+   },
+   {
+    "key": "t1c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.6715,
+     0.519,
+     0.6905
+    ]
+   },
+   {
+    "key": "t1b",
+    "t": "{brand}",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.6715,
+     0.92,
+     0.6905
+    ]
+   },
+   {
+    "key": "t2a",
+    "t": "Model/Year",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.6955,
+     0.5,
+     0.714
+    ]
+   },
+   {
+    "key": "t2c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.6955,
+     0.519,
+     0.714
+    ]
+   },
+   {
+    "key": "t2b",
+    "t": "{model}",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.6955,
+     0.92,
+     0.714
+    ]
+   },
+   {
+    "key": "t3a",
+    "t": "Cooling Capacity (100%)",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.719,
+     0.5,
+     0.737
+    ]
+   },
+   {
+    "key": "t3c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.719,
+     0.519,
+     0.737
+    ]
+   },
+   {
+    "key": "t3b",
+    "t": "{cc100}",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.719,
+     0.92,
+     0.737
+    ]
+   },
+   {
+    "key": "t4a",
+    "t": "Cooling Capacity (50%)",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.742,
+     0.5,
+     0.7605
+    ]
+   },
+   {
+    "key": "t4c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.742,
+     0.519,
+     0.7605
+    ]
+   },
+   {
+    "key": "t4b",
+    "t": "{cc50}",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.742,
+     0.92,
+     0.7605
+    ]
+   },
+   {
+    "key": "t5a",
+    "t": "Electricity Consumption",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.766,
+     0.5,
+     0.784
+    ]
+   },
+   {
+    "key": "t5c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.766,
+     0.519,
+     0.784
+    ]
+   },
+   {
+    "key": "t5b",
+    "t": "{elec}",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.766,
+     0.92,
+     0.784
+    ]
+   },
+   {
+    "key": "t6a",
+    "t": "Compressor Type",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.79,
+     0.5,
+     0.807
+    ]
+   },
+   {
+    "key": "t6c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.79,
+     0.519,
+     0.807
+    ]
+   },
+   {
+    "key": "t6b",
+    "t": "{comp}",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.79,
+     0.92,
+     0.807
+    ]
+   },
+   {
+    "key": "t7a",
+    "t": "Heat Pump",
+    "font": "bold",
+    "win": [
+     0.17,
+     0.8125,
+     0.5,
+     0.8305
+    ]
+   },
+   {
+    "key": "t7c",
+    "t": ":",
+    "font": "bold",
+    "win": [
+     0.505,
+     0.8125,
+     0.519,
+     0.8305
+    ]
+   },
+   {
+    "key": "t7b",
+    "t": "{hp}",
+    "font": "bold",
+    "win": [
+     0.519,
+     0.8125,
+     0.92,
+     0.8305
+    ]
+   },
+   {
+    "key": "reg",
+    "t": "{reg}",
+    "font": "bold",
+    "win": [
+     0.42,
+     0.942,
+     0.6,
+     0.9525
+    ]
+   },
+   {
+    "key": "foot1",
+    "t": "*Under test conditions, when tested in accordance with ISO 16358 & based on 1600 operating hours per annum.",
+    "font": "narrowbold",
+    "win": [
+     0.1,
+     0.958,
+     0.9,
+     0.9745
+    ]
+   },
+   {
+    "key": "foot2",
+    "t": "Actual electricity consumption will depend on how the appliance being used.",
+    "font": "narrowbold",
+    "win": [
+     0.1,
+     0.9745,
+     0.9,
+     0.99
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,19 @@
+{
+ "_about": "Samsung RT34HG5A42BXHL: Sangeetha's photo of this model's own label (samsung/1.jpg), as cut out before.",
+ "template": "samsung2026",
+ "src": "pipeline/sources/photos/samsung/bee_cut_label.png",
+ "out": "pipeline/tex/samsung/label.png",
+ "width_mm": 125,
+ "words": {
+  "series": "2026 - 28",
+  "head": "ANNUAL ENERGY CONSUMPTION",
+  "unit": "units/yr",
+  "kind": "Refrigerator",
+  "brand": "SAMSUNG",
+  "country": "INDIA",
+  "value": "241",
+  "type": "Frost Free",
+  "volume_line": "Total Volume : 330 (Ltr)",
+  "model": "RT34HG5A42BXHL"
+ }
+}
