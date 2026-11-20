@@ -1,0 +1,15 @@
+{
+ "_about": "LG GL-S312SPZY: the label redrawn before from BEE's register (271 units a year, 272 L, 2026-28 series) on LG's own 2026-28 template (tex_lg_gls312.py), as cut out.",
+ "template": "lg2026",
+ "src": "pipeline/sources/photos/lg_gls312/bee_cut_bee_label.png",
+ "out": "pipeline/tex/lg_gls312/bee_label.png",
+ "width_mm": 90,
+ "words": {
+  "series": "2026 - 28",
+  "value": "271",
+  "type": "Frost Free",
+  "volume": "272",
+  "model": "GL-S312SPZY",
+  "country": "INDIA"
+ }
+}

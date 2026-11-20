@@ -93,7 +93,11 @@ def word(img, text, cx, cy, height_px, face, col, max_w=None, anchor="c"):
 
 
 def lgmark():
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
+    # drawn sharp from LG's vector mark (tex_lg_mark.py) in the layout of logos/lg.png, 680 px across the 54 mm decal:
+    # 12.6 px per mm (logos/lg.png's 349 px gave 6.5)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    lg = tex_lg_mark.lg_hi(LOGOS, 680)
     a = np.asarray(lg).astype(float)
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (210, 211, 214)
@@ -155,7 +159,7 @@ def line(img, parts, cx, base, cap, col, width=None, gap=0.28):
 
 def prints():
     ink = (52, 58, 70, 255)          # LG's dark slate print inside the cabinet (DZ-3, DZ-6)
-    S = 5                            # 5 px per mm
+    S = 12                           # 12 px per mm
     # "Convertible" on the freezer's back wall: 93 mm wide (DZ-6 at 1.86 mm a pixel), medium weight
     img = Image.new("RGBA", (100 * S, 24 * S), (0, 0, 0, 0))
     line(img, [("Convertible", 5)], 50 * S, 18 * S, 13 * S, ink, width=93 * S)
