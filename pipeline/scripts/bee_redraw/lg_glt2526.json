@@ -1,0 +1,15 @@
+{
+ "_about": "LG GLT2526XWPZ: LG's label image for this model (2010x1334-2-v.jpg; it prints LG's family name GLT252), as cut out before.",
+ "template": "lg2026b",
+ "src": "pipeline/sources/photos/lg_glt2526/bee_cut_label.png",
+ "out": "pipeline/tex/lg_glt2526/label.png",
+ "width_mm": 66,
+ "words": {
+  "series": "2026 - 28",
+  "value": "233",
+  "type": "Frost Free",
+  "volume": "251",
+  "model": "GLT252",
+  "country": "India"
+ }
+}

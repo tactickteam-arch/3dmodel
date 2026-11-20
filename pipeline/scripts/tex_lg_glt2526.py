@@ -107,7 +107,11 @@ def label():
 
 
 def lgmark():
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
+    # drawn sharp from LG's vector mark (tex_lg_mark.py) in the layout of logos/lg.png, 600 px across the 47 mm decal:
+    # 12.8 px per mm (logos/lg.png's 349 px gave 7.4)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    lg = tex_lg_mark.lg_hi(LOGOS, 600)
     a = np.asarray(lg).astype(float)
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (84, 86, 90)
@@ -149,8 +153,8 @@ def prints():
     Positions in mm from the decal's top left: dial centre (61.5, 42); three ticks over it at 20 mm radius, at -33, 0
     and +33 degrees; Min (33, 29) and Max (91, 29); two outlined pills to the left, the upper one (24, 42) with an arrow
     to the dial, the lower one (23, 56) reading Convertible; the
-    word Convertible, 102 mm wide, centred at (225, 27)."""
-    S = 5
+    word Convertible, 102 mm wide, centred at (225, 27). Drawn at 12 px per mm."""
+    S = 12
     W_, H_ = 283 * S, 70 * S
     img = Image.new("RGBA", (W_, H_), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
