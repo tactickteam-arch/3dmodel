@@ -1,0 +1,19 @@
+{
+ "_about": "Samsung RS76CG8113SLHL: Samsung India's picture of this code's own label (sl_label_554043382.jpg), as cut out before.",
+ "template": "samsung2026",
+ "src": "pipeline/sources/photos/samsung_rs76cg8113/bee_cut_label.png",
+ "out": "pipeline/tex/samsung_rs76cg8113/label.png",
+ "width_mm": 131,
+ "words": {
+  "series": "2023 - 26",
+  "head": "ANNUAL ENERGY CONSUMPTION",
+  "unit": "units/yr",
+  "kind": "Refrigerator",
+  "brand": "SAMSUNG",
+  "country": "INDIA",
+  "value": "547",
+  "type": "Side by Side",
+  "volume_line": "Total Volume : 653 (Ltr)",
+  "model": "RS76CG8113SLHL"
+ }
+}

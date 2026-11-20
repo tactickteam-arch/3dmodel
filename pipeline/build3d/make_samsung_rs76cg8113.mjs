@@ -407,7 +407,7 @@ fridgeDoor.add(bx("FridgeDoorChannel", frX0, frFace0, 0, doorH, zb, chZ, [recess
 // then from the label image's aspect, 238 mm against the photo's 238), 120 mm below the top, centred 321 mm right of the
 // middle. Both colours carry their own code's label in the same place (ESTIMATED)
 const LW = 0.131, LH = LW * 1237 / 680;
-fridgeDoor.add(plane("SamsungMarkDecal", 0.084, 0.084 / 6.522, markM, 0.368 - pinX, doorH - 0.0455, zf + 0.0007));
+fridgeDoor.add(plane("SamsungMarkDecal", 0.084, 0.084 / 6.543, markM, 0.368 - pinX, doorH - 0.0455, zf + 0.0007));
 fridgeDoor.add(plane("BeeLabelDecal", LW, LH, labelM, 0.321 - pinX, doorH - 0.12 - LH / 2, zf + 0.0007));
 const frInside = doorInside(fridgeDoor, "FridgeDoor", FR);
 root.add(freezerDoor, fridgeDoor);
