@@ -491,29 +491,93 @@ def pulsator():
 
 
 def filt():
-    """the Magic Filter: a grey frame round a honeycomb mesh, "MagicFilter" printed up its side, a latch at the top.
-    Drawn at 4 x its first size (960 x 2560: 12.8 px per mm on the 75 x 200 mm face), the same shapes and places."""
-    K = 4
-    w, h = 240, 640
-    img = Image.new("RGB", (w * K, h * K), (150, 152, 156))
-    d = ImageDraw.Draw(img)
-    d.rounded_rectangle([18 * K, 60 * K, (w - 18) * K, (h - 18) * K], 14 * K, fill=(132, 134, 139))
-    r = 17
-    for row in range(17):
-        for col in range(5):
-            x = 44 + col * 38 + (19 if row % 2 else 0)
-            y = 96 + row * 31
-            if x > w - 34 or y > h - 40:
+    """the Magic Filter's face (75 x 200 mm), drawn from Samsung's drum photo (drum_filter.jpg) at 12 px per mm.
+
+    The photo sees the filter at a slant: its frame's four corners (1176,124) (1473,212) (1366,766) (1140,665) are mapped to
+    the 75 x 200 mm face, and everything below is measured on that straightened view (mm from the face's top-left):
+      the latch and its recess (0-45 mm): relief, no print, so the straightened photo itself, its grey scaled to the frame's
+      the mesh panel (x 14-63, y 45.8-186.7): hexagonal openings, pointed left and right, 11.1 mm across the points, 9.1 mm
+          flat to flat, 7.3 mm along the top and bottom; five columns 11.65 mm apart (x 15.2, 26.85, 38.5, 50.15, 61.8), rows
+          11.9 mm apart, the second and fourth columns half a row lower; the panel's edges cut the outer columns and the
+          first and last rows
+      each opening: the mesh, dark under its top edge and lighter downwards; the lit lower wall, a light band 2.3 mm tall
+      the middle column: openings in rows 1-2 and 10-12; rows 3, 4, 8 and 9 closed (plain hexagons, a dark top edge and a
+          light lower edge); rows 5-7 give way to "MagicFilter", raised, reading upwards, 29.9 mm long (y 126.4 to 96.5) and
+          4.2 mm tall, centred on x 38.6 (Avenir Next Medium fitted to that box). The small mark after it (y 95.6-96.4) can't be read on the photo and is left out
+    The greys are the photo's, scaled so its face (135) is the frame's colour (150, 152, 156)."""
+    K = 12
+    W, H = 75 * K, 200 * K
+    FACE = np.array([150, 152, 156], float)
+    tone = lambda t: tuple(int(round(min(255, t * c / 135))) for c in FACE)
+    # the latch and its recess: the straightened photo
+    ph = cv2.imread(os.path.join(P, "drum_filter.jpg"))[..., ::-1].astype(np.float32)
+    src = np.float32([(1176, 124), (1473, 212), (1366, 766), (1140, 665)])
+    dst = np.float32([(0, 0), (W, 0), (W, H), (0, H)])
+    rect = cv2.warpPerspective(ph, cv2.getPerspectiveTransform(src, dst), (W, H), flags=cv2.INTER_CUBIC)
+    grey = rect.mean(2, keepdims=True) * (FACE / 135)
+    base = np.tile(FACE, (H, W, 1))
+    t = np.clip((np.arange(H) / K - 40) / 5, 0, 1)[:, None, None]          # the photo down to 40 mm, the flat face from 45 mm
+    img = Image.fromarray(np.clip(grey * (1 - t) + base * t, 0, 255).astype(np.uint8))
+
+    hw, hh, top = 11.1 / 2, 9.1 / 2, 7.3 / 2
+    def hexpts(cx, cy, grow=0.0):
+        a, b, c = (hw + grow) * K, (hh + grow) * K, (top + grow * 0.5) * K
+        x, y = cx * K, cy * K
+        return [(x - a, y), (x - c, y - b), (x + c, y - b), (x + a, y), (x + c, y + b), (x - c, y + b)]
+
+    def hexmask(cx, cy, dy=0.0):
+        m = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(m).polygon(hexpts(cx, cy + dy), fill=255)
+        return np.asarray(m) > 127
+
+    def put(mask, t):
+        arr[mask] = tone(t)
+
+    arr = np.asarray(img).copy()
+    clip = np.zeros((H, W), bool)
+    clip[round(45.8 * K):round(186.7 * K), round(14.0 * K):round(63.0 * K)] = True    # the panel's edges cut the outer hexagons
+    yy = np.arange(H)[:, None] / K
+    cols = [(15.2, 0), (26.85, 1), (38.5, 0), (50.15, 1), (61.8, 0)]
+    for cx, odd in cols:
+        for k in range(-1, 13):
+            cy = 50.8 + k * 11.9 + (5.95 if odd else 0)
+            row = k + 1                                                    # rows counted from 1 in the middle column
+            if cy - hh > 186.7 or cy + hh < 45.8 or (cx == 38.5 and row in (5, 6, 7)):
                 continue
-            pts = [((x + r * math.cos(math.radians(60 * i + 30))) * K, (y + r * math.sin(math.radians(60 * i + 30))) * K) for i in range(6)]
-            d.polygon(pts, fill=(92, 94, 99), outline=(166, 168, 172), width=K)
-    d.rounded_rectangle([86 * K, 8 * K, 154 * K, 56 * K], 8 * K, fill=(122, 124, 129))
-    txt = Image.new("L", (400 * K, 60 * K), 0)
-    ImageDraw.Draw(txt).text((200 * K, 30 * K), "MagicFilter", font=ImageFont.truetype(FONT, 34 * K, index=MED), fill=255, anchor="mm")
+            m = hexmask(cx, cy) & clip
+            if cx == 38.5 and row in (3, 4, 8, 9):
+                # closed: the panel's face inside, a dark rim along the upper edges, a light rim along the lower ones
+                put(m, 129)
+                put(m & ~hexmask(cx, cy, 0.7), 100)
+                put(m & ~hexmask(cx, cy, -1.0), 185)
+                continue
+            # an opening: the mesh, dark under its top edge and lighter downwards; the lit lower wall (the hexagon less
+            # itself raised 2.3 mm); the shadowed upper wall (less itself lowered 0.6 mm)
+            f = np.clip((yy - (cy - hh)) / (2 * hh * 0.7), 0, 1)
+            shade = (97 + 30 * f)[:, :, None] * (FACE / 135)
+            arr[m] = np.broadcast_to(shade, (H, W, 3))[m].round().astype(np.uint8)
+            put(m & ~hexmask(cx, cy, -2.3), 182)
+            put(m & ~hexmask(cx, cy, 0.6), 85)
+    img = Image.fromarray(arr)
+
+    # "MagicFilter", raised: a light edge under each stroke, the stroke darker, reading upwards along the middle column
+    fnt = ImageFont.truetype("/System/Library/Fonts/Avenir Next.ttc", 100, index=5)
+    l, t0, r, b = fnt.getbbox("MagicFilter")
+    size = round(100 * 29.9 * K / (r - l))
+    fnt = ImageFont.truetype("/System/Library/Fonts/Avenir Next.ttc", size, index=5)
+    l, t0, r, b = fnt.getbbox("MagicFilter")
+    txt = Image.new("L", (r - l + 8, b - t0 + 8), 0)
+    ImageDraw.Draw(txt).text((4 - l, 4 - t0), "MagicFilter", font=fnt, fill=255)
+    ys, xs = np.nonzero(np.asarray(txt))
+    txt = txt.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+    txt = txt.resize((round(29.9 * K), round(4.2 * K)), Image.LANCZOS)   # the photo's box: 29.9 mm long, 4.2 mm from M's top to g's foot
     txt = txt.rotate(90, expand=True)
-    tx = Image.new("RGB", txt.size, (70, 72, 76))
-    img.paste(tx, ((w - 52) * K, 200 * K), txt)
-    save(img, "filter.jpg", 88)
+    x = round(38.6 * K - txt.width / 2)
+    y = round((96.5 + 126.4) / 2 * K - txt.height / 2)
+    img.paste(tone(168), (x, y + round(0.3 * K)), txt)
+    img.paste(tone(100), (x, y), txt)
+    print("filter: MagicFilter", round(txt.height / K, 1), "mm long,", round(txt.width / K, 1), "mm tall")
+    save(img, "filter.jpg", 90)
 
 
 def detergent():
