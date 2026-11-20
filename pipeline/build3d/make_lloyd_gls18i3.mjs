@@ -10,6 +10,7 @@
 // usage: node make_lloyd_gls18i3.mjs <entries json> <tex dir> <out.glb>
 import fs from "node:fs";
 import { THREE, mat, mesh, box, group, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
+import { uvDecals } from "./decal_curved.mjs";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS, KHRMaterialsVariants } from "@gltf-transform/extensions";
 
@@ -249,12 +250,17 @@ root.add(lv);
   }
 }
 
+// the three words again at 15 px per mm on curved decals over the panel (tex_lloyd_gls18i3.py draws them, decals.json
+// places them); the same in both finishes, so they need no variant
+const printTex = uvDecals(fp.getObjectByName("PanelFace"), `${T}/decals.json`, (n) => mat(n, 0xffffff, { rough: 0.24 }));
+
 const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
   PanelFront: `${T}/${F0.panel}`,
   TopGrille: `${T}/top.jpg`,
+  ...printTex,
 }, { dir: `${TEX}/grain`, materials: {
   // glossy moulded white plastic: the gentle peel on the body, caps and louvre; none on the printed panel
   Body: { type: "peel_soft" }, LowerChassis: { type: "peel_soft" }, Louvre: { type: "peel_soft" },

@@ -10,6 +10,7 @@ INVERTER drawn stroke by stroke in the panel's thin squared letters, "A HAVELLS 
 usage: python tex_lloyd_gls18i3.py <photos dir> <logos src dir> <out dir> [--compare]
 Writes into <out dir>/lloyd_gls18i3/.
 """
+import json
 import os
 import subprocess
 import sys
@@ -78,9 +79,10 @@ def to_texture(r):
     return 1 - ink
 
 
-X = lambda mm: W_PX / 2 + mm * S                           # texture px from x in mm (0 = centre)
-Ym = lambda m: (H - m) * 1000 * S                          # texture px from height in metres
-Yp = lambda row: (row - TOP) / PPM * S                     # texture px from a photo row
+OX = OY = 0.0                                              # the drawing's origin: 0 for the panel, a word's box for its decal
+X = lambda mm: W_PX / 2 + mm * S - OX                      # texture px from x in mm (0 = centre)
+Ym = lambda m: (H - m) * 1000 * S - OY                     # texture px from height in metres
+Yp = lambda row: (row - TOP) / PPM * S - OY                # texture px from a photo row
 Xp = lambda col: X((col - CX) / PPM)                       # texture px from a photo column
 
 
@@ -155,23 +157,44 @@ def havells(d, box, col_light, col_bold):
     a, b, c, e = box
     x0, y0, x1, y1 = Xp(a), Yp(b), Xp(c), Yp(e)
     cap = y1 - y0
+    # the box's height takes in the ascenders, so a font fitted to it set the line about 30 % wider than the photo's 68 mm
+    # (and the capitals 7 mm against the photo's 5): the cap is fitted to the box, then brought down till the line fits
+    # the box's width as well (capitals come out about 5.3 mm)
     px = 40
-    for _ in range(30):
-        f1, f2 = ImageFont.truetype(AV, round(px), index=7), ImageFont.truetype(AV, round(px), index=8)
-        hb = f2.getbbox("H")
-        if abs((hb[3] - hb[1]) - cap) < 0.5:
+    for _ in range(4):
+        for _ in range(30):
+            f1, f2 = ImageFont.truetype(AV, max(1, round(px)), index=7), ImageFont.truetype(AV, max(1, round(px)), index=8)
+            hb = f2.getbbox("H")
+            if abs((hb[3] - hb[1]) - cap) < 0.5:
+                break
+            px *= cap / (hb[3] - hb[1])
+        parts = [("A", f1, col_light), ("HAVELLS", f2, col_bold), ("Brand", f1, col_light)]
+        sp = 0.35 * cap
+        widths = [d.textlength(s, font=f) for s, f, _ in parts]
+        total = sum(widths) + 2 * sp
+        if total <= (x1 - x0) * 1.005:
             break
-        px *= cap / (hb[3] - hb[1])
-    parts = [("A", f1, col_light), ("HAVELLS", f2, col_bold), ("Brand", f1, col_light)]
-    sp = 0.35 * cap
-    widths = [d.textlength(s, font=f) for s, f, _ in parts]
-    total = sum(widths) + 2 * sp
+        cap *= (x1 - x0) / total
     # the photo's line is wider than the natural set: open the spaces, never stretch the letters
     sp += max(0, (x1 - x0) - total) / 2
     x = x0
     for (s, f, col), w in zip(parts, widths):
         d.text((x, y1), s, font=f, fill=col, anchor="ls")
         x += w + sp
+
+
+WORDS = {"lloyd": (565, 696, 646, 709), "inverter": (1017, 701, 1088, 711), "havells": (152, 476, 238, 485)}
+
+
+def words(im, only=None):
+    d = ImageDraw.Draw(im, "RGBA")
+    if only in (None, "lloyd"):
+        mark, at = lloyd_mark(WORDS["lloyd"], (40, 42, 46))
+        im.alpha_composite(mark, at)
+    if only in (None, "inverter"):
+        inverter(im, WORDS["inverter"], (64, 66, 70, 255))
+    if only in (None, "havells"):
+        havells(d, WORDS["havells"], (96, 98, 102, 255), (84, 86, 90, 255))
 
 
 def panel(ink_scale, name):
@@ -181,13 +204,44 @@ def panel(ink_scale, name):
     fall = np.linspace(1.0, 0.985, H_PX)[:, None, None]
     img = (BASE[None, None, :] * fall * r[:, :, None]).clip(0, 255).astype(np.uint8)
     im = Image.fromarray(img).convert("RGBA")
-    d = ImageDraw.Draw(im, "RGBA")
-    mark, at = lloyd_mark((565, 696, 646, 709), (40, 42, 46))
-    im.alpha_composite(mark, at)
-    inverter(im, (1017, 701, 1088, 711), (64, 66, 70, 255))
-    havells(d, (152, 476, 238, 485), (96, 98, 102, 255), (84, 86, 90, 255))
+    ground = im.copy()
+    words(im)
     save(im.convert("RGB"), name, 88)
-    return im
+    return im, ground
+
+
+# The three words again at 15 px per mm (12+ on the curved panel), each on its own decal over the panel: the box round each
+# word (3 mm round it, inside the patch erased from the photo), its ground the panel's own ground there enlarged 5 x, the
+# word set again at 5 x on it; the decal's edge is the panel's ground, so it doesn't show. The words and their ground are
+# the same in both finishes (only the honeycomb's strength differs, and the words' patches have none), so one set serves
+# both. decals.json gives each box as a UV rectangle of the panel for the builder.
+DECAL_K = 5
+
+
+def decals(inked, ground):
+    global S, W_PX, H_PX, OX, OY
+    S0, W0, H0 = S, W_PX, H_PX
+    ink = np.abs(np.asarray(inked.convert("RGB")).astype(int) - np.asarray(ground.convert("RGB")).astype(int)).sum(2) > 6
+    out = {}
+    for name, (a, b, c, e) in WORDS.items():
+        # the word as drawn (its set can run past the photo's box), 3 mm round it
+        w = round(15 * S0)
+        x0, y0, x1, y1 = int(Xp(a)) - w, int(Yp(b)) - w, int(Xp(c)) + w, int(Yp(e)) + w
+        ys, xs = np.nonzero(ink[max(0, y0):y1, max(0, x0):x1])
+        m = 3 * S0
+        box = (int(max(0, x0) + xs.min() - m), int(max(0, y0) + ys.min() - m), int(max(0, x0) + xs.max() + 1 + m), int(max(0, y0) + ys.max() + 1 + m))
+        box = (max(0, box[0]), max(0, box[1]), min(W0, box[2]), min(H0, box[3]))
+        k = DECAL_K
+        g = ground.crop(box).convert("RGB")
+        im = g.resize((g.width * k, g.height * k), Image.BICUBIC).convert("RGBA")
+        S, W_PX, H_PX = S0 * k, W0 * k, H0 * k
+        OX, OY = box[0] * k, box[1] * k
+        words(im, name)
+        S, W_PX, H_PX, OX, OY = S0, W0, H0, 0.0, 0.0
+        save(im.convert("RGB"), f"decal_{name}.jpg", 90)
+        out[name] = {"file": f"decal_{name}.jpg", "rect": [box[0] / W0, box[1] / H0, box[2] / W0, box[3] / H0]}
+    with open(os.path.join(OUT, PRODUCT, "decals.json"), "w") as f:
+        json.dump(out, f, indent=1)
 
 
 def top_grille():
@@ -208,10 +262,11 @@ def top_grille():
     save(img, "top.jpg", 86)
 
 
-a = panel(1.0, "panel_aschc.jpg")
+a, ground = panel(1.0, "panel_aschc.jpg")
+decals(a, ground)
 # GLS18I3GWSPC: Sangeetha's front photo puts its honeycomb at 0.12 below the panel's white at the 2nd percentile, against
 # 0.35 for GLS18I3ASCHC on both Lloyd's and Sangeetha's photos (ESTIMATED from those ratios: print about a third as strong)
-panel(0.35, "panel_gwspc.jpg")
+_, ground_w = panel(0.35, "panel_gwspc.jpg")
 top_grille()
 if COMPARE:
     src = Image.open(os.path.join(PHOTOS, PRODUCT, "maker_aschc", "classic_main_image_3.jpg")).convert("RGB")

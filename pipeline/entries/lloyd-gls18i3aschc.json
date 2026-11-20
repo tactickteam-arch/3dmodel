@@ -12,12 +12,7 @@
       "arTip": "Tap the louvre to open it",
       "glb": "/models/lloyd-gls18i3aschc.glb",
       "thumb": "/photos/lloyd-gls18i3aschc/0.jpg",
-      "photos": [
-        "/photos/lloyd-gls18i3aschc/0.jpg",
-        "/photos/lloyd-gls18i3aschc/1.jpg",
-        "/photos/lloyd-gls18i3aschc/2.jpg",
-        "/photos/lloyd-gls18i3aschc/3.jpg"
-      ],
+      "photos": ["/photos/lloyd-gls18i3aschc/0.jpg", "/photos/lloyd-gls18i3aschc/1.jpg", "/photos/lloyd-gls18i3aschc/2.jpg", "/photos/lloyd-gls18i3aschc/3.jpg"],
       "placement": "wall",
       "arLabel": "View on your wall",
       "orbit": "-22deg 82deg 128%",
@@ -30,10 +25,7 @@
           "code": "GLS18I3ASCHC",
           "itemCode": "GLS18I3ASCHC",
           "sangeethaUrl": "https://www.sangeetha.com/product-details/lloyd-classic-series-inverter-split-ac-1-5-or-3-star-gls18i3aschc/20486",
-          "altCodes": [
-            "GLS18I3ASCHC IDU",
-            "GLS18I3ASCHC ODU"
-          ]
+          "altCodes": ["GLS18I3ASCHC IDU", "GLS18I3ASCHC ODU"]
         },
         {
           "name": "White",
@@ -55,28 +47,12 @@
           "hint": true,
           "zone": {
             "closed": [
-              [
-                -0.363,
-                0.026,
-                0.15
-              ],
-              [
-                0.315,
-                0.066,
-                0.201
-              ]
+              [-0.363, 0.026, 0.15],
+              [0.315, 0.066, 0.201]
             ],
             "open": [
-              [
-                -0.363,
-                -0.015,
-                0.148
-              ],
-              [
-                0.315,
-                0.05,
-                0.21
-              ]
+              [-0.363, -0.015, 0.148],
+              [0.315, 0.05, 0.21]
             ]
           }
         }
@@ -88,50 +64,17 @@
       },
       "sizeNote": "Indoor unit, Lloyd's size for GLS18I3ASCHC. Outdoor unit 87 x 56 x 36.5 cm",
       "specs": [
-        [
-          "Capacity",
-          "1.5 ton, 4800 W"
-        ],
-        [
-          "Energy rating",
-          "3 star"
-        ],
-        [
-          "Technology",
-          "Inverter, rotary compressor"
-        ],
-        [
-          "Refrigerant",
-          "R-32"
-        ],
-        [
-          "Cooling",
-          "Turbo Cool"
-        ],
-        [
-          "Smart features",
-          "Wi-Fi ready (Wi-Fi optional)"
-        ],
-        [
-          "Checks",
-          "Low gas detection, installation check"
-        ],
-        [
-          "Outdoor coil",
-          "Golden fin condenser"
-        ],
-        [
-          "Operating temperature",
-          "16 to 54 degrees C"
-        ],
-        [
-          "Power supply",
-          "230 V, 50 Hz, single phase"
-        ],
-        [
-          "Warranty",
-          "1 year on the product, 10 years on the compressor"
-        ]
+        ["Capacity", "1.5 ton, 4800 W"],
+        ["Energy rating", "3 star"],
+        ["Technology", "Inverter, rotary compressor"],
+        ["Refrigerant", "R-32"],
+        ["Cooling", "Turbo Cool"],
+        ["Smart features", "Wi-Fi ready (Wi-Fi optional)"],
+        ["Checks", "Low gas detection, installation check"],
+        ["Outdoor coil", "Golden fin condenser"],
+        ["Operating temperature", "16 to 54 degrees C"],
+        ["Power supply", "230 V, 50 Hz, single phase"],
+        ["Warranty", "1 year on the product, 10 years on the compressor"]
       ],
       "sangeethaUrl": "https://www.sangeetha.com/product-details/lloyd-classic-series-inverter-split-ac-1-5-or-3-star-gls18i3aschc/20486",
       "source": "https://havells.com/lloyd/home-appliances/air-conditioners/classic-series-inverter-split-ac-15-3-star-gls18i3aschc.html",
@@ -139,61 +82,29 @@
         {
           "title": "Turbo Cool",
           "text": "Turbo Cool gives a rapid drop in temperature when the room is hot.",
-          "pos": [
-            -0.2,
-            0.2,
-            0.218
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [-0.2, 0.2, 0.218],
+          "normal": [0, 0, 1],
           "show": "always"
         },
         {
           "title": "Low gas detection",
           "text": "Warns when the refrigerant gas runs low, for timely maintenance.",
-          "pos": [
-            0.18,
-            0.17,
-            0.218
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [0.18, 0.17, 0.218],
+          "normal": [0, 0, 1],
           "show": "always"
         },
         {
           "title": "Installation check",
           "text": "A self check that the AC has been installed correctly.",
-          "pos": [
-            -0.3,
-            0.09,
-            0.21
-          ],
-          "normal": [
-            0,
-            -0.25,
-            0.97
-          ],
+          "pos": [-0.3, 0.09, 0.21],
+          "normal": [0, -0.25, 0.97],
           "show": "always"
         },
         {
           "title": "Wi-Fi ready",
           "text": "Upgrade to smart control at any time with the optional Wi-Fi module.",
-          "pos": [
-            0.33,
-            0.14,
-            0.217
-          ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
+          "pos": [0.33, 0.14, 0.217],
+          "normal": [0, 0, 1],
           "show": "always"
         }
       ]
