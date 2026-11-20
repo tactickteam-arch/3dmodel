@@ -1,0 +1,9 @@
+{
+  "_about": "Lloyd GLS18I3ASCHC: Lloyd's own BEE label image for this model (2026-27 series), as cut out before (bee_cut_bee_label_aschc.png).",
+  "template": "ac2026",
+  "src": "pipeline/sources/photos/lloyd_gls18i3/bee_cut_bee_label_aschc.png",
+  "out": "pipeline/tex/lloyd_gls18i3/bee_label_aschc.png",
+  "width_mm": 69.1,
+  "words": { "series": "2026 - 27", "value": "ISEER 4.47*", "type": "Split", "brand": "LLOYD", "tonnage": "Tonnage (TR): 1.36",
+             "cooling": "Cooling Capacity (100%) : 4800 (W)", "model": "GLS18I3ASCHC", "speed": "Variable Speed", "heatpump": "Heat Pump: No", "country": "INDIA" }
+}
