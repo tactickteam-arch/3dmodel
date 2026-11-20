@@ -535,38 +535,54 @@ def pulsator():
 
 
 def filt():
-    """the Magic Filter: a grey frame, "Magic Filter" moulded at its top, two columns of slots, a latch on top (drum_filter.jpg)"""
-    w, h = 240, 640
-    img = Image.new("RGB", (w, h), (156, 158, 162))
+    """the Magic Filter (75 x 200 mm face), 12 px per mm: "Magic Filter" moulded over two columns of 15 mesh slots, below the
+    grip, as Samsung's drum photo drum_filter.jpg shows it (15 slots in each column, counted there; it is the same filter as
+    the WA70BG4441's, whose drum photo gave the places: the word's centre at 0.34 of the height and 0.57 of the width wide,
+    the slots from 0.377 to 0.93 of the height, the columns at 0.15-0.47 and 0.53-0.85 of the width). The mesh inside the
+    slots is too fine to read on the photos: the slots are plain and darker. The grey frame and the latch at the top as before."""
+    K = 12
+    W, H = 75 * K, 200 * K
+    img = Image.new("RGB", (W, H), (156, 158, 162))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([14, 50, w - 14, h - 12], 16, fill=(146, 148, 153))
-    d.text((w / 2, 104), "Magic Filter", font=ImageFont.truetype(FONT, 34, index=MED), fill=(118, 120, 125), anchor="mm")
-    for colx in (40, 128):
-        for i in range(20):
-            y = 150 + i * 23
-            d.rounded_rectangle([colx, y, colx + 72, y + 11], 3, fill=(92, 94, 99))
-    d.rounded_rectangle([84, 6, 156, 46], 6, fill=(132, 134, 139))
+    d.rounded_rectangle([0.058 * W, 0.078 * H, 0.942 * W, 0.981 * H], 0.067 * W, fill=(146, 148, 153))
+    d.rounded_rectangle([0.35 * W, 0.009 * H, 0.65 * W, 0.072 * H], 0.025 * W, fill=(132, 134, 139))
+    f = ImageFont.truetype(FONT, 400, index=MED)
+    text = "Magic Filter"
+    bb = d.textbbox((0, 0), text, font=f)
+    lay = Image.new("L", (bb[2] - bb[0] + 8, bb[3] - bb[1] + 8), 0)
+    ImageDraw.Draw(lay).text((4 - bb[0], 4 - bb[1]), text, font=f, fill=255)
+    tw = round(0.57 * W)
+    lay = lay.resize((tw, round(lay.height * tw / lay.width)), Image.LANCZOS)
+    img.paste(Image.new("RGB", lay.size, (118, 120, 125)), ((W - tw) // 2, round(0.34 * H - lay.height / 2)), lay)
+    top, bot, n = 0.377 * H, 0.93 * H, 15
+    pitch = (bot - top) / (n - 0.45)
+    for c0, c1 in ((0.15, 0.47), (0.53, 0.85)):
+        for i in range(n):
+            y = top + i * pitch
+            d.rounded_rectangle([c0 * W, y, c1 * W, y + 0.45 * pitch], radius=0.12 * pitch, fill=(92, 94, 99))
     save(img, "filter.jpg", 88)
 
 
 def detergent():
     """the detergent box's front: the pour mark, DETERGENT, and Ecobubble™ on a bar (lid_open.jpg / lid_open_bg.jpg):
-    black on the Versailles Gray unit, light grey on the Light Gray one; 190 x 66 mm at 4 px/mm"""
+    black on the Versailles Gray unit, light grey on the Light Gray one; 190 x 66 mm, drawn at 12 px/mm (3 x its first
+    4 px/mm: the same shapes and places)"""
+    K = 3
+    P = lambda pts: [(x * K, y * K) for x, y in pts]
     for suf, base, ink, bar, barink in (("", (18, 18, 20), (210, 210, 214), (196, 197, 201), (30, 30, 32)),
                                          ("_bg", (176, 177, 181), (78, 79, 84), (98, 99, 104), (232, 232, 236))):
         w, h = 760, 264
-        img = Image.new("RGB", (w, h), base)
+        img = Image.new("RGB", (w * K, h * K), base)
         d = ImageDraw.Draw(img)
-        d.text((362, 104), "DETERGENT", font=ImageFont.truetype(FONT_W, 52, index=MED), fill=ink, anchor="lm")
-        d.rectangle([362, 132, 600, 168], fill=bar)
-        d.text((481, 150), "Ecobubble™", font=ImageFont.truetype(FONT_W, 26, index=DEMI), fill=barink, anchor="mm")
+        d.text((362 * K, 104 * K), "DETERGENT", font=ImageFont.truetype(FONT_W, 52 * K, index=MED), fill=ink, anchor="lm")
+        d.rectangle([362 * K, 132 * K, 600 * K, 168 * K], fill=bar)
+        d.text((481 * K, 150 * K), "Ecobubble™", font=ImageFont.truetype(FONT_W, 26 * K, index=DEMI), fill=barink, anchor="mm")
         # the mark: a cup tipped to pour, drops falling from it
-        d.line([(262, 84), (300, 124), (342, 92)], fill=ink, width=4)
-        d.line([(300, 124), (316, 140), (346, 116), (342, 92)], fill=ink, width=4)
+        d.line(P([(262, 84), (300, 124), (342, 92)]), fill=ink, width=4 * K, joint="curve")
+        d.line(P([(300, 124), (316, 140), (346, 116), (342, 92)]), fill=ink, width=4 * K, joint="curve")
         for (x, y) in ((276, 128), (268, 146), (280, 162), (300, 170)):
-            d.ellipse([x - 4, y - 4, x + 4, y + 4], fill=ink)
+            d.ellipse([(x - 4) * K, (y - 4) * K, (x + 4) * K, (y + 4) * K], fill=ink)
         save(img, f"detergent{suf}.jpg", 90)
-
 
 build_panel()
 sides()
