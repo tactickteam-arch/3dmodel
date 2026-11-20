@@ -1,0 +1,8 @@
+{
+  "_about": "Whirlpool 431 L (NFT43127IRM1C1TE, shared by its four colours): Whirlpool's own 2026-28 label image on this product's page (image 176430), as cut out before (bee_cut_bee_label.png).",
+  "template": "wp2026",
+  "src": "pipeline/sources/photos/whirlpool_22439/bee_cut_bee_label.png",
+  "out": "pipeline/tex/whirlpool_22439/bee_label.png",
+  "width_mm": 90,
+  "words": { "series": "2026 - 28", "value": "248", "type": "Frost Free", "brand": "Whirlpool", "volume": "431", "model": "NFT43127IRM1C1TE", "country": "India" }
+}
