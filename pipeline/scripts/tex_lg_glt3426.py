@@ -107,44 +107,75 @@ def main():
     save(r, "rear.jpg", 84)
     print("rear px", r.size)
 
-    # ── interior prints ──
-    def brushed_plate(w, h, text=None, dial=False):
-        """A brushed-steel plate with concentric machining rings, as on LG's freezer and fridge walls."""
-        yy, xx = np.mgrid[0:h, 0:w]
-        cx, cy = w / 2, h / 2
-        r = np.hypot((xx - cx) * 0.55, yy - cy)
-        v = 178 + 26 * np.cos(r * 0.55) * np.exp(-r / 160) + 18 * np.sin(np.arctan2(yy - cy, xx - cx) * 2)
-        v += rng.normal(0, 1.4, v.shape)
-        im = Image.fromarray(np.stack([v, v, v + 2], axis=2).clip(0, 255).astype(np.uint8))
+    # ── interior prints, 12 px per mm on the model (LG's open photo DZ-04: the words and their weights) ──
+    K = 12
+
+    def spun(w_mm, h_mm, cu, cv, k=K):
+        """Brushed steel spun round one centre (cu, cv as fractions of the plate), the light falling in two broad lobes
+        as on LG's photo; the rings are fine (about 0.7 mm) and soft."""
+        w, h = round(w_mm * k), round(h_mm * k)
+        yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+        dx, dy = (xx - cu * w) / k, (yy - cv * h) / k               # mm from the spin centre
+        r, th = np.hypot(dx, dy), np.arctan2(dy, dx)
+        v = 176 + 30 * np.sin(2 * th + 0.9) * (1 - np.exp(-r / 6)) + 5 * np.cos(r * 2 * np.pi / 0.7) * np.exp(-r / 120)
+        v += rng.normal(0, 1.6, v.shape)
+        return np.stack([v, v, v + 2], axis=2)
+
+    def plate(w_mm, h_mm, cu, cv):
+        a = spun(w_mm, h_mm, cu, cv)
+        im = Image.fromarray(a.clip(0, 255).astype(np.uint8))
         d = ImageDraw.Draw(im)
-        d.rounded_rectangle([1, 1, w - 2, h - 2], 6, outline=(120, 122, 126), width=3)
-        if dial:
-            R = int(h * 0.42)
-            d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(40, 42, 46), width=5)
-            d.ellipse([cx - R + 12, cy - R + 12, cx + R - 12, cy + R - 12], fill=(190, 192, 196), outline=(110, 112, 116), width=2)
-            d.line([(cx, cy), (cx, cy - R + 14)], fill=(50, 52, 56), width=5)
-            d.text((cx - R - 22, cy + R * 0.6), "Min", font=font(15), fill=(70, 72, 76), anchor="rm")
-            d.text((cx + R + 22, cy + R * 0.6), "Max", font=font(15), fill=(70, 72, 76), anchor="lm")
-        if text:
-            d.text((cx, cy), text, font=font(int(h * 0.26), 5), fill=(46, 48, 52), anchor="mm")
-        return im
-    save(brushed_plate(332, 154, "Convertible"), "plate_convertible.jpg", 90)
-    save(brushed_plate(324, 144, None, dial=True), "plate_control.jpg", 90)
-    # printed words on the clear trays (transparent decals)
-    img = Image.new("RGBA", (900, 200), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    d.text((450, 70), "Fresh 0 Zone", font=font(64, 5), fill=(70, 72, 76, 255), anchor="mm")
-    d.text((450, 135), "Fresh & Cool", font=font(34, 7), fill=(96, 98, 104, 255), anchor="mm")
-    save(img, "print_fresh0.png")
-    img = Image.new("RGBA", (900, 120), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    d.text((450, 60), "Pull-out Tray", font=font(54, 5), fill=(70, 72, 76, 255), anchor="mm")
-    save(img, "print_pullout.png")
-    img = Image.new("RGBA", (900, 220), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    d.text((450, 80), "Fresh Zone", font=font(66, 5), fill=(70, 72, 76, 255), anchor="mm")
-    d.text((450, 150), "Fruit & Vegetables", font=font(36, 7), fill=(96, 98, 104, 255), anchor="mm")
-    save(img, "print_freshzone.png")
+        d.rounded_rectangle([0, 0, im.width - 1, im.height - 1], round(2.5 * K), outline=(132, 134, 138), width=round(0.5 * K))
+        return im, d
+
+    def words(d, parts, cx, cy, cap_mm, colour, w_img):
+        """parts = [(text, face)] on one line, centred at (cx, cy) px, cap height cap_mm"""
+        probe = font(200, parts[0][1])
+        l, t, r, b = d.textbbox((0, 0), "H", font=probe)
+        px = round(200 * cap_mm * K / (b - t))
+        fs = [font(px, f) for _, f in parts]
+        ws = [d.textlength(tx, font=f) for (tx, _), f in zip(parts, fs)]
+        x = cx - sum(ws) / 2
+        for (tx, _), f, wd in zip(parts, fs, ws):
+            d.text((x, cy), tx, font=f, fill=colour, anchor="lm")
+            x += wd
+
+    # the freezer's back-wall plate: "Convertible" in black on steel spun round a centre right of the middle (166 x 77 mm)
+    im, d = plate(166, 77, 0.66, 0.30)
+    words(d, [("Convertible", 2)], im.width / 2, im.height * 0.50, 9.8, (34, 36, 40), im.width)   # 0.47 of the plate wide, as on the photo
+    save(im, "plate_convertible.jpg", 90)
+    # the fridge's control plate (162 x 72 mm): steel spun round the dial; the dial's black ring (56 mm across), its spun face,
+    # the light dots over and under it. The small words round the dial and on its face can't be read on any photo; the
+    # Min and Max of the earlier drawing are kept where it had them (not confirmed on a source)
+    im, d = plate(162, 72, 0.5, 0.5)
+    cx, cy, R = im.width / 2, im.height / 2, 27.8 * K
+    face = Image.fromarray(spun(2 * 26.6, 2 * 26.6, 0.5, 0.5).clip(0, 255).astype(np.uint8))
+    m = Image.new("L", face.size, 0)
+    ImageDraw.Draw(m).ellipse([0, 0, face.width - 1, face.height - 1], fill=255)
+    im.paste(face, (round(cx - face.width / 2), round(cy - face.height / 2)), m)
+    d = ImageDraw.Draw(im)
+    d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(30, 32, 36), width=round(1.3 * K))
+    for sy in (-1, 1):
+        y = cy + sy * (R + 3.0 * K)
+        d.ellipse([cx - 0.9 * K, y - 0.9 * K, cx + 0.9 * K, y + 0.9 * K], fill=(236, 238, 240))
+    for tx, sx, anchor in (("Min", -1, "rm"), ("Max", 1, "lm")):
+        d.text((cx + sx * (R + 4 * K), cy + R * 0.6), tx, font=font(round(3.2 * K), 7), fill=(70, 72, 76), anchor=anchor)
+    save(im, "plate_control.jpg", 90)
+
+    def tray_print(name, w_mm, h_mm, lines):
+        """Words printed on a clear tray (transparent decal); lines = [(parts, centre y fraction, cap mm, colour)]"""
+        im = Image.new("RGBA", (round(w_mm * K), round(h_mm * K)), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        for parts, fy, cap, col in lines:
+            words(d, parts, im.width / 2, im.height * fy, cap, col, im.width)
+        save(im, name)
+    # the builder lays these 170 mm wide; sizes and places as the earlier drawing had them, the weights as on LG's photo
+    # (Fresh 0 / Fresh / Pull-out bold, Zone / Tray and the second lines regular)
+    tray_print("print_fresh0.png", 170, 37.8, [([("Fresh 0 ", 2), ("Zone", 7)], 0.35, 8.6, (60, 62, 66, 255)),
+                                              ([("Fresh & Cool", 7)], 0.675, 4.6, (96, 98, 104, 255))])
+    tray_print("print_pullout.png", 170, 22.7, [([("Pull-out ", 2), ("Tray", 7)], 0.5, 7.2, (60, 62, 66, 255))])
+    tray_print("print_freshzone.png", 170, 44.2, [([("Fresh ", 2), ("Zone", 7)], 0.364, 8.8, (60, 62, 66, 255)),
+                                                 ([("Fruit & Vegetables", 7)], 0.68, 4.8, (96, 98, 104, 255))])
     # the knob top
     k = Image.new("RGB", (256, 256), (235, 236, 238))
     d = ImageDraw.Draw(k)

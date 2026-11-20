@@ -1,0 +1,15 @@
+{
+ "_about": "LG GLT3426SNPZ: LG's label image for this model (2010x1334-2-v1.jpg; it prints LG's family name GLT342), as cut out before.",
+ "template": "lg2026b",
+ "src": "pipeline/sources/photos/lg_glt3426/bee_cut_label.png",
+ "out": "pipeline/tex/lg_glt3426/label.png",
+ "width_mm": 70.5,
+ "words": {
+  "series": "2026 - 28",
+  "value": "245",
+  "type": "Frost Free",
+  "volume": "343",
+  "model": "GLT342",
+  "country": "India"
+ }
+}
