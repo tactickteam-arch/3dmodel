@@ -491,11 +491,13 @@ def pulsator():
 
 
 def filt():
-    """the Magic Filter: a grey frame round a honeycomb mesh, "MagicFilter" printed up its side, a latch at the top"""
+    """the Magic Filter: a grey frame round a honeycomb mesh, "MagicFilter" printed up its side, a latch at the top.
+    Drawn at 4 x its first size (960 x 2560: 12.8 px per mm on the 75 x 200 mm face), the same shapes and places."""
+    K = 4
     w, h = 240, 640
-    img = Image.new("RGB", (w, h), (150, 152, 156))
+    img = Image.new("RGB", (w * K, h * K), (150, 152, 156))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([18, 60, w - 18, h - 18], 14, fill=(132, 134, 139))
+    d.rounded_rectangle([18 * K, 60 * K, (w - 18) * K, (h - 18) * K], 14 * K, fill=(132, 134, 139))
     r = 17
     for row in range(17):
         for col in range(5):
@@ -503,34 +505,36 @@ def filt():
             y = 96 + row * 31
             if x > w - 34 or y > h - 40:
                 continue
-            pts = [(x + r * math.cos(math.radians(60 * i + 30)), y + r * math.sin(math.radians(60 * i + 30))) for i in range(6)]
-            d.polygon(pts, fill=(92, 94, 99), outline=(166, 168, 172))
-    d.rounded_rectangle([86, 8, 154, 56], 8, fill=(122, 124, 129))
-    txt = Image.new("L", (400, 60), 0)
-    ImageDraw.Draw(txt).text((200, 30), "MagicFilter", font=ImageFont.truetype(FONT, 34, index=MED), fill=255, anchor="mm")
+            pts = [((x + r * math.cos(math.radians(60 * i + 30))) * K, (y + r * math.sin(math.radians(60 * i + 30))) * K) for i in range(6)]
+            d.polygon(pts, fill=(92, 94, 99), outline=(166, 168, 172), width=K)
+    d.rounded_rectangle([86 * K, 8 * K, 154 * K, 56 * K], 8 * K, fill=(122, 124, 129))
+    txt = Image.new("L", (400 * K, 60 * K), 0)
+    ImageDraw.Draw(txt).text((200 * K, 30 * K), "MagicFilter", font=ImageFont.truetype(FONT, 34 * K, index=MED), fill=255, anchor="mm")
     txt = txt.rotate(90, expand=True)
     tx = Image.new("RGB", txt.size, (70, 72, 76))
-    img.paste(tx, (w - 52, 200), txt)
+    img.paste(tx, ((w - 52) * K, 200 * K), txt)
     save(img, "filter.jpg", 88)
 
 
 def detergent():
     """the detergent box's front: glossy black, the pour-cup mark, DETERGENT, and Bubble Storm on a light grey bar, as in
-    Samsung's photo of the open lid (lid_open.jpg); 180 x 66 mm at 4 px/mm"""
+    Samsung's photo of the open lid (lid_open.jpg); 180 x 66 mm, drawn at 12 px/mm (3 x its first 4 px/mm: the same
+    shapes and places)"""
+    K = 3
     w, h = 720, 264
-    img = Image.new("RGB", (w, h), (16, 16, 18))
+    img = Image.new("RGB", (w * K, h * K), (16, 16, 18))
     d = ImageDraw.Draw(img)
-    d.text((372, 108), "DETERGENT", font=ImageFont.truetype(FONT, 60, index=REG), fill=(206, 206, 210), anchor="lm")
-    d.rectangle([372, 140, 590, 182], fill=(190, 191, 195))
-    d.text((481, 162), "Bubble Storm", font=ImageFont.truetype(FONT, 34, index=DEMI), fill=(26, 26, 28), anchor="mm")
+    d.text((372 * K, 108 * K), "DETERGENT", font=ImageFont.truetype(FONT, 60 * K, index=REG), fill=(206, 206, 210), anchor="lm")
+    d.rectangle([372 * K, 140 * K, 590 * K, 182 * K], fill=(190, 191, 195))
+    d.text((481 * K, 162 * K), "Bubble Storm", font=ImageFont.truetype(FONT, 34 * K, index=DEMI), fill=(26, 26, 28), anchor="mm")
     # the mark: a cup tipped to pour, and four drops below it
-    d.line([(262, 92), (300, 132), (346, 98)], fill=(200, 200, 204), width=4)
-    d.line([(300, 132), (318, 150), (350, 128), (346, 98)], fill=(200, 200, 204), width=4)
-    d.line([(318, 150), (300, 132)], fill=(200, 200, 204), width=4)
+    P = lambda pts: [(x * K, y * K) for x, y in pts]
+    d.line(P([(262, 92), (300, 132), (346, 98)]), fill=(200, 200, 204), width=4 * K, joint="curve")
+    d.line(P([(300, 132), (318, 150), (350, 128), (346, 98)]), fill=(200, 200, 204), width=4 * K, joint="curve")
+    d.line(P([(318, 150), (300, 132)]), fill=(200, 200, 204), width=4 * K)
     for (x, y) in ((268, 130), (262, 150), (272, 168), (292, 176)):
-        d.ellipse([x - 4, y - 4, x + 4, y + 4], fill=(200, 200, 204))
+        d.ellipse([(x - 4) * K, (y - 4) * K, (x + 4) * K, (y + 4) * K], fill=(200, 200, 204))
     save(img, "detergent.jpg", 90)
-
 
 build_panel()
 label()

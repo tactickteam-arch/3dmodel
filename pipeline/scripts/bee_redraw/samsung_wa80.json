@@ -1,0 +1,8 @@
+{
+  "_about": "Samsung WA80F08S2CTL: Samsung's own 2024-26 label image for this model, as cut out before (bee_cut_label.png).",
+  "template": "sw2024",
+  "src": "pipeline/sources/photos/samsung_wa80/bee_cut_label.png",
+  "out": "pipeline/tex/samsung_wa80/label.png",
+  "width_mm": 92,
+  "words": { "series": "2024 - 26", "value": "0.0083", "type": "Top Load", "cap": "8.0", "model": "WA80F08S2CTL", "country": "India" }
+}
