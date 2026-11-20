@@ -1,0 +1,19 @@
+{
+ "_about": "Samsung RT40H28W1CPNL: Samsung India's picture of this model's own label (label_553849566.jpg), as cut out before.",
+ "template": "samsung2026b",
+ "src": "pipeline/sources/photos/samsung_rt40/bee_cut_label.png",
+ "out": "pipeline/tex/samsung_rt40/label.png",
+ "width_mm": 111.4,
+ "words": {
+  "series": "2026 - 28",
+  "head": "ANNUAL ENERGY CONSUMPTION",
+  "unit": "units/yr",
+  "kind": "Refrigerator",
+  "brand": "SAMSUNG",
+  "country": "INDIA",
+  "value": "263",
+  "type": "Frost Free",
+  "volume_line": "Total Volume : 236 (Ltr)",
+  "model": "RT40H28W1CPNL"
+ }
+}
