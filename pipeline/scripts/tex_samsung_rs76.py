@@ -171,13 +171,14 @@ def label():
 
 
 def mark():
-    lg = Image.open(os.path.join(LOGOS, "samsung.png")).convert("RGBA")
-    a = np.asarray(lg).astype(float)
-    ys, xs = np.where(a[..., 3] > 8)
-    a = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-    out = np.zeros(a.shape, np.uint8)
+    # the wordmark drawn sharp from Samsung's vector logotype (pipeline/sources/logos/samsung.svg, through
+    # tex_samsung_standmark.wordmark), 1060 px across the 84 mm decal: 12.6 px per mm
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_samsung_standmark
+    a = tex_samsung_standmark.wordmark(LOGOS, 1060).astype(float)
+    out = np.zeros(a.shape + (4,), np.uint8)
     out[..., :3] = (226, 228, 232)          # the wordmark reads light silver on the dark door (3/4 photos)
-    out[..., 3] = (a[..., 3] * 0.95).clip(0, 255).astype(np.uint8)
+    out[..., 3] = (a * 0.95).clip(0, 255).astype(np.uint8)
     save(Image.fromarray(out), "mark.png")
     return out.shape[1] / out.shape[0]
 

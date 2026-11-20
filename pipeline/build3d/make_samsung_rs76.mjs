@@ -302,7 +302,7 @@ fridgeDoor.add(bx("FridgeDoorChannel", frX0, frFace0, 0, doorH, zb, chZ, [recess
 // the SAMSUNG wordmark (84 mm, light silver, 45.5 mm below the top, centred 368 mm right of the middle) and the BEE label
 // (133 x 242 mm, 129 mm below the top, centred 310 mm right of the middle), measured on Samsung's straight-on front (its
 // rows are 0.660 px per mm, its columns 0.643: the photo is 2.6% taller than the published size, so heights use its rows)
-fridgeDoor.add(plane("SamsungMarkDecal", 0.084, 0.084 / 6.486, markM, 0.368 - pinX, doorH - 0.0455, zf + 0.0007));
+fridgeDoor.add(plane("SamsungMarkDecal", 0.084, 0.084 / 6.543, markM, 0.368 - pinX, doorH - 0.0455, zf + 0.0007));
 fridgeDoor.add(plane("BeeLabelDecal", 0.133, 0.133 * 1237 / 681, labelM, 0.31 - pinX, doorH - 0.129 - 0.133 * 1237 / 681 / 2, zf + 0.0007));
 const frInside = doorInside(fridgeDoor, "FridgeDoor", FR);
 root.add(freezerDoor, fridgeDoor);
