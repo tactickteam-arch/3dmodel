@@ -10,8 +10,9 @@ Writes pipeline/tex/whirlpool_22457/:
   sixth.png                       the 6th Sense mark on the left fridge door (white)
   panel.jpg                       the door display on the left fridge door's inner edge (black glass), every word and
                                   icon redrawn at 7.2 px/mm on the layout of Whirlpool's close-up of it
-  print_360.png, print_triple.png the 360 degree mark and "TRIPLE COOLING" on the fridge's back panel, cut from
-                                  Whirlpool's own artwork of the mark (the front render's overlay), recoloured grey
+  print_360.png, print_triple.png the 360 degree mark and "TRIPLE COOLING" on the fridge's back panel: the mark cut from
+                                  Whirlpool's own artwork of it (the front render's overlay), recoloured grey; the words
+                                  set again in type on the artwork's letter places (12 px/mm)
   print_arctic.png                "ARCTIC FREEZE" on the freezer's upper drawer
   icons_crisper.png, icons_drawer.png  the line icons on the crisper fronts and the lower drawers, lifted off
                                   Whirlpool's open photo (0.47 px/mm, so soft)
@@ -294,12 +295,37 @@ class Panel:
 # the mark at columns 435-573, rows 324-395; "TRIPLE COOLING" at 398-607, rows 408-418), recoloured to the panel's grey ──
 def overlay_prints():
     im = np.asarray(Image.open(os.path.join(SRC, "front_rs.jpg")).convert("RGB")).astype(np.float32)
-    for name, (x0, x1, y0, y1) in (("print_360", (431, 578, 320, 399)), ("print_triple", (394, 611, 404, 422))):
+    for name, (x0, x1, y0, y1) in (("print_360", (431, 578, 320, 399)),):
         c = im[y0:y1, x0:x1]
         gold = np.clip(((c[..., 0] - c[..., 2]) - 12) / 50, 0, 1)
         a = Image.fromarray((gold * 255).astype(np.uint8)).resize(((x1 - x0) * 4, (y1 - y0) * 4), Image.LANCZOS)
         a = a.filter(ImageFilter.GaussianBlur(0.8)).point(lambda v: 255 if v > 150 else int(v * 255 / 150))
         decal(a, (122, 124, 128)).save(os.path.join(OUT, name + ".png"), optimize=True)
+
+
+# "TRIPLE COOLING" set again sharp (12 px per mm on the model): the artwork's 13 letters are 9 px tall there, too few to cut
+# from, so each letter is set in Avenir Next Demi Bold (the closest face on this Mac to the mark's geometric sans), its cap
+# height and the centre of its box measured on the artwork (columns 394-611, rows 404-422 of front_rs.jpg, the gold above
+# 35%), on the same 217 x 18 canvas as before, so the builder's decal keeps its size and place
+TRIPLE = [("T", 5.5), ("R", 21.5), ("I", 36.5), ("P", 50.0), ("L", 67.0), ("E", 82.5), ("C", 111.5), ("O", 129.5),
+          ("O", 147.5), ("L", 164.0), ("I", 177.5), ("N", 193.0), ("G", 209.5)]
+
+
+def triple():
+    S = 9.4                                         # px per artwork px: 0.783 mm each (217 px = 170 mm), so 12 px per mm
+    cap_top, base = 4.7, 13.8                       # the letters' top and foot on the artwork's rows
+    W, H = round(217 * S), round(18 * S)
+    f = font(DEMI, 200)
+    probe = ImageDraw.Draw(Image.new("L", (10, 10)))
+    l, t, r, b = probe.textbbox((0, 0), "H", font=f, anchor="ls")
+    f = font(DEMI, round(200 * (base - cap_top) * S / (b - t)))
+    img = Image.new("L", (W, H), 0)
+    d = ImageDraw.Draw(img)
+    for ch, cx in TRIPLE:
+        l, t, r, b = d.textbbox((0, 0), ch, font=f, anchor="ls")
+        d.text((cx * S + 0.5 * S - (l + r) / 2, base * S), ch, font=f, fill=255, anchor="ls")
+    decal(img, (122, 124, 128)).save(os.path.join(OUT, "print_triple.png"), optimize=True)
+    print("print_triple.png", (W, H), round(W / 170, 2), "px per mm")
 
 
 def arctic():
@@ -328,6 +354,7 @@ def main():
     sixth()
     p = Panel(); p.draw(); p.save(os.path.join(OUT, "panel.jpg"))
     overlay_prints()
+    triple()
     arctic()
     icons()
     for f in sorted(os.listdir(OUT)):
