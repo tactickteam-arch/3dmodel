@@ -91,6 +91,9 @@ const sidePaint = mat("SidePaint", F0.side, { metal: 0.3, rough: 0.5 });
 const topPaint = mat("TopPaint", F0.top, { metal: 0.15, rough: 0.65 });
 const standM = mat("StandPlastic", F0.stand, { rough: 0.6 });
 const standFront = mat("StandFront", 0xffffff, { rough: 0.5 });
+// the SAMSUNG mark sunk into the drawer front: a sharp decal of its light and shade (12 px per mm, the same on every colour;
+// tex_samsung_standmark.py), the photo's soft mark taken out of the stand texture
+const standMarkM = mat("StandMark", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const markM = mat("SamsungMark", 0xffffff, { rough: 0.45, opacity: 0.999 });
 const badgeM = mat("InverterBadge", 0xffffff, { rough: 0.45, opacity: 0.999 });
 const rearM = mat("SafeCleanBack", 0x8a8d91, { metal: 0.3, rough: 0.55 });
@@ -324,6 +327,8 @@ const notchW = 0.254, notchH = 0.03;
   for (let i = 0; i < p.count; i++) uv.setXY(i, (p.getX(i) + fwBot / 2) / fwBot, 1 - (fy1 - p.getY(i)) / (fy1 - fy0));
   flipV(g);
   drawer.add(mesh("DrawerFace", g, standFront, 0, 0, zNose));
+  // the mark: 198 mm wide (the photo's mark), centred, its middle where the photo has it; 1.5 mm clear round it
+  { const smW = 0.198, smH = smW * 353 / 2304; drawer.add(plane("StandMarkDecal", smW + 0.003, smH + 0.003, standMarkM, 0, 0.166 - 0.6448 * 0.153, zNose + 0.0006)); }
   // the face's thickness round its edge, and the notch's floor and back (the grip)
   drawer.add(box("DrawerFaceBack", fwBot - 0.01, fy1 - fy0, 0.012, standM, 0, (fy0 + fy1) / 2, zNose - 0.008));
   drawer.add(box("DrawerGripFloor", notchW, 0.004, 0.03, dark, 0, fy1 - notchH - 0.002, zNose - 0.015));
@@ -617,7 +622,7 @@ const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 const textures = {
-  DoorFace: `${T}/door_${F0.slug}.jpg`, StandFront: `${T}/stand_${F0.slug}.jpg`, SamsungMark: `${T}/mark_${F0.mark}.png`, InverterBadge: `${T}/badge.png`,
+  DoorFace: `${T}/door_${F0.slug}.jpg`, StandMark: `${T}/stand_mark.png`, StandFront: `${T}/stand_${F0.slug}.jpg`, SamsungMark: `${T}/mark_${F0.mark}.png`, InverterBadge: `${T}/badge.png`,
   Print_freeze: `${T}/print_freeze.png`, Print_fresh: `${T}/print_fresh.png`, Print_temp: `${T}/print_temp.png`,
 };
 Object.assign(textures, stock.textures());

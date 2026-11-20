@@ -272,3 +272,18 @@ prints()
 with open(os.path.join(D, "colours.json"), "w") as fh:
     json.dump(colours, fh, indent=1)
 print("wrote colours.json")
+
+
+# ── the SAMSUNG mark on the stand's drawer front: the photo's soft mark taken out of every stand texture (its box in
+# texture px, found as the mark's edges on all the colours' stands), and drawn sharp as one decal for all colours
+# (tex_samsung_standmark.py; 198 mm wide, the width of the photo's mark, and its height from the wordmark's own proportions) ──
+import glob as _glob  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tex_samsung_standmark as _sm  # noqa: E402
+for _f in sorted(_glob.glob(os.path.join(D, "stand_*.jpg"))):
+    _a = np.asarray(Image.open(_f).convert("RGB")).copy()
+    _sm.paint_out(_a, (278, 136, 622, 190), pad=4)
+    Image.fromarray(_a).save(_f, quality=88, optimize=True)
+    print("mark taken out of", os.path.basename(_f))
+_sm.decal(LOGOS, 198).save(os.path.join(D, "stand_mark.png"), optimize=True)
+print("wrote stand_mark.png")
