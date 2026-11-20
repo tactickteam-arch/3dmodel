@@ -1,0 +1,78 @@
+{
+  "_about": "Haier HW120-DM14F11BKU1 (12 kg): the energy label in Sangeetha's listing images for this model (p21448), as cut out before, with the blue backdrop the old cut kept now made transparent (bee_cut2_bee_label.png).",
+  "template": "hpsg",
+  "src": "pipeline/sources/photos/haier_hw120/bee_cut2_bee_label.png",
+  "out": "pipeline/tex/haier_hw120/bee_label.png",
+  "width_mm": 64,
+  "words": {
+    "value": "0.0408",
+    "y0": "2024",
+    "y1": "2026",
+    "brand": "Haier",
+    "model": "HW120-DM14F11BKU1/2026",
+    "type": "Front Load",
+    "cap": "12.0 kg",
+    "water": "6.45 L/kg/cycle",
+    "reg": "BEE/Hai/0020/20"
+  },
+  "items": [
+    {
+      "key": "head",
+      "box": [
+        0.253,
+        0.5375,
+        0.744,
+        0.5547
+      ],
+      "bg": "cream"
+    },
+    {
+      "key": "t2b",
+      "win": [
+        0.497,
+        0.711,
+        0.92,
+        0.7285
+      ]
+    },
+    {
+      "key": "t4a",
+      "win": [
+        0.185,
+        0.759,
+        0.47,
+        0.7775
+      ],
+      "box": [
+        0.19,
+        0.7609,
+        0.392,
+        0.7775
+      ]
+    },
+    {
+      "key": "t4c",
+      "win": [
+        0.472,
+        0.759,
+        0.497,
+        0.7775
+      ]
+    },
+    {
+      "key": "t4b",
+      "win": [
+        0.497,
+        0.759,
+        0.87,
+        0.7775
+      ],
+      "box": [
+        0.503,
+        0.7609,
+        0.605,
+        0.7775
+      ]
+    }
+  ]
+}
