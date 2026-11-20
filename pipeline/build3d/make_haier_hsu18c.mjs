@@ -12,6 +12,7 @@
 // usage: node make_haier_hsu18c.mjs <entries json> <tex dir> <out.glb>
 import { THREE, mat, mesh, box, group, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { mergeGeometries, mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { uvDecals } from "./decal_curved.mjs";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "haier-hsu18c-tqb3bn-inv";
@@ -280,6 +281,9 @@ root.add(lv);
   }
 }
 
+// the prints again at 15 px per mm on curved decals over the panel (tex_haier_hsu18c.py draws them, decals.json places them)
+const printTex = uvDecals(fp.getObjectByName("PanelFace"), `${T}/decals.json`, (n) => mat(n, 0xffffff, { rough: 0.2 }));
+
 const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
@@ -287,6 +291,7 @@ await exportGLB(root, clips, OUT, {
   PanelFront: `${T}/panel.jpg`,
   Filter: `${T}/filter.jpg`,
   TopGrille: `${T}/top.jpg`,
+  ...printTex,
 }, { dir: `${TEX}/grain`, materials: {
   // glossy moulded white plastic: a faint peel on the body, caps and louvre; none on the printed panel
   Body: { type: "peel_soft" }, SideCap: { type: "peel_soft" }, Louvre: { type: "peel_soft" },

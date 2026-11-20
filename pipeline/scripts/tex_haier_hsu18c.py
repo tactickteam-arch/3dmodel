@@ -9,6 +9,7 @@ Haier's 3/4 photos (1200 x 1200) confirm the same marks at the same places.
 usage: python tex_haier_hsu18c.py <photos dir> <logos dir> <out dir>
 Writes into <out dir>/haier_hsu18c/.
 """
+import json
 import math
 import os
 import sys
@@ -37,10 +38,11 @@ def save(img, name, quality=88):
 
 
 W_PX, H_PX = round(2 * XIN * 1000 * S), round((H - YS1) * 1000 * S)
-X = lambda mm: W_PX / 2 + mm * S
-Y = lambda m: (H - m) * 1000 * S
+OX = OY = 0.0                               # the drawing's origin: 0 for the whole panel, a print's box for its decal
+X = lambda mm: W_PX / 2 + mm * S - OX
+Y = lambda m: (H - m) * 1000 * S - OY
 Xp = lambda col: X((col - CX) / PPM)
-Yp = lambda row: (row - TOP) / PPM * S
+Yp = lambda row: (row - TOP) / PPM * S - OY
 
 
 def seven(d, cx, cy, h, w, ch, col, t):
@@ -69,9 +71,11 @@ def snowflake(d, cx, cy, r, col, t):
             d.line((mx, my, mx + 0.34 * r * math.cos(b), my - 0.34 * r * math.sin(b)), fill=col, width=round(t))
 
 
-def panel():
+def draw_panel(box=None):
+    """the panel's print at the current scale S; box = (x0, y0, x1, y1) in px at S draws only that part"""
     K = 4                                   # everything is drawn at K x and reduced, so edges are smooth
-    big = Image.new("RGB", (W_PX * K, H_PX * K), (240, 241, 243))
+    bw, bh = (W_PX, H_PX) if box is None else (box[2] - box[0], box[3] - box[1])
+    big = Image.new("RGB", (bw * K, bh * K), (240, 241, 243))
     d = ImageDraw.Draw(big, "RGBA")
     XK, YK = (lambda mm: X(mm) * K), (lambda m: Y(m) * K)
     # Haier wordmark from Haier's own logo file, black as on the unit, fitted to the photo's box (cols 394..432, rows 384..396)
@@ -119,11 +123,39 @@ def panel():
     sw = 0.16 * cap
     ib = f.getbbox("\u0131")
     d.rectangle((xs[1] + 0.45 * adv[1], by0 - 0.01 * cap, xs[2] + ib[2], by0 + sw), fill=ink)
-    img = big.resize((W_PX, H_PX), Image.LANCZOS)
+    img = big.resize((bw, bh), Image.LANCZOS)
     # a 1.5 % fall to the bottom, as on the Haier HSO52 panel
-    g = np.linspace(1.0, 0.985, H_PX)[:, None, None]
-    img = Image.fromarray((np.asarray(img).astype(float) * g).clip(0, 255).astype(np.uint8))
-    save(img, "panel.jpg", 90)
+    g = (1.0 - 0.015 * (OY + np.arange(bh)) / (H_PX - 1))[:, None, None]
+    return Image.fromarray((np.asarray(img).astype(float) * g).clip(0, 255).astype(np.uint8))
+
+
+# The prints again at 15 px per mm (12+ on the curved panel), each on its own decal over the panel: the box round each
+# print, in the panel texture's px (3 per mm), and the same box of the same drawing at 5 x; the panel ground is in both,
+# so the decal's edge doesn't show. decals.json gives each box as a UV rectangle of the panel for the builder.
+DECAL_K = 5
+DECALS = {                                  # photo boxes (cols, rows) of each print, 4 mm round it
+    "wordmark": (394, 384, 432, 396),
+    "display": (665, 380, 722, 404),
+    "badge": (713, 470, 800, 482),
+}
+
+
+def panel():
+    global S, W_PX, H_PX, OX, OY
+    save(draw_panel(), "panel.jpg", 90)
+    S0, W0, H0 = S, W_PX, H_PX
+    out = {}
+    for name, (c0, r0, c1, r1) in DECALS.items():
+        m = 4 * S0
+        box = (math.floor(Xp(c0) - m), math.floor(Yp(r0) - m), math.ceil(Xp(c1 + 1) + m), math.ceil(Yp(r1 + 1) + m))
+        S, W_PX, H_PX = S0 * DECAL_K, W0 * DECAL_K, H0 * DECAL_K
+        OX, OY = box[0] * DECAL_K, box[1] * DECAL_K
+        img = draw_panel(tuple(v * DECAL_K for v in box))
+        S, W_PX, H_PX, OX, OY = S0, W0, H0, 0.0, 0.0
+        save(img, f"decal_{name}.jpg", 90)
+        out[name] = {"file": f"decal_{name}.jpg", "rect": [box[0] / W0, box[1] / H0, box[2] / W0, box[3] / H0]}
+    with open(os.path.join(OUT, PRODUCT, "decals.json"), "w") as f:
+        json.dump(out, f, indent=1)
 
 
 def filters():
