@@ -1,0 +1,8 @@
+{
+  "_about": "Samsung WA70BG4441BY: Samsung's own 2024-26 label image for this model, as cut out before (bee_cut_label.png).",
+  "template": "sw2024",
+  "src": "pipeline/sources/photos/samsung_wa70/bee_cut_label.png",
+  "out": "pipeline/tex/samsung_wa70/label.png",
+  "width_mm": 88,
+  "words": { "series": "2024 - 26", "value": "0.0089", "type": "Top Load", "cap": "7.0", "model": "WA70BG4441BYTL", "country": "India" }
+}
