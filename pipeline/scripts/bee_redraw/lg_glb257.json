@@ -1,0 +1,15 @@
+{
+ "_about": "LG GL-B257JDS3: LG's label image for this model (energy_label.jpg), as cut out before.",
+ "template": "lg2026",
+ "src": "pipeline/sources/photos/lg_glb257/bee_cut_label.png",
+ "out": "pipeline/tex/lg_glb257/label.png",
+ "width_mm": 89,
+ "words": {
+  "series": "2023 - 26",
+  "value": "552",
+  "type": "Side by Side",
+  "volume": "650",
+  "model": "GL-B257JDS3",
+  "country": "INDIA"
+ }
+}
