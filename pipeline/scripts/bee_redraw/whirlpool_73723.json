@@ -1,0 +1,20 @@
+{
+  "_about": "Whirlpool 207 L (DAS20743ITAUC): Whirlpool's own 2026-28 label image on this product's page (image 175026), as cut out before (bee_cut_bee_label.png).",
+  "template": "wp2026r",
+  "src": "pipeline/sources/photos/whirlpool_73723/bee_cut_bee_label.png",
+  "out": "pipeline/tex/whirlpool_73723/bee_label.png",
+  "width_mm": 90,
+  "words": {
+    "series": "2026 - 28",
+    "value": "152",
+    "type": "Direct Cool",
+    "brand": "Whirlpool",
+    "volume": "207",
+    "model": "DAS20743ITAUC",
+    "country": "India"
+  },
+  "rim": {
+    "px": 4,
+    "to": "white"
+  }
+}
