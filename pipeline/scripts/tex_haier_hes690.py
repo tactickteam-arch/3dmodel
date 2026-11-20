@@ -39,12 +39,16 @@ D = os.path.join(OUT, "haier_hes690")
 os.makedirs(D, exist_ok=True)
 rng = np.random.default_rng(690)
 AV = "/System/Library/Fonts/Avenir Next.ttc"      # faces: 0 Bold, 5 Medium, 7 Regular, 10 Ultra Light
-PXMM = 7.2                                          # print resolution
+PXMM = 7.2                                          # print resolution (the display)
+PRINT_PXMM = 15                                     # the words inside: the builder lays them about 0.8 x their size here, 12 px/mm on the model
 
 
 def save(img, name, q=86):
     p = os.path.join(D, name)
-    if name.endswith(".png"):
+    if name.startswith("print_") and name != "print_display.png":
+        # the words are two or three inks: 48 palette colours keep their edges and hold the model under its 3.8 MB budget
+        img.quantize(colors=48, method=Image.FASTOCTREE, dither=Image.Dither.NONE).save(p, optimize=True)
+    elif name.endswith(".png"):
         img.save(p, optimize=True)
     else:
         img.convert("RGB").save(p, quality=q, optimize=True)
@@ -327,7 +331,7 @@ def rear():
 # ── the words Haier prints inside, set again sharp (Avenir Next, the closest face on this Mac to Haier's geometric sans) ──
 def two_weight(parts, cap_mm, name, pad=0.6, bar=None):
     """Words in two weights on one line; parts = [(text, face, rgba)], cap height cap_mm. bar = rgba draws a black bar."""
-    S = PXMM * 3
+    S = PRINT_PXMM * 3
     f0 = font(200, 0)
     probe = ImageDraw.Draw(Image.new("L", (10, 10)))
     l, t, r, b = probe.textbbox((0, 0), "H", font=f0)
@@ -346,7 +350,7 @@ def two_weight(parts, cap_mm, name, pad=0.6, bar=None):
         x += w
     out = im.resize((max(1, round(pw / 3)), max(1, round(ph / 3))), Image.LANCZOS)
     save(out, name)
-    print(name, "mm", round(out.width / PXMM, 1), "x", round(out.height / PXMM, 1))
+    print(name, "mm", round(out.width / PRINT_PXMM, 1), "x", round(out.height / PRINT_PXMM, 1))
 
 
 def prints():
