@@ -1,36 +1,36 @@
 {
  "label_px": [
-  636,
-  1140
+  1363,
+  2443
  ],
- "ink_w": 616,
- "pad": 10,
+ "ink_w": 1320,
+ "pad": 21,
  "patch": [
-  62,
-  930,
-  402,
-  959
+  133,
+  1993,
+  862,
+  2055
  ],
  "models": {
   "elegant_inox": {
    "text": "Model No.: RT40H28U2PHL",
-   "w_px": 303.8
+   "w_px": 651.07
   },
   "black_doi": {
    "text": "Model No.: RT40H28U2FHL",
-   "w_px": 302.2
+   "w_px": 647.64
   },
   "hydrangea_blue": {
    "text": "Model No.: RT40H28U2HSHL",
-   "w_px": 316.5
+   "w_px": 678.29
   },
   "paradise_bloom_blue": {
    "text": "Model No.: RT40H28U2PBHL",
-   "w_px": 320.8
+   "w_px": 687.5
   },
   "paradise_bloom_purple": {
    "text": "Model No.: RT40H28U2PRHL",
-   "w_px": 320.8
+   "w_px": 687.5
   }
  }
 }
