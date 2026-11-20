@@ -1,0 +1,15 @@
+{
+ "_about": "LG GLT4626TMPZ: LG's label image for this model (GLT4626TMPZ-2010x1334-2-v.jpg; it prints LG's family name GLT462), as cut out before.",
+ "template": "lg2026",
+ "src": "pipeline/sources/photos/lg_glt4626/bee_cut_label.png",
+ "out": "pipeline/tex/lg_glt4626/label.png",
+ "width_mm": 90,
+ "words": {
+  "series": "2026 - 28",
+  "value": "261",
+  "type": "Frost Free",
+  "volume": "466",
+  "model": "GLT462",
+  "country": "INDIA"
+ }
+}

@@ -130,7 +130,11 @@ def label():
 
 
 def lgmark():
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
+    # drawn sharp from LG's vector mark (tex_lg_mark.py) in the layout of logos/lg.png, 600 px across the 47 mm decal:
+    # 12.8 px per mm (logos/lg.png's 349 px gave 7.4)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    lg = tex_lg_mark.lg_hi(LOGOS, 600)
     a = np.asarray(lg).astype(float)
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (84, 86, 90)
@@ -186,13 +190,15 @@ def plates():
     save(brushed_plate(326, 148, "Convertible"), "plate_convertible.jpg", 90)
     save(brushed_plate(326, 150, "Hygiene Fresh"), "plate_hygiene.jpg", 90)
     # printed words on the clear trays (transparent decals): "Fresh 0 Zone / Fish & Meat" and "Fresh Zone / Fruit & Vegetables"
-    img = Image.new("RGBA", (900, 200), (0, 0, 0, 0))
-    word(img, "Fresh 0 Zone", 450, 72, 50, 5, (60, 62, 66, 255))
-    word(img, "Fish & Meat", 450, 145, 24, 7, (90, 92, 98, 255))
+    # (drawn at 3 x the first layout: about 12.8 px per mm on the trays)
+    k = 3
+    img = Image.new("RGBA", (900 * k, 200 * k), (0, 0, 0, 0))
+    word(img, "Fresh 0 Zone", 450 * k, 72 * k, 50 * k, 5, (60, 62, 66, 255))
+    word(img, "Fish & Meat", 450 * k, 145 * k, 24 * k, 7, (90, 92, 98, 255))
     save(img, "print_fresh0.png")
-    img = Image.new("RGBA", (900, 220), (0, 0, 0, 0))
-    word(img, "Fresh Zone", 450, 82, 52, 5, (60, 62, 66, 255))
-    word(img, "Fruit & Vegetables", 450, 158, 26, 7, (90, 92, 98, 255))
+    img = Image.new("RGBA", (900 * k, 220 * k), (0, 0, 0, 0))
+    word(img, "Fresh Zone", 450 * k, 82 * k, 52 * k, 5, (60, 62, 66, 255))
+    word(img, "Fruit & Vegetables", 450 * k, 158 * k, 26 * k, 7, (90, 92, 98, 255))
     save(img, "print_freshzone.png")
 
 
