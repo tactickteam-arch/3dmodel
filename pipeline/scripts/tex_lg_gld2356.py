@@ -6,7 +6,7 @@ usage: python3 -I tex_lg_gld2356.py <photos dir> <logos dir> <out dir>
           the rear (the same back on every colour)
           lg_gld2356/manual/control_panel_dial.png  the dial's printed ring, from LG's manual (MFL72035001, its control
           panel figure, rasterised)
-  logos:  lg.png
+  logos:  lg.png (its layout; the marks are drawn from pipeline/sources/logos/lg.svg)
   writes <out dir>/lg_gld2356/:
     door_<finish>.jpg        each colour's door face, from that colour's own front photo (the handle's chrome bar, the
                              lock, the LG mark and the energy label taken out: they are modelled or decals)
@@ -245,9 +245,17 @@ def doors():
         sheet.save(os.path.join(DBG, "gld_door_overlay.png"))
 
 
+def lg_hi(canvas_w):
+    """LG's mark drawn sharp from pipeline/sources/logos/lg.svg in logos/lg.png's layout (tex_lg_mark.py)."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    return np.asarray(tex_lg_mark.lg_hi(LOGOS, canvas_w)).astype(float)
+
+
 def lgmarks():
     """The LG mark on the door: dark grey on the steel, light on the printed doors (both read off the fronts)."""
-    lg = np.asarray(Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")).astype(float)
+    # the door's mark is 52 mm wide (720 px, about 14 px per mm), the stand's 100 mm (1200 px, 12 px per mm)
+    lg = lg_hi(720)
     # one-colour mark: the logo file's white face lines inside the red circle become cut-outs, as on LG's moulded marks
     lg[..., 3] *= 1 - np.clip((lg[..., :3].min(2) - 150) / 70, 0, 1)
     for name, fin in (("lgmark_dark", "shiny_steel"), ("lgmark_light", "royal_spring")):
@@ -259,6 +267,8 @@ def lgmarks():
         save(Image.fromarray(mk), name + ".png")
     # the stand's mark, one image per finish with its ink baked in (colours.json stand_mark): Apple's SceneKit ignores
     # a texture's colour factor, so a white image tinted by the factor drew white there
+    lg = lg_hi(1200)
+    lg[..., 3] *= 1 - np.clip((lg[..., :3].min(2) - 150) / 70, 0, 1)
     for fin, sm in colours["stand_mark"].items():
         mk = np.zeros(lg.shape, np.uint8)
         mk[..., :3] = [int(v) for v in sm["col"]]
@@ -363,7 +373,7 @@ def prints():
     ring = np.zeros((h, w, 4), np.uint8)
     ring[..., :3] = (70, 72, 78)
     ring[..., 3] = np.clip(ink * 255 * (rr > rk * 1.02), 0, 255).astype(np.uint8)
-    save(Image.fromarray(ring).resize((384, round(384 * h / w)), Image.LANCZOS), "dial_ring.png")
+    save(Image.fromarray(ring).resize((840, round(840 * h / w)), Image.LANCZOS), "dial_ring.png")   # 12 px per mm on the 70 mm ring
     face = np.full((h, w, 3), 246, np.float32) - ink[..., None] * 150
     x0, y0 = int(cx - rk), int(cy - rk)
     face[rr > rk * 0.97] = 246

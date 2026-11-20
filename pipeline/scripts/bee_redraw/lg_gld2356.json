@@ -1,0 +1,15 @@
+{
+ "_about": "LG GLD2356* (all four colours): LG's label image for this model (LG's gallery, 2010x1334-2-v.jpg), as cut out before.",
+ "template": "lg2026",
+ "src": "pipeline/sources/photos/lg_gld2356/bee_cut_label.png",
+ "out": "pipeline/tex/lg_gld2356/label.png",
+ "width_mm": 84,
+ "words": {
+  "series": "2026 - 28",
+  "value": "118",
+  "type": "Direct Cool",
+  "volume": "224",
+  "model": "GLD235",
+  "country": "INDIA"
+ }
+}
