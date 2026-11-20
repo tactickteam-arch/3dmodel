@@ -123,6 +123,9 @@ const linerDk = mat("LinerGrey", 0xd5d9de, { rough: 0.6 });
 const doorLinerM = mat("DoorLiner", 0xc9ccd0, { metal: 0.2, rough: 0.5 });   // the door's grey liner frame (open photo)
 const gasket = mat("Gasket", 0x8d9196, { rough: 0.85 });
 const white = mat("WhitePlastic", 0xf6f7f8, { rough: 0.45 });
+// the knob is light blue on every colour's open photo (9r, 9u, cr, cu, hs, ht, uz): its face sampled on 9r/cr/hs, set against
+// the white panel beside it on the same photo (knob 157,175,203 on panel 229,230,235) and scaled to this file's WhitePlastic
+const knobM = mat("KnobBlue", 0xa9bcd6, { rough: 0.35 });
 const clear = mat("ClearPlastic", 0xc9dcef, { rough: 0.12, opacity: 0.5, side: THREE.DoubleSide });       // Samsung: "a mild blue"
 const clearLight = mat("ClearPlasticLight", 0xdfe9f3, { rough: 0.12, opacity: 0.26, side: THREE.DoubleSide });
 const clearRib = mat("ClearRib", 0xeef4fa, { rough: 0.3, opacity: 0.92 });
@@ -265,7 +268,7 @@ cab.add(mesh("VentSlots", mergeGeometries([...Array(11)].map((_, i) => new THREE
   const pcx = (pnX0 + fbX1) / 2;
   cab.add(mesh("ControlPanel", new THREE.BoxGeometry(fbX1 - pnX0, h, d), [white, white, white, white, panelM, white], pcx, (fbBot + fbTop) / 2, zc));
   { const g = cab.getObjectByName("ControlPanel").geometry; flipV(g); }
-  const k = cyl("TempKnob", 0.0095, 0.0095, 0.012, white, pcx, 1.160, fbZ1 + 0.006, 32);
+  const k = cyl("TempKnob", 0.0095, 0.0095, 0.012, knobM, pcx, 1.160, fbZ1 + 0.006, 32);
   k.rotation.x = Math.PI / 2;
   cab.add(k);
   cab.add(box("KnobRib", 0.003, 0.014, 0.004, linerDk, pcx, 1.160, fbZ1 + 0.014));
