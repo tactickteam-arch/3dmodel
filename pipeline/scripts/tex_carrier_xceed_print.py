@@ -6,8 +6,8 @@ usage: python3 -I tex_carrier_xceed_print.py <site dir>
   writes pipeline/tex/carrier/front_print.jpg  the panel with its soft 2 px/mm oval taken out (the decal goes over it)
          pipeline/tex/carrier/logo.png         the oval, 34 mm tall, 12 px per mm, transparent round it
 
-The size, place and colour are the ones prep_textures.py already gives the oval (34 mm tall, centred across, its centre at
-56% of the panel's height, as in Carrier's photo; the colour of the SVG). Only the sharpness changes.
+The size and place are the ones prep_textures.py already gives the oval (34 mm tall, centred across, its centre at 56% of
+the panel's height, as in Carrier's photo); the blue is sampled off the badge on Carrier's main photo (below).
 """
 import os
 import subprocess
@@ -54,5 +54,13 @@ with tempfile.TemporaryDirectory() as tmp:
 
     im = draw(1000)
     im = draw(round(1000 * OVAL_H * K / im.height))
+# its blue is the real badge's, not the SVG's (2, 2, 152), which reads purple: the oval's saturated core on Carrier's main photo
+# (photos/carrier/1.jpg, the 21 x 9 px badge: median (3, 64, 161)) set against the white panel beside it on the same photo
+# (214, 215, 233), the ratio taken in linear light and applied to this panel's white near the mark (246, 247, 249)
+BLUE = (4, 75, 172)
+a = np.asarray(im).astype(np.float32)
+w = np.clip(1 - (a[..., 0] - 2) / (255 - 2), 0, 1)[..., None]         # 1 on the SVG's blue (red 2), 0 on its white (red 255)
+a[..., :3] = a[..., :3] * (1 - w) + np.array(BLUE, np.float32) * w      # the blue changes; the white word and ring stay white
+im = Image.fromarray(a.round().clip(0, 255).astype(np.uint8))
 im.save(os.path.join(D, "logo.png"), optimize=True)
 print("wrote logo.png", im.size, "mm", round(im.width / K, 1), "x", round(im.height / K, 1))
