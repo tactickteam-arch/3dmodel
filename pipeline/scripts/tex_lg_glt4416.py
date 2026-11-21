@@ -182,17 +182,19 @@ def rear():
 
 
 def prints():
-    # "Convertible" in black on the freezer's raised back panel (DZ-06: about 130 mm wide), drawn at 6 px per mm
-    img = Image.new("RGBA", (840, 150), (0, 0, 0, 0))
-    word(img, "Convertible", 420, 75, 92, 2, (24, 25, 28, 255), max_w=780)
+    # "Convertible" in black on the freezer's raised back panel (DZ-06: about 130 mm wide), drawn at 12 px per mm
+    img = Image.new("RGBA", (1680, 300), (0, 0, 0, 0))
+    word(img, "Convertible", 840, 150, 184, 2, (24, 25, 28, 255), max_w=1560)
     save(img, "print_convertible.png")
     # "Ice Maker" on the ice maker's top band (DZ-06: about 42 mm wide, cap height about 6 mm): "Ice" bold, "Maker" regular
-    scratch = Image.new("RGBA", (600, 200), (0, 0, 0, 0))
-    wi, wm, gap = text(scratch, "Ice", 300, 100, 36, 2, (0, 0, 0, 255)), text(scratch, "Maker", 300, 100, 36, 7, (0, 0, 0, 255)), 12
-    img = Image.new("RGBA", (300, 64), (0, 0, 0, 0))
-    x0 = 150 - (wi + gap + wm) / 2
-    text(img, "Ice", x0 + wi / 2, 32, 36, 2, (60, 62, 66, 255))
-    text(img, "Maker", x0 + wi + gap + wm / 2, 32, 36, 7, (80, 82, 86, 255))
+    # (1.8 x the first draft: 6.8 -> 12 px per mm)
+    m = 1.8
+    scratch = Image.new("RGBA", (round(600 * m), round(200 * m)), (0, 0, 0, 0))
+    wi, wm, gap = text(scratch, "Ice", 300 * m, 100 * m, 36 * m, 2, (0, 0, 0, 255)), text(scratch, "Maker", 300 * m, 100 * m, 36 * m, 7, (0, 0, 0, 255)), 12 * m
+    img = Image.new("RGBA", (round(300 * m), round(64 * m)), (0, 0, 0, 0))
+    x0 = 150 * m - (wi + gap + wm) / 2
+    text(img, "Ice", x0 + wi / 2, 32 * m, 36 * m, 2, (60, 62, 66, 255))
+    text(img, "Maker", x0 + wi + gap + wm / 2, 32 * m, 36 * m, 7, (80, 82, 86, 255))
     save(img, "print_icemaker.png")
     # the trays' words, as LG prints them (DZ-07): "Fresh 0 Zone / Fish & Meat" and "Fresh Zone / Fruit & Vegetables"
     # (drawn at 3 x the first layout: about 12.8 px per mm on the trays)
@@ -208,14 +210,14 @@ def prints():
 
 
 def panel():
-    """The inner control panel (manual: Control Panel 2, Type B), 118 x 57 mm at 7.2 px per mm, as printed on the fridge's
+    """The inner control panel (manual: Control Panel 2, Type B), 118 x 57 mm at 12 px per mm, as printed on the fridge's
     back wall: a pale grey label, grey words, ten unlit dots and the two key outlines. Positions are fractions of the manual's
     drawing (its frame runs 160-1445 x 68-683 units)."""
-    S = 7.2
+    S = 12
     W_, H_ = round(118 * S), round(57 * S)
     img = Image.new("RGBA", (W_, H_), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([0, 0, W_ - 1, H_ - 1], 3 * S, fill=(226, 228, 231, 255), outline=(178, 181, 186, 255), width=2)
+    d.rounded_rectangle([0, 0, W_ - 1, H_ - 1], 3 * S, fill=(226, 228, 231, 255), outline=(178, 181, 186, 255), width=max(2, round(0.28 * S)))
     ink, dot = (70, 72, 78, 255), (120, 123, 129, 255)
     fx = lambda u: (u - 160) / 1285 * W_
     fy = lambda v: (v - 68) / 615 * H_
