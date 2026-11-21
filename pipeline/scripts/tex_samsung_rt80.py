@@ -377,23 +377,31 @@ def back_fridge():
 
 def filter_print():
     # the Active Fresh Filter+ unit (Samsung's close-up g_550460089 and the open-door photo, rows 944-968, x 842-1019):
-    # a light grey face, eleven louvres to each side and the name plate in the middle with "Active Fresh / Filter+"
-    PX = 6
+    # a white face, four louvre slats to each side (the close-up shows four grooves each side, 21 Nov; it had eight bars)
+    # and the silver name plate in the middle with "Active Fresh / Filter+" in near-black semibold
+    PX = 11  # px per mm (was 6), so "Active Fresh Filter+" stays sharp at the 4 degree close-up
     wm, hm = 323, 44
     w, h = wm * PX, hm * PX
-    img = Image.new("RGB", (w * S, h * S), (236, 238, 241))
+    img = Image.new("RGB", (w * S, h * S), (240, 241, 243))
     d = ImageDraw.Draw(img)
-    rrect(d, (2, 2, w - 2, h - 2), 4 * PX, outline=(214, 217, 222), w=2.5)
+    rrect(d, (2, 2, w - 2, h - 2), 4 * PX, outline=(214, 217, 222), w=2.5 * PX / 6)
     plate = (wm / 2 - 30, 7, wm / 2 + 30, hm - 7)
     for side in (-1, 1):
         xa, xb = (6, plate[0] - 5) if side < 0 else (plate[2] + 5, wm - 6)
-        for k in range(8):
-            y = 8 + k * 4
-            rrect(d, (xa * PX, y * PX, xb * PX, (y + 1.4) * PX), 0.7 * PX, fill=(176, 180, 186))
-    rrect(d, tuple(v * PX for v in plate), 2 * PX, fill=(212, 214, 218), outline=(190, 193, 198), w=2)
-    f = font(AV, 6.2 * PX, 5)
-    text(d, (wm / 2 * PX, (hm / 2 - 3.6) * PX), "Active Fresh", f, (70, 73, 80))
-    text(d, (wm / 2 * PX, (hm / 2 + 3.8) * PX), "Filter⁺", f, (70, 73, 80))
+        for k in range(4):
+            y = 12.5 + k * 7.0
+            rrect(d, (xa * PX, y * PX, xb * PX, (y + 1.1) * PX), 0.5 * PX, fill=(150, 154, 160))
+            rrect(d, (xa * PX, (y + 1.1) * PX, xb * PX, (y + 1.8) * PX), 0.3 * PX, fill=(250, 251, 252))
+    rrect(d, tuple(v * PX for v in plate), 2 * PX, fill=(196, 199, 203), outline=(160, 164, 170), w=2 * PX / 6)
+    f = font(AV, 6.2 * PX, 2)
+    text(d, (wm / 2 * PX, (hm / 2 - 3.6) * PX), "Active Fresh", f, (34, 35, 38))
+    # "Filter" then a small raised "+" (Avenir Next has no superscript plus: "Filter⁺" drew a missing-glyph box)
+    fs = font(AV, 6.2 * PX * 0.62, 2)
+    wf, wp = d.textlength("Filter", font=f), d.textlength("+", font=fs)
+    x0 = wm / 2 * PX * S - (wf + wp) / 2
+    yb = (hm / 2 + 3.8) * PX * S
+    d.text((x0, yb), "Filter", font=f, fill=(34, 35, 38), anchor="lm")
+    d.text((x0 + wf, yb - 6.2 * PX * S * 0.30), "+", font=fs, fill=(34, 35, 38), anchor="lm")
     img = img.resize((w, h), Image.LANCZOS).quantize(colors=48, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
     p = os.path.join(D, "filter_print.png")
     img.save(p, optimize=True)
@@ -410,11 +418,9 @@ def shared_prints():
         runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tex_samsung_fridge.py"), run_name="__main__")
     finally:
         sys.argv = argv
-    # drawn at 12 px per mm; kept at 8 (above the 7.2 the print needs at the 4 degree close-up), so the GLB with its three
-    # colours stays within the fridge budget
+    # drawn at 12 px per mm and kept at that (21 Nov; was cut to 8 for the budget, which still has room)
     for n in ("inner_panel.png", "bigbox_print.png", "icemaker_print.png"):
         im = Image.open(os.path.join(tmp, "samsung", n))
-        im = im.resize((round(im.width * 2 / 3), round(im.height * 2 / 3)), Image.LANCZOS)
         if im.mode == "RGBA":
             im = im.quantize(colors=64, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
         save(im, n)
