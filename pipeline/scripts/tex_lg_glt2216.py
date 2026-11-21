@@ -283,7 +283,13 @@ def sides():
 
 def lgmarks():
     """The LG mark: light grey on the dark doors, dark grey on the light ones (both read off the front photos)."""
-    lg = np.asarray(Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")).astype(float)
+    # drawn sharp from LG's vector mark (tex_lg_mark.py, as for the GLT2526) in the layout of logos/lg.png, 600 px across
+    # the 47 mm decal: 12.8 px per mm (the 349 px mark gave 7.4)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    lg = np.asarray(tex_lg_mark.lg_hi(LOGOS, 600).convert("RGBA")).astype(float)
+    # one-colour mark: the logo file's white face lines inside the red circle become cut-outs (as tex_lg_gld2356.py)
+    lg[..., 3] *= 1 - np.clip((lg[..., :3].min(2) - 150) / 70, 0, 1)
     for name, col in (("lgmark_light", (150, 151, 154)), ("lgmark_dark", (84, 86, 90))):
         mk = np.zeros(lg.shape, np.uint8)
         mk[..., :3] = col
@@ -374,6 +380,18 @@ def prints():
     img = Image.new("RGBA", (463 * S, 140 * S), (246, 247, 249, 255))
     word(img, "Fresh Zone", 463 * S / 2 + 15 * S, (140 - 70) * S, 7.5 * S, 5, (128, 130, 136, 255), max_w=46 * S)
     save(img.convert("RGB"), "fresh_zone.jpg", 90)
+    # the same front again at 12 px per mm, cut to the word and 2 mm round it: a decal over the drawer front so the word
+    # stays sharp close up (fz_word.jpg; fz_word.json gives its box in mm from the front's top left for the builder)
+    S = 12
+    img = Image.new("RGBA", (463 * S, 140 * S), (246, 247, 249, 255))
+    word(img, "Fresh Zone", 463 * S / 2 + 15 * S, (140 - 70) * S, 7.5 * S, 5, (128, 130, 136, 255), max_w=46 * S)
+    x0, y0, x1, y1 = img.convert("L").point(lambda v: 255 if v < 240 else 0).getbbox()
+    m = 2 * S
+    x0, y0, x1, y1 = (x0 - m) // S * S, (y0 - m) // S * S, -(-(x1 + m) // S) * S, -(-(y1 + m) // S) * S
+    img.crop((x0, y0, x1, y1)).convert("RGB").save(os.path.join(D, "fz_word.jpg"), quality=92, subsampling=0)
+    with open(os.path.join(D, "fz_word.json"), "w") as f:
+        json.dump({"face_mm": [463, 140], "box_mm": [x0 / S, y0 / S, x1 / S, y1 / S]}, f)
+    print("wrote fz_word.jpg", (x1 - x0, y1 - y0), "box mm", (x0 / S, y0 / S, x1 / S, y1 / S))
 
 
 def grain_h():
