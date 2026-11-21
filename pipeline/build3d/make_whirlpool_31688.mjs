@@ -10,8 +10,9 @@
 //   lid_open_top.jpg       the well, the drum and the impeller: dark grey dish, black vanes and hub
 // Whirlpool shows no rear photo of the 31688, so its back is left plain: no cord, inlet or drain hose are drawn (NOTES.md).
 // usage: node make_whirlpool_31688.mjs <entry.json> <tex dir> <out.glb>
-import { stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
+import { mat, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { buildBloomwash } from "./make_whirlpool_31671.mjs";
+import { uvDecals } from "./decal_curved.mjs";
 
 // ── the 31688's measurements (metres). VERIFIED: W, H, D. Everything else ESTIMATED off Whirlpool's 31688 photos. ──
 export const K31688 = {
@@ -49,12 +50,15 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const ID = "whirlpool-31688";
   const T = `${TEX}/whirlpool_31688`;
   const root = buildBloomwash(K31688);
+  // the panel's print at 12 px per mm for a close look: two halves (each under the 4096 px a phone loads) laid over the
+  // panel face, the same drawing as panel.jpg (tex_whirlpool_31688.py panel_halves), the face's satin finish
+  const printTex = uvDecals(root.getObjectByName("PanelFace"), `${T}/decals.json`, (n) => mat(n, 0xffffff, { rough: 0.38 }), { cell: [0.05, 0.05] });
   const parts = productParts(PRODUCTS, ID);
   const clips = stateClips(root, parts);
   saveZones(PRODUCTS, ID, root, parts);
   await exportGLB(root, clips, OUT, {
     SideL: `${T}/side.jpg`, SideR: `${T}/side.jpg`, PanelFace: `${T}/panel.jpg`, LabelBEE: `${T}/label.png`,
-    SteelDrum: `${T}/drum.jpg`, Impeller: `${T}/impeller.jpg`,
+    SteelDrum: `${T}/drum.jpg`, Impeller: `${T}/impeller.jpg`, ...printTex,
   }, { dir: `${TEX}/grain`, materials: {
     // Grain (BENCHMARK.md section 10). Whirlpool names the finish Graphite, a paint colour (no hairline in any of its photos):
     // the cabinet, its sides and the top cover get the soft peel; the moulded plinth and the lid's inner frame the strong peel;
