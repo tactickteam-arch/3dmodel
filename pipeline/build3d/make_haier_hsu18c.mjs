@@ -72,8 +72,8 @@ const louvreMat = mat("Louvre", 0xeef0f2, { rough: 0.28 });
 const louvreIn = mat("LouvreInner", 0xd0d3d7, { rough: 0.5 });
 const outlet = mat("Outlet", 0x9a9ea3, { rough: 0.85 });   // Haier's open-louvre photo: a light grey channel
 const vaneMat = mat("Vane", 0xdcdfe2, { rough: 0.45 });
-const bottomMat = mat("Bottom", 0xe4e6e9, { rough: 0.5 });
-const backMat = mat("Back", 0xc8cbcf, { rough: 0.7 });
+const bottomMat = mat("Bottom", 0xe4e6e9, { rough: 0.5, side: THREE.DoubleSide });   // two-sided: seen from inside through the seams it must not let the background through
+const backMat = mat("Back", 0xc8cbcf, { rough: 0.7, side: THREE.DoubleSide });   // two-sided: seen from inside through the seams it must not let the background through
 const lineMat = mat("Seam", 0xa4a8ad, { rough: 0.6 });
 
 // ── geometry helpers (as in make_haier_hso52.mjs) ──
