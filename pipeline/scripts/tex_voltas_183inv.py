@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 PHOTOS, OUT = sys.argv[1:3]
 PRODUCT = "voltas_183inv"
 S = 3.0                      # px per mm
-XIN, H, YG = 0.443, 0.310, 0.092   # half width of the panel, unit height, top of the gold line (m)
+XIN, H, YG = 0.451, 0.310, 0.092   # half width of the panel (the builder's xIn; 0.443 drew every print 1.8% wide), unit height, top of the gold line (m)
 W_PX, H_PX = round(2 * XIN * 1000 * S), round((H - YG) * 1000 * S)
 FONT = "/System/Library/Fonts/Avenir Next.ttc"
 

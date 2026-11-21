@@ -51,8 +51,8 @@ const louvreMat = mat("Louvre", 0xf0f1f3, { rough: 0.28 });
 const louvreIn = mat("LouvreInner", 0xd4d7db, { rough: 0.5 });
 const outlet = mat("Outlet", 0x26292e, { rough: 0.85 });
 const vaneMat = mat("Vane", 0xd2d5d9, { rough: 0.45 });
-const bottomMat = mat("Bottom", 0xe6e8eb, { rough: 0.5 });
-const backMat = mat("Back", 0xc6c9cd, { rough: 0.7 });
+const bottomMat = mat("Bottom", 0xe6e8eb, { rough: 0.5, side: THREE.DoubleSide });   // two-sided: seen from inside through the seams it must not let the background through
+const backMat = mat("Back", 0xc6c9cd, { rough: 0.7, side: THREE.DoubleSide });   // two-sided: seen from inside through the seams it must not let the background through
 const boardMat = mat("DisplayBoard", 0xdfe2e5, { rough: 0.5 });
 const windowMat = mat("DisplayWindow", 0x15171a, { rough: 0.2 });
 
