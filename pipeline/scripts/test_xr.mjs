@@ -146,11 +146,16 @@ for (const id of ids) {
       await sleep(600);
       check((await info()).finishIndex === 1, `the panel changes the colour to ${P.finishes[1].name}`);
     }
-    // move it: point at the floor to the left
-    const spot = [-0.9, 0, -1.6];
-    await aim("right", hand, spot);
-    await sleep(400);
-    const hv = (await info()).hovers.find(Boolean);
+    // move it: point at a floor spot the open parts don't stand in front of (a door open to 135-140 degrees, as on LG
+    // front-loaders, covers the spot to the left; pointing through it would rightly close the door instead)
+    let spot, hv;
+    for (const s of [[-0.9, 0, -1.6], [0.9, 0, -1.6], [-1.5, 0, -0.9], [1.5, 0, -0.9]]) {
+      spot = s;
+      await aim("right", hand, spot);
+      await sleep(400);
+      hv = (await info()).hovers.find(Boolean);
+      if (hv?.type === "floor") break;
+    }
     await trigger();
     await sleep(500);
     inf = await info();
