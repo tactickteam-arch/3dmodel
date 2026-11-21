@@ -101,6 +101,9 @@ const grilleM = mat("BayGrille", 0x18191b, { rough: 0.8 });
 const printCrisp = mat("print_crisper", 0xffffff, { rough: 0.6, opacity: 0.999 });
 const printFz = mat("print_fzdrawer", 0xffffff, { rough: 0.6, opacity: 0.999 });
 const printArctic = mat("print_arctic", 0xffffff, { rough: 0.6, opacity: 0.999 });
+// the 360 panel's print: its ink in the white panel's grey, and in the steel panel's darker grey on the two steel-panel colours
+// (their own textures: Apple's files are not given a colour over a texture)
+const printPanel = { p360: mat("print_p360", 0xffffff, { rough: 0.45, opacity: 0.999 }), ptc: mat("print_ptc", 0xffffff, { rough: 0.45, opacity: 0.999 }) };
 
 // ── small builders ──
 const cyl = (name, rt, rb, h, m, x, y, z, seg = 14) => mesh(name, new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y, z);
@@ -212,6 +215,12 @@ for (const dz of [0.07, 0.1]) cab.add(span("FridgeLed", -0.19, 0.19, yCeil - 0.0
   const g = group("TripleCoolingPanel", 0, yc, zIn1);
   g.add(mesh("PanelBody", new THREE.ExtrudeGeometry(rrect(-pw / 2, pw / 2, -ph / 2, ph / 2, 0.012), { depth: 0.018, bevelEnabled: false, curveSegments: 4 }), white));
   g.add(plane("PanelFace", pw - 0.004, ph - 0.004, panel360, 0, 0, 0.0186));
+  // its print ("360°", TRIPLE COOLING) on two decals at 12 px per mm, 2.5 mm off the face (the face itself is moved up to
+  // 1.7 mm out off the panel's body by defight.mjs, the decal clears that by 0.8 mm); panel360_prints.json gives their
+  // boxes in the panel's mm (351 x 619 from its top left), which the face's texture spans
+  const fw = pw - 0.004, fh = ph - 0.004, box = JSON.parse(fs.readFileSync(`${T}/panel360_prints.json`, "utf8"));
+  for (const [key, b] of Object.entries(box))
+    g.add(plane(`Panel360Print_${key}`, b.w / 351 * fw, b.h / 619 * fh, printPanel[key], ((b.x + b.w / 2) / 351 - 0.5) * fw, (0.5 - (b.y + b.h / 2) / 619) * fh, 0.0211));
   cab.add(g);
 }
 // shelf supports moulded in the side walls, at four heights (open view)
@@ -733,6 +742,7 @@ saveZones(PRODUCTS, ID, root, parts);
 const textures = {
   DoorLower: `${T}/door_dn_low.jpg`, WhirlpoolMark: `${T}/mark_whirlpool.png`, SixthSenseMark: `${T}/mark_6th.png`, DoorUI: `${T}/ui.jpg`,
   Panel360: `${T}/panel360_white.jpg`, print_crisper: `${T}/print_crisper.png`, print_fzdrawer: `${T}/print_fzdrawer.png`, print_arctic: `${T}/print_arctic.png`,
+  print_p360: `${T}/p360.png`, print_ptc: `${T}/ptc.png`,
   ...food.textures(`${TEX}/food`),
   ...Object.fromEntries(Object.keys(labelMats).map((n) => [n, `${TEX}/brands/small/${n.slice(3)}.jpg`])),
 };
@@ -755,11 +765,13 @@ const FINISHES = [
     DoorUpper: { tex: `${T}/door_vc_up.jpg`, coat: GLASS.coat }, DoorLower: glassLow(`${T}/door_vc_low.jpg`),
     SixthSenseMark: { tex: `${T}/mark_6th_ai.png` },
     Panel360: { tex: `${T}/panel360_steel.jpg`, metal: 0.38, rough: 0.5 },
+    print_p360: { tex: `${T}/p360_steel.png` }, print_ptc: { tex: `${T}/ptc_steel.png` },
   }],
   ["Nero Bianco", {
     DoorUpper: { tex: `${T}/door_nb_up.jpg`, coat: GLASS.coat }, DoorLower: glassLow(null),
     SixthSenseMark: { tex: `${T}/mark_6th_ai.png` },
     Panel360: { tex: `${T}/panel360_steel.jpg`, metal: 0.38, rough: 0.5 },
+    print_p360: { tex: `${T}/p360_steel.png` }, print_ptc: { tex: `${T}/ptc_steel.png` },
   }],
 ];
 {

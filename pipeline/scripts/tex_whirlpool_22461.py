@@ -20,6 +20,7 @@ Writes pipeline/tex/whirlpool_22461/:
 usage: python3 -I pipeline/scripts/tex_whirlpool_22461.py
 Sources: pipeline/sources/photos/whirlpool_22461/ (NOTES.md lists each one and its scale).
 """
+import json
 import os
 import site
 import subprocess
@@ -471,7 +472,15 @@ def panel360(steel):
     else:
         img = Image.new("RGB", (PAN_W * k, PAN_H * k), (243, 244, 246))
         ink = (120, 122, 128)
-    d = ImageDraw.Draw(img)
+    # the print is not on the panel's own texture (2 px per mm): it is a decal of its own at 12 (panel360_prints below)
+    img = img.resize((PAN_W * 2, PAN_H * 2), Image.LANCZOS)
+    name = "panel360_steel.jpg" if steel else "panel360_white.jpg"
+    img.save(os.path.join(OUT, name), quality=88, optimize=True)
+    print(name, img.width, "x", img.height)
+
+
+def panel360_ink(d, k, ink):
+    """the panel's print ("360" with its degree ring, TRIPLE COOLING) at k px per mm, in panel mm"""
     f = font(ULTRA, 34 * k / 0.72)
     d.text((PAN_W / 2 * k, (63 + 16) * k), "360", font=f, fill=ink, anchor="mm")
     tb = d.textbbox((PAN_W / 2 * k, (63 + 16) * k), "360", font=f, anchor="mm")
@@ -485,10 +494,32 @@ def panel360(steel):
     for ch, wpx in zip(s, widths):
         d.text((x, (261 + 2.5) * k), ch, font=fc, fill=ink, anchor="ls")
         x += wpx + sp
-    img = img.resize((PAN_W * 2, PAN_H * 2), Image.LANCZOS)
-    name = "panel360_steel.jpg" if steel else "panel360_white.jpg"
-    img.save(os.path.join(OUT, name), quality=88, optimize=True)
-    print(name, img.width, "x", img.height)
+
+
+def panel360_prints():
+    """The panel's print as two decals over it, 12 px per mm: the ink on clear, in the white panel's grey 120, 122, 128
+    (p360.png, ptc.png) and the steel panel's darker 70, 72, 76 (*_steel.png), as on the panel textures before;
+    panel360_prints.json gives each one's box on the panel (mm from the panel's top left corner) for the builder"""
+    K, AA = 12, 3
+    k = K * AA
+    boxes = {}
+    a = Image.new("L", (PAN_W * k, PAN_H * k), 0)
+    panel360_ink(ImageDraw.Draw(a), k, 255)
+    for key, (y0, y1) in (("p360", (40, 120)), ("ptc", (240, 280))):
+        band = a.crop((0, y0 * k, PAN_W * k, y1 * k))
+        bb = band.getbbox()
+        m = 2 * k                                       # 2 mm of clear round the ink
+        box = (max(0, bb[0] - m), max(0, bb[1] - m), min(band.width, bb[2] + m), min(band.height, bb[3] + m))
+        box = tuple(int(round(v / k)) * k for v in box)   # whole mm, so the decal's size is exact
+        al = band.crop(box).resize(((box[2] - box[0]) // AA, (box[3] - box[1]) // AA), Image.LANCZOS)
+        for suffix, ink in (("", (120, 122, 128)), ("_steel", (70, 72, 76))):
+            out = Image.new("RGBA", al.size, ink + (0,))
+            out.putalpha(al)
+            out.save(os.path.join(OUT, f"{key}{suffix}.png"), optimize=True)
+        boxes[key] = {"x": box[0] / k, "y": y0 + box[1] / k, "w": (box[2] - box[0]) / k, "h": (box[3] - box[1]) / k}
+        print(f"{key}.png", out.width, "x", out.height, boxes[key])
+    with open(os.path.join(OUT, "panel360_prints.json"), "w") as f:
+        json.dump(boxes, f, indent=1)
 
 
 # ── the drawer prints (white line icons on the clear fronts, open view) ──
@@ -566,6 +597,7 @@ if __name__ == "__main__":
     door_ui()
     panel360(False)
     panel360(True)
+    panel360_prints()
     icons("crisper")
     icons("fzdrawer")
     arctic()
