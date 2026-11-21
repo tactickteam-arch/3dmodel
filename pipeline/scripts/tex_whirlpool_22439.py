@@ -386,17 +386,17 @@ def spaced(text, width_mm, cap_mm, name="avenir", face=DEMI, colour=INK, alpha=1
     return out
 
 
-def two_tone(first, second, cap_mm, light_first=True, track=0.25):
-    """ARCTIC FRESH: the first word dark on clear, the second white in a black box"""
-    px = cap_px("avenir", DEMI, cap_mm, PK)
+def two_tone(first, second, cap_mm, light_first=True, track=0.25, k=PK):
+    """ARCTIC FRESH: the first word dark on clear, the second white in a black box; k px per mm"""
+    px = cap_px("avenir", DEMI, cap_mm, k)
     a = ink(first, "avenir", px, REG, track)
     b = ink(second, "avenir", px, DEMI, 0.06)
-    pad = int(0.9 * PK)
+    pad = int(0.9 * k)
     bh = a.height + 2 * pad
-    out = Image.new("RGBA", (a.width + int(1.2 * PK) + b.width + 2 * pad, bh), (0, 0, 0, 0))
+    out = Image.new("RGBA", (a.width + int(1.2 * k) + b.width + 2 * pad, bh), (0, 0, 0, 0))
     lay = Image.new("RGBA", a.size, INK + (255,))
     out.paste(lay, (0, pad), a)
-    bx = a.width + int(1.2 * PK)
+    bx = a.width + int(1.2 * k)
     ImageDraw.Draw(out).rectangle([bx, 0, out.width - 1, bh - 1], fill=(14, 14, 16, 255))
     out.paste(Image.new("RGBA", b.size, (246, 246, 246, 255)), (bx + pad, pad), b)
     return out
@@ -519,7 +519,7 @@ def main():
         "print_easy": spaced("EASY RACK", 128, 6.0),
         "print_bigbottle": spaced("BIG BOTTLE RACK", 186, 6.0),
         "print_bottle": spaced("BOTTLE RACK", 138, 6.0),
-        "print_arctic": two_tone("ARCTIC", "FRESH", 4.0),
+        "print_arctic": two_tone("ARCTIC", "FRESH", 4.0, k=17),     # 17 px per mm: 12 on the model (8 gave 5.8)
         "print_microblock": logo_word("diamond", "MICRO", "BLOCK", 6.0, tm=True),
         "print_sealfresh": logo_word("circle", "SEAL", "FRESH", 6.0),
         "print_cheese": drawing((558, 491, 628, 531), 124),
@@ -529,7 +529,7 @@ def main():
     sizes = {}
     for n, im in prints.items():
         im.save(os.path.join(OUT, n + ".png"), optimize=True)
-        k = DK if n in ("print_cheese", "print_fruits", "print_veg") else PK
+        k = DK if n in ("print_cheese", "print_fruits", "print_veg") else 17 if n == "print_arctic" else PK
         sizes[n] = (round(im.width / k, 1), round(im.height / k, 1))
     sensor_icon().save(os.path.join(OUT, "icon_sensor.jpg"), quality=88, optimize=True)
     dial_scale().save(os.path.join(OUT, "dial_scale.png"), optimize=True)

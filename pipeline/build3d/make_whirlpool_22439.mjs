@@ -194,7 +194,9 @@ const ibW = 0.16, ibH = 0.095, ibD = 0.24, ibX = -0.127, ibZ1 = frontFreezer - 0
   g.add(box("IceTwisterFront", ibW - 0.014, bh, 0.004, clearLite, 0, bh / 2, ibZ1 - 0.007));
   g.add(box("IceTwisterBack", ibW - 0.014, bh, 0.004, clear, 0, bh / 2, ibZ0 + 0.007));
   g.add(box("IceTwisterLid", ibW, lid, ibD, white, 0, bh + lid / 2, bz));
-  print(g, "PrintArctic", "arctic", 0, 0.05, ibZ1 - 0.0045);
+  // ARCTIC FRESH on the clear front, 47 % down from the lid to the base (feature_icetwister_crop.jpg: clear rows 195-440,
+  // the words at 310); it sat at the lid's lower edge, half under the lid
+  print(g, "PrintArctic", "arctic", 0, bh * 0.53, ibZ1 - 0.0045);
   cab.add(g);
 }
 
