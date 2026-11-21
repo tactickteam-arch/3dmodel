@@ -39,6 +39,13 @@ LEVEL_BM = 40
 PT = "/System/Library/Fonts/Supplemental/PTSans.ttc"
 
 
+def tex_lg_mark_hi(logos, w):
+    # LG's vector mark drawn sharp (tex_lg_mark.py): 680 px across a 48-55 mm decal is 12-14 px per mm (logos/lg.png's 349 gave 6-7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    return tex_lg_mark.lg_hi(logos, w)
+
+
 def pt(px, bold=False):
     return ImageFont.truetype(PT, max(6, round(px)), index=7 if bold else 0)
 
@@ -157,7 +164,7 @@ def label(code):
 
 
 def mark(rgb):
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
+    lg = tex_lg_mark_hi(LOGOS, 680)
     a = np.asarray(lg).astype(float)
     out = np.zeros(a.shape, np.uint8)
     out[..., :3] = rgb
@@ -278,15 +285,18 @@ def main():
     save(mark(tuple(int(v) for v in r_bm["mark"])), "lgmark_bm.png")
     save(mark(tuple(int(v) for v in r_ps["mark"])), "lgmark_ps.png")
 
-    # ── words LG prints inside, at about 8 px/mm on the model ──
-    # "Multi Air Flow" on the air filter's white face (195 x 90 mm, LG's photo of the open fridge)
-    maf = words([("Multi", True), ("Air", False), ("Flow", False)], (1560, 720), px=150, ink=(48, 50, 54, 255), bg=(240, 242, 244, 255))
+    # ── words LG prints inside, at about 12 px/mm on the model ──
+    # "Multi Air Flow" on the air filter's white face (195 x 90 mm, LG's photo of the open fridge): 1.5 x the first draft
+    m = 1.5
+    maf = words([("Multi", True), ("Air", False), ("Flow", False)], (round(1560 * m), round(720 * m)), px=round(150 * m), ink=(48, 50, 54, 255), bg=(240, 242, 244, 255))
     d = ImageDraw.Draw(maf)
-    d.rounded_rectangle((4, 4, maf.width - 5, maf.height - 5), radius=36, outline=(196, 200, 205, 255), width=16)
+    d.rounded_rectangle((4, 4, maf.width - 5, maf.height - 5), radius=round(36 * m), outline=(196, 200, 205, 255), width=round(16 * m))
     save(maf, "print_maf.png")
     # "Big Fresh Zone" on each vegetable box (79 mm wide on LG's photo) and "Fresh Converter+" on the pantry drawer (93 mm)
-    save(words([("Big", True), ("Fresh", True), ("Zone", False)], (760, 150), px=112), "print_bigfresh.png")
-    save(words([("Fresh", True), ("Converter", False)], (880, 150), px=112, sup="+"), "print_freshconv.png")
+    # (1.25 x the first draft: 9.5 -> 12 px/mm)
+    m = 1.25
+    save(words([("Big", True), ("Fresh", True), ("Zone", False)], (round(760 * m), round(150 * m)), px=round(112 * m)), "print_bigfresh.png")
+    save(words([("Fresh", True), ("Converter", False)], (round(880 * m), round(150 * m)), px=round(112 * m), sup="+"), "print_freshconv.png")
     save(panel(), "print_panel.png")
 
 
