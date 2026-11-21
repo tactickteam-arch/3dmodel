@@ -239,7 +239,8 @@ const icX = -0.176, icW = 0.188, icH = 0.178, icD = 0.22, icZ1 = frontFreezer - 
   cab.add(box("IceHousingTop", icW, 0.008, icD, iceWhite, icX, y0 + icH - 0.004, zc));
   for (const sx of [-1, 1]) cab.add(box("IceHousingSide", 0.005, icH - 0.008, icD, iceWhite, icX + sx * (icW / 2 - 0.0025), y0 + (icH - 0.008) / 2, zc));
   cab.add(box("IceHousingBack", icW - 0.01, icH - 0.008, 0.005, iceWhite, icX, y0 + (icH - 0.008) / 2, icZ0 + 0.0025));
-  for (let i = 0; i < 10; i++) cab.add(box("FloorGrille", 0.026, 0.003, 0.005, grille, -0.08 + i * 0.0385, fzFloor + 0.0015, frontFreezer - 0.012));
+  // the floor grille 1.6 mm high (was 3), so the ice bin, its floor 2 mm up, slides out over it instead of through it
+  for (let i = 0; i < 10; i++) cab.add(box("FloorGrille", 0.026, 0.0016, 0.005, grille, -0.08 + i * 0.0385, fzFloor + 0.0008, frontFreezer - 0.012));
 }
 const ice = group("IceMaker", icX, fzFloor, 0);
 {
@@ -260,6 +261,10 @@ const ice = group("IceMaker", icX, fzFloor, 0);
   for (let i = 0; i < 14; i++) {
     const c = mesh("IceCube", cube, iceCube, -0.055 + (i % 4) * 0.036 + (Math.floor(i / 4) % 2) * 0.012, 0.022 + Math.floor(i / 8) * 0.023, zf - 0.04 - Math.floor((i % 8) / 4) * 0.06 - (i % 3) * 0.012);
     c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
+    // each tipped cube rests on the bin's floor (its top 6 mm up) instead of dipping through it (21 Nov: down to 1.5 mm)
+    c.updateMatrix();
+    const cb = new THREE.Box3().setFromBufferAttribute(cube.attributes.position).applyMatrix4(c.matrix);
+    if (cb.min.y < 0.0065) c.position.y += 0.0065 - cb.min.y;
     ice.add(c);
   }
 }
@@ -298,7 +303,11 @@ function door(name, y0, h, frontMat) {
   pivot.add(pocket);
   // inside: gasket, liner and bins standing on the liner's face
   pivot.add(box(name + "Gasket", pw - 0.018, h - 0.018, 0.008, gasket, -pw / 2, h / 2, -0.004));
-  pivot.add(box(name + "Liner", pw - 0.07, h - 0.07, 0.012, liner, -pw / 2, h / 2, -0.01));
+  // the liner's plug stays inside the door's opening, 3 mm clear of its floor and ceiling (21 Nov: the freezer's reached
+  // down over the mullion's face and cut through it in the first degrees of opening)
+  const [oLo, oHi] = name === "FreezerDoor" ? [fzFloor, H - wall] : [floorTop, fzCeil];
+  const lo = Math.max(0.035, oLo - y0 + 0.003), hi = Math.min(h - 0.035, oHi - y0 - 0.003);
+  pivot.add(box(name + "Liner", pw - 0.07, hi - lo, 0.012, liner, -pw / 2, (lo + hi) / 2, -0.01));
   BINS[name].forEach((b, i) => {
     const zc = -linerFace - b.d / 2, zl = -linerFace - b.d;
     pivot.add(box(`${name}Bin${i}Floor`, bw, 0.004, b.d, binMat, -pw / 2, b.f + 0.002, zc));
