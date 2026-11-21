@@ -18,7 +18,7 @@ usage: python3 tex_haier_hrf2902.py <photos dir> <logos dir> <out dir> [--compar
 
 The print is Haier's own picture at its own resolution: 0.57 px per mm is all the detail any source of this door has
 (Haier's 1200 px front; Sangeetha's photos are no sharper). It is enlarged 3 x with Lanczos only so the texture filters
-smoothly; that adds no detail. Every word on the door is set again sharp at 7 px per mm.
+smoothly; that adds no detail. Every word on the door is set again sharp at 12 px per mm.
 """
 import os
 import sys
@@ -33,6 +33,7 @@ D = os.path.join(OUT, "haier_hrf2902")
 os.makedirs(D, exist_ok=True)
 SRC = os.path.join(PHOTOS, "haier_hrf2902", "haier_front.jpg")
 BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
+PX = 12.0                          # px per mm for every word and mark (12 on the model)
 AV = "/System/Library/Fonts/Avenir Next.ttc"
 
 # the body on Haier's front: x 441-755 (548 mm), door top row 146.5, floor row 1031 (1560 mm)
@@ -91,12 +92,12 @@ def doors():
 
 
 def logo():
-    # Haier's own wordmark (logos/haier.png), white as on the door; 59 mm wide on the photo, at 7.2 px per mm
+    # Haier's own wordmark (logos/haier.png), white as on the door; 59 mm wide on the photo, at PX px per mm
     lg = Image.open(os.path.join(LOGOS, "haier.png")).convert("RGBA")
     al = lg.getchannel("A")
     bb = al.getbbox()
     al = al.crop(bb)
-    w = round(59 * 7.2)
+    w = round(59 * PX)
     al = al.resize((w, round(al.height * w / al.width)), Image.LANCZOS)
     out = Image.new("RGBA", al.size, (244, 246, 250, 0))
     out.putalpha(al)
@@ -123,8 +124,8 @@ def text_img(s, font, px, fill, track=0.0):
 
 def badge():
     # the CONVERTIBLE badge: 82 x 17.6 mm on the photo (47 x 10 px), a light rim about 1 mm wide round a dark navy plate
-    # with the word in white capitals filling about 86% of it. Drawn at 7.2 px per mm, 3 x over and reduced.
-    S, k = 7.2, 3
+    # with the word in white capitals filling about 86% of it. Drawn at PX px per mm, 3 x over and reduced.
+    S, k = PX, 3
     w, h = round(82 * S * k), round(17.6 * S * k)
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -147,12 +148,12 @@ def words():
     # grey words on the clear and white plastic inside, set in Avenir Next Medium (size and colour from the open-door photo)
     def word(s, mm_w, name, col=(118, 124, 132)):
         t = text_img(s, (AV, 5), 200, col, track=0.08)
-        W = round(mm_w * 7.2)
+        W = round(mm_w * PX)
         save(t.resize((W, round(t.height * W / t.width)), Image.LANCZOS), name)
     word("SLIDING SHELF", 120, "print_sliding.png")
     word("FRUIT BOX", 95, "print_fruit.png")
     # the NAVI badge: a rounded square outline with the word; its small print below can't be read and is left out
-    S, k = 7.2, 3
+    S, k = PX, 3
     n = round(46 * S * k)
     im = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)

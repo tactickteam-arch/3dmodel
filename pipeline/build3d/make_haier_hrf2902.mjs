@@ -38,9 +38,9 @@ const fzCeil = 1.05, fzFloor = 1.115;                // the mullion: fridge ceil
 const fzTop = cabTop - 0.035;                        // freezer ceiling
 const fzShelfTop = 1.32;                             // the freezer shelf
 const s1 = 0.888, s2 = 0.746, s3 = 0.492;            // Sliding Shelf, shelf 2, shelf 3 (over the fruit box): glass tops
-const fbBottom = 0.375, fbTop = 0.48;                // the Separate Fruit Box
+const fbBottom = 0.375, fbTop = 0.4755;              // the Separate Fruit Box (its top just under shelf 3's rim, so it slides out under it)
 const sCover = 0.352;                                // the vegetable box cover's top
-const vbBottom = floorTop + 0.006, vbTop = 0.335;    // the Large Vegetable Box
+const vbBottom = floorTop + 0.006, vbTop = 0.3315;   // the Large Vegetable Box (its top just under the cover's front, so it slides out under it)
 // door bins (ESTIMATED, same photo): floor above the door's bottom edge, end-wall height, depth out from the liner
 const BINS = {
   FridgeDoor: [{ f: 0.31, h: 0.14, d: 0.095 }, { f: 0.77, h: 0.075, d: 0.09 }, { f: 0.935, h: 0.065, d: 0.065, eggs: true }],
@@ -127,7 +127,8 @@ for (const x of [-0.13, 0, 0.13]) cab.add(box("FreezerVent", 0.07, 0.01, 0.004, 
 {
   const z0 = zDuct + 0.002, z1 = frontFreezer, w = inW - 0.012;
   cab.add(box("FreezerShelf", w, 0.006, z1 - 0.009 - z0, clearLite, 0, fzShelfTop - 0.003, (z0 + z1 - 0.009) / 2));
-  cab.add(box("FreezerShelfRim", w, 0.016, 0.009, frosted, 0, fzShelfTop - 0.006, z1 - 0.0045));
+  // its frosted front flush with the shelf's top, so the ice maker slides out over it
+  cab.add(box("FreezerShelfRim", w, 0.016, 0.009, frosted, 0, fzShelfTop - 0.008, z1 - 0.0045));
   rails("FreezerShelfRail", fzShelfTop - 0.006, zIn, z1 - 0.01);
 }
 // the Ice Maker on the shelf at the front left: a white tray over a clear bin with the ice in it (Sangeetha's photo:
@@ -147,6 +148,10 @@ const iceM = group("IceMaker", icX, fzShelfTop, 0);
   for (let i = 0; i < 12; i++) {
     const c = mesh("IceCube", cube, ice, -0.03 + (i % 3) * 0.03, 0.017 + Math.floor(i / 6) * 0.022, icZ1 - 0.035 - (Math.floor(i / 3) % 2) * 0.06 - (i % 2) * 0.01 - Math.floor(i / 6) * 0.04);
     c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
+    // a tilted cube's low corner stays on the bin's floor (it poked 2 mm through the floor and the shelf under it)
+    c.updateMatrix(); const cb = cube.clone().applyMatrix4(c.matrix); cb.computeBoundingBox();
+    if (cb.boundingBox.min.y < 0.0045) c.position.y += 0.0045 - cb.boundingBox.min.y;
+    else if (cb.boundingBox.max.y > bh - 0.001) c.position.y -= cb.boundingBox.max.y - (bh - 0.001);
     iceM.add(c);
   }
 }
