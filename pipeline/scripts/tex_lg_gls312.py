@@ -99,6 +99,7 @@ def lgmark():
     import tex_lg_mark
     lg = tex_lg_mark.lg_hi(LOGOS, 680)
     a = np.asarray(lg).astype(float)
+    a[..., 3] *= 1 - np.clip((a[..., :3].min(2) - 150) / 70, 0, 1)   # the face lines inside the disc are cut out, as on LG's photos
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (210, 211, 214)
     mark[..., 3] = (a[..., 3] * 0.95).clip(0, 255).astype(np.uint8)
@@ -176,10 +177,10 @@ def prints():
 
 
 def plate():
-    """The fridge's control plate, 170 x 80 mm (DZ-6), at 6 px per mm: circular brushing round the ring (DZ-5), the ring
+    """The fridge's control plate, 170 x 80 mm (DZ-6), at 12 px per mm (was 6; the words now stay sharp close up): circular brushing round the ring (DZ-5), the ring
     56 mm across, and the manual's internal-controller words re-set (manual p.17: Freezer and Fridge with a dotted line
     under each, *Convertible and *Express Freeze with an LED bar before each, Cold and Coldest outside the ring)."""
-    S = 6
+    S = 12
     W_, H_ = 170 * S, 80 * S
     cx, cy = 87 * S, 40 * S
     yy, xx = np.mgrid[0:H_, 0:W_]
@@ -187,7 +188,7 @@ def plate():
     # concentric brushing: noise along the radius, smooth round it
     rad = rng.normal(0, 1, 4000)
     rad = np.convolve(rad, np.ones(3) / 3, mode="same")
-    tex = rad[(r * 1.0).astype(int).clip(0, 3999)] * 7 + rng.normal(0, 2.0, r.shape)
+    tex = rad[(r * 6.0 / S).astype(int).clip(0, 3999)] * 7 + rng.normal(0, 2.0, r.shape)
     base = 170 - 10 * (xx / W_ - 0.5) ** 2
     img = np.stack([base + tex, base + tex + 1, base + tex + 3], 2).clip(0, 255).astype(np.uint8)
     im = Image.fromarray(img).convert("RGBA")
@@ -220,8 +221,8 @@ def plate():
 def topcover():
     """The top hinge cover's print (DZ-3, about 1 mm a pixel): the Smart Diagnosis icon, simplified to what that photo
     resolves (a ring with a phone overlapping its right side), and Smart Diagnosis(TM) under it in two lines, light grey
-    on the dark cover; 50 x 22 mm at 8 px per mm."""
-    S = 8
+    on the dark cover; 50 x 22 mm at 12 px per mm."""
+    S = 12
     im = Image.new("RGBA", (50 * S, 22 * S), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     ink = (190, 192, 196, 255)
