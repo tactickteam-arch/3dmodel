@@ -62,21 +62,27 @@ function locate(tris, u, v) {
   return null;
 }
 
-export function uvDecal(src, rect, material, { name = "Decal", nu = 0, nv = 0, cell = [0.003, 0.004], lift = 0.0009 } = {}) {
+// clip: grid points off the surface (a rectangle reaching past a curved edge) are dropped with the cells they touch, so
+// the decal follows the surface's outline to within one cell; without it such a point is an error.
+export function uvDecal(src, rect, material, { name = "Decal", nu = 0, nv = 0, cell = [0.003, 0.004], lift = 0.0009, clip = false } = {}) {
   const [u0, v0, u1, v1] = rect;
   const tris = triangles(src.geometry);
   // the grid: cells of about `cell` metres (3 mm across, 4 mm down: as fine as the panels' own rounded ends), so the decal
   // bends with the surface; finer costs file size (Apple's file most)
   const at = (u, v) => { const h = locate(tris, u, v); const P = new THREE.Vector3(); if (h) for (let k = 0; k < 3; k++) P.addScaledVector(h.tr.P[k], h.w[k]); return P; };
-  const pA = at(u0, v0), pB = at(u1, v0), pC = at(u0, v1);
+  // (clipped: measured through the middle, where the surface is)
+  const um = (u0 + u1) / 2, vm = (v0 + v1) / 2;
+  const [pA, pB, pC, pD] = clip ? [at(u0, vm), at(u1, vm), at(um, v0), at(um, v1)] : [at(u0, v0), at(u1, v0), at(u0, v0), at(u0, v1)];
   nu = nu || Math.max(4, Math.ceil(pA.distanceTo(pB) / cell[0]));
-  nv = nv || Math.max(4, Math.ceil(pA.distanceTo(pC) / cell[1]));
-  const pos = [], nor = [], uvs = [];
+  nv = nv || Math.max(4, Math.ceil(pC.distanceTo(pD) / cell[1]));
+  const pos = [], nor = [], uvs = [], ok = [];
   for (let j = 0; j <= nv; j++) {
     for (let i = 0; i <= nu; i++) {
       const s = i / nu, t = j / nv;
       const u = u0 + (u1 - u0) * s, v = v0 + (v1 - v0) * t;
       const hit = locate(tris, u, v);
+      ok.push(!!hit);
+      if (!hit && clip) { pos.push(0, 0, 0); nor.push(0, 0, 1); uvs.push(s, t); continue; }
       if (!hit) throw new Error(`uvDecal ${name}: (${u.toFixed(4)}, ${v.toFixed(4)}) is not on ${src.name}`);
       const { tr, w } = hit;
       const P = new THREE.Vector3(), Nn = new THREE.Vector3();
@@ -90,17 +96,25 @@ export function uvDecal(src, rect, material, { name = "Decal", nu = 0, nv = 0, c
   const W = nu + 1;
   for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) {
     const a = j * W + i, b = a + 1, c = a + W, d = c + 1;
-    idx.push(a, c, b, b, c, d);
+    if (ok[a] && ok[b] && ok[c] && ok[d]) idx.push(a, c, b, b, c, d);
   }
-  // wind the triangles to face the way the surface's normals do
-  const A = new THREE.Vector3(...pos.slice(0, 3)), B = new THREE.Vector3(...pos.slice(3, 6)), C = new THREE.Vector3(...pos.slice(3 * W, 3 * W + 3));
+  if (!idx.length) throw new Error(`uvDecal ${name}: no part of the rectangle is on ${src.name}`);
+  // wind the triangles to face the way the surface's normals do (judged on the first cell that is on the surface)
+  const [ia, ic, ib] = idx;
+  const A = new THREE.Vector3(...pos.slice(3 * ia, 3 * ia + 3)), B = new THREE.Vector3(...pos.slice(3 * ib, 3 * ib + 3)), C = new THREE.Vector3(...pos.slice(3 * ic, 3 * ic + 3));
   const face = new THREE.Vector3().subVectors(C, A).cross(new THREE.Vector3().subVectors(B, A));
-  if (face.dot(new THREE.Vector3(...nor.slice(0, 3))) < 0) for (let k = 0; k < idx.length; k += 3) [idx[k + 1], idx[k + 2]] = [idx[k + 2], idx[k + 1]];
+  if (face.dot(new THREE.Vector3(...nor.slice(3 * ia, 3 * ia + 3))) < 0) for (let k = 0; k < idx.length; k += 3) [idx[k + 1], idx[k + 2]] = [idx[k + 2], idx[k + 1]];
+  // keep only the points the cells use (clipped points would otherwise sit at the origin and stretch the bounds)
+  const used = new Map(), P2 = [], N2 = [], U2 = [];
+  const idx2 = !clip ? idx : idx.map((k) => {
+    if (!used.has(k)) { used.set(k, used.size); P2.push(...pos.slice(3 * k, 3 * k + 3)); N2.push(...nor.slice(3 * k, 3 * k + 3)); U2.push(...uvs.slice(2 * k, 2 * k + 2)); }
+    return used.get(k);
+  });
   const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-  g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
-  g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  g.setIndex(idx);
+  g.setAttribute("position", new THREE.Float32BufferAttribute(clip ? P2 : pos, 3));
+  g.setAttribute("normal", new THREE.Float32BufferAttribute(clip ? N2 : nor, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(clip ? U2 : uvs, 2));
+  g.setIndex(idx2);
   const m = new THREE.Mesh(g, material);
   m.name = name;
   m.position.copy(src.position); m.quaternion.copy(src.quaternion); m.scale.copy(src.scale);

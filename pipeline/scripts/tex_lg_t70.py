@@ -9,7 +9,7 @@ usage: python3 tex_lg_t70.py <photos dir> <manual panel drawing> <logos dir> <ou
   manual:  the control-panel drawing for the 10-water-level models (T70AJ* among them) in LG's owner's manual
            MFL72021909, page 25, rendered with  pdftoppm -r 1600 -f 25 -l 25 -x 800 -y 2700 -W 8100 -H 2500 -gray -png
            (kept in .work/, not in git)
-  logos:   lg.png
+  logos:   the logos folder (LG's mark is drawn from pipeline/sources/logos/lg.svg by tex_lg_mark.py)
   writes <out dir>/lg_t70/* (the energy label is cut out separately by tex_bee_label.py into bee_label.png)
 
 Copied from tex_lg_t12.py (LG T12SJMB1Z, the same panel drawing and the same family): the control panel is drawn new at 7 px/mm
@@ -32,6 +32,12 @@ if "--debug" in args:
     DEBUG = args[args.index("--debug") + 1]
     del args[args.index("--debug"):args.index("--debug") + 2]
     os.makedirs(DEBUG, exist_ok=True)
+# --hi <px per mm>: draw only the control panel, at that density, and cut its print into the uvDecals pieces the builder lays on
+# the panel (print_a.jpg, print_b.jpg, ..., decals.json; pipeline/scripts/decal_cut.py); panel.jpg and the rest are left alone
+HI = None
+if "--hi" in args:
+    HI = float(args[args.index("--hi") + 1])
+    del args[args.index("--hi"):args.index("--hi") + 2]
 PHOTOS, MANUAL, LOGOS, OUT = args[:4]
 P = os.path.join(PHOTOS, "lg_t70")
 D = os.path.join(OUT, "lg_t70")
@@ -58,7 +64,7 @@ def photo(name):
 # ───────────────────────── control panel ─────────────────────────
 # The panel face is the sloped front of the top cover, 23 degrees up toward the lid. Texture coordinates: x across (540 mm, the
 # machine's width, centred), s up the slope from the front edge (0 to 140 mm). Row 0 is the back (s = 140 mm).
-PXMM = 7.0
+PXMM = HI or 7.0
 XW, SMAX = 540.0, 140.0
 TW, TH = int(XW * PXMM), int(SMAX * PXMM)
 BG = np.array((12, 12, 13), np.float32)
@@ -328,14 +334,20 @@ put_box(np.asarray(ring).astype(np.float32) / 255.0, SILVER, 1407.3, 1036.9, 141
 put_box(text_alpha("WARRANTY", (AVENIR, 2), 200, 0.12), SILVER, 1403.8, 1050.0, 1419.4, 1051.6)
 
 # the LG logo, silver: the face's disc becomes a silver disc with the face cut out of it, the letters silver
-logo = np.asarray(Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")).astype(np.float32)
-la = logo[..., 3] / 255.0
-red = (logo[..., 0] - logo[..., 1] > 60)
-white = (logo[..., :3].min(2) > 200)
-lg_a = la * np.where(white & ~red, 0.0, 1.0)
+# (LG's vector mark, tex_lg_mark.py, in logos/lg.png's layout: sharp at any density; lg.png's 349 px were 9 px per mm here)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tex_lg_mark
+logo = np.asarray(tex_lg_mark.lg_hi(LOGOS, 1200)).astype(np.float32)
+lg_a = logo[..., 3] / 255.0 * (1 - np.clip((logo[..., :3].min(2) - 150) / 70, 0, 1))
 put_box(lg_a, SILVER, 665.0, 1037.0, 721.6, 1061.0)
 
 canvas = np.clip(canvas, 0, 255)
+# the plain ground's faint noise (half a level) snapped to the ground colour: no visible change, and the files compress far better
+canvas[np.abs(canvas - BG).max(2) <= 3] = BG
+if HI:
+    import decal_cut
+    decal_cut.cut(Image.fromarray(canvas.astype(np.uint8)), BG, D, prefix="print")
+    sys.exit(0)
 save(Image.fromarray(canvas.astype(np.uint8)), "panel.jpg", q=90)
 if DEBUG:
     ph = photo("top_open.jpg")
