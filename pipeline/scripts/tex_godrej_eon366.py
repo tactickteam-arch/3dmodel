@@ -16,7 +16,7 @@ Writes:
   logo_light.png, logo_dark.png                the Godrej script (Godrej's own header SVG), white on the Matt Black and
                                                Steel Rush doors, near-black ink on the Champagne Gold (Godrej's fronts)
   panel.png                                    the control panel on the cabinet's top frame (seen with the freezer
-                                               door open), redrawn at 7.2 px per mm from Godrej's close-up
+                                               door open), redrawn at 11.5 px per mm from Godrej's close-up
   print_qab.png, print_utility.png, print_icemaker.png   the words Godrej prints inside (open photo, close-up)
   liner_dimples.jpg                            the fridge door's lower liner with its round embossed dimples
 Every size is in private/research/godrej_eon366/NOTES.md, with how it was measured.
@@ -132,22 +132,32 @@ def door_textures(key, f):
 for key, f in FIN.items():
     door_textures(key, f)
 
-# ── the Godrej script: Godrej's header SVG, rendered by rasterize_svg.mjs into logos/godrej.png (650 px wide) ──
-logo = Image.open(os.path.join(SITE, "logos/godrej.png")).convert("RGBA")
+# ── the Godrej script: Godrej's header SVG (pipeline/sources/logos/godrej.svg), rendered by rasterize_svg.mjs at 2400 px
+# and reduced to 800 px: 11.4 px per mm on the 70 mm wide decal (the 650 px logos/godrej.png gave 7.3) ──
+def svg_logo(width=2400):
+    import subprocess, tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, "logo.png")
+        subprocess.run(["node", "rasterize_svg.mjs", os.path.join(SITE, "pipeline/sources/logos/godrej.svg"), out, str(width)],
+                       cwd=os.path.join(SITE, "pipeline/build3d"), check=True, capture_output=True)
+        return Image.open(out).convert("RGBA")
+
+
+logo = svg_logo()
 alpha = logo.getchannel("A")
 for name, col in [("logo_light.png", (236, 236, 238)), ("logo_dark.png", (58, 58, 62))]:
     im = Image.new("RGBA", logo.size, col + (0,))
     im.putalpha(alpha.point(lambda v: int(v * 0.95)))
-    save(im.resize((512, int(512 * logo.size[1] / logo.size[0])), Image.LANCZOS), name)
+    save(im.resize((800, 366), Image.LANCZOS), name)
 
 # ── the control panel, redrawn ──
 # Godrej's close-up (feature_control_panel.webp, 1216 x 790): the black glass runs x 13-1201, y 283-545 (1188 x 262 px).
 # On the cabinet it is 188 x 41.5 mm (open photo, NOTES.md). Every box below is in the close-up's own pixels, measured on
-# it; the finger in the close-up covers only empty glass. Drawn at 3x and reduced to 7.2 px per mm.
+# it; the finger in the close-up covers only empty glass. Drawn at 3x and reduced to 11.5 px per mm.
 PW, PH = 1188, 262
 OX, OY = 13, 283 - 270                                    # the measurements were taken on the crop from y 270
 SS = 3
-PX = 7.2
+PX = 11.5                                  # px per mm on the model (7.2 before)
 pw, ph = int(round(188 * PX)), int(round(41.5 * PX))
 img = Image.new("RGB", (PW * SS, PH * SS), (24, 24, 27))
 d = ImageDraw.Draw(img)
