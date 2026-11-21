@@ -9,6 +9,9 @@ usage: python tex_bosch_wga1420.py <photos dir> <logos dir> <out dir>
 The control strip is drawn again from the photo's measurements at twice its resolution: every word (set in Avenir Next) at the
 place and size it has in the photo, the leader lines, the 7-segment time, the display. The small icons are the photo's own,
 smoothed by upscaling and re-thresholding so their edges are clean. The knob in the photo is left out because the model has a real 3D knob.
+With --hi, only the print is drawn again, at 4.5 texture px per photo px (12 px per mm on the model): the box from the
+programme names to the display, written as print_a.jpg with decals.json (its place in panel.jpg's UVs) for the builder,
+which lays it on the strip as a decal. The icons in it are still the photo's own shapes, only re-thresholded more finely.
 The side panels (concentric ring relief), the open steel back and the drawer front are cropped from Bosch's photos.
 The drain hose, the inlet hose, the power cord and its plug lie over the back; the builder models them in 3D along the centre
 lines below (written to rear_paths.json), so the flat back has them painted out along the same lines.
@@ -22,22 +25,27 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-PHOTOS, LOGOS, OUT = sys.argv[1:4]
+HI = "--hi" in sys.argv
+PHOTOS, LOGOS, OUT = [a for a in sys.argv[1:] if a != "--hi"][:3]
 D = os.path.join(OUT, "bosch_wga1420")
 os.makedirs(D, exist_ok=True)
 rng = np.random.default_rng(14)
 FONT = "/System/Library/Fonts/Avenir Next Condensed.ttc"       # matches the widths and letter height of Bosch's panel print
-S = 2                                        # texture px per photo px
+S = 4.5 if HI else 2                         # texture px per photo px (--hi: the print decal, 12 px per mm)
 BODY = np.array([74, 80, 96], np.float32)    # Dark lake, sampled from the studio photo
 STRIP_BG = np.array([81, 86, 99], np.float32)
 PW, PH = 1600, 2228                          # photo px that span 598 x 848 mm (rows 5..2232 of the file)
+
+
+def iw(k):                                                      # a line width or radius of k photo px, in whole texture px
+    return max(1, int(k * S + 0.5))
 
 
 def font(px, face=5):                                           # 5 Medium, 7 Regular, 0 Bold
     return ImageFont.truetype(FONT, max(4, round(px * S)), index=face)
 
 
-SHADE = {"panel.jpg": 0.80, "drawer.jpg": 0.88, "body.jpg": 0.78, "front.jpg": 0.78, "side_l.jpg": 0.85, "side_r.jpg": 0.85, "rear.jpg": 0.9}
+SHADE = {"panel.jpg": 0.80, "print_a.jpg": 0.80, "drawer.jpg": 0.88, "body.jpg": 0.78, "front.jpg": 0.78, "side_l.jpg": 0.85, "side_r.jpg": 0.85, "rear.jpg": 0.9}
 
 
 def save(img, name, q=88):
@@ -71,7 +79,7 @@ def icon(ph, box, fg_pad=3, bg_val=None):
     t = lo + 0.45 * (hi - lo)
     m = np.clip((big - t) / 14 + 0.5, 0, 1)                       # a soft edge about two device pixels wide
     h, w = a.shape
-    return cv2.resize(m, (w * S, h * S), interpolation=cv2.INTER_AREA), (x0 - fg_pad, y0 - fg_pad)
+    return cv2.resize(m, (int(round(w * S)), int(round(h * S))), interpolation=cv2.INTER_AREA), (x0 - fg_pad, y0 - fg_pad)
 
 
 def blend(canvas, mask, x, y, colour):
@@ -119,20 +127,21 @@ def seven(d, x, y, w, h, digit, on):
 
 def panel(ph):
     W, H = 1600, 358
-    img = np.ones((H * S, W * S, 3), np.float32) * STRIP_BG
-    yy = np.linspace(0, 1, H * S)[:, None, None]
+    HS, WS = int(round(H * S)), int(round(W * S))
+    img = np.ones((HS, WS, 3), np.float32) * STRIP_BG
+    yy = np.linspace(0, 1, HS)[:, None, None]
     img *= (1.0 + 0.05 * (1 - yy))                                 # a touch lighter along the top edge
-    img += rng.normal(0, 0.9, (H * S, W * S, 1))
+    img += rng.normal(0, 0.9, (HS, WS, 1))
     im = Image.fromarray(img.clip(0, 255).astype(np.uint8))
     d = ImageDraw.Draw(im)
     WHITE, DIM = (236, 237, 240), (190, 193, 202)
 
     # rim of the strip: the top highlight and the groove under it
-    d.line([(0, 9 * S), (W * S, 9 * S)], fill=(104, 109, 124), width=2 * S)
-    d.line([(0, 357 * S), (W * S, 357 * S)], fill=(40, 43, 52), width=2 * S)
+    d.line([(0, 9 * S), (W * S, 9 * S)], fill=(104, 109, 124), width=iw(2))
+    d.line([(0, 357 * S), (W * S, 357 * S)], fill=(40, 43, 52), width=iw(2))
     # the drawer's bay: the drawer is its own part, so this is what shows when it is pulled out
-    d.rounded_rectangle([100 * S, 75 * S, 555 * S, 282 * S], 6 * S, fill=(22, 24, 30), outline=(58, 62, 76), width=2 * S)
-    d.line([(600 * S, 6 * S), (600 * S, 356 * S)], fill=(34, 36, 44), width=3 * S)
+    d.rounded_rectangle([100 * S, 75 * S, 555 * S, 282 * S], iw(6), fill=(22, 24, 30), outline=(58, 62, 76), width=iw(2))
+    d.line([(600 * S, 6 * S), (600 * S, 356 * S)], fill=(34, 36, 44), width=iw(3))
     # the dial's recess: a dark ring round where the 3D knob stands
     d.ellipse([(800 - 101) * S, (176 - 101) * S, (800 + 101) * S, (176 + 101) * S], fill=(46, 49, 60))
 
@@ -145,31 +154,31 @@ def panel(ph):
     left_end = {89: 608 + lw("Quick 15/30 min"), 179: 608 + lw("Sportswear"), 211: 608 + lw("Shirts"), 241: 608 + lw("Rinse"), 269: 608 + lw("Spin/Drain")}
     right_start = {89: 991 - lw("Cottons"), 116: 991 - lw("Cottons 60\u00b0 Label"), 148: 991 - lw("Synthetics"), 179: 991 - lw("Mix Load"), 211: 991 - lw("Delicates/Silk"), 241: 991 - lw("Wool") - 26, 269: 991 - lw("Drum Descale")}
     for y, x0, x1 in [(89, 700, 747), (179, 676, 693), (211, 645, 698), (241, 643, 717), (269, 670, 747)]:
-        d.line([(max(x0, left_end[y] + 6) * S, y * S), (x1 * S, y * S)], fill=DIM, width=S)
+        d.line([(max(x0, left_end[y] + 6) * S, y * S), (x1 * S, y * S)], fill=DIM, width=iw(1))
     for y, x0, x1 in [(89, 850, 943), (116, 883, 889), (148, 900, 932), (179, 905, 958), (211, 901, 912), (241, 883, 938), (269, 858, 912)]:
         if x1 - 6 > x0 and min(x1, right_start[y] - 6) > x0:
-            d.line([(x0 * S, y * S), (min(x1, right_start[y] - 6) * S, y * S)], fill=DIM, width=S)
+            d.line([(x0 * S, y * S), (min(x1, right_start[y] - 6) * S, y * S)], fill=DIM, width=iw(1))
     text(d, (800, 54), "Off", 13.5, DIM, "mm")
     text(d, (1076, 53), "Steam", 16, WHITE, "lm", face=0)
     text(d, (1131, 53), "Cycle", 16, WHITE, "lm", face=7)
     text(d, (1405, 53), "Serie", 16, WHITE, "lm", face=7, spacing=2.6)
-    d.line([(1456 * S, 43 * S), (1456 * S, 63 * S)], fill=DIM, width=S)
+    d.line([(1456 * S, 43 * S), (1456 * S, 63 * S)], fill=DIM, width=iw(1))
     text(d, (1481, 53), "6", 17, WHITE, "lm", face=0)
 
     # the display
-    d.rounded_rectangle([1046 * S, 75 * S, 1500 * S, 282 * S], 5 * S, fill=(11, 12, 15), outline=(52, 56, 68), width=2 * S)
+    d.rounded_rectangle([1046 * S, 75 * S, 1500 * S, 282 * S], iw(5), fill=(11, 12, 15), outline=(52, 56, 68), width=iw(2))
     d.rectangle([1048 * S, 222 * S, 1498 * S, 280 * S], fill=(8, 9, 11))
     text(d, (1184, 102), "1200", 15, WHITE, "mm")
     text(d, (1130, 124), "60°", 14.5, WHITE, "mm")
     text(d, (1493, 90), "9 kg", 14.5, WHITE, "rm", face=5)
-    d.line([(1458 * S, 146 * S), (1481 * S, 146 * S)], fill=WHITE, width=2 * S)
+    d.line([(1458 * S, 146 * S), (1481 * S, 146 * S)], fill=WHITE, width=iw(2))
     text(d, (1469, 166), "Start/Pause", 9.6, WHITE, "mm")
     for i, (cx, name) in enumerate([(1072, "Anti Stain"), (1129, "Temp.°C"), (1186, "Spin Speed"), (1243, "Pretreatment"), (1300, "Anti Tangle"), (1357, "Anti Wrinkle"), (1414, "Ready In"), (1471, "Speed Perfect")]):
         text(d, (cx, 240), name, 9.6, WHITE, "mm")
     for x in (1101, 1157, 1215, 1272, 1329, 1386, 1443):
-        d.line([(x * S, 231 * S), (x * S, 276 * S)], fill=(152, 98, 100), width=S)
-    d.line([(1348 * S, 272.5 * S), (1366 * S, 272.5 * S)], fill=DIM, width=S)
-    d.line([(1411 * S, 272.5 * S), (1430 * S, 272.5 * S)], fill=DIM, width=S)
+        d.line([(x * S, 231 * S), (x * S, 276 * S)], fill=(152, 98, 100), width=iw(1))
+    d.line([(1348 * S, 272.5 * S), (1366 * S, 272.5 * S)], fill=DIM, width=iw(1))
+    d.line([(1411 * S, 272.5 * S), (1430 * S, 272.5 * S)], fill=DIM, width=iw(1))
     text(d, (1391, 273), "3 sec.", 9.6, WHITE, "lm")
     # the time, drawn as 7-segment digits like the photo's "1:25"
     on = (240, 240, 244)
@@ -190,7 +199,7 @@ def panel(ph):
         if r:
             blend(canvas, r[0], r[1][0], r[1][1], WHITE)
     full = Image.fromarray(canvas.clip(0, 255).astype(np.uint8))
-    return full.crop((0, 5 * S, W * S, 358 * S))     # the strip: from the machine's top edge (row 5) to the groove under it (row 358)
+    return full.crop((0, round(5 * S), WS, round(358 * S)))     # the strip: from the machine's top edge (row 5) to the groove under it (row 358)
 
 
 def drawer(ph):
@@ -295,8 +304,24 @@ def rear_and_paths():
         Image.fromarray(mask).save(os.environ["REAR_DEBUG"])
 
 
+# the print's box in photo px: from the programme names (column 604, right of the divider at 600) to the display's right edge,
+# from above "Steam Cycle" and "Serie | 6" (row 40) to under the display (row 286); the strip's texture starts at row 5
+PRINT_BOX = (604, 40, 1504, 286)
+
+
+def print_decal(ph):
+    x0, y0, x1, y1 = PRINT_BOX
+    strip = panel(ph)
+    save(strip.crop((round(x0 * S), round((y0 - 5) * S), round(x1 * S), round((y1 - 5) * S))), "print_a.jpg", 88)
+    with open(os.path.join(D, "decals.json"), "w") as f:
+        json.dump({"printA": {"file": "print_a.jpg", "rect": [x0 / 1600, (y0 - 5) / 353, x1 / 1600, (y1 - 5) / 353]}}, f, indent=1)
+
+
 def main():
     ph = photo()
+    if HI:
+        print_decal(ph)
+        return
     save(panel(ph), "panel.jpg", 90)
     save(drawer(ph), "drawer.jpg", 90)
 

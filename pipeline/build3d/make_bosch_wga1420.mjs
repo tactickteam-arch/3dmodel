@@ -128,6 +128,19 @@ cab.add(mainFront);
 // the control strip: the panel print, a raised face
 // 1.5 mm inside the side faces and under the top (defight looks at planes closer than 1.2 mm), so it shares no plane with them and the cabinet stays at Bosch's 598 x 848 mm
 cab.add(mesh("ControlStrip", flipV(new THREE.BoxGeometry(W - 0.003, stripH - 0.0015, 0.01)), [bodyDark, bodyDark, bodyDark, bodyDark, panelM, bodyDark], 0, stripY + (stripH - 0.0015) / 2, zF - 0.004));
+// the print sharp: the strip's print drawn again at 12 px/mm (tex_bosch_wga1420.py --hi) on a plane 0.9 mm in front of the strip,
+// over the same rectangle of the strip's UVs (decals.json), so it lands exactly on panel.jpg's own print
+const printTex = {};
+{
+  const fw = W - 0.003, fh = stripH - 0.0015, top = stripY + fh;           // the strip's printed face, as the box above
+  for (const [key, d] of Object.entries(JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8")))) {
+    const [u0, v0, u1, v1] = d.rect;
+    const m = mat(`Print_${key}`, 0xffffff, { rough: 0.32 });
+    cab.add(mesh(`PrintDecal_${key}`, flipV(new THREE.PlaneGeometry((u1 - u0) * fw, (v1 - v0) * fh)), m,
+      -fw / 2 + ((u0 + u1) / 2) * fw, top - ((v0 + v1) / 2) * fh, zF + 0.001 + 0.0009));
+    printTex[`Print_${key}`] = `${T}/${d.file}`;
+  }
+}
 cab.add(box("StripGroove", W, 0.0012, 0.0016, dark, 0, stripY - 0.0006, zF + 0.0008));
 // the knob: chrome ring, black glossy cap, a white pointer
 {
@@ -220,5 +233,5 @@ const grain = { dir: `${TEX}/grain`, materials: {
 } };
 await exportGLB(root, clips, OUT, {
   Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Rear: `${T}/rear.jpg`,
-  Panel: `${T}/panel.jpg`, DrawerFace: `${T}/drawer.jpg`, Tray: `${T}/tray.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`,
+  Panel: `${T}/panel.jpg`, ...printTex, DrawerFace: `${T}/drawer.jpg`, Tray: `${T}/tray.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`,
 }, grain);
