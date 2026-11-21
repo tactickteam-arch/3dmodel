@@ -27,6 +27,13 @@ rng = np.random.default_rng(257)
 PT = "/System/Library/Fonts/Supplemental/PTSans.ttc"
 
 
+def tex_lg_mark_hi(logos, w):
+    # LG's vector mark drawn sharp (tex_lg_mark.py): 680 px across a 48-55 mm decal is 12-14 px per mm (logos/lg.png's 349 gave 6-7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    return tex_lg_mark.lg_hi(logos, w)
+
+
 def pt(px, bold=False):
     return ImageFont.truetype(PT, px, index=7 if bold else 0)
 
@@ -96,7 +103,7 @@ def main():
     save(lab, "label.png")
 
     # ── LG mark: light silver on the dark door, as LG's front photo shows it (about 200 grey on a 99 door) ──
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
+    lg = tex_lg_mark_hi(LOGOS, 680)
     a = np.asarray(lg).astype(float)
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (206, 208, 212)
@@ -132,8 +139,8 @@ def main():
         if sub:
             d.text((size[0] / 2, size[1] * 0.78), sub, font=pt(subpx), fill=(70, 72, 76, 255), anchor="mm")
         save(im, name)
-    # 1.4 times the first draft, so every word is set at 7.6 to 8.6 px/mm on the model (sharp at the 4 degree close-up)
-    k = 1.4
+    # 2 times the first draft, so every word is set at 11 to 12 px/mm on the model (sharp at the 4 degree close-up)
+    k = 2.0
     sc = lambda wh: (round(wh[0] * k), round(wh[1] * k))
     words("print_convertible.png", [("Convertible", True)], sc((900, 200)), px=round(110 * k))
     words("print_multiairflow.png", [("Multi", True), ("Air Flow", False)], sc((1000, 200)), px=round(110 * k))
