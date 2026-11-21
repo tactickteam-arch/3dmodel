@@ -203,13 +203,15 @@ def panel(ph):
 
 
 def drawer(ph):
-    """The drawer's front: the studio photo's drawer, with the soft logo replaced by Bosch's own crisp one."""
+    """The drawer's front: the studio photo's drawer, with the soft logo replaced by Bosch's own crisp one, at 4.5 texture px per
+    photo px (12 px per mm on the model, so the mark is as sharp as the strip's print; the plain face is the photo's own)."""
+    S = 4.5
     x0, y0, x1, y1 = 100, 75, 556, 283
-    c = ph.crop((x0, y0, x1, y1)).resize(((x1 - x0) * S, (y1 - y0) * S), Image.LANCZOS)
+    c = ph.crop((x0, y0, x1, y1)).resize((round((x1 - x0) * S), round((y1 - y0) * S)), Image.LANCZOS)
     a = np.asarray(c).astype(np.float32)
-    lx0, lx1 = (258 - x0) * S, (397 - x0) * S
-    ly0, ly1 = (158 - y0) * S, (194 - y0) * S
-    left, right = a[ly0:ly1, lx0 - 8:lx0 - 2].mean(axis=1, keepdims=True), a[ly0:ly1, lx1 + 2:lx1 + 8].mean(axis=1, keepdims=True)
+    lx0, lx1 = round((258 - x0) * S), round((397 - x0) * S)
+    ly0, ly1 = round((158 - y0) * S), round((194 - y0) * S)
+    left, right = a[ly0:ly1, lx0 - 18:lx0 - 4].mean(axis=1, keepdims=True), a[ly0:ly1, lx1 + 4:lx1 + 18].mean(axis=1, keepdims=True)
     t = np.linspace(0, 1, lx1 - lx0)[None, :, None]
     a[ly0:ly1, lx0:lx1] = left * (1 - t) + right * t
     out = Image.fromarray(a.clip(0, 255).astype(np.uint8))

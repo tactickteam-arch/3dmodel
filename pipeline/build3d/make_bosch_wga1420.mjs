@@ -58,13 +58,18 @@ const cab = group("Cabinet");
 root.add(cab);
 
 // ── cabinet: sides carry Bosch's Anti-Vibration ring relief, the back is the open steel panel with its hoses ──
+// The sides stop 1.5 mm under the top plate's upper face, reach 1.5 mm past the back panel's rear face, and the base stops
+// 1.5 mm short of it, so no two faces share a plane (defight moved single faces 0.8 mm and opened slits along the top's edges
+// and the back corners). The sides' back edges at 591.5 mm stay inside the gate's 3 mm.
 const t = 0.012, bodyH = H - feet, midY = feet + bodyH / 2;
-cab.add(mesh("SideLeft", flipV(new THREE.BoxGeometry(t, bodyH, D - 0.004)), [dark, sideL, bodyDark, bodyDark, bodyDark, bodyDark], -W / 2 + t / 2, midY, -0.002));
-cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(t, bodyH, D - 0.004)), [sideR, dark, bodyDark, bodyDark, bodyDark, bodyDark], W / 2 - t / 2, midY, -0.002));
+const sideH = bodyH - 0.0015, sideD = D - 0.004 + 0.0015, sideZ = -0.002 - 0.00075;
+cab.add(mesh("SideLeft", flipV(new THREE.BoxGeometry(t, sideH, sideD)), [dark, sideL, bodyDark, bodyDark, bodyDark, bodyDark], -W / 2 + t / 2, feet + sideH / 2, sideZ));
+cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(t, sideH, sideD)), [sideR, dark, bodyDark, bodyDark, bodyDark, bodyDark], W / 2 - t / 2, feet + sideH / 2, sideZ));
 // the top sits 1.5 mm inside the sides' outer faces, so the two never share a plane (a shared plane is pushed out 0.8 mm by defight)
 cab.add(faced("Top", W - 0.003, 0.014, D, [topM, topM, topM, dark, topM, topM], 0, H - 0.007, 0));
-cab.add(box("Base", W - 2 * t, t, D - 0.01, dark, 0, feet + t / 2, -0.005));
-cab.add(mesh("BackPanel", flipV(new THREE.BoxGeometry(W - 2 * t, bodyH - 0.014, 0.004)), [dark, dark, dark, dark, dark, rearM], 0, feet + (bodyH - 0.014) / 2, zB + 0.002));
+cab.add(box("Base", W - 2 * t, t, D - 0.0115, dark, 0, feet + t / 2, -0.00425));
+// the back panel's foot 1.5 mm over the base's underside (no shared plane); its texture is squeezed 1.5 mm in 822 (0.2%)
+cab.add(mesh("BackPanel", flipV(new THREE.BoxGeometry(W - 2 * t, bodyH - 0.014 - 0.0015, 0.004)), [dark, dark, dark, dark, dark, rearM], 0, feet + 0.0015 + (bodyH - 0.014 - 0.0015) / 2, zB + 0.002));
 for (const [fx, fz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
   cab.add(mesh("Foot", new THREE.CylinderGeometry(0.017, 0.019, feet, 18), footM, fx * (W / 2 - 0.045), feet / 2, fz * (D / 2 - 0.05)));
 }
@@ -212,7 +217,11 @@ root.add(filter);
 // the door stands 46 mm proud of the body front (636 mm deep with the door); its front is at 0.074 above the hinge axis
 const door = group("Door", cx - ringR, cy, hingeZ);
 const dc = group("DoorCentre", ringR, 0, 0);
-dc.add(lathe("DoorInnerRing", [[holeR - 0.02, 0.028], [ringR - 0.003, 0.028]], doorIn));
+dc.add(lathe("DoorInnerRing", [[0.165, 0.028], [ringR, 0.028]], doorIn));      // from the bowl's edge out to the rim's own edge: no open ring
+// the door's inner wall, from the glass's edge down to the bowl's: it closes the hollow between the front and the back of the
+// door, which showed through the glass from the side (the rim's far side, one-sided, vanished there)
+const doorWall = mat("DoorInnerWall", 0x2d3036, { rough: 0.6, side: THREE.DoubleSide });
+dc.add(lathe("DoorInnerWall", [[0.162, 0.0704], [0.165, 0.028]], doorWall));
 dc.add(lathe("DoorRim", [[ringR, 0.028], [ringR + 0.0012, 0.0395], [ringR - 0.002, 0.0545], [ringR - 0.0075, 0.0603]], chrome));
 dc.add(lathe("DoorBlack", [[ringR - 0.0075, 0.0603], [ringR - 0.016, 0.0645], [0.19, 0.0676], [0.162, 0.0704]], ringBlack));
 dc.add(lathe("DoorGlass", [[0.162, 0.0704], [0.12, 0.0720], [0.06, 0.0732], [0.0, 0.0738]], glass));
