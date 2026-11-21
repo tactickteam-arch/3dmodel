@@ -137,8 +137,9 @@ def main():
         # the two at the front of the shelves set at 136 px capitals (12.5 px per mm on the model; 60 gave 5.5-5.7)
         "print_magic": spaced("MAGIC CHILL", 136, (70, 74, 82)),
         "print_veggie": spaced("VEGGIE FRESH", 136, (40, 112, 172)),
-        "print_airflow": spaced("ADVANCED AIR FLOW", 60, (176, 182, 188), track=0.3),
-        "print_bigbottle": spaced("BIG BOTTLE RACK", 60, (150, 156, 164), track=0.3),
+        # the two on the door bins and the back: 80 px capitals (about 12 px per mm on the model; 60 gave 8.9-9.2)
+        "print_airflow": spaced("ADVANCED AIR FLOW", 80, (176, 182, 188), track=0.3),
+        "print_bigbottle": spaced("BIG BOTTLE RACK", 80, (150, 156, 164), track=0.3),
     }
     for n, im in prints.items():
         im.save(os.path.join(OUT, n + ".png"), optimize=True)
