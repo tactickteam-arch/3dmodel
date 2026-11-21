@@ -125,12 +125,22 @@ def door_textures(key, f):
 for key, f in FIN.items():
     door_textures(key, f)
 
-# ── the Godrej script: Godrej's header SVG (logos/godrej.png), white on both colours (both fronts) ──
-logo = Image.open(os.path.join(SITE, "logos/godrej.png")).convert("RGBA")
+# ── the Godrej script: Godrej's header SVG (pipeline/sources/logos/godrej.svg), white on both colours (both fronts) ──
+# rendered at 2400 px and reduced to 800 px: 11.4 px per mm on the 70 mm wide decal (the 650 px logos/godrej.png gave 7.3)
+def svg_logo(width=2400):
+    import subprocess, tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, "logo.png")
+        subprocess.run(["node", "rasterize_svg.mjs", os.path.join(SITE, "pipeline/sources/logos/godrej.svg"), out, str(width)],
+                       cwd=os.path.join(SITE, "pipeline/build3d"), check=True, capture_output=True)
+        return Image.open(out).convert("RGBA")
+
+
+logo = svg_logo()
 alpha = logo.getchannel("A")
 im = Image.new("RGBA", logo.size, (236, 236, 238, 0))
 im.putalpha(alpha.point(lambda v: int(v * 0.95)))
-save(im.resize((512, int(512 * logo.size[1] / logo.size[0])), Image.LANCZOS), "logo_light.png")
+save(im.resize((800, 366), Image.LANCZOS), "logo_light.png")
 
 # ── the display on the freezer door, redrawn ──
 # 78 x 148 mm (both fronts: 31 x 58 px at 0.401 px per mm). In fractions of its width and height (measured on the Matt
@@ -138,7 +148,7 @@ save(im.resize((512, int(512 * logo.size[1] / logo.size[0])), Image.LANCZOS), "l
 # 0.33, 0.43 down with their words to the right; at the right three strokes at 0.21, 0.285 (brighter) and 0.37 down; the
 # slider at 0.49 from 0.15 to 0.78 with its dot at 0.82; the bottom keys at 0.6 (a figure at 0.19, two lit squares at 0.37
 # and 0.5, a two-line word block at 0.68-0.87); under it the grey badge with the shield ring at 0.15-0.35 and two lines.
-DW, DH, DPX, SS = 78, 148, 6, 3
+DW, DH, DPX, SS = 78, 148, 12, 3   # 12 px per mm on the model (6 before)
 
 
 def display(frame, name):
