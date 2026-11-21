@@ -353,8 +353,8 @@ def word(img, text, cx, cy, height_px, face, col, max_w=None):
 def prints():
     """The words LG prints inside (DZ-04, the empty open-door photo, 0.79 px per mm): "Fast Freezing Zone" across the
     freezer box's back, 126 mm wide; "Cool & Fresh Zone" on the chiller tray's front, 122 mm wide; "Lamp 10W" over the
-    lamp, 15 mm wide. Set in Avenir Next Demi Bold, grey as on the photo, 8 px per mm."""
-    S = 8
+    lamp, 15 mm wide. Set in Avenir Next Demi Bold, grey as on the photo, 12 px per mm."""
+    S = 12
     for name, text, wmm, hmm, col in (("print_fastfreeze", "Fast Freezing Zone", 126, 14, (88, 90, 96, 235)),
                                       ("print_coolfresh", "Cool & Fresh Zone", 122, 14, (96, 98, 104, 235)),
                                       ("print_lamp", "Lamp 10W", 15, 4, (110, 112, 118, 235))):
