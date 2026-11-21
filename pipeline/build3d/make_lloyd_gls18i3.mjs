@@ -57,15 +57,15 @@ const FINISHES = [
 ];
 const F0 = FINISHES[0];
 const panelFront = mat("PanelFront", 0xffffff, { rough: 0.24 });
-const panelInner = mat("PanelInner", 0xe1e3e6, { rough: 0.6 });
+const panelInner = mat("PanelInner", 0xe1e3e6, { rough: 0.6, side: THREE.DoubleSide });
 const body = mat("Body", 0xf1f2f4, { rough: 0.32 });
-const lower = mat("LowerChassis", F0.lower, { rough: 0.36 });
+const lower = mat("LowerChassis", F0.lower, { rough: 0.36, side: THREE.DoubleSide });   // two-sided, as the back: the seam at each end looks into the unit
 const grille = mat("TopGrille", 0xffffff, { rough: 0.5 });
 const louvreMat = mat("Louvre", F0.lower, { rough: 0.3 });
 const louvreIn = mat("LouvreInner", 0xc9ccd0, { rough: 0.5 });
 const outlet = mat("Outlet", 0x6e7277, { rough: 0.85 });   // Sangeetha's open-louvre photos: a grey channel behind white blades
 const vaneMat = mat("Vane", 0xdfe1e4, { rough: 0.45 });
-const backMat = mat("Back", 0xd2d5d8, { rough: 0.7 });
+const backMat = mat("Back", 0xd2d5d8, { rough: 0.7, side: THREE.DoubleSide });   // two-sided: seen from inside through the seams, it must not vanish
 const knock = mat("KnockOut", 0xe4e6e9, { rough: 0.4 });
 
 // ── geometry helpers (as in make_haier_hso52.mjs) ──
@@ -176,6 +176,8 @@ root.add(cab);
 // ── chassis: top inlet, back, underside, the end caps ──
 cab.add(ribbon("TopBackEdge", [[0, H - 0.006], [0.006, H]], -HW + 0.006, HW - 0.006, body));
 cab.add(ribbon("TopGrille", lin([0.006, H], [zGrille, H], 1), -HW + 0.01, HW - 0.01, grille, { uv: "topz", box: { x0: -HW + 0.01, x1: HW - 0.01, z0: 0.006, z1: zGrille } }));
+// the top between the grille's ends and the end caps (4.5 mm each side): closed in the body's white, so no slot looks into the unit
+for (const side of [-1, 1]) cab.add(ribbon("TopEnd" + (side < 0 ? "L" : "R"), lin([0.006, H], [zGrille, H], 1), side < 0 ? -HW + 0.0055 : HW - 0.01, side < 0 ? -HW + 0.01 : HW - 0.0055, body));
 cab.add(ribbon("Back", [[0, 0.008], [0, H - 0.006]], -HW + 0.006, HW - 0.006, backMat));
 cab.add(ribbon("Underside", underside, -HW + 0.006, HW - 0.006, lower));
 for (const side of [-1, 1]) {
