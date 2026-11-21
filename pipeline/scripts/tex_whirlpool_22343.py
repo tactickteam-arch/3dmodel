@@ -4,7 +4,7 @@ Writes pipeline/tex/whirlpool_22343/:
   door_freezer.jpg, door_fridge.jpg  the Illusia Steel doors: brushed steel with half the depth of the soft vertical
                                      bands Whirlpool's straight front shows (the hairline map adds the fine brushing)
   side_l.jpg, side_r.jpg             the painted steel sides, brightest at the front as on Whirlpool's 3/4 views
-  panel.jpg                          the External UI touch panel (black glass), redrawn sharp at 7.2 px/mm from
+  panel.jpg                          the External UI touch panel (black glass), redrawn sharp at 11 px/mm from
                                      Whirlpool's own close-up of it (feature "up to 50% energy saving")
   cap.jpg                            the fridge door's top cap: black on the left, silver from the crescent tip on
   print_*.png                        the inside prints as Whirlpool's open-door photo shows them (first word dark on
@@ -31,7 +31,7 @@ WORK = os.path.join(SITE, ".work", "whirlpool_22343_tex")
 AVENIR = "/System/Library/Fonts/Avenir Next.ttc"
 BASK = "/System/Library/Fonts/Supplemental/Baskerville.ttc"
 BOLD, BOLDI, DEMI, MED, REG = 0, 1, 2, 5, 7
-PX_MM = 7.2
+PX_MM = 11.0                              # px per mm on the model (7.2 before)
 SS = 3                                    # supersampling while drawing the panel
 WHITE = (236, 236, 238)
 GLASS = (9, 9, 10)
