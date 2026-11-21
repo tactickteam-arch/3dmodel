@@ -9,6 +9,8 @@
 // usage: node make_lg_t12.mjs <entry.json> <tex dir> <out.glb>
 import { THREE, mat, mesh, box, group, flipV, inward, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { mergeVertices, mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { uvDecals } from "./decal_curved.mjs";
+import fs from "node:fs";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "lg-t12sjmb1z";
@@ -174,6 +176,9 @@ const onPanel = new THREE.Matrix4().makeBasis(new THREE.Vector3(1, 0, 0), new TH
 const PANEL_UV = (x, s) => [(x + W / 2) / W, (0.14 - s) / 0.14];       // panel.jpg: 590 mm across, s 0-140 mm, row 0 at s = 140
 
 const root = group("LGT12");
+let printTex = {};
+// the panel's print decals (decals.json: name -> file, rect in the panel's UVs); the keys' tops are printed from the same pieces
+const DECALS = JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8"));
 const cab = group("Cabinet");
 root.add(cab);
 
@@ -236,7 +241,11 @@ for (const [sx, xf] of [[1, 0.475], [-1, 0.166]]) {
   across(cCurve, 0.295, -0.295).forEach((p) => s.lineTo(p.x, p.y));
   s.lineTo(-0.295, 0.06 - zF);
   s.quadraticCurveTo(-0.295, 0.02 - zF, -0.25, fCurve(-0.25) - zF);
-  cab.add(prism("PanelFace", s, flat(J), (x, xf) => coverTop(xf), panelM, { bev: 0.003, caps: ["top"], uvf: (x, xf) => PANEL_UV(x, xf / CS) }));
+  const pf = prism("PanelFace", s, flat(J), (x, xf) => coverTop(xf), panelM, { bev: 0.003, caps: ["top"], uvf: (x, xf) => PANEL_UV(x, xf / CS) });
+  cab.add(pf);
+  // the print sharp: the panel drawn again at 12 px/mm (about 11 on the model), its inked part laid on the panel in pieces (tex_lg_t12.py --hi,
+  // decal_curved.mjs), clipped to the panel's curved front edge
+  printTex = uvDecals(pf, `${T}/decals.json`, (n) => mat(n, 0xffffff, { rough: 0.16 }), { cell: [0.015, 0.0025], clip: true });
 }
 // the cover round the opening (flat under the lid), its sides down to the cabinet; it runs 6 mm under the panel and 10 mm into
 // the rear band, 0.8 mm lower, so no two surfaces share a plane
@@ -274,10 +283,23 @@ for (const [sx, xf] of [[1, 0.475], [-1, 0.166]]) {
     const g = new THREE.ExtrudeGeometry(sh, { depth: 0.0014, bevelEnabled: false, curveSegments: 3 });
     g.translate(kx / 1000, ks / 1000, -0.0002);
     const p = g.attributes.position, uv = g.attributes.uv;
-    for (let i = 0; i < p.count; i++) uv.setXY(i, ...PANEL_UV(p.getX(i), p.getY(i)));
+    // the key's top printed from the decal piece that holds it, in that piece's own UVs
+    const [ku] = PANEL_UV(kx / 1000, ks / 1000);
+    const piece = Object.keys(DECALS).find((k) => DECALS[k].rect[0] <= ku && ku < DECALS[k].rect[2]);
+    if (!piece) throw new Error(`key at ${kx} mm is on no print decal`);
+    const [u0, v0, u1, v1] = DECALS[piece].rect;
+    for (let i = 0; i < p.count; i++) {
+      const [u, v] = PANEL_UV(p.getX(i), p.getY(i));
+      if (u < u0 || u > u1 || v < v0 || v > v1) throw new Error(`key at ${kx} mm crosses the edge of decal ${piece}`);
+      uv.setXY(i, (u - u0) / (u1 - u0), (v - v0) / (v1 - v0));
+    }
+    g.userData.piece = piece;
     return g.applyMatrix4(onPanel);
   });
-  cab.add(mesh("PanelKeys", mergeVertices(mergeGeometries(geos), 1e-6), panelM));
+  for (const piece of new Set(geos.map((g) => g.userData.piece))) {
+    const gs = geos.filter((g) => g.userData.piece === piece);
+    cab.add(mesh(`PanelKeys_${piece}`, mergeVertices(mergeGeometries(gs), 1e-6), root.getObjectByName(`PrintDecal_${piece}`).material));
+  }
   // the chrome rings round Power (x 164 mm, s 75.5 mm, 10.4 mm radius) and Start/Pause (x 141 mm, s 44 mm, 15.8 mm radius)
   const rings = [[164.1, 75.5, 10.4], [141.4, 44.0, 15.8]].map(([rx, rs, rr]) => {
     const g = new THREE.TorusGeometry(rr / 1000, 0.0009, 8, 48);
@@ -441,7 +463,7 @@ const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
-  PanelFace: `${T}/panel.jpg`, LabelBEE: `${T}/label.png`, BackPanel: `${T}/back.jpg`, PunchDrum: `${T}/drum.jpg`,
+  PanelFace: `${T}/panel.jpg`, ...printTex, LabelBEE: `${T}/label.png`, BackPanel: `${T}/back.jpg`, PunchDrum: `${T}/drum.jpg`,
   Pulsator: `${T}/pulsator.jpg`, LintFilter: `${T}/filter.jpg`, DrawerFace: `${T}/detergent.jpg`, Capacity: `${T}/kg12.png`,
 }, { dir: `${TEX}/grain`, materials: {
   // Grain (BENCHMARK.md section 10): the Middle Black cabinet the peel, as LG's other dark washers; the gloss black top cover
