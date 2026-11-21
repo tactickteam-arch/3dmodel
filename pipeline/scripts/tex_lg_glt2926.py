@@ -101,6 +101,7 @@ def lgmark():
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import tex_lg_mark
     a = np.asarray(tex_lg_mark.lg_hi(LOGOS, 800)).astype(float)
+    a[..., 3] *= 1 - np.clip((a[..., :3].min(2) - 150) / 70, 0, 1)   # the face lines inside the disc are cut out, as on LG's photos
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (62, 64, 68)
     mark[..., 3] = (a[..., 3] * 0.95).clip(0, 255).astype(np.uint8)
@@ -155,9 +156,9 @@ def prints():
 
 
 def display():
-    """The fridge's control display on the back wall's duct: 114 x 64 mm (DZ-05), at 8 px per mm, light grey, with LG's
+    """The fridge's control display on the back wall's duct: 114 x 64 mm (DZ-05), at 12 px per mm, light grey, with LG's
     Type A layout from the manual (two rows of five dots and one, each with its button box on the right)."""
-    S = 8
+    S = 12
     W_, H_ = 114 * S, 64 * S
     im = Image.new("RGBA", (W_, H_), (224, 226, 229, 255))
     d = ImageDraw.Draw(im)
