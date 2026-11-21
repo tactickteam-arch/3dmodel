@@ -119,9 +119,9 @@ const printLed = mat("PrintLed", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const root = group("HaierHRB3752");
 const cab = group("Cabinet");
 root.add(cab);
-// the printed words are drawn at 7.2 px per mm (tex_haier_hrb3752.py): a decal's size in metres is its PNG's size / 7200
-const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 7200, b.readUInt32BE(20) / 7200]; };
-const PAD = 4 / 7200;                                 // the 4 px of margin round each word
+// the printed words are drawn at 12 px per mm (tex_haier_hrb3752.py): a decal's size in metres is its PNG's size / 12000
+const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 12000, b.readUInt32BE(20) / 12000]; };
+const PAD = 4 / 12000;                                // the 4 px of margin round each word
 const plane = (name, w, h, m, x, y, z) => mesh(name, flipV(new THREE.PlaneGeometry(w, h)), m, x, y, z);
 const cyl = (name, rt, rb, h, m, x, y, z, seg = 16) => mesh(name, new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y, z);
 // A box from its corners. frame [x0, x1, y0, y1]: its front (+z) face takes that part of a texture laid over the whole
@@ -267,6 +267,8 @@ const iceM = group("IceMaker", icX, fzShelfTop, 0);
   for (let i = 0; i < 8; i++) {
     const c = mesh("IceCube", cube, ice, -0.06 + (i % 4) * 0.04, 0.014, icZ1 - 0.05 - Math.floor(i / 4) * 0.07 - (i % 2) * 0.012);
     c.rotation.set(0.15 * (i % 3), 0.5 * i, 0.1 * (i % 4));
+    // a tilted cube's low corner stays on the floor it sits on (it poked through the bin's floor)
+    { c.updateMatrix(); const cb = cube.clone().applyMatrix4(c.matrix); cb.computeBoundingBox(); if (cb.boundingBox.min.y < 0.005) c.position.y += 0.005 - cb.boundingBox.min.y; }
     iceM.add(c);
   }
 }
