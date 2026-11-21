@@ -177,6 +177,22 @@ const drawer = group("Drawer", dX, dY, zF);
   drawer.add(mesh("DosingCap", new THREE.CylinderGeometry(0.019, 0.019, 0.006, 32), capM, 0.012, y0 + 0.006, tz + tankL / 2 + 0.003).rotateX(Math.PI / 2));
 }
 cab.add(drawer);
+// the print sharp: the panel's and the strip's print drawn again at 12 px per mm (the texture script's --hi) and cut into
+// pieces (decals.json: the drawer's section, the display and programme tiles, the keys, the ULTRA FRESH AIR plate), each on a
+// plane 0.9 mm in front of its face over the same rectangle of that face's UVs, so it lands exactly on panel.jpg's or
+// strip.jpg's own print; the drawer's piece rides on the drawer
+const printTex = {};
+for (const [key, d] of Object.entries(JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8")))) {
+  const [u0, v0, u1, v1] = d.rect;
+  const x0 = -W / 2 + u0 * W, x1 = -W / 2 + u1 * W;
+  const [top, span] = d.face === "plate" ? [panelBot, panelBot - stripBot] : [H, H - panelBot];
+  const y1 = top - v0 * span, y0 = top - v1 * span;
+  // faces: the panel's glass at zF, the plate's at zF - 4 mm, the drawer's glass 0.3 mm behind the drawer's origin (zF)
+  const [parent, ox, oy, z] = d.face === "drawer" ? [drawer, dX, dY, -0.0003 + 0.0009] : [cab, 0, 0, (d.face === "plate" ? zF - 0.004 : zF) + 0.0009];
+  const m = mat(`Print_${key}`, 0xffffff, { rough: d.face === "plate" ? 0.45 : 0.12 });   // as the face under it (Strip, Panel)
+  parent.add(mesh(`PrintDecal_${key}`, flipV(new THREE.PlaneGeometry(x1 - x0, y1 - y0)), m, (x0 + x1) / 2 - ox, (y0 + y1) / 2 - oy, z));
+  printTex[`Print_${key}`] = `${T}/${d.file}`;
+}
 
 // ── the gasket and the 525 mm Super Drum ──
 // the gasket: its lip over the dish's inner edge, a fold, then back to the drum (open-door photos)
@@ -221,7 +237,8 @@ cab.add(mesh("DrumHub", new THREE.CylinderGeometry(0.036, 0.04, 0.03, 40), drumB
 // Radii from the front photo: rim 261.5-267.7 mm; the black ring's inner edge 190 mm (open34.jpg). Profiles from the body front.
 const door = group("Door", hingeX, cy, hingeZ);
 const dc = group("DoorCentre", cx - hingeX, 0, zF - hingeZ);
-dc.add(lathe("DoorInner", [[0.262, 0.009], [0.19, 0.009], [0.19, 0.003], [0.262, 0.003]], doorIn));
+// the black ring meets the rim where the rim starts (0.262, 0.002), so no slit opens between them at the back
+dc.add(lathe("DoorInner", [[0.262, 0.009], [0.19, 0.009], [0.19, 0.003], [0.262, 0.002]], doorIn));
 dc.add(lathe("DoorRim", [[0.262, 0.002], [ringR, 0.0045], [ringR, 0.0135], [0.2655, 0.0185], [0.2615, 0.0195]], silver));
 dc.add(lathe("DoorTint", [[0.2615, 0.0195], [0.24, 0.0215], [0.2, 0.024], [0.12, 0.0262], [0.0, doorFront]], tint));
 dc.add(lathe("DoorBowl", [[0.19, 0.003], [0.182, -0.02], [0.165, -0.05], [0.13, -0.075], [0.07, -0.088], [0.0, -0.09]], bowl));
@@ -247,5 +264,5 @@ const grain = { dir: `${TEX}/grain`, materials: {
   TopPlate: { type: "peel_soft" },
 } };
 await exportGLB(root, clips, OUT, {
-  Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Panel: `${T}/panel.jpg`, Strip: `${T}/strip.jpg`, Drum: `${T}/drum.jpg`,
+  Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Panel: `${T}/panel.jpg`, Strip: `${T}/strip.jpg`, Drum: `${T}/drum.jpg`, ...printTex,
 }, grain);

@@ -41,7 +41,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-PHOTOS, LOGOS, OUT = sys.argv[1:4]
+HI = "--hi" in sys.argv                # --hi: only the print decals, the panel and the strip drawn again at 12 px per mm
+PHOTOS, LOGOS, OUT = [x for x in sys.argv[1:] if x != "--hi"][:3]
 SRC = os.path.join(PHOTOS, "haier_hw120")
 D = os.path.join(OUT, "haier_hw120")
 os.makedirs(D, exist_ok=True)
@@ -93,6 +94,11 @@ BODY = np.array([66, 69, 76], np.float32)              # the cabinet's colour wh
 SHADE = {"front.jpg": 0.55, "side_l.jpg": 1.0, "side_r.jpg": 1.0, "strip.jpg": 0.9, "drum.jpg": 0.6}   # the front faces the viewer's key light, the sides don't
 
 S = 4096 / W_MM                       # panel and strip texture px per mm (6.88)
+F = 1.0                                # the drawing's scale against the 6.88 px per mm one (photo-sized filters grow with it)
+if HI:
+    S = 12.0
+    F = S / (4096 / W_MM)
+TW = round(W_MM * S)                   # the panel's and strip's width in texture px (4096; 7140 with --hi)
 
 # This model's own print: Haier's two feature images registered onto panel.jpg (homographies image px -> panel.jpg px; SIFT
 # matches on the print both share, RANSAC at 1.5 and 1.0 px: 78 and 11 inliers, the shared words agree to 0.7 px)
@@ -300,7 +306,7 @@ def icon(name):
             arc(*P(415, 345), r * 1.5, 180, 270, 26)
         cx, cy = P(415, 345)
         d.ellipse([cx - 22, cy - 22, cx + 22, cy + 22], fill=255)
-    return crop_ink(np.asarray(im.resize((N // 4, N // 4), Image.LANCZOS)).astype(np.float32) / 255, 0.15)
+    return crop_ink(np.asarray(im.resize((N // (2 if HI else 4), N // (2 if HI else 4)), Image.LANCZOS)).astype(np.float32) / 255, 0.15)
 
 
 def seven(canvas, b, colour, segs="abcdefg"):
@@ -338,7 +344,7 @@ def panel():
     """The black glass panel and its rim, 595 x 79 mm (771-850 mm up), with the drawer's section at the left."""
     ph = np.asarray(Image.open(os.path.join(SRC, "panel.jpg")).convert("RGB")).astype(np.float32)
     h = round((H_MM - PANEL_BOT) * S)
-    c = Canvas(4096, h, H_MM)
+    c = Canvas(TW, h, H_MM)
     a = c.a
     # the rim: a brushed grey frame round the glass, lit along its top, as the photo has it (rows 732-740, 870-873)
     yy = (np.arange(h) + 0.5) / S
@@ -419,11 +425,11 @@ def panel():
         lum = tile.mean(2)
         band = round(th_ * 0.36)
         txt = np.zeros(lum.shape, np.uint8)
-        med = cv2.medianBlur(lum.astype(np.uint8), 31).astype(np.float32)
+        med = cv2.medianBlur(lum.astype(np.uint8), 2 * round(15 * F) + 1).astype(np.float32)
         txt[:band] = ((lum[:band] - med[:band]) > 18).astype(np.uint8) * 255
-        txt = cv2.dilate(txt, np.ones((7, 7), np.uint8))
-        tile = cv2.inpaint(tile.clip(0, 255).astype(np.uint8), txt, 9, cv2.INPAINT_TELEA).astype(np.float32)
-        blur = cv2.GaussianBlur(tile, (0, 0), 3)
+        txt = cv2.dilate(txt, np.ones((round(7 * F), round(7 * F)), np.uint8))
+        tile = cv2.inpaint(tile.clip(0, 255).astype(np.uint8), txt, 9 * F, cv2.INPAINT_TELEA).astype(np.float32)
+        blur = cv2.GaussianBlur(tile, (0, 0), 3 * F)
         tile = np.clip(tile + (tile - blur) * 0.6, 0, 255)
         r = round(1.6 * S)
         mask = np.zeros((th_, tw_), np.uint8)
@@ -447,6 +453,8 @@ def panel():
     c.cap("Remote", 1019.4, 1041.25, 835, 838.8, WHITE)
     c.cap("AI Onetouch", 1046.9, 1080, 835, 838.8, WHITE)
     c.cap("Hold 3s", 1055, 1071.9, 841.5, 844.6, GREY)
+    if HI:
+        return a
     save(Image.fromarray(a.clip(0, 255).astype(np.uint8)), "panel.jpg", 92)
 
 
@@ -457,16 +465,18 @@ def strip():
     ph = Image.open(os.path.join(SRC, "panel.jpg")).convert("RGB")
     y0, y1 = PY0 + (H_MM - PANEL_BOT) * PKY, PY0 + (H_MM - STRIP_BOT) * PKY
     h = round((PANEL_BOT - STRIP_BOT) * S)
-    im = ph.crop((PX0 - W_MM / 2 * PKX, y0, PX0 + W_MM / 2 * PKX, y1)).resize((4096, h), Image.LANCZOS)
+    im = ph.crop((PX0 - W_MM / 2 * PKX, y0, PX0 + W_MM / 2 * PKX, y1)).resize((TW, h), Image.LANCZOS)
     a = np.asarray(im).astype(np.float32)
-    a = cv2.GaussianBlur(a, (0, 0), 1.0)
-    c = Canvas(4096, h, PANEL_BOT)
+    a = cv2.GaussianBlur(a, (0, 0), 1.0 * F)
+    c = Canvas(TW, h, PANEL_BOT)
     c.a = a
     # the plate: its face evened out, then the words
     px0, py0, px1, py1 = c.box((491, 885, 724.5, 917.5))
     face = a[round(py0):round(py1), round(px0):round(px1)]
     face[:] = np.median(face.reshape(-1, 3), 0) * np.linspace(1.05, 0.95, face.shape[0])[:, None, None]
     c.word("ULTRA FRESH AIR", (563, 897, 653, 904.5), (226, 226, 228), BOLD, "fit")
+    if HI:
+        return a
     save(Image.fromarray(a.clip(0, 255).astype(np.uint8)), "strip.jpg", 90)
 
 
@@ -581,6 +591,42 @@ def drum():
     save(im, "drum.jpg", 86)
 
 
+
+# ── --hi: the print decals. The panel and the strip are drawn again by the same code at 12 px per mm, and each printed
+# area is cut out (each piece under the 4096 px a phone or headset loads): the drawer's section (it slides out with the
+# drawer), the display with the programme tiles, the keys at the right, and the ULTRA FRESH AIR plate. decals.json gives
+# each piece's face and its u, v rectangle in that face's own UVs (the panel's or the strip's); the builder lays each on a
+# plane 0.9 mm in front of its face. The pieces' edges are glass (or the plate's even face), the same as under them. ──
+PIECES = {   # name: (face, photo box x0, y0, x1, y1 in panel.jpg px)
+    "drawer": ("drawer", 125, 758, 378, 856),
+    "display": ("panel", 462, 762, 1015, 850),
+    "keys": ("panel", 1015, 762, 1086, 850),
+    "plate": ("plate", 492, 886, 723.5, 916.5),
+}
+
+
+def decals():
+    canv = {"panel": (panel(), H_MM, H_MM - PANEL_BOT, "panel.jpg"), "plate": (strip(), PANEL_BOT, PANEL_BOT - STRIP_BOT, "strip.jpg")}
+    canv["drawer"] = canv["panel"]
+    out = {}
+    for key, (face, x0, y0, x1, y1) in PIECES.items():
+        a, top, span, base = canv[face]
+        X0, X1 = round(tx(pX(x0))), round(tx(pX(x1)))
+        Y0, Y1 = round((top - pY(y0)) * S), round((top - pY(y1)) * S)
+        assert X1 - X0 <= 4096 and Y1 - Y0 <= 4096
+        piece = a[Y0:Y1, X0:X1] * SHADE.get(base, 1.0)
+        name = f"print_{key}.jpg"
+        Image.fromarray(piece.clip(0, 255).astype(np.uint8)).save(os.path.join(D, name), quality=88, subsampling=0, optimize=True)
+        h, w = a.shape[:2]
+        out[key] = {"file": name, "face": face, "rect": [X0 / w, Y0 / h, X1 / w, Y1 / h]}
+        print("wrote", name, (X1 - X0, Y1 - Y0))
+    with open(os.path.join(D, "decals.json"), "w") as fh:
+        json.dump(out, fh, indent=1)
+
+
+if HI:
+    decals()
+    sys.exit(0)
 panel()
 strip()
 front()
