@@ -23,6 +23,13 @@ rng = np.random.default_rng(26)
 FONT = "/System/Library/Fonts/Avenir Next.ttc"
 
 
+def tex_lg_mark_hi(logos, w):
+    # LG's vector mark drawn sharp (tex_lg_mark.py): 680 px across a 48-55 mm decal is 12-14 px per mm (logos/lg.png's 349 gave 6-7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    return tex_lg_mark.lg_hi(logos, w)
+
+
 def font(px, face=7):
     return ImageFont.truetype(FONT, px, index=face)
 
@@ -90,8 +97,9 @@ def main():
     save(lab, "label.png")
 
     # ── LG mark: grey disc and wordmark as printed on the freezer door (dark on steel) ──
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
+    lg = tex_lg_mark_hi(LOGOS, 680)
     a = np.asarray(lg).astype(float)
+    a[..., 3] *= 1 - np.clip((a[..., :3].min(2) - 150) / 70, 0, 1)   # the face lines inside the disc are cut out, as on LG's photos
     mark = np.zeros(a.shape, np.uint8)
     lum = a[..., :3].mean(axis=2)
     mark[..., :3] = (84, 86, 90)
