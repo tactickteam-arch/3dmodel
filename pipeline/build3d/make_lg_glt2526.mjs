@@ -250,6 +250,15 @@ const fzD = drawerFront - zIn1 - 0.016, fzW = inW - 0.02, fzC = zIn1 + fzD / 2 +
   g.add(box("FzBoxR", 0.004, fzH, bd, clear, bw / 2, yc, zc));
   g.add(mesh("FzBoxFront", flipV(new THREE.BoxGeometry(bw, faceH, 0.004)), [white, white, white, white, drawerFace, white], 0, drawerY + faceH / 2, zc + bd / 2));
   g.add(box("FzBoxFrontUp", bw, fzH - faceH, 0.004, clearLight, 0, drawerY + faceH + (fzH - faceH) / 2, zc + bd / 2));
+  // "Fresh Zone" again at 12 px per mm on a decal just off the front (0.9 mm, clear of defight's 0.8 mm gap), cut from the
+  // same drawing as fresh_zone.jpg (tex script prints(): fz_word.jpg, its box in fz_word.json), so its edges don't show
+  {
+    const fw = JSON.parse(fs.readFileSync(`${T}/fz_word.json`, "utf8"));
+    const [FW, FH] = fw.face_mm, [x0, y0, x1, y1] = fw.box_mm;
+    const w = (x1 - x0) / FW * bw, h = (y1 - y0) / FH * faceH;
+    const x = ((x0 + x1) / 2 / FW - 0.5) * bw, y = drawerY + faceH * (1 - (y0 + y1) / 2 / FH);
+    g.add(plane("FzWordDecal", w, h, mat("print_fzword", 0xffffff, { rough: 0.45 }), x, y, zc + bd / 2 + 0.002 + 0.0009));
+  }
   g.add(box("FzBoxRim", bw, 0.008, 0.008, clearRib, 0, drawerY + fzH - 0.004, zc + bd / 2));
   trays.add(g);
 }
@@ -371,7 +380,7 @@ const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 const textures = {
   DoorFreezer: `${T}/door_freezer.jpg`, DoorFridge: `${T}/door_fridge.jpg`, SideSteel: `${T}/side.jpg`, SideSteelL: `${T}/side_l.jpg`, RearPlate: `${T}/rear.jpg`,
-  LabelBEE: `${T}/label.png`, LgMark: `${T}/lgmark.png`, print_convertible: `${T}/print_convertible.png`, KnobFace: `${T}/knob.jpg`, FreshZoneFront: `${T}/fresh_zone.jpg`,
+  LabelBEE: `${T}/label.png`, LgMark: `${T}/lgmark.png`, print_convertible: `${T}/print_convertible.png`, KnobFace: `${T}/knob.jpg`, FreshZoneFront: `${T}/fresh_zone.jpg`, print_fzword: `${T}/fz_word.jpg`,
 };
 Object.assign(textures, stock.textures());
 // textures of food that was left out
