@@ -62,7 +62,7 @@ const filterMat = mat("Filter", 0xffffff, { rough: 0.75 });
 const flapMat = mat("Flap", 0xf1f2f4, { rough: 0.28 });
 const flapIn = mat("FlapInner", 0xd4d7db, { rough: 0.5 });
 const outlet = mat("Outlet", 0x26292e, { rough: 0.85 });
-const backMat = mat("Back", 0xc6c9cd, { rough: 0.7 });
+const backMat = mat("Back", 0xc6c9cd, { rough: 0.7, side: THREE.DoubleSide });   // two-sided: seen from inside through the open panel's and flaps' seams, it must not vanish
 const receiverMat = mat("Receiver", 0xc9ccd1, { rough: 0.2 });
 const windowMat = mat("DisplayWindow", 0x5c5f64, { rough: 0.18 });   // smoked grey, as the photos show it
 const switchMat = mat("Switch", 0xe8e9eb, { rough: 0.4 });
@@ -150,9 +150,16 @@ cab.add(ribbon("TopGrille", lin([0.006, H], [zG, H], 1), -xIn, xIn, grille, { uv
 cab.add(ribbon("Back", [[0, 0.008], [0, H - 0.006]], -xIn, xIn, backMat));
 cab.add(ribbon("StripL", lower, -xIn, xO0 - 0.0015, body));
 cab.add(ribbon("StripR", lower, xO1 + 0.0015, xIn, body));
+// their insides, 2 mm in and facing in, in the back's grey (two-sided): the seam under the front panel looks into them
+// (2 mm: past defight's 0.8 mm gap, so it leaves them where they are)
+cab.add(ribbon("StripLInner", offset(lower, 0.002), -xIn, xO0 - 0.0015, backMat, { flip: true }));
+cab.add(ribbon("StripRInner", offset(lower, 0.002), xO1 + 0.0015, xIn, backMat, { flip: true }));
 // in front of and behind the outlet, along the outlet's length: the lip over it and the underside behind it
 cab.add(ribbon("OutletLip", span(START, outTop), xO0, xO1, body));
 cab.add(ribbon("Underside", span(outBot, END), xO0, xO1, body));
+// its inside, 2 mm above it and facing in, in the back's grey (two-sided): seen through the slot over the open flaps, the underside's own
+// faces point away and would let the background through
+cab.add(ribbon("UndersideInner", offset(span(outBot, END), 0.002), xO0, xO1, backMat, { flip: true }));
 
 // ── under the panel: the two air filters over the coil ──
 const filterFace = offset(panelOuter, 0.008).map(([z, y]) => [Math.min(Math.max(z, zG), zF - 0.008), y]);
