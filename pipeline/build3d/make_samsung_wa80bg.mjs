@@ -181,7 +181,8 @@ for (const sx of [-1, 1]) {
   for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * uRep, 1 - uv.getY(i) * vRep);
   inward(g);
   cab.add(mesh("DiamondDrum", g, drumM, 0, drumTop - drumDepth / 2, dz));
-  const fl = new THREE.CircleGeometry(drumR, 64); fl.rotateX(-Math.PI / 2);
+  // 3 mm wider than the drum and 72-sided: a 64-sided floor at drumR left hairline slits to the background at the wall
+  const fl = new THREE.CircleGeometry(drumR + 0.003, 72); fl.rotateX(-Math.PI / 2);
   cab.add(mesh("DrumFloor", fl, baseM, 0, drumFloor, dz));
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * Math.PI * 2 + Math.PI / 12;
@@ -218,7 +219,9 @@ const lid = group("Lid", 0, PIV[0], xz(PIV[1]));
 {
   const s = roundRect(new THREE.Shape(), -0.258, 0.258, LID0, LID1, 0.022, 0.006);
   s.holes.push(roundRect(new THREE.Path(), -0.233, 0.233, 0.049, 0.4, 0.008, 0.008));
-  const fr = prism("LidFrame", s, (xf) => seat(Math.max(xf, HB0)) + 0.002, lidTop, black, { bev: 0.004, curve: 5 });
+  // the frame's underside reaches 1.5 mm into the top cover (hidden there): a lid 2 mm over the cover left a slit along both sides
+  // that showed the background through from the side; the frame's bevel still draws the lid line. Opening lifts it clear at once.
+  const fr = prism("LidFrame", s, (xf) => seat(Math.max(xf, HB0)) - 0.0015, lidTop, black, { bev: 0.004, curve: 5 });
   fr.geometry.translate(0, -PIV[0], -xz(PIV[1]));
   lid.add(fr);
   // the nose: the lid's front edge hangs 9 mm down in front of the top cover (Samsung's side photo)
@@ -233,6 +236,7 @@ const lid = group("Lid", 0, PIV[0], xz(PIV[1]));
 }
 root.add(lid);
 
+const printTex = {};
 // ── rear control panel: the black housing behind the lid, the panel glass on its slope (Samsung's own layout) ──
 {
   const prof = [[HX, 0.87], [HX, 0.9336], [0.516, H], [0.520, 0.9848], [0.556, 0.9352], [0.560, 0.912], [0.564, 0.9105], [0.566, 0.905], [0.568, 0.891], [0.568, 0.87]];
@@ -246,9 +250,19 @@ root.add(lid);
   const face = mesh("PanelFace", flipV(new THREE.PlaneGeometry(0.522, len)), panelM, 0, 0, 0);
   face.rotation.x = -Math.PI / 2;
   pg.add(face);
-  // the Washing Cycles ring, raised: photo px (962, 477.5), radii 86.6-90.0 px at 4.146 px/mm, the face from row 236 to 714
+  // the print sharp: the panel drawn again at 12 px/mm (tex_samsung_wa80bg.py --hi), its inked part laid in pieces on planes 0.9 mm
+  // over the face, each over the same rectangle of the face's UVs (decals.json), so it lands exactly on panel.jpg's own print
+  for (const [key, d] of Object.entries(JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8")))) {
+    const [u0, v0, u1, v1] = d.rect;
+    const dm = mesh(`PrintDecal_${key}`, flipV(new THREE.PlaneGeometry((u1 - u0) * 0.522, (v1 - v0) * len)), mat(`Print_${key}`, 0xffffff, { rough: 0.18 }),
+      -0.522 / 2 + ((u0 + u1) / 2) * 0.522, 0.0009, -(len / 2 - ((v0 + v1) / 2) * len));
+    dm.rotation.x = -Math.PI / 2;
+    pg.add(dm);
+    printTex[`Print_${key}`] = `${T}/${d.file}`;
+  }
+  // the Washing Cycles ring, raised (0.8 mm over the print decals): photo px (962, 477.5), radii 86.6-90.0 px at 4.146 px/mm, the face from row 236 to 714
   const mm = 4.146, v = (477.5 - (236 + 239)) / mm / 1000 * (len / 0.1153);
-  const ring = mesh("PowerRing", new THREE.RingGeometry(86.6 / mm / 1000, 90.0 / mm / 1000, 72), ringM, 0, 0.0006, v);
+  const ring = mesh("PowerRing", new THREE.RingGeometry(86.6 / mm / 1000, 90.0 / mm / 1000, 72), ringM, 0, 0.0017, v);
   ring.rotation.x = -Math.PI / 2; pg.add(ring);
   root.add(pg);
 }
@@ -304,7 +318,7 @@ const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
-  SideL: `${T}/side_l.jpg`, SideR: `${T}/side.jpg`, Rear: `${T}/rear.jpg`, PanelFace: `${T}/panel.jpg`,
+  SideL: `${T}/side_l.jpg`, SideR: `${T}/side.jpg`, Rear: `${T}/rear.jpg`, PanelFace: `${T}/panel.jpg`, ...printTex,
   DiamondDrum: `${T}/drum.jpg`, Pulsator: `${T}/pulsator.jpg`, DetergentFace: `${T}/detergent.jpg`, MagicFilter: `${T}/filter.jpg`,
 }, { dir: `${TEX}/grain`, materials: {
   // Grain: the painted cabinet, sides and top cover get the soft peel; the black lid frame and housing are smooth gloss plastic

@@ -32,6 +32,12 @@ if "--debug" in args:
     DEBUG = args[args.index("--debug") + 1]
     del args[args.index("--debug"):args.index("--debug") + 2]
     os.makedirs(DEBUG, exist_ok=True)
+# --hi <px per mm>: draw only the control panel, at that density, and cut its print into the decal pieces the builder lays 0.9 mm
+# over the panel face (print_a.jpg, print_b.jpg, ..., decals.json; pipeline/scripts/decal_cut.py); panel.jpg and the rest are left alone
+HI = None
+if "--hi" in args:
+    HI = float(args[args.index("--hi") + 1])
+    del args[args.index("--hi"):args.index("--hi") + 2]
 PHOTOS, MANUAL, LOGOS, OUT = args[:4]
 P = os.path.join(PHOTOS, "samsung_wa80bg")
 D = os.path.join(OUT, "samsung_wa80bg")
@@ -67,7 +73,7 @@ def photo(name, bg=(0, 0, 0)):
 # ───────────────────────── control panel ─────────────────────────
 # Photo rows 236 (the face's top edge) to 714 (the lid line) are the face's 115.3 mm: 4.146 photo px per mm, the same across
 # (the ring is round in the photo). The face is 524 mm across, so it runs from photo x -124 to 2048 round the ring's centre (962).
-S = 1.8                                   # texture px per photo px: 7.5 px/mm
+S = HI / 4.146 if HI else 1.8           # texture px per photo px: 7.5 px/mm (--hi: that density)
 PX0, PY0 = -124.0, 236.0
 PW, PH = 2172, 478
 pan = photo("panel.png")
@@ -395,6 +401,14 @@ def build_panel():
     a2, tx, ty = fit(a, (box[2] + 2.5, box[3] - kh, box[2] + 2.5 + kw, box[3]))
     put(a2, WHITE, tx, ty)
 
+    if HI:
+        # the plain ground's faint noise snapped to the ground colour (no visible change; the pieces compress far better), then cut
+        c = canvas.clip(0, 255)
+        c[np.abs(c - np.array((13, 13, 15), np.float32)).max(2) <= 3] = (13, 13, 15)
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import decal_cut
+        decal_cut.cut(Image.fromarray(c.astype(np.uint8)), (13, 13, 15), D, prefix="print")
+        return
     img = Image.fromarray(canvas.clip(0, 255).astype(np.uint8))
     save(img, "panel.jpg", 88)
     if DEBUG:
@@ -585,6 +599,8 @@ def detergent():
         save(img, f"detergent{suf}.jpg", 90)
 
 build_panel()
+if HI:
+    sys.exit(0)
 sides()
 rear()
 drum()
