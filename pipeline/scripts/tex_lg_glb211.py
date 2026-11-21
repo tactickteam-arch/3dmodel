@@ -44,6 +44,13 @@ BANDS_KEPT = 0.7
 colours = {}
 
 
+def tex_lg_mark_hi(logos, w):
+    # LG's vector mark drawn sharp (tex_lg_mark.py): 680 px across a 48-55 mm decal is 12-14 px per mm (logos/lg.png's 349 gave 6-7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    return tex_lg_mark.lg_hi(logos, w)
+
+
 def save(img, name, q=88):
     p = os.path.join(D, name)
     if name.endswith(".png"):
@@ -167,7 +174,7 @@ def door():
 def lgmark():
     """The LG mark on the steel door: LG's photo draws it a light grey over the steel (the mark's brightest tenth),
     held at 0.86 like the door (the viewer's light lifts both)."""
-    lg = np.asarray(Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")).astype(float)
+    lg = np.asarray(tex_lg_mark_hi(LOGOS, 680)).astype(float)
     lg[..., 3] *= 1 - np.clip((lg[..., :3].min(2) - 150) / 70, 0, 1)
     col = [v * SHADE for v in colours["mark_photo"]]
     mk = np.zeros(lg.shape, np.uint8)
@@ -254,18 +261,18 @@ def word(img, text, cx, cy, height_px, face, col, max_w=None):
 
 def prints():
     """"Fast Freezing Zone" on the freezer's clear door (LG's open photos MZ-04 and MZ-03: in front of the food, so on
-    the door; 137 x 14 mm on MZ-04 at 1.46 mm per px across), set in Avenir Next Demi Bold, dark grey, 8 px per mm.
+    the door; 137 x 14 mm on MZ-04 at 1.46 mm per px across), set in Avenir Next Demi Bold, dark grey, 12 px per mm.
     The knob panel (65 x 93 mm, MZ-03 and MZ-04): the dial's ring with its numbers and words from LG's manual figure
     for this model (1 Low Cooling to 7 High Cooling, OFF, Winter, Monsoon, Summer), "Defrost Button" under it and
     "Lamp 10W" at its foot, where MZ-03 shows them. The paragraph and two icons between those two lines are too small
     on every photo to read, so they are left off."""
-    S = 8
+    S = 12
     wmm, hmm = 137, 14
     img = Image.new("RGBA", (wmm * S, hmm * S), (0, 0, 0, 0))
     word(img, "Fast Freezing Zone", wmm * S / 2, hmm * S / 2, hmm * S * 0.62, 2, (74, 78, 88, 240), max_w=wmm * S - 2)
     save(img, "print_fastfreeze.png")
     PW, PH = 65, 93
-    P = 8
+    P = 12                                # 12 px per mm (was 8), so the dial's words stay sharp close up
     pan = Image.new("RGBA", (PW * P, PH * P), (244, 245, 246, 255))
     fig = Image.open(os.path.join(SRC, "manual", "control_panel_dial.png")).convert("RGBA")
     a = np.asarray(fig).astype(np.float32)
