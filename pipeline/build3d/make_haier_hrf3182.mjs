@@ -109,8 +109,8 @@ const gridM = mat("CoverGrid", 0xffffff, { rough: 0.45, opacity: 0.999, side: TH
 const root = group("HaierHRF3182");
 const cab = group("Cabinet");
 root.add(cab);
-// the printed words are drawn at 7.2 px per mm (tex_haier_hrf3182.py): a decal's size in metres is its PNG's size / 7200
-const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 7200, b.readUInt32BE(20) / 7200]; };
+// the printed words are drawn at 12 px per mm (tex_haier_hrf3182.py): a decal's size in metres is its PNG's size / 12000
+const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 12000, b.readUInt32BE(20) / 12000]; };
 const plane = (name, w, h, m, x, y, z) => mesh(name, flipV(new THREE.PlaneGeometry(w, h)), m, x, y, z);
 const decal = (name, f, m, x, y, z) => { const [w, h] = png(f); return plane(name, w, h, m, x, y, z); };
 const cyl = (name, rt, rb, h, m, x, y, z, seg = 16) => mesh(name, new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y, z);
@@ -134,7 +134,9 @@ for (const sx of [-1, 1]) cab.add(cyl("FootRear", 0.02, 0.021, base, footM, sx *
 // hinges on the right: the bracket over the right foot (front photo, 57 mm across), the middle hinge plate on the mullion
 // (open photo), and the cover on the cabinet's top behind the freezer door (3/4 photos)
 cab.add(box("HingeBottom", 0.05, 0.008, 0.07, hingeM, W / 2 - 0.037, base - 0.004, zFront + 0.012));
-cab.add(box("HingeMid", 0.035, 0.012, 0.006, hingeM, W / 2 - 0.025, (yFreezer + frTop) / 2, zFront + 0.003));
+// (the plate as thick as the 4 mm gap between the doors less 1 mm: 12 mm thick, the doors' corners passed through it
+// as they opened)
+cab.add(box("HingeMid", 0.035, yFreezer - frTop - 0.001, 0.006, hingeM, W / 2 - 0.025, (yFreezer + frTop) / 2, zFront + 0.003));
 cab.add(box("HingeCoverTop", 0.07, H - cabTop - 0.001, 0.05, topPaint, W / 2 - 0.04, cabTop + (H - cabTop - 0.001) / 2, zFront - 0.026));
 
 // ── inside ──
@@ -177,6 +179,8 @@ const iceBox = group("IceBox", icX, fzFloor, 0);
   for (let i = 0; i < 12; i++) {
     const c = mesh("IceCube", cube, ice, -0.045 + (i % 4) * 0.03, 0.016 + Math.floor(i / 8) * 0.019, icZ1 - 0.04 - Math.floor((i % 8) / 4) * 0.07 - (i % 2) * 0.012);
     c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
+    // a tilted cube's low corner stays on the floor it sits on (it poked through the bin's floor)
+    { c.updateMatrix(); const cb = cube.clone().applyMatrix4(c.matrix); cb.computeBoundingBox(); if (cb.boundingBox.min.y < 0.006) c.position.y += 0.006 - cb.boundingBox.min.y; }
     iceBox.add(c);
   }
 }

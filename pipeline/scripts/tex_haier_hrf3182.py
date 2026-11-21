@@ -30,7 +30,7 @@ usage: python3 tex_haier_hrf3182.py <photos dir> <logos dir> <out dir>
     arc_temp.png      the dots round the fridge's small temperature knob (its tiny words can't be read: left out)
     hexrow.png        the faint row of 11 hexagon vents low on the freezer's back
     grid.png          the white grid of the FRESHBOX cover: ribs and gaps
-Every word is set at 7.2 px per mm in Avenir Next (Demi Bold for the first word, Regular for the second, as printed).
+Every word is set at 12 px per mm in Avenir Next (Demi Bold for the first word, Regular for the second, as printed).
 """
 import os
 import sys
@@ -44,7 +44,7 @@ D = os.path.join(OUT, SLUG)
 os.makedirs(D, exist_ok=True)
 AV = "/System/Library/Fonts/Avenir Next.ttc"
 DEMI, REG, BOLD = 2, 7, 0
-S = 7.2                                     # px per mm for print
+S = 12.0                                    # px per mm for print (12 on the model)
 rng = np.random.default_rng(3182)
 
 # the doors' silver. Haier's front reads 170 of 255 on average over both doors (0.67 of the page's white, against 0.76 on
