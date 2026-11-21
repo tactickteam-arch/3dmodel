@@ -7,6 +7,7 @@
 // Samsung is measured off Samsung's side photo, scaled to the published height and depth (private/research/samsung_wa80/NOTES.md).
 // usage: node make_samsung_wa80.mjs <entry.json> <tex dir> <out.glb>
 import { THREE, mat, mesh, box, faced, group, flipV, inward, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
+import fs from "node:fs";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
@@ -176,7 +177,8 @@ for (const sx of [-1, 1]) {
   inward(g);
   cab.add(mesh("DiamondDrum", g, drumM, 0, drumTop - drumDepth / 2, dz));
   // drum floor: a light ring with twelve raised nubs round the pulsator
-  const fl = new THREE.CircleGeometry(drumR, 64); fl.rotateX(-Math.PI / 2);
+  // 3 mm wider than the drum and 72-sided: a 64-sided floor at drumR left hairline slits to the background at the wall
+  const fl = new THREE.CircleGeometry(drumR + 0.003, 72); fl.rotateX(-Math.PI / 2);
   cab.add(mesh("DrumFloor", fl, baseM, 0, drumFloor, dz));
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * Math.PI * 2 + Math.PI / 12;
@@ -219,7 +221,9 @@ const lid = group("Lid", 0, PIV[0], xz(PIV[1]));
 {
   const s = roundRect(new THREE.Shape(), -0.258, 0.258, LID0, LID1, 0.022, 0.006);
   s.holes.push(roundRect(new THREE.Path(), -0.233, 0.233, 0.049, 0.4, 0.008, 0.008));
-  const fr = prism("LidFrame", s, (xf) => seat(xf) + 0.002, lidTop, black, { bev: 0.003, curve: 5 });
+  // the frame's underside reaches 2.5 mm into the top cover (hidden there): a lid 2 mm over the cover left a slit along both sides
+  // that showed the background through from the side; the frame's bevel still draws the lid line. 1.5 mm left pinholes along the open lid's side edge. Opening lifts it clear at once.
+  const fr = prism("LidFrame", s, (xf) => seat(xf) - 0.0025, lidTop, black, { bev: 0.003, curve: 5 });
   fr.geometry.translate(0, -PIV[0], -xz(PIV[1]));
   lid.add(fr);
   // the tempered glass: one sloped pane just under the frame's top
@@ -230,6 +234,7 @@ const lid = group("Lid", 0, PIV[0], xz(PIV[1]));
 }
 root.add(lid);
 
+const printTex = {};
 // ── rear control panel: the black housing behind the lid, the panel glass on its slope (Samsung's own layout) ──
 {
   const prof = [[HX, 0.87], [HX, 0.9345], [0.5073, 0.9864], [0.5125, 0.988], [0.551, 0.941], [0.5555, 0.914], [0.5641, 0.898], [0.566, 0.888], [0.566, 0.87]];
@@ -242,9 +247,19 @@ root.add(lid);
   const face = mesh("PanelFace", flipV(new THREE.PlaneGeometry(0.505, len)), panelM, 0, 0, 0);
   face.rotation.x = -Math.PI / 2;
   pg.add(face);
-  // the Washing Cycles ring, raised: photo px (787.0, 473.5), radii 89.3-92.2 px, at 3.80 px/mm on a panel 1920 x 416 px from y 268
+  // the print sharp: the panel drawn again at 12 px/mm (tex_samsung_wa80.py --hi), its inked part laid in pieces on planes 0.9 mm
+  // over the face, each over the same rectangle of the face's UVs (decals.json), so it lands exactly on panel.jpg's own print
+  for (const [key, d] of Object.entries(JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8")))) {
+    const [u0, v0, u1, v1] = d.rect;
+    const dm = mesh(`PrintDecal_${key}`, flipV(new THREE.PlaneGeometry((u1 - u0) * 0.505, (v1 - v0) * len)), mat(`Print_${key}`, 0xffffff, { rough: 0.18 }),
+      -0.505 / 2 + ((u0 + u1) / 2) * 0.505, 0.0009, -(len / 2 - ((v0 + v1) / 2) * len));
+    dm.rotation.x = -Math.PI / 2;
+    pg.add(dm);
+    printTex[`Print_${key}`] = `${T}/${d.file}`;
+  }
+  // the Washing Cycles ring, raised (0.8 mm over the print decals): photo px (787.0, 473.5), radii 89.3-92.2 px, at 3.80 px/mm on a panel 1920 x 416 px from y 268
   const mm = 3.8, u = (787.0 - 960) / mm / 1000, v = (473.5 - (268 + 208)) / mm / 1000 * (len / 0.1095);
-  const ring = mesh("PowerRing", new THREE.RingGeometry(89.3 / mm / 1000, 92.2 / mm / 1000, 72), ringM, u, 0.0006, v);
+  const ring = mesh("PowerRing", new THREE.RingGeometry(89.3 / mm / 1000, 92.2 / mm / 1000, 72), ringM, u, 0.0017, v);
   ring.rotation.x = -Math.PI / 2; pg.add(ring);
   root.add(pg);
 }
@@ -294,7 +309,7 @@ const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
-  SideL: `${T}/side_l.jpg`, SideR: `${T}/side.jpg`, PanelFace: `${T}/panel.jpg`, LabelBEE: `${T}/label.png`,
+  SideL: `${T}/side_l.jpg`, SideR: `${T}/side.jpg`, PanelFace: `${T}/panel.jpg`, ...printTex, LabelBEE: `${T}/label.png`,
   DiamondDrum: `${T}/drum.jpg`, Pulsator: `${T}/pulsator.jpg`, DetergentFace: `${T}/detergent.jpg`, MagicFilter: `${T}/filter.jpg`,
 }, { dir: `${TEX}/grain`, materials: {
   // Grain (BENCHMARK.md section 10): painted Deep Charcoal cabinet, sides and top cover get the soft peel; the black lid frame

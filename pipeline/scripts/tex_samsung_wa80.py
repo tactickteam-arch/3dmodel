@@ -34,6 +34,12 @@ if "--debug" in args:
     DEBUG = args[args.index("--debug") + 1]
     del args[args.index("--debug"):args.index("--debug") + 2]
     os.makedirs(DEBUG, exist_ok=True)
+# --hi <px per mm>: draw only the control panel, at that density, and cut its print into the decal pieces the builder lays 0.9 mm
+# over the panel face (print_a.jpg, print_b.jpg, ..., decals.json; pipeline/scripts/decal_cut.py); panel.jpg and the rest are left alone
+HI = None
+if "--hi" in args:
+    HI = float(args[args.index("--hi") + 1])
+    del args[args.index("--hi"):args.index("--hi") + 2]
 PHOTOS, MANUAL, LOGOS, OUT = args[:4]
 P = os.path.join(PHOTOS, "samsung_wa80")
 D = os.path.join(OUT, "samsung_wa80")
@@ -62,14 +68,15 @@ def photo(name, bg=(0, 0, 0)):
 # ───────────────────────── control panel ─────────────────────────
 # The face in the model runs 0.1093 m up the slope from the lid to the top edge, 0.505 m across. Samsung's photo is 1920 px across
 # that width (3.80 px/mm), so the face is 416 photo rows; they are taken centred on the printed area (rows 326 to 625).
-S = 2
+S = HI / 3.80 if HI else 2
 PX0, PY0, PW, PH = 0, 268, 1920, 416
 pan = photo("panel.png")
 lum = pan.mean(2)
 redness = pan[..., 0] - pan[..., 1]
-canvas = np.zeros((PH * S, PW * S, 3), np.float32)
+CW, CH = int(round(PW * S)), int(round(PH * S))
+canvas = np.zeros((CH, CW, 3), np.float32)
 canvas[...] = (12, 12, 14)
-canvas += rng.normal(0, 0.6, (PH * S, PW * S, 1))
+canvas += rng.normal(0, 0.6, (CH, CW, 1))
 
 
 def T(x, y):
@@ -391,6 +398,13 @@ def build_panel():
         for b in blobs(win, 40):
             rect(b[:4], (70, 70, 71))
 
+    if HI:
+        # the plain ground's faint noise snapped to the ground colour (no visible change; the pieces compress far better), then cut
+        c = canvas.clip(0, 255)
+        c[np.abs(c - np.array((12, 12, 14), np.float32)).max(2) <= 3] = (12, 12, 14)
+        import decal_cut
+        decal_cut.cut(Image.fromarray(c.astype(np.uint8)), (12, 12, 14), D, prefix="print")
+        return
     img = Image.fromarray(canvas.clip(0, 255).astype(np.uint8))
     save(img, "panel.jpg", 90)
     if DEBUG:
@@ -601,6 +615,8 @@ def detergent():
     save(img, "detergent.jpg", 90)
 
 build_panel()
+if HI:
+    sys.exit(0)
 label()
 side()
 drum()
