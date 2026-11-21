@@ -9,7 +9,7 @@ Writes pipeline/tex/whirlpool_22457/:
   logo.png                        the Whirlpool mark on the right fridge door (white word, gold swirl)
   sixth.png                       the 6th Sense mark on the left fridge door (white)
   panel.jpg                       the door display on the left fridge door's inner edge (black glass), every word and
-                                  icon redrawn at 7.2 px/mm on the layout of Whirlpool's close-up of it
+                                  icon redrawn at 11 px/mm on the layout of Whirlpool's close-up of it
   print_360.png, print_triple.png the 360 degree mark and "TRIPLE COOLING" on the fridge's back panel: the mark cut from
                                   Whirlpool's own artwork of it (the front render's overlay), recoloured grey; the words
                                   set again in type on the artwork's letter places (12 px/mm)
@@ -38,7 +38,7 @@ WORK = os.path.join(SITE, ".work", "whirlpool_22457", "tex")
 AVENIR = "/System/Library/Fonts/Avenir Next.ttc"
 BASK = "/System/Library/Fonts/Supplemental/Baskerville.ttc"
 BOLD, BOLDI, DEMI, MED, REG = 0, 1, 2, 5, 7
-PX_MM = 7.2
+PX_MM = 11.0                                      # px per mm on the model (7.2 before)
 SS = 3
 WHITE = (236, 236, 238)
 GLASS = (9, 9, 10)
@@ -128,7 +128,7 @@ def logo():
     right = cols[gaps[-1]] + 1 if len(gaps) else cols[-1] + 1
     ys = np.where((a[:, :right] > 0.1).any(1))[0]
     a, gold = a[ys.min():ys.max() + 1, cols[0]:right], gold[ys.min():ys.max() + 1, cols[0]:right]
-    W = int(69 * 8)                                   # 8 px/mm
+    W = int(69 * 12)                                  # 12 px/mm (8 before)
     Hh = int(round(a.shape[0] * W / a.shape[1]))
     A = Image.fromarray((a * 255).astype(np.uint8)).resize((W, Hh), Image.LANCZOS)
     G = Image.fromarray((gold * 255).astype(np.uint8)).resize((W, Hh), Image.LANCZOS)
@@ -136,7 +136,7 @@ def logo():
     col = (1 - g) * np.array(WHITE, np.float32) + g * np.array((214, 165, 52), np.float32)
     out = np.dstack([col, np.asarray(A)]).clip(0, 255).astype(np.uint8)
     Image.fromarray(out, "RGBA").save(os.path.join(OUT, "logo.png"), optimize=True)
-    return W / 8, Hh / 8
+    return W / 12, Hh / 12
 
 
 # ── the 6th Sense mark (left fridge door; 19 x 24 mm on the 3/4 photos, ESTIMATED): "6" in Baskerville with "th", and
