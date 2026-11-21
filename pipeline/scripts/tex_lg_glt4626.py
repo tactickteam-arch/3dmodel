@@ -136,6 +136,7 @@ def lgmark():
     import tex_lg_mark
     lg = tex_lg_mark.lg_hi(LOGOS, 600)
     a = np.asarray(lg).astype(float)
+    a[..., 3] *= 1 - np.clip((a[..., :3].min(2) - 150) / 70, 0, 1)   # the face lines inside the disc are cut out, as on LG's photos
     mark = np.zeros(a.shape, np.uint8)
     mark[..., :3] = (84, 86, 90)
     mark[..., 3] = (a[..., 3] * 0.95).clip(0, 255).astype(np.uint8)
@@ -171,7 +172,7 @@ def rear():
 
 
 def plates():
-    def brushed_plate(w, h, text, k=3):
+    def brushed_plate(w, h, text, k=6):
         """A spun-steel plate (LG's Convertible and Hygiene Fresh plates, DZ-04 and DZ-06): fine concentric turning
         lines, and the sunburst sheen that makes a dark X from corner to corner. Drawn at k times 2 px per mm."""
         w, h = w * k, h * k
@@ -186,7 +187,7 @@ def plates():
         d.rounded_rectangle([k, k, w - 2 * k, h - 2 * k], 6 * k, outline=(120, 122, 126), width=3 * k)
         word(im, text, cx, cy, h * 0.19, 0, (30, 32, 36, 255), max_w=w * 0.62)
         return im
-    # plates are 163 x 74 mm (measured on DZ-04 at 1.24 px per mm): drawn at 6 px per mm so the word stays sharp at the 4 degree close-up
+    # plates are 163 x 74 mm (measured on DZ-04 at 1.24 px per mm): drawn at 12 px per mm so the word stays sharp at the 4 degree close-up
     save(brushed_plate(326, 148, "Convertible"), "plate_convertible.jpg", 90)
     save(brushed_plate(326, 150, "Hygiene Fresh"), "plate_hygiene.jpg", 90)
     # printed words on the clear trays (transparent decals): "Fresh 0 Zone / Fish & Meat" and "Fresh Zone / Fruit & Vegetables"
@@ -206,8 +207,9 @@ def display():
     """The external LED display on the freezer door: 58 x 166 mm (front photo: 56 x 165 mm), 8 px per mm. Read off
     LG's photos DZ-08, DZ-09 and DZ-10 (the display is about 30 x 90 px in each): ThinQ; -18 and 3, each with its degree
     C, lit; "Freezer / Convertible", "Fridge / Express Freeze", "Wi-Fi"; one small line that no photo resolves (left
-    soft, not written); the Smart Inverter mark at the foot. Positions are fractions of the window, measured on DZ-09."""
-    S = 8
+    soft, not written); the Smart Inverter mark at the foot. Positions are fractions of the window, measured on DZ-09.
+    Drawn at 12 px per mm (was 8) so the small words stay sharp close up."""
+    S = 12
     W_, H_ = 58 * S, 166 * S
     img = Image.new("RGBA", (W_, H_), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
