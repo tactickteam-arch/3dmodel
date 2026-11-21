@@ -4,7 +4,7 @@ Writes pipeline/tex/whirlpool_22439/:
   door_freezer.jpg, door_fridge.jpg  Alpha Steel: short fine horizontal brushing on a flat neutral grey (the studio's
                                      light bands in Whirlpool's renders are left out; the 3D light makes its own)
   panel.jpg                          the External UI touch panel (black glass, a darker strip on the right), redrawn
-                                     sharp at 7.2 px/mm from Whirlpool's own blow-up of it ("2-UI-Shot"), laid on the
+                                     sharp at 11 px/mm from Whirlpool's own blow-up of it ("2-UI-Shot"), laid on the
                                      front render's 100 x 248.6 mm
   cap.jpg                            the fridge door's top cap: black on the left, a silver crescent and its fall, as the
                                      front render shows it
@@ -40,7 +40,7 @@ F = {
     "bask": ("/System/Library/Fonts/Supplemental/Baskerville.ttc", None),
 }
 BOLD, BOLDI, DEMI, MED, REG = 0, 1, 2, 5, 7     # Avenir Next faces
-PX_MM = 7.2
+PX_MM = 11.0                              # px per mm on the model (7.2 before)
 SS = 3
 WHITE = (236, 236, 238)
 
@@ -364,7 +364,7 @@ def cap():
 
 
 # ── the inside prints ──
-PK = 8                               # px per mm for the inside prints
+PK = 11                              # px per mm for the inside prints (8 before)
 INK = (58, 60, 64)
 
 
@@ -528,6 +528,16 @@ def main():
     }
     sizes = {}
     for n, im in prints.items():
+        if n in ("print_cheese", "print_fruits", "print_veg"):
+            # one ink at 32 levels of cover, as an indexed PNG: the same drawing at a fifth of the bytes, which pays for
+            # the sharper panel and words inside the iPhone file's budget
+            a = np.asarray(im.getchannel("A")).astype(np.float32)
+            idx = np.round(a / 255 * 31).astype(np.uint8)
+            pal = Image.fromarray(idx, "P")
+            pal.putpalette(list(DRAW_INK) * 32)
+            pal.info["transparency"] = bytes(int(round(i * 255 / 31)) for i in range(32))
+            pal.save(os.path.join(OUT, n + ".png"), optimize=True, transparency=pal.info["transparency"])
+            continue
         im.save(os.path.join(OUT, n + ".png"), optimize=True)
         k = DK if n in ("print_cheese", "print_fruits", "print_veg") else 17 if n == "print_arctic" else PK
         sizes[n] = (round(im.width / k, 1), round(im.height / k, 1))
