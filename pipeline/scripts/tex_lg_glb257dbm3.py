@@ -33,6 +33,13 @@ rng = np.random.default_rng(2573)
 PT = "/System/Library/Fonts/Supplemental/PTSans.ttc"
 
 
+def tex_lg_mark_hi(logos, w):
+    # LG's vector mark drawn sharp (tex_lg_mark.py): 680 px across a 48-55 mm decal is 12-14 px per mm (logos/lg.png's 349 gave 6-7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_lg_mark
+    return tex_lg_mark.lg_hi(logos, w)
+
+
 def pt(px, bold=False):
     return ImageFont.truetype(PT, max(6, round(px)), index=7 if bold else 0)
 
@@ -130,7 +137,7 @@ def label(code):
 
 
 def mark(rgb):
-    lg = Image.open(os.path.join(LOGOS, "lg.png")).convert("RGBA")
+    lg = tex_lg_mark_hi(LOGOS, 680)
     a = np.asarray(lg).astype(float)
     out = np.zeros(a.shape, np.uint8)
     out[..., :3] = rgb
@@ -179,10 +186,10 @@ def seven(dr, x, y, w, h, ch, fill, t):
 
 def display():
     """The fridge's internal display (LG's photo dln3_display.jpg; the owner's manual, page 24, Wi-Fi panel): a white
-    panel 70 x 220 mm (ESTIMATED from the photo against the shelf spacing), drawn at 7.2 px/mm. Rows as fractions of
+    panel 70 x 220 mm (ESTIMATED from the photo against the shelf spacing), drawn at 12 px/mm. Rows as fractions of
     the panel's height, read off the photo: ThinQ 0.057, fridge temperature 0.12-0.21, freezer 0.23-0.31, then Fridge,
     Freezer / *Convertible, *Wi-Fi, Express Cool, Express Freeze, *Lock and "*Hold 3 seconds"."""
-    S = 7.2
+    S = 12.0
     W, H = 70.0, 220.0
     im = Image.new("RGB", (round(W * S), round(H * S)), (238, 240, 242))
     dr = ImageDraw.Draw(im)
@@ -274,18 +281,19 @@ def main():
     save(r, "rear.jpg", 84)
     print("rear crop rows", rows[0], rows[-1], "cols", cols.min(), cols.max())
 
-    # ── words LG prints inside, at about 8 px/mm on the model ──
-    k = 1.4
+    # ── words LG prints inside, at about 11-12 px/mm on the model ──
+    k = 2.0
     sc = lambda wh: (round(wh[0] * k), round(wh[1] * k))
     save(words("c", [("Convertible", True)], sc((900, 200)), px=round(110 * k)), "print_convertible.png")
     save(words("f", [("Fresh", True), ("Zone", False)], sc((900, 300)), "Fruit & Vegetables", round(96 * k), round(44 * k)), "print_freshzone.png")
     save(words("z", [("Freezing", True), ("Zone", False)], sc((900, 300)), "Fish & Meat", round(96 * k), round(44 * k)), "print_freezingzone.png")
-    # Ice Maker: the label plate on the door's ice maker, 207 x 57 mm (LG's close-up dbm3_icemaker.jpg), drawn at 7 px/mm
-    save(words("i", [("Ice", True), ("Maker", False)], (1449, 399), px=150, ink=(70, 72, 76, 255), bg=(244, 245, 246, 255)), "print_icemaker.png")
+    # Ice Maker: the label plate on the door's ice maker, 207 x 57 mm (LG's close-up dbm3_icemaker.jpg), drawn at 12 px/mm
+    m = 1.65   # 1.65 times the first draft (7.1-7.35 px/mm -> 11.7-12.1)
+    save(words("i", [("Ice", True), ("Maker", False)], (round(1449 * m), round(399 * m)), px=round(150 * m), ink=(70, 72, 76, 255), bg=(244, 245, 246, 255)), "print_icemaker.png")
     # Hygiene Fresh+: the filter's face, 205 x 90 mm with its grey rim (open photo; LG's feature image shows the cartridge)
-    hf = words("h", [("Hygiene", True), ("Fresh", False)], (1435, 630), px=150, ink=(60, 62, 66, 255), bg=(238, 240, 242, 255), sup="+")
+    hf = words("h", [("Hygiene", True), ("Fresh", False)], (round(1435 * m), round(630 * m)), px=round(150 * m), ink=(60, 62, 66, 255), bg=(238, 240, 242, 255), sup="+")
     d = ImageDraw.Draw(hf)
-    d.rounded_rectangle((4, 4, hf.width - 5, hf.height - 5), radius=40, outline=(178, 182, 188, 255), width=22)
+    d.rounded_rectangle((4, 4, hf.width - 5, hf.height - 5), radius=round(40 * m), outline=(178, 182, 188, 255), width=round(22 * m))
     save(hf, "print_hygienefresh.png")
     save(display(), "print_display.png")
 
