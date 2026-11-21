@@ -122,7 +122,9 @@ Run the gate for every product that changed, then the site-wide tests:
 - `make_pages.mjs --check`;
 - `test_customer.mjs`;
 - `test_embed.mjs`;
-- `test_site`, `test_features`, `test_controls` and `test_arphone`, across all products on show.
+- `test_site`, `test_features`, `test_controls` and `test_arphone`, across all products on show;
+- after a change to the showroom, xr.js or the AR buttons: `test_showroom.mjs` and `test_xr.mjs ... all` (every product in
+  passthrough and VR, its Apple files, and what each phone, tablet and headset is offered).
 
 Everything must have 0 failures. After the push, run the same tests against the live site.
 

@@ -1618,7 +1618,7 @@ async function openHeadset(mode) {
     const [xr, s] = await Promise.all([loadXR(), sessionReq]);
     session = s;
     await xr.runXR(session, {
-      mode, product, finishIndex, parts: { ...state },
+      mode, product, src: model(product.glb), finishIndex, parts: { ...state },
       onEnd: async ({ parts: after, finishIndex: fi }) => {
         // carry the headset's door and finish state back to the page, one part at a time as on the page
         // (a part inside another waits for it, and the model has a clip only for one part moving)

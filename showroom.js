@@ -61,13 +61,20 @@ const light = isPhone || isHeadset || isVisionPro;
 const CAP = clamp(Math.round(+params.get("cap") || (light ? 6 : 10)), 1, 40);
 const CAP_XR = clamp(Math.round(+params.get("cap") || 6), 1, 40);
 const NEAR = light ? 10 : 14, NEAR_XR = 8, HYST = 3;
+// on a screen, a model loads only once the camera itself is this near it: from the whole-hall view a phone shows the
+// boxes with their photos (each model would be a few dozen pixels), and spends its data on the ones you go to
+const SEE = light ? 12 : 26;
 const TEX_MAX = light || canVR ? 1024 : 4096;
 const PARALLEL = light ? 1 : 2;
 
 // ── layout, in metres: x across the hall, z into it (the entrance is at z = 0, the hall runs to -D) ──
 const GAP = 0.34;      // between neighbours
+const CLEAR = 0.05;    // between an open door and anything next to it, open or shut
 const WALK = 2.4;      // an aisle's walkway: two fridge doors open across it still leave room
-const BACK = 0.06;     // a floor unit's back to the partition
+// a floor unit's back to the partition: as in a shop, and room for what a model carries behind its published depth
+// (the cord and plug hang up to 13 cm behind some fridges); a model that still reaches the partition is stood
+// forward when it loads (fitSlot)
+const BACK = 0.16;
 const PT = 0.1;        // partition thickness
 const ENTRY = 1.4;     // floor inside an aisle before its first product
 const END = 0.8, CROSS = 2.2;       // after an aisle's last product; the cross aisle along the back wall
@@ -76,6 +83,48 @@ const PART_H = 2.6, WALL_H = 3.2, SIGN_Y = 2.98;
 const AC_Y = 2.05;     // an air conditioner's centre height, as in xr.js
 const RING_R = 2.4;    // passthrough: the ring round you
 const sizeOf = (p) => ({ w: cm(p.size.w) / 100, h: cm(p.size.h) / 100, d: cm(p.size.d) / 100 });
+// What a product takes up, in its own model space (x across it, y up, z out of its front): its body, and each
+// part's box when open (the zones in products.json, measured from the model). A wall unit's origin is the middle of
+// its back at the bottom; a floor unit's the middle of its footprint.
+function boxesOf(p) {
+  const s = sizeOf(p), wall = p.placement === "wall";
+  const body = { min: [-s.w / 2, 0, wall ? 0 : -s.d / 2], max: [s.w / 2, s.h, wall ? s.d : s.d / 2], open: false };
+  const open = (p.parts || []).filter((q) => q.zone?.open).map((q) => ({ min: q.zone.open[0], max: q.zone.open[1], open: true }));
+  return [body, ...open];
+}
+// Two neighbours on a line, B further along than A (`along` +1: B on A's +x side, -1: on its -x side): how far apart
+// their middles must be so that no door of either, open or shut, comes within CLEAR of the other or its open doors,
+// and the bodies keep GAP. `depth(p, z)` turns a model z into a distance out from the line both backs stand on;
+// `squeeze(t)` (a ring) how much nearer the two are at depth t than at the line itself.
+function spacing(A, B, along, depth, squeeze = () => 1) {
+  let need = 0;
+  for (const a of boxesOf(A)) for (const b of boxesOf(B)) {
+    if (a.min[1] >= b.max[1] || b.min[1] >= a.max[1]) continue; // one above the other
+    const [a0, a1] = [depth(A, a.min[2]), depth(A, a.max[2])], [b0, b1] = [depth(B, b.min[2]), depth(B, b.max[2])];
+    if (a0 >= b1 || b0 >= a1) continue; // one in front of the other
+    const aEdge = along > 0 ? a.max[0] : -a.min[0], bEdge = along > 0 ? -b.min[0] : b.max[0];
+    const k = squeeze(Math.max(a1, b1));
+    need = Math.max(need, (aEdge + bEdge + (a.open || b.open ? CLEAR : GAP)) / k);
+  }
+  return need;
+}
+// distance out from the partition (floor units stand BACK off it, wall units on it)
+const depthOut = (p, z) => z + (p.placement === "wall" ? 0.005 : BACK + sizeOf(p).d / 2);
+// One aisle's products along its two sides: each goes on the side that ends nearer the entrance, as close to the one
+// before as its doors allow. at[side][i] is how far into the aisle its middle stands; end, where each side's last
+// door reaches. On the left side the product's +x points into the aisle, on the right its -x.
+function fillAisle(items) {
+  const sides = { L: [], R: [] }, at = { L: [], R: [] }, end = { L: 0, R: 0 };
+  for (const p of items) {
+    const side = end.L <= end.R ? "L" : "R", along = side === "L" ? 1 : -1, list = sides[side];
+    const s = sizeOf(p), bx = boxesOf(p);
+    let u = ENTRY + Math.max(s.w / 2 + GAP / 2, ...bx.map((b) => (along > 0 ? -b.min[0] : b.max[0]))); // its reach back to the entrance
+    list.forEach((q, i) => { u = Math.max(u, at[side][i] + spacing(q, p, along, depthOut)); });
+    list.push(p); at[side].push(u);
+    end[side] = Math.max(end[side], u + Math.max(s.w / 2 + GAP / 2, ...bx.map((b) => (along > 0 ? b.max[0] : -b.min[0]))));
+  }
+  return { sides, at, len: Math.max(end.L, end.R) + END };
+}
 
 function makeLayout() {
   // categories in the catalogue's order, then any new one; in each, brand by brand, smallest first
@@ -85,32 +134,33 @@ function makeLayout() {
   for (const [cat, title] of [...known, ...other]) {
     const items = products.filter((p) => p.category === cat)
       .sort((a, b) => a.brand.localeCompare(b.brand) || cm(a.size.h) - cm(b.size.h) || a.model.localeCompare(b.model));
-    const run = items.reduce((t, p) => t + sizeOf(p).w + GAP, 0);
-    const n = Math.max(1, Math.ceil(run / 2 / MAX_RUN)), per = Math.ceil(items.length / n);
-    for (let i = 0; i < n; i++) aisles.push({ cat, title, part: i + 1, of: n, items: items.slice(i * per, (i + 1) * per) });
+    // as few aisles as keep each one's sides within MAX_RUN
+    let n = 1, split;
+    for (;; n++) {
+      const per = Math.ceil(items.length / n);
+      split = [...Array(n)].map((_, i) => items.slice(i * per, (i + 1) * per)).filter((x) => x.length);
+      if (split.every((x) => fillAisle(x).len <= ENTRY + MAX_RUN + END) || per === 1) break;
+    }
+    split.forEach((list, i) => aisles.push({ cat, title, part: i + 1, of: split.length, items: list }));
   }
   const places = [];
   let x = 0;
   for (const a of aisles) {
-    a.sides = { L: [], R: [] };
-    const run = { L: 0, R: 0 };
-    for (const p of a.items) { const s = run.L <= run.R ? "L" : "R"; a.sides[s].push(p); run[s] += sizeOf(p).w + GAP; }
+    const { sides, at, len } = fillAisle(a.items);
+    a.sides = sides;
     const zone = (list) => Math.max(0.5, ...list.map((p) => sizeOf(p).d + (p.placement === "wall" ? 0.05 : BACK + 0.12)));
     a.x0 = x;
     a.x1 = x + PT / 2 + zone(a.sides.L) + WALK + zone(a.sides.R) + PT / 2;
     a.walk = [a.x0 + PT / 2 + zone(a.sides.L), a.x1 - PT / 2 - zone(a.sides.R)];
-    a.len = ENTRY + Math.max(run.L, run.R) + END;
+    a.len = len;
     x = a.x1;
     for (const side of ["L", "R"]) {
-      let z = -ENTRY;
       const face = side === "L" ? 1 : -1, back = side === "L" ? a.x0 + PT / 2 : a.x1 - PT / 2;
-      for (const p of a.sides[side]) {
+      a.sides[side].forEach((p, i) => {
         const s = sizeOf(p), wall = p.placement === "wall";
-        const cz = z - GAP / 2 - s.w / 2;
-        z -= s.w + GAP;
         // floor units stand by the middle of their footprint; wall units hang by their back (the builders' origin)
-        places.push({ p, aisle: a, side, pos: [wall ? back + face * 0.005 : back + face * (BACK + s.d / 2), wall ? AC_Y - s.h / 2 : 0, cz], rot: face * Math.PI / 2 });
-      }
+        places.push({ p, aisle: a, side, pos: [wall ? back + face * 0.005 : back + face * (BACK + s.d / 2), wall ? AC_Y - s.h / 2 : 0, -at[side][i]], rot: face * Math.PI / 2 });
+      });
     }
   }
   const W = x, shift = -W / 2;
@@ -160,9 +210,12 @@ function canvasTexture(w, h, draw) {
   draw(c.getContext("2d"));
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
   return t;
 }
+// Flat things laid on another surface (the runners on the floor, a shadow under a product, the plaque on the wall) are
+// drawn as if a little nearer, so from across the hall the two never flicker through each other (z-fighting).
+const onTop = (m, k = 1) => Object.assign(m, { polygonOffset: true, polygonOffsetFactor: -k, polygonOffsetUnits: -4 * k });
 const blockers = []; // walls and partitions: a pointer stops at them
 const signs = [];
 {
@@ -172,28 +225,33 @@ const signs = [];
     g.strokeStyle = "rgba(255,255,255,.6)"; g.lineWidth = 3; g.strokeRect(1.5, 1.5, 253, 253);
   });
   floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-  const FW = W + 8, FD = D + 10;
+  floorTex.anisotropy = 4; // it covers most of the view: more filtering costs a phone's GPU frames
+  // the floor runs on well past the hall, so out of the entrance there is no edge where it stops (in a headset
+  // the fog takes it before it ends)
+  const FW = W + 80, FD = D + 80;
   floorTex.repeat.set(FW / 0.8, FD / 0.8);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(FW, FD), new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.9 }));
   floor.rotation.x = -Math.PI / 2;
-  floor.position.set(0, 0, -D + FD / 2 - 2.5);
+  floor.position.set(0, 0, -D / 2);
   hall.add(floor);
   const wallMat = new THREE.MeshStandardMaterial({ color: 0xf2eee7, roughness: 0.95 });
   const partMat = new THREE.MeshStandardMaterial({ color: 0xebe6de, roughness: 0.9 });
   const edgeMat = new THREE.MeshStandardMaterial({ color: 0xf58a29, roughness: 0.7 });
-  const runnerMat = new THREE.MeshStandardMaterial({ color: 0xcfc8bd, roughness: 0.95 });
-  // single-sided walls: the back, and the two outer sides from the entrance to the back
-  const wall = (w, x, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, WALL_H), wallMat); m.position.set(x, WALL_H / 2, z); m.rotation.y = ry; hall.add(m); blockers.push(m); };
-  wall(W, 0, -D, 0);
-  wall(D, -W / 2, -D / 2, Math.PI / 2);
-  wall(D, W / 2, -D / 2, -Math.PI / 2);
+  const runnerMat = onTop(new THREE.MeshStandardMaterial({ color: 0xcfc8bd, roughness: 0.95 }));
+  // single-sided walls: the back, and the two outer sides from the entrance to the back. Each runs 5 cm past the
+  // corners and under the floor, so no hairline of sky shows where two meet
+  const SINK = 0.05;
+  const wall = (w, x, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, WALL_H + SINK), wallMat); m.position.set(x, (WALL_H - SINK) / 2, z); m.rotation.y = ry; hall.add(m); blockers.push(m); };
+  wall(W + 2 * SINK, 0, -D, 0);
+  wall(D + SINK, -W / 2, -(D + SINK) / 2, Math.PI / 2);
+  wall(D + SINK, W / 2, -(D + SINK) / 2, -Math.PI / 2);
   // partitions between aisles, with an orange edge at the entrance end
   L.aisles.slice(0, -1).forEach((a) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(PT, PART_H, LEN), partMat);
-    m.position.set(a.x1, PART_H / 2, -LEN / 2);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(PT, PART_H + 0.02, LEN), partMat);
+    m.position.set(a.x1, (PART_H - 0.02) / 2, -LEN / 2);
     hall.add(m); blockers.push(m);
-    const e = new THREE.Mesh(new THREE.BoxGeometry(PT + 0.012, PART_H, 0.05), edgeMat);
-    e.position.set(a.x1, PART_H / 2, -0.025);
+    const e = new THREE.Mesh(new THREE.BoxGeometry(PT + 0.012, PART_H + 0.024, 0.054), edgeMat);
+    e.position.set(a.x1, (PART_H + 0.004 - 0.02) / 2, -0.023);
     hall.add(e);
   });
   // a darker runner down each walkway, and a sign over each entrance (both faces)
@@ -203,13 +261,14 @@ const signs = [];
     r.position.set(a.mid, 0.002, -a.len / 2);
     hall.add(r);
     const count = a.items.length;
-    const tex = canvasTexture(1024, 256, (g) => {
+    const tex = canvasTexture(2048, 512, (g) => {
+      g.scale(2, 2);
       g.fillStyle = NAVY; roundRect(g, 0, 0, 1024, 256, 40); g.fill();
       g.fillStyle = COPPER; g.fillRect(60, 62, 12, 132);
       g.fillStyle = "#FFFFFF"; g.font = `600 92px ${FONT}`; g.textBaseline = "alphabetic"; g.textAlign = "left";
-      g.fillText(a.of > 1 ? `${a.title} ${a.part}` : a.title, 104, 140);
+      g.fillText(a.of > 1 ? `${a.title} ${a.part}` : a.title, 104, 140, 880);
       g.fillStyle = "#C9C9CC"; g.font = `500 46px ${FONT}`;
-      g.fillText(`${count} model${count === 1 ? "" : "s"} · open any door`, 106, 206);
+      g.fillText(`${count} model${count === 1 ? "" : "s"} · open any door`, 106, 206, 880);
     });
     const sw = Math.min(2.3, a.walk[1] - a.walk[0]), mat = new THREE.MeshBasicMaterial({ map: tex, toneMapped: false });
     for (const ry of [0, Math.PI]) {
@@ -222,9 +281,10 @@ const signs = [];
   }
   // the Sangeetha plaque on the back wall, over the cross aisle
   const logo = new Image();
-  const plaque = canvasTexture(1024, 384, () => {});
+  const plaque = canvasTexture(2048, 768, () => {});
   const drawPlaque = () => {
     const g = plaque.image.getContext("2d");
+    g.setTransform(2, 0, 0, 2, 0, 0);
     g.clearRect(0, 0, 1024, 384);
     g.fillStyle = NAVY; roundRect(g, 0, 0, 1024, 384, 44); g.fill();
     if (logo.naturalWidth) { const w = 520, h = w * logo.naturalHeight / logo.naturalWidth; g.drawImage(logo, (1024 - w) / 2, 70, w, h); }
@@ -237,7 +297,7 @@ const signs = [];
   drawPlaque();
   logo.onload = drawPlaque;
   logo.src = "/logos/sangeetha.png";
-  const pm = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.9), new THREE.MeshBasicMaterial({ map: plaque, toneMapped: false }));
+  const pm = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.9), onTop(new THREE.MeshBasicMaterial({ map: plaque, toneMapped: false })));
   pm.position.set(0, 2.05, -D + 0.01);
   hall.add(pm);
 }
@@ -251,7 +311,7 @@ const tintOf = (hex) => {
   if (!tints.has(hex)) tints.set(hex, new THREE.MeshStandardMaterial({ color: new THREE.Color(hex || "#d9d9dc"), roughness: 0.5, metalness: 0.15 }));
   return tints.get(hex);
 };
-const blobMat = new THREE.MeshBasicMaterial({ map: radialTexture([[0, "rgba(0,0,0,0.4)"], [0.55, "rgba(0,0,0,0.16)"], [1, "rgba(0,0,0,0)"]]), transparent: true, depthWrite: false });
+const blobMat = onTop(new THREE.MeshBasicMaterial({ map: radialTexture([[0, "rgba(0,0,0,0.4)"], [0.55, "rgba(0,0,0,0.16)"], [1, "rgba(0,0,0,0)"]]), transparent: true, depthWrite: false }), 2);
 const noRay = () => {};
 const probe = document.createElement("canvas");
 probe.width = probe.height = 96;
@@ -261,6 +321,8 @@ function frontTexture(src, tint) {
   // Until the photo comes, the front is the colour of the sides.
   const tex = canvasTexture(256, 256, (g) => { g.fillStyle = tint || "#d9d9dc"; g.fillRect(0, 0, 256, 256); });
   const img = new Image();
+  img.fetchPriority = "low"; // the models near you come first
+  img.decoding = "async";
   img.onload = () => {
     const pg = probe.getContext("2d", { willReadFrequently: true }), n = probe.width;
     pg.clearRect(0, 0, n, n);
@@ -339,7 +401,7 @@ function planLoads() {
     // nearer first, then what is in front of you; one already loaded keeps its place unless clearly beaten
     s.score = s.dist + 2.5 * ang / Math.PI - (s.model || s.loading ? 1 : 0);
   }
-  const ranked = slots.filter((s) => s.dist < ldr.near).sort((a, b) => a.score - b.score);
+  const ranked = slots.filter((s) => s.dist < ldr.near && (xr || s.center.distanceTo(from) < SEE)).sort((a, b) => a.score - b.score);
   const wanted = new Set(ranked.slice(0, ldr.cap));
   // far ones go; and while there are more than the cap allows (the cap is lower in a headset), the worst ones
   for (const s of slots) if (s.model && !wanted.has(s) && s.dist > ldr.near + HYST) unload(s);
@@ -366,6 +428,7 @@ async function load(s) {
     await prepare(s, gltf);
     // its shaders are made before it is shown, so the swap from the stand-in costs no frame
     await renderer.compileAsync(gltf.scene, xr ? xr.cam : camera, scene).catch(() => {});
+    fitSlot(s, gltf.scene);
     s.model = gltf.scene;
     s.group.add(s.model);
     s.stand.visible = false;
@@ -381,6 +444,15 @@ async function load(s) {
     ldr.inFlight--;
     planSoon();
   }
+}
+// A model that reaches further back than its slot allows (a cord or hose behind its published depth) is stood forward
+// just enough, so nothing goes into the partition or the wall behind it.
+function fitSlot(s, root) {
+  root.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(root);
+  const limit = s.wall ? -0.004 : -(s.size.d / 2 + BACK - 0.02);
+  s.shift = box.min.z < limit ? limit - box.min.z : 0;
+  root.position.z += s.shift;
 }
 function unload(s) {
   if (!s.model) return;
@@ -875,6 +947,7 @@ async function startXR(session, mode) {
   document.body.classList.add("in-xr");
   ldr.cap = CAP_XR; ldr.near = NEAR_XR;
   if (ar) { scene.background = null; hall.visible = false; }
+  else scene.fog = new THREE.Fog(BG, 24, 46); // the far floor fades into the sky, past the hall's far corner
 
   // the pointer, its tooltip on a door, the product card and the panel by your side
   xr.tooltip = makeTooltip();
@@ -890,8 +963,8 @@ async function startXR(session, mode) {
     const room = 2 * Math.PI * RING_R * 0.9;
     for (const a of L.aisles) {
       const list = order.filter((s) => s.aisle === a);
-      let cur = [], used = 0;
-      for (const s of list) { const arc = s.size.w + 0.45; if (cur.length && used + arc > room) { xr.sets.push({ title: a.title, slots: cur }); cur = []; used = 0; } cur.push(s); used += arc; }
+      let cur = [];
+      for (const s of list) { if (cur.length && ringArcs([...cur, s]).span > room) { xr.sets.push({ title: a.title, slots: cur }); cur = []; } cur.push(s); }
       if (cur.length) xr.sets.push({ title: a.title, slots: cur });
     }
     const n = {};
@@ -954,16 +1027,28 @@ function startPose() {
   } else if (focus) standBefore(focus);
   else teleport(new THREE.Vector3(0, 0, 1.4), 0);
 }
+// Where each of a ring's products stands, as a length along the ring from the first one's outer edge, and the whole
+// ring's length: neighbours as far apart as their open doors need (spacing), measured where the ring is tightest,
+// since everything in it faces the middle.
+function ringArcs(list) {
+  const depth = (p, z) => z - (p.placement === "wall" ? 0.15 : 0); // towards you from the ring's line
+  const squeeze = (t) => Math.max(0.3, (RING_R - t) / RING_R);
+  const at = [];
+  list.forEach((s, i) => {
+    const edge = s.size.w / 2 + 0.225;
+    at.push(i ? Math.max(at[i - 1] + list[i - 1].size.w / 2 + 0.45 + s.size.w / 2, at[i - 1] + spacing(list[i - 1].p, s.p, 1, depth, squeeze)) : edge);
+  });
+  const span = list.length ? at.at(-1) + list.at(-1).size.w / 2 + 0.225 : 0;
+  return { at, span };
+}
 // passthrough: the set's products in a ring round where you stood, each facing you, centred on your view
 function setRing(k) {
   xr.set = k;
   const set = xr.sets[k], f = xr.ringFwd, right = new THREE.Vector3(-f.z, 0, f.x);
   for (const s of slots) s.group.visible = set.slots.includes(s);
-  const total = set.slots.reduce((t, s) => t + s.size.w + 0.45, 0);
-  let cum = -total / 2;
-  for (const s of set.slots) {
-    const arc = s.size.w + 0.45, a = (cum + arc / 2) / RING_R;
-    cum += arc;
+  const { at, span } = ringArcs(set.slots);
+  for (const [i, s] of set.slots.entries()) {
+    const a = (at[i] - span / 2) / RING_R;
     const out = right.clone().multiplyScalar(Math.sin(a)).addScaledVector(f, Math.cos(a));
     const pos = xr.ringCenter.clone().addScaledVector(out, s.wall ? RING_R + 0.15 : RING_R);
     placeSlot(s, [pos.x, s.wall ? AC_Y - s.size.h / 2 : 0, pos.z], Math.atan2(-out.x, -out.z));
@@ -1097,6 +1182,7 @@ function endXR() {
   for (const s of slots) { s.group.visible = true; if (s.arWall) s.arWall.removeFromParent(); placeSlot(s, s.home.pos, s.home.rot); }
   hall.visible = true;
   scene.background = BG;
+  scene.fog = null;
   ldr.cap = CAP; ldr.near = NEAR;
   document.body.classList.remove("in-xr");
   fitCamera();
@@ -1178,7 +1264,7 @@ function makeMenu() {
 // ── read-only views for automated checks ──
 const v3 = (v) => v.toArray().map((n) => +n.toFixed(3));
 window.__showroom = {
-  layout: () => ({ W: +L.W.toFixed(2), D: +L.D.toFixed(2), aisles: L.aisles.map((a) => ({ cat: a.cat, part: a.part, of: a.of, n: a.items.length, x: [+a.x0.toFixed(2), +a.x1.toFixed(2)], walk: a.walk.map((v) => +v.toFixed(2)), mid: +a.mid.toFixed(2), len: +a.len.toFixed(2) })) }),
+  layout: () => ({ W: +L.W.toFixed(2), D: +L.D.toFixed(2), LEN: +L.LEN.toFixed(2), PT, PART_H, WALL_H, aisles: L.aisles.map((a) => ({ cat: a.cat, part: a.part, of: a.of, n: a.items.length, x: [+a.x0.toFixed(2), +a.x1.toFixed(2)], walk: a.walk.map((v) => +v.toFixed(2)), mid: +a.mid.toFixed(2), len: +a.len.toFixed(2) })) }),
   slots: () => slots.map((s) => {
     let meshes = 0;
     s.model?.traverse((o) => { if (o.isMesh) meshes++; });
@@ -1194,8 +1280,74 @@ window.__showroom = {
   // a point in a product's own model space, on the screen
   screenOf: (id, p) => { const s = byId.get(id); const v = s.group.localToWorld(new THREE.Vector3(...p)).project(camera); const r = renderer.domElement.getBoundingClientRect(); return v.z > 1 ? null : [r.left + (v.x + 1) / 2 * r.width, r.top + (1 - v.y) / 2 * r.height]; },
   draws: () => renderer.info.render.calls,
+  // Z-fighting and holes in the hall: from camera position `pos` looking at `target`, the hall alone (products hidden)
+  // is drawn on magenta, then again from 1 mm away. flicker: the share of pixels that change a lot (two faces fighting
+  // for the same depth flip between frames; anything else barely moves). holes: magenta pixels in the lower 60% of the
+  // view (with no ceiling the sky is above the walls; below them it can only show through a gap).
+  flicker: (pos, target) => {
+    const was = slots.map((s) => s.group.visible);
+    slots.forEach((s) => (s.group.visible = false));
+    const bg = scene.background;
+    scene.background = new THREE.Color(0xff00ff);
+    const w = 640, h = 400, rt = new THREE.WebGLRenderTarget(w, h, { samples: 0 }), buf = [new Uint8Array(w * h * 4), new Uint8Array(w * h * 4)];
+    const cam = new THREE.PerspectiveCamera(FOV, w / h, camera.near, camera.far);
+    let changed = 0;
+    for (const off of [0, 0.001]) {
+      cam.position.set(...pos).add(new THREE.Vector3(off * 0.7, off * 0.5, off * 0.5));
+      cam.lookAt(...target);
+      cam.updateMatrixWorld(true);
+      renderer.setRenderTarget(rt);
+      renderer.render(scene, cam);
+      renderer.readRenderTargetPixels(rt, 0, 0, w, h, buf[off ? 1 : 0]);
+    }
+    renderer.setRenderTarget(null);
+    let holes = 0;
+    for (let i = 0; i < w * h * 4; i += 4) {
+      if (Math.max(Math.abs(buf[0][i] - buf[1][i]), Math.abs(buf[0][i + 1] - buf[1][i + 1]), Math.abs(buf[0][i + 2] - buf[1][i + 2])) > 48) changed++;
+      if (i / 4 < w * h * 0.6 && buf[0][i] > 235 && buf[0][i + 1] < 30 && buf[0][i + 2] > 235) holes++; // rows from the bottom
+    }
+    rt.dispose();
+    scene.background = bg;
+    slots.forEach((s, i) => (s.group.visible = was[i]));
+    redraw();
+    return { flicker: +(changed / (w * h)).toFixed(5), holes };
+  },
   memory: () => ({ ...renderer.info.memory }),
   labels: () => slots.filter((s) => s.tag.style.display !== "none").map((s) => s.p.id),
+  // a loaded product's boxes in the hall: its body (all but the moving parts), and each part as it stands when open
+  boxes: (id) => {
+    const s = byId.get(id);
+    if (!s?.model) return null;
+    // in the product's own frame (its slot's), so a product turned to face you in the ring is measured square
+    s.group.updateMatrixWorld(true);
+    const inv = s.group.matrixWorld.clone().invert(), m4 = new THREE.Matrix4(), v = new THREE.Vector3();
+    const box = (objs) => {
+      const b = new THREE.Box3();
+      for (const o of objs) o.traverse((x) => {
+        if (!x.isMesh || !shown(x)) return;
+        m4.multiplyMatrices(inv, x.matrixWorld);
+        const p = x.geometry.attributes.position;
+        for (let i = 0; i < p.count; i++) b.expandByPoint(v.fromBufferAttribute(p, i).applyMatrix4(m4));
+      });
+      return [v3(b.min), v3(b.max)];
+    };
+    const movers = new Set([...s.moving.values()].flatMap((m) => [m.node, ...m.also.map((c) => c.node)]));
+    const fixed = [];
+    s.model.traverse((o) => { if (!o.isMesh || !shown(o)) return; for (let n = o; n && n !== s.model; n = n.parent) if (movers.has(n)) return; fixed.push(o); });
+    const parts = {};
+    for (const [key, m] of s.moving) {
+      const pose = (t) => { for (const c of [m, ...m.also]) { c.node.quaternion.slerpQuaternions(c.closed, c.open, t); c.node.position.lerpVectors(c.at, c.out, t); } };
+      const outer = needsOf(m.part).map((k) => s.moving.get(k)).filter(Boolean);
+      for (const o of outer) for (const c of [o, ...o.also]) { c.node.quaternion.copy(c.open); c.node.position.copy(c.out); }
+      pose(1);
+      s.model.updateMatrixWorld(true);
+      parts[key] = box([m.node, ...m.also.map((c) => c.node)]);
+      pose(m.t);
+      for (const o of outer) for (const c of [o, ...o.also]) { c.node.quaternion.slerpQuaternions(c.closed, c.open, o.t); c.node.position.lerpVectors(c.at, c.out, o.t); }
+      s.model.updateMatrixWorld(true);
+    }
+    return { at: v3(s.group.getWorldPosition(new THREE.Vector3())), rot: +s.group.rotation.y.toFixed(5), body: box(fixed), parts, shift: +(s.shift || 0).toFixed(3) };
+  },
   caps: { canVR, canAR, light, CAP, CAP_XR, TEX_MAX },
 };
 window.__showroomXR = {

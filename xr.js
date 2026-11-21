@@ -22,7 +22,7 @@ const AXES = { x: new THREE.Vector3(1, 0, 0), y: new THREE.Vector3(0, 1, 0), z: 
 // "Open <label>" and "Close <label>", or the part's own two words (text: [to open, to close])
 function partText(p, open) { return p.text ? p.text[open ? 1 : 0] : `${open ? "Close" : "Open"} ${p.label}`; }
 
-export async function runXR(session, { mode, product, finishIndex = 0, parts = {}, onEnd }) {
+export async function runXR(session, { mode, product, src = product.glb, finishIndex = 0, parts = {}, onEnd }) {
   const ar = mode === "ar";
   const cm = (s) => parseFloat(s) / 100;
   const size = { w: cm(product.size.w), h: cm(product.size.h), d: cm(product.size.d) };
@@ -98,10 +98,11 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
   if (!ar) {
     scene.background = new THREE.Color(0xe7e2d9);
     scene.fog = new THREE.Fog(0xe7e2d9, 7, 16);
-    // many small triangles: one big fan that passes behind the viewer can clip badly
+    // many small triangles: one big fan that passes behind the viewer can clip badly. No hole in the middle, and
+    // wide enough that its edge is lost in the fog (fog ends at 16 m), so no line where the floor stops
     const floor = new THREE.Mesh(
-      new THREE.RingGeometry(0.01, 9, 72, 36),
-      new THREE.MeshStandardMaterial({ color: 0xd6cfc2, roughness: 0.85, map: radialTexture([[0, "#ffffff"], [0.35, "#f4f1ec"], [1, "#e7e2d9"]]) })
+      new THREE.RingGeometry(0, 20, 96, 48),
+      new THREE.MeshStandardMaterial({ color: 0xd6cfc2, roughness: 0.85, map: radialTexture([[0, "#ffffff"], [0.16, "#f4f1ec"], [0.45, "#e7e2d9"], [1, "#e7e2d9"]]) })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = floorY;
@@ -118,14 +119,30 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     holder.add(showroomWall);
   }
 
-  // ── product ──
-  const gltf = await new GLTFLoader().loadAsync(product.glb);
+  // ── product ── (the page's own file and cache key, so it isn't fetched twice)
+  let gltf;
+  try { gltf = await new GLTFLoader().loadAsync(src); }
+  catch (err) { renderer.dispose(); pmrem.dispose(); renderer.domElement.remove(); throw err; }
   const model = gltf.scene;
   // full anisotropic filtering: print, labels and grain stay sharp on a face seen at a slant (three.js's default is none)
   const aniso = renderer.capabilities.getMaxAnisotropy();
   const sharpen = (m) => { for (const k of ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap", "clearcoatNormalMap", "alphaMap"]) if (m[k]) m[k].anisotropy = aniso; };
   model.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; [].concat(o.material).forEach(sharpen); } });
   mount.add(model);
+  // what the model really takes up: a cord or hose can hang behind its published depth, and an open door reaches
+  // further; the showroom's wall stands behind all of it, so nothing goes into it
+  const reachBack = () => {
+    model.updateMatrixWorld(true);
+    let back = new THREE.Box3().setFromObject(model, true).min.z;
+    for (const s of moving.values()) {
+      for (const c of [s, ...s.also]) { c.node.quaternion.copy(c.open); c.node.position.copy(c.out); }
+      model.updateMatrixWorld(true);
+      back = Math.min(back, new THREE.Box3().setFromObject(s.node, true).min.z);
+      for (const c of [s, ...s.also]) { c.node.quaternion.slerpQuaternions(c.closed, c.open, s.t); c.node.position.lerpVectors(c.at, c.out, s.t); }
+    }
+    model.updateMatrixWorld(true);
+    return back;
+  };
   if (onWall) {
     mount.position.y = 2.05 - size.h / 2; // a typical mounting height
     shadowWall.position.set(0, size.h / 2, -0.002);
@@ -173,6 +190,7 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     });
     moving.set(p.key, s);
   }
+  if (showroomWall && !onWall) showroomWall.position.z = Math.min(-size.d / 2, reachBack()) - 0.05;
   function togglePart(key) {
     const s = moving.get(key);
     if (!s) return;
@@ -461,6 +479,20 @@ export async function runXR(session, { mode, product, finishIndex = 0, parts = {
     card: () => card.current,
     partWorld: (key) => { const s = moving.get(key); if (!s) return null; const b = new THREE.Box3().setFromObject(s.node); return b.getCenter(new THREE.Vector3()).toArray(); },
     alsoWorld: (key) => (moving.get(key)?.also || []).map((c) => new THREE.Box3().setFromObject(c.node).getCenter(new THREE.Vector3()).toArray()),
+    // the model's box where it stands, in the spot's own frame (x across, y up from the floor, z out of the front),
+    // as it is now; and where the showroom's wall and floor are in that frame
+    box: () => {
+      holder.updateMatrixWorld(true);
+      const inv = holder.matrixWorld.clone().invert(), b = new THREE.Box3(), v = new THREE.Vector3(), m4 = new THREE.Matrix4();
+      model.traverse((o) => {
+        if (!o.isMesh || !o.visible || o.userData.spot != null) return;
+        for (let n = o; n; n = n.parent) if (!n.visible) return;
+        m4.multiplyMatrices(inv, o.matrixWorld);
+        const p = o.geometry.attributes.position;
+        for (let i = 0; i < p.count; i++) b.expandByPoint(v.fromBufferAttribute(p, i).applyMatrix4(m4));
+      });
+      return { min: b.min.toArray(), max: b.max.toArray(), wallZ: showroomWall ? showroomWall.position.z : null, floorY, holderY: holder.position.y, swinging: [...moving.values()].some((s) => s.t !== s.to) };
+    },
   };
 
   await applyFinish(finishIndex);

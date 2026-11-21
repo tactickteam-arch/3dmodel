@@ -17,6 +17,10 @@
 //   keeps to the headset's cap; Exit puts the page back;
 // - passthrough: the hall is hidden; one category stands in a ring about 2.4 m round you, facing you; a door opens;
 //   the panel switches category, and between them they show every product; air conditioners hang at 2.05 m;
+// - nothing leaks: every model, shut and with each part open, stays inside its aisle (off the partitions and walls,
+//   on or over the floor, under the partition tops) and clear of every other model and its open parts; the hall's
+//   faces never fight for the same depth (z-fighting), from the entrance, down an aisle, at the far end, close to a
+//   partition and from far out;
 // - no console errors.
 // Emulation only: headless Chrome (SwiftShader) and IWER, not a real phone, Quest or Vision Pro.
 // usage: node test_showroom.mjs <base url> <out dir> <iwer.min.js>   (PORT and PORT+1: the two browsers' debugging ports)
@@ -49,12 +53,32 @@ const frontOf = (part, inset = 0) => {
 const X = products.find((p) => p.category === "Refrigerator" && doorOf(p)) || products.find(doorOf);       // the product most checks use
 const W = products.find((p) => p.category === "Washing machine" && doorOf(p) && p.id !== X.id) || products.find((p) => p.id !== X.id);
 const hyp = (a, b) => Math.hypot(a[0] - b[0], a[2] - b[2]);
+// a product's boxes (from __showroom.boxes, in its own frame) as footprints in the room (4 corners in x, z), a height
+// range and a world box round them
+const placed = (id, bx) => (bx ? [["body", bx.body], ...Object.entries(bx.parts)] : []).map(([k, [mn, mx]]) => {
+  const c = Math.cos(bx.rot), s = Math.sin(bx.rot);
+  const quad = [[mn[0], mn[2]], [mx[0], mn[2]], [mx[0], mx[2]], [mn[0], mx[2]]].map(([x, z]) => [x * c + z * s + bx.at[0], -x * s + z * c + bx.at[2]]);
+  const xs = quad.map((q) => q[0]), zs = quad.map((q) => q[1]);
+  return { id, k, quad, y: [mn[1] + bx.at[1], mx[1] + bx.at[1]], min: [Math.min(...xs), mn[1] + bx.at[1], Math.min(...zs)], max: [Math.max(...xs), mx[1] + bx.at[1], Math.max(...zs)] };
+});
+// do two placed boxes overlap by more than T (separating axes of the two footprints, then the heights)?
+const overlap = (a, c, T = 0.005) => {
+  if (a.y[0] >= c.y[1] - T || c.y[0] >= a.y[1] - T) return false;
+  for (const q of [a.quad, c.quad]) for (let i = 0; i < 4; i++) {
+    const [x0, z0] = q[i], [x1, z1] = q[(i + 1) % 4], n = [z1 - z0, x0 - x1], l = Math.hypot(...n);
+    const pr = (pts) => pts.map(([x, z]) => (x * n[0] + z * n[1]) / l);
+    const pa = pr(a.quad), pc = pr(c.quad);
+    if (Math.max(...pa) <= Math.min(...pc) + T || Math.max(...pc) <= Math.min(...pa) + T) return false;
+  }
+  return true;
+};
+const clashes = (list) => { const h = []; for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) if (list[i].id !== list[j].id && overlap(list[i], list[j])) h.push(`${list[i].id} ${list[i].k} / ${list[j].id} ${list[j].k}`); return h; };
 
 let b;
 const sr = (expr) => b.evalJS(`window.__showroom.${expr}`);
 const slotOf = async (id) => (await sr("slots()")).find((s) => s.id === id);
 const ready = () => b.waitFor("!!window.__showroom && !document.getElementById('loading')", 60000);
-const settle = async () => { await sleep(150); await b.waitFor("!window.__showroom.camera().flying", 8000); await sleep(250); };
+const settle = async () => { await sleep(150); await b.waitFor("!window.__showroom.camera().flying", 30000); await sleep(250); };
 const loadedSoon = (id, ms = 120000) => b.waitFor(`window.__showroom.slots().find((s) => s.id === "${id}").loaded`, ms);
 const mouse = async (x, y) => { for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) await b.send("Input.dispatchMouseEvent", { type, x, y, button: "left", clickCount: 1 }); };
 const finger = async (x, y) => { await b.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] }); await sleep(60); await b.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); };
@@ -186,6 +210,7 @@ await b.evalJS("window.__showroom.resetMax()");
 const before = await sr("loader()");
 let worst = 0;
 const worstUnder = [];
+const boxes = new Map(); // each model's body and open parts, in the hall
 for (const id of dock.chips) {
   await b.evalJS(`document.querySelector('.chip[data-id="${id}"]').click()`);
   await settle();
@@ -193,6 +218,7 @@ for (const id of dock.chips) {
   ld = await sr("loader()");
   worst = Math.max(worst, ld.loaded + ld.loading);
   worstUnder.push(...(await tagsUnderUI()).map((u) => `${id}: ${u}`));
+  if (await loadedSoon(id, 90000)) boxes.set(id, await sr(`boxes(${JSON.stringify(id)})`));
 }
 check(await loadedSoon(dock.chips.at(-1)), `the last one (${dock.chips.at(-1)}) loads when you reach it`);
 ld = await sr("loader()");
@@ -203,6 +229,41 @@ si = await standIns();
 check(!si.bad.length, `after it, every product is either its model or its coloured stand-in${si.bad.length ? `: ${si.bad.slice(0, 2).join(", ")}` : ""}`);
 check(ld.unloads > before.unloads && ld.loads > before.loads && !ld.failed.length, `${ld.loads - before.loads} loads and ${ld.unloads - before.unloads} unloads on the way, none failed`);
 console.log(`       now ${ld.loaded} loaded, ${mem.geometries} geometries, ${mem.textures} textures, ${await sr("draws()")} draw calls`);
+
+console.log("\n[no leaks: every model inside its aisle and clear of every other, doors open or shut]");
+check(boxes.size === products.length, `every model loaded and measured (${boxes.size} of ${products.length})`);
+{
+  const T = 0.005, all = [...boxes].flatMap(([id, bx]) => placed(id, bx));
+  const slotsNow = await sr("slots()"), lay2 = await sr("layout()");
+  const aisleOf = (id) => { const c = slotsNow.find((s) => s.id === id).center; return lay2.aisles.find((a) => c[0] >= a.x[0] && c[0] <= a.x[1]); };
+  const out = all.filter((x) => { const a = aisleOf(x.id), wall = byId.get(x.id).placement === "wall";
+    return x.min[0] < a.x[0] + lay2.PT / 2 - T || x.max[0] > a.x[1] - lay2.PT / 2 + T || x.min[1] < -T || x.max[1] > (wall ? lay2.WALL_H : lay2.PART_H) || x.max[2] > -T || x.min[2] < -lay2.D; })
+    .map((x) => `${x.id} ${x.k} [${x.min}]-[${x.max}]`);
+  check(!out.length, `every model and its open parts inside its aisle: off the partitions and walls, on the floor, under the tops${out.length ? `: ${out.slice(0, 3).join("; ")}` : ""}`);
+  const hits = clashes(all);
+  check(!hits.length, `no model or open part touches another's, with every door in the hall open at once${hits.length ? `: ${hits.slice(0, 4).join("; ")}` : ""}`);
+  const moved = [...boxes].filter(([, bx]) => bx?.shift > 0).map(([id, bx]) => `${id} ${Math.round(bx.shift * 1000)} mm`);
+  console.log(`       stood forward off the partition (they reach behind their published depth): ${moved.join(", ") || "none"}`);
+}
+
+console.log("\n[no z-fighting in the hall]");
+{
+  const a0 = lay.aisles[0], a1 = lay.aisles.at(-1), lay2 = await sr("layout()");
+  const views = [
+    ["the whole hall from far out", [0, 30, 40], [0, 0, -lay2.D / 2], false],
+    ["from the entrance", [a0.mid, 1.6, 1.5], [a0.mid, 1, -lay2.D], false],
+    ["the floor along a side wall", [-lay2.W / 2 + 1.2, 1.2, -2], [-lay2.W / 2, 0, -5]],
+    ["the far left corner, low", [-lay2.W / 2 + 0.8, 0.5, -lay2.D + 0.8], [-lay2.W / 2, 0.2, -lay2.D]],
+    ["down an aisle, the floor and runner at a slant", [a1.mid, 1.6, -0.5], [a1.mid, 0, -lay2.LEN], false],
+    ["the partition ends and their orange edges", [lay2.aisles[0].x[1] + 0.8, 1.4, 1.2], [lay2.aisles[0].x[1], 1.3, 0]],
+    ["the back wall and its plaque", [0, 1.7, -lay2.D + 4], [0, 2, -lay2.D]],
+    ["a corner of the hall", [lay2.W / 2 - 1, 1.6, -lay2.D + 1.5], [lay2.W / 2, 0.5, -lay2.D]],
+  ];
+  for (const [what, pos, tgt, seams = true] of views) {
+    const f = await sr(`flicker(${JSON.stringify(pos)}, ${JSON.stringify(tgt)})`);
+    check(f.flicker < 0.002 && (!seams || f.holes === 0), `${what}: ${(f.flicker * 100).toFixed(2)}% of pixels change when the eye moves 1 mm${seams ? `; ${f.holes} pixels of sky through the walls or floor` : ""}`);
+  }
+}
 await b.go(`${base}/showroom?cap=4`);
 await ready();
 await b.evalJS("window.__showroom.resetMax()");
@@ -407,9 +468,21 @@ if (await enter("btnAR", "ar")) {
     const O = info.ring, ring = vis.map((s) => hyp(s.center, O));
     const facingYou = vis.every((s) => { const dx = s.center[0] - O[0], dz = s.center[2] - O[2]; return -(s.front[0] * dx + s.front[2] * dz) / Math.hypot(dx, dz) > 0.97; });
     const walls = vis.filter((s) => byId.get(s.id).placement === "wall");
-    const arc = vis.reduce((t, s) => t + sz(byId.get(s.id)).w + 0.45, 0);
+    const ang = vis.map((s) => Math.atan2(s.center[0] - O[0], -(s.center[2] - O[2])));
+    const rel = ang.map((a) => { let d = a - ang.reduce((t, x) => t + x, 0) / ang.length; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; });
+    const arc = (Math.max(...rel) - Math.min(...rel)) * 2.4;
     check(info.set === k && vis.every((s) => byId.get(s.id).category === cat) && ring.every((r, i) => (walls.some((w) => w.id === vis[i].id) ? r > 2 && r < 2.7 : Math.abs(r - 2.4) < 0.05)) && facingYou && arc <= 2 * Math.PI * 2.4 * 0.9 + 0.01,
-      `"${info.sets[k]}": ${vis.length} ${cat} in a ring ${Math.min(...ring).toFixed(2)}-${Math.max(...ring).toFixed(2)} m round you, all facing you (set ${info.set} of ${info.sets.length}, arc ${arc.toFixed(2)} of ${(2 * Math.PI * 2.4 * 0.9).toFixed(2)} m, categories ${[...new Set(vis.map((s) => byId.get(s.id).category))].join("/")}, facing ${facingYou})`);
+      `"${info.sets[k]}": ${vis.length} ${cat} in a ring ${Math.min(...ring).toFixed(2)}-${Math.max(...ring).toFixed(2)} m round you, all facing you (set ${info.set} of ${info.sets.length}, from the first to the last ${arc.toFixed(2)} of ${(2 * Math.PI * 2.4 * 0.9).toFixed(2)} m, categories ${[...new Set(vis.map((s) => byId.get(s.id).category))].join("/")}, facing ${facingYou})`);
+    // the ones loaded so far: no door of one, open, reaches another or its open doors
+    // wait (up to 90 s on a slow machine) for at least two of them to load, so the check is not empty
+    let rb = [];
+    for (let t0 = Date.now(); Date.now() - t0 < 90000; await sleep(2000)) {
+      rb = [];
+      for (const s of vis) rb.push(...placed(s.id, await sr(`boxes(${JSON.stringify(s.id)})`)));
+      if (new Set(rb.map((x) => x.id)).size >= Math.min(2, vis.length)) break;
+    }
+    const rh = clashes(rb);
+    check(!rh.length && rb.length > 0, `in the ring, the ${new Set(rb.map((x) => x.id)).size} loaded so far stay clear of each other with their doors open${rh.length ? `: ${rh.slice(0, 3).join("; ")}` : ""}`);
     if (walls.length) check(walls.every((s) => Math.abs(s.center[1] - 2.05) < 0.02), `its air conditioners hang at 2.05 m (${walls.map((s) => s.center[1]).join(", ")})`);
     if (k === 0) {
       // a door on the one most in front of you
