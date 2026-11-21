@@ -179,7 +179,14 @@ def mark():
     box = src[y0:y1, x0:x1].reshape(-1, 3)
     lum = box.mean(1)
     col = tuple(int(round(v)) for v in box[lum >= 0.82 * lum.max()].mean(0))
-    lg = np.asarray(Image.open(os.path.join(LOGOS, "samsung.png")).convert("RGBA")).astype(float)
+    # the wordmark from Samsung's SVG, drawn at 12 px per mm of its 66 mm ink (21 Nov; samsung.png gave about 7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_samsung_standmark as _smk
+    _w = round(66 * 12)
+    cov = _smk.wordmark(LOGOS, _w)
+    cov = _smk.wordmark(LOGOS, round(_w * _w / cov.shape[1]))     # the SVG has a margin: draw again so the ink is 66 mm
+    lg = np.zeros(cov.shape + (4,))
+    lg[..., 3] = cov
     out = np.zeros(lg.shape, np.uint8)
     out[..., :3] = col
     out[..., 3] = (lg[..., 3] * 0.95).clip(0, 255).astype(np.uint8)
@@ -195,14 +202,16 @@ def font(px, face):
     return ImageFont.truetype(FONT, px, index=face)
 
 
-def text_png(name, lines, px_h, fill, face, wmm, hmm, PX=8, italic_shift=0):
-    # words set again at PX px per mm on a clear ground, each line fitted to its measured height
+def text_png(name, lines, px_h, fill, face, wmm, hmm, PX=12, italic_shift=0):
+    # words set again at PX px per mm on a clear ground, each line fitted to its measured height (12 px per mm since
+    # 21 Nov, was 8; the margin stays 1.25 mm, so the builders' planes keep their size)
+    P = round(PAD * PX / 8)
     W, H = int(wmm * PX), int(hmm * PX)
-    img = Image.new("RGBA", (W + 2 * PAD, H + 2 * PAD), fill[:3] + (0,))
+    img = Image.new("RGBA", (W + 2 * P, H + 2 * P), fill[:3] + (0,))
     d = ImageDraw.Draw(img)
     for (s, cy_mm, h_mm, fc) in lines:
         f = font(int(h_mm * PX * 1.35), fc)
-        d.text((PAD + W / 2, PAD + cy_mm * PX), s, font=f, fill=fill, anchor="mm")
+        d.text((P + W / 2, P + cy_mm * PX), s, font=f, fill=fill, anchor="mm")
     save(img, name)
     return img
 
