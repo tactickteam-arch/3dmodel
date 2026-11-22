@@ -31,7 +31,7 @@ usage: python3 -I tex_samsung_rt40u2.py <photos dir> <logos dir> <out dir> [--co
     rear.jpg, bay.jpg, base_rear.jpg, cord_path.json   as the RT40H28W1CPNL's (the same rear photo)
     back_freezer.png    the freezer's raised back panel, redrawn: vents, screw caps, "Convertible Freezer"
     back_fridge.png     the fridge's raised back panel, redrawn: vents, the round cap's ring, the louvres
-    display.png         the display on the fridge's right wall, redrawn at 8 px per mm: SAMSUNG, the lit -19 / 2 degrees,
+    display.png         the display on the fridge's right wall, redrawn at 12 px per mm: SAMSUNG, the lit -19 / 2 degrees,
                         the three keys "Freezer Power Freeze (3 sec)", "Freezer Convert (3 sec)", "Fridge Power Cool (3 sec)"
     bigbox_print.png    "Big Box" and its fruit icons, by tex_samsung_fridge.py (the RT34's, run unchanged into a temp folder)
 """
@@ -438,11 +438,11 @@ INK = (78, 82, 90)
 
 
 def display():
-    PX = 8
+    PX = 12  # px per mm (was 8)
     w, h = DISP_MM[0] * PX, DISP_MM[1] * PX
     img = Image.new("RGBA", (w * SS, h * SS), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    rrect(d, (0, 0, w, h), 0.11 * w, fill=(226, 228, 231, 255), outline=(206, 209, 214, 255), w=4)
+    rrect(d, (0, 0, w, h), 0.11 * w, fill=(226, 228, 231, 255), outline=(206, 209, 214, 255), w=4 * PX / 8)
     X = lambda f: f * w
     Y = lambda f: f * h
     # SAMSUNG: Samsung's own wordmark (logos/samsung.png), 24 mm wide, in the panel's ink
