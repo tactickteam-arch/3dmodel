@@ -161,6 +161,8 @@ const iceM = group("IceMaker", icX, fzFloor, 0);
   for (let i = 0; i < 12; i++) {
     const c = mesh("IceCube", cube, ice, -0.03 + (i % 3) * 0.03, 0.016 + Math.floor(i / 6) * 0.018, icZ1 - 0.03 - (Math.floor(i / 3) % 2) * 0.05 - Math.floor(i / 6) * 0.03);
     c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
+    // a tilted cube's low corner stays on the floor it sits on (it poked through the bin's floor)
+    { c.updateMatrix(); const cb = cube.clone().applyMatrix4(c.matrix); cb.computeBoundingBox(); if (cb.boundingBox.min.y < 0.006) c.position.y += 0.006 - cb.boundingBox.min.y; }
     iceM.add(c);
   }
 }
@@ -232,6 +234,14 @@ stock.shelves(trays, {
 });
 // the freezer: ice-cream tubs and packs on its floor behind the ice maker, packs lying on the COOL PACK plate
 stock.freezer(cab, { fit: true, zIn1: zIn, floor: fzFloor, top: cpTop + 0.0005, box: { hw: inW / 2 - 0.03, z0: zDuct + 0.02, z1: icZ0 - 0.01 } });
+// the packs lying on the plate are laid out for a deeper freezer: their front row ran up to 9 mm into the freezer door's
+// bins with the door shut. What reaches past the line the bins come back to (less 3 mm) is left out
+{
+  const t = cab.getObjectByName("OnFreezerShelf"), lim = frontFreezer - 0.003, out = [];
+  t.updateMatrixWorld(true);
+  for (const o of [...t.children]) if (new THREE.Box3().setFromObject(o).max.z > lim) { out.push(o.name); o.removeFromParent(); }
+  if (out.length) console.log(`left out (past the freezer door's bins): ${out.join(", ")}`);
+}
 
 // The fitted stock is laid out for the LG 343 L's trays (about 540 mm between the walls and deeper shelves; this one has
 // 488 mm and 327 mm of shelf), so three trays hold less here, as on the HRF-2902ICMC-P: the top shelf leaves out the milk

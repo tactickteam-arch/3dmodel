@@ -39,6 +39,7 @@ P = os.path.join(PHOTOS, SLUG)
 D = os.path.join(OUT, SLUG)
 os.makedirs(D, exist_ok=True)
 AV = "/System/Library/Fonts/Avenir Next.ttc"
+PX = 12.0                                   # px per mm for every word and mark (12 on the model)
 FRONT = os.path.join(P, "g01_front.jpg")
 X0, X1 = 416, 785                  # print columns [X0, X1): the outer column each side is the glass's lit edge
 FZ = (72, 402)                     # freezer print rows
@@ -83,11 +84,11 @@ def doors():
 
 
 def logo():
-    # Haier's own wordmark, white as on the door (the photo's ink reads 236-246); 59 mm wide, at 7.2 px per mm
+    # Haier's own wordmark, white as on the door (the photo's ink reads 236-246); 59 mm wide, at PX px per mm
     lg = Image.open(os.path.join(LOGOS, "haier.png")).convert("RGBA")
     al = lg.getchannel("A")
     al = al.crop(al.getbbox())
-    w = round(59 * 7.2)
+    w = round(59 * PX)
     al = al.resize((w, round(al.height * w / al.width)), Image.LANCZOS)
     out = Image.new("RGBA", al.size, (240, 242, 246, 0))
     out.putalpha(al)
@@ -115,8 +116,9 @@ def fit(img, w):
     return img.resize((w, max(1, round(img.height * w / img.width))), Image.LANCZOS)
 
 
-def two_tone(a, b, ca, cb, font, track, mm_w, name, S=7.2):
+def two_tone(a, b, ca, cb, font, track, mm_w, name, S=None):
     """Two words set as one (FRESH+BOX, BOTTLE+GUARD), each in its own grey, fitted to mm_w."""
+    S = S or PX
     ta = text_img(a, font, 200, ca, track)
     tb = text_img(b, font, 200, cb, track)
     gap = round(200 * track)
@@ -127,7 +129,7 @@ def two_tone(a, b, ca, cb, font, track, mm_w, name, S=7.2):
 
 
 def words():
-    S, k = 7.2, 3
+    S, k = PX, 3
     # NAVI badge: 50 mm square on g05 (its frame x 316-391 of the 2x crop: 37 px at about 0.6 px per mm), dark grey
     n = round(50 * S * k)
     im = Image.new("RGBA", (n, n), (0, 0, 0, 0))
