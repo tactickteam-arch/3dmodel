@@ -32,3 +32,6 @@ tools/
 /presentations/
 .vercel
 .env*
+
+# Sangeetha MOP prices: served from the server only, never in this public repo (prices.js reads it)
+/prices.json

@@ -16,6 +16,7 @@ new=$(git rev-parse FETCH_HEAD)
 
 git reset -q --hard "$new"
 rsync -a --delete --delay-updates --exclude-from=.vercelignore \
-  --exclude=.git --exclude=.gitignore --exclude=.vercelignore --exclude=vercel.json ./ "$WEB/"
+  --exclude=.git --exclude=.gitignore --exclude=.vercelignore --exclude=vercel.json \
+  --exclude=/prices.json ./ "$WEB/"   # prices.json lives only on the server (the repo is public): never delete it
 echo "$new" > "$MARK"
 echo "$(date -Is) deployed $new"
