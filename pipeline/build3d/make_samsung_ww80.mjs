@@ -165,12 +165,29 @@ cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(t, sideH, sideD)), [sideR,
   };
   const field = new THREE.PlaneGeometry(W - 2 * fieldIn, D - 2 * fieldIn).rotateX(-Math.PI / 2).translate(0, H - drop, (zF + zB) / 2);
   const parts = [...sides.flatMap((sd) => profiles.map((pr) => strip(sd, pr))), field,
-    new THREE.BoxGeometry(0.006, 0.0265, D - 0.001).translate(-W / 2 + 0.003, 0.8265, -0.0005),
-    new THREE.BoxGeometry(0.006, 0.0265, D - 0.001).translate(W / 2 - 0.003, 0.8265, -0.0005),
-    new THREE.BoxGeometry(W - 0.013, 0.0265, 0.006).translate(0, 0.8265, zB + 0.003)];
+    // the skirts reach up to the rim's lower edge (H - 10 mm) exactly: 0.25 mm short, they left a slit under the rim all round
+    new THREE.BoxGeometry(0.006, 0.02675, D - 0.001).translate(-W / 2 + 0.003, 0.826625, -0.0005),
+    new THREE.BoxGeometry(0.006, 0.02675, D - 0.001).translate(W / 2 - 0.003, 0.826625, -0.0005),
+    new THREE.BoxGeometry(W - 0.013, 0.02675, 0.006).translate(0, 0.826625, zB + 0.003)];
   cab.add(mesh("Top", mergeGeometries(parts), topM));
 }
-cab.add(box("Base", W - 2 * t - 0.002, 0.006, sideD - 0.004, dark, 0, sideY0 + 0.003 + 0.0005, (sideZ0 + sideZ1) / 2));
+// the worktop's underside, closed: a dark liner under the slab from the sides' tops up to just under the field. The slab is a skin
+// (its top and rim face up only) and the skirts stop short of the sides (no shared planes), so without it the thin gaps along the
+// top edges showed the background through the slab from below and from the sides. It stays clear of the drawer's bay (left front),
+// of the hose and cord where they hook over the back (the recess behind the back panel gets its own ceiling above them) and of
+// the panel at the front. One mesh, so no two of its own faces get pulled apart.
+{
+  const yL0 = 0.811, yL1 = 0.847, xi = W / 2 - 0.0095, bayBack = -0.0595, seamX = -0.074;
+  const bx = (x0, x1, y0, y1, z0, z1) => new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0).translate((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+  cab.add(mesh("TopLiner", mergeGeometries([
+    bx(-xi, xi, yL0, yL1, -0.2445, bayBack),               // the full width behind the drawer's bay (its back inside the back panel)
+    bx(seamX, xi, yL0, yL1, bayBack, 0.262),               // right of the bay, up to the panel
+    bx(-xi, xi, 0.815, yL1 - 0.001, -0.2675, -0.2455),     // the ceiling of the recess behind the back panel, over the hose and cord
+  ]), dark));
+}
+// the base runs back into the back panel's thickness and up past its lower edge, and forward 1.5 mm past the front plinth band
+// (z 257.8 mm, under the bow's lip; 0.3 mm short of it the two flickered), so no slit opens at either end: from below one showed through the cabinet and out of the door
+cab.add(box("Base", W - 2 * t - 0.002, 0.0075, 0.2593 + 0.2455, dark, 0, 0.013 + 0.00375, (0.2593 - 0.2455) / 2));
 const backY0 = rp.panel.y0, backY1 = 0.8125, zBackFace = -0.2465;
 cab.add(mesh("BackPanel", flipV(new THREE.BoxGeometry(W - 0.001, backY1 - backY0, 0.004)), [dark, dark, dark, dark, dark, rearM], 0, (backY0 + backY1) / 2, zBackFace + 0.002));
 { // four feet: a black pad and a silver hex nut (rear photo), 12 mm in all; x and z ESTIMATED from the rear and side photos
@@ -239,8 +256,10 @@ cab.add(box("FrontSeam", W - 0.001, SEAM1 - SEAM0 + 0.004, 0.012, dark, 0, (SEAM
     s.lineTo(sgn * sideZ1, 0.0176);
     return new THREE.ShapeGeometry(s);
   };
-  const l = mesh("SideReturnL", shape(1), bodyDark, -W / 2, 0, 0); l.rotation.y = -Math.PI / 2; cab.add(l);
-  const r = mesh("SideReturnR", shape(-1), bodyDark, W / 2, 0, 0); r.rotation.y = Math.PI / 2; cab.add(r);
+  // 1.5 mm inside the sides' outer faces: in their plane the build pulled them out of it by 0.3-1.1 mm, and from behind a corner
+  // the line of sight then slipped past the side panel's front edge into the hollow cabinet (a hairline down both front corners)
+  const l = mesh("SideReturnL", shape(1), bodyDark, -W / 2 + 0.0015, 0, 0); l.rotation.y = -Math.PI / 2; cab.add(l);
+  const r = mesh("SideReturnR", shape(-1), bodyDark, W / 2 - 0.0015, 0, 0); r.rotation.y = Math.PI / 2; cab.add(r);
 }
 
 // ── the door seat: the black groove the door's rim sits in, a shallow dish in the body colour, and its inner edge turning
@@ -353,7 +372,9 @@ const drawer = group("Drawer", 0, 0, 0);
   drawer.add(grid("DrawerFace", rows.length, cols.length, (i, j) => [cols[j], rows[i], stripZ(rows[i]) - pocketDepth(cols[j], rows[i])], panelUV, panelM));
   // the face's rim: 12 mm deep round its four edges
   const yr = stripRows, dep = 0.012;
-  drawer.add(grid("DrawerRimL", yr.length, 2, (i, j) => [dx0, yr[i], stripZ(yr[i]) - (j ? 0 : dep)], null, bodyDark));
+  // the left side 3.5 mm inside the face's edge: near the cabinet's front return's plane, the two were pulled apart in pieces and a
+  // hairline opened at the front corner; the return covers the drawer's side when it is shut
+  drawer.add(grid("DrawerRimL", yr.length, 2, (i, j) => [dx0 + 0.0035, yr[i], stripZ(yr[i]) - (j ? 0 : dep)], null, bodyDark));
   drawer.add(grid("DrawerRimR", yr.length, 2, (i, j) => [dx1, yr[i], stripZ(yr[i]) - (j ? dep : 0)], null, bodyDark));
   drawer.add(grid("DrawerRimTop", 2, 2, (i, j) => [j ? dx1 : dx0, 0.848, stripZ(0.848) - (i ? dep : 0)], null, bodyDark));
   drawer.add(grid("DrawerRimBottom", 2, 2, (i, j) => [j ? dx1 : dx0, SEAM1, stripZ(SEAM1) - (i ? 0 : dep)], null, bodyDark));
