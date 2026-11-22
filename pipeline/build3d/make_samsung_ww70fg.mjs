@@ -14,7 +14,7 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { mergeGeometries as mergeRaw, mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS, KHRMaterialsVariants } from "@gltf-transform/extensions";
-import { THREE, mat, mesh, box, faced, group, lathe, inward, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
+import { THREE, mat, mesh, box, faced, group, lathe, flipV, inward, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "samsung-ww70fg4s02abtl";
@@ -144,6 +144,26 @@ const range = (a, b, n) => [...Array(n + 1).keys()].map((k) => a + ((b - a) * k)
 const uniq = (a) => [...new Set(a.map((v) => +v.toFixed(6)))].sort((p, q) => p - q);
 // the band's texture: x -300..300 mm, h 722..850 mm, v down from the top
 const panelUV = (x, y) => [(x + W / 2) / W, (0.85 - y) / 0.128];
+// the print sharp: the band drawn again at 12 px/mm in each colour (tex_samsung_ww70fg.py --hi), its inked parts cut into pieces
+// (decals.json: each piece's rectangle in the band's UVs and the surface it lies on; print_<piece>.jpg Black, _ax Refined Inox),
+// each laid 0.9 mm over its surface where panel*.jpg has the same print: on the band, the drawer face (moving with it), the
+// display glass, each key and each button
+const DECALS = JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8"));
+const printTex = {};
+const printMat = (n, on) => { printTex[n] = `${T}/${DECALS[n.slice(6)].file}`;
+  return on === "glass" ? mat(n, 0xffffff, { metal: 0.85, rough: 0.42 }) : mat(n, 0xffffff, { rough: 0.35 }); };   // as the band's
+// a band piece: its rows the band's own rows, each facet the facet under it moved forward by `off`, so the two stay parallel
+// (the flicker check pairs near-parallel facets of a curved band otherwise)
+const chordZ = (y) => { const i = Math.max(0, Math.min(stripRows.length - 2, stripRows.findIndex((r, k) => stripRows[k + 1] >= y)));
+  const t = (y - stripRows[i]) / (stripRows[i + 1] - stripRows[i]); return stripZ(stripRows[i]) * (1 - t) + stripZ(stripRows[i + 1]) * t; };
+const decalsOn = (parent, on, off) => { for (const [k, d] of Object.entries(DECALS)) {
+  if (d.on !== on) continue;
+  const [u0, v0, u1, v1] = d.rect;
+  const x0 = u0 * W - W / 2, x1 = u1 * W - W / 2, yT = 0.85 - v0 * 0.128, yB = 0.85 - v1 * 0.128;
+  const rows = [yB, ...stripRows.filter((y) => y > yB + 1e-5 && y < yT - 1e-5), yT];
+  parent.add(grid(`PrintDecal_${k}`, rows.length, 2, (i, j) => [j ? x1 : x0, rows[i], chordZ(rows[i]) + off],
+    (x, y) => [(x - x0) / (x1 - x0), (yT - y) / (yT - yB)], printMat(`Print_${k}`, on)));
+} };
 
 // ── cabinet: the sides carry the pressed channels (side photo), the back is Samsung's rear photo with the hoses painted out ──
 // The side walls run from 416 mm in front of the back (where the front's return begins) to the back, h 25 to 821.5 mm (under the
@@ -337,6 +357,7 @@ const seam = L.seam, stripRows = uniq([...range(SEAM1, BANDTOP, 50)]);
 {
   const xs = [seam + 0.0005, W / 2];
   cab.add(grid("Fascia", stripRows.length, 2, (i, j) => [xs[j], stripRows[i], stripZ(stripRows[i])], panelUV, panelM));
+  decalsOn(cab, "fascia", 0.0009);
 }
 // the display glass, 1.6 mm proud, above the row of keys
 {
@@ -345,6 +366,7 @@ const seam = L.seam, stripRows = uniq([...range(SEAM1, BANDTOP, 50)]);
     const t = (y - stripRows[i]) / (stripRows[i + 1] - stripRows[i]); return stripZ(stripRows[i]) * (1 - t) + stripZ(stripRows[i + 1]) * t; };
   const rows = [y0, ...stripRows.filter((y) => y > y0 + 1e-5 && y < g.y1 - 1e-5), g.y1];
   cab.add(grid("DisplayGlass", rows.length, 2, (i, j) => [j ? g.x1 : g.x0, rows[i], lin(rows[i]) + 0.0016], panelUV, glassFace));
+  decalsOn(cab, "glass", 0.0016 + 0.0009);
 }
 // the five keys (light grey, raised 2.4 mm along the display's foot) and the Power and Start/Pause buttons (raised 4.5 mm in their
 // frames); the band's print on their faces
@@ -358,6 +380,16 @@ const raised = (b, depth, rad, lift) => {
 };
 cab.add(mesh("Keys", mergeGeometries(L.keys.map((k) => raised({ ...k, x0: k.x0 + 0.0003, x1: k.x1 - 0.0003 }, 0.0045, 0.0009, 0.0024))), panelM));
 cab.add(mesh("ButtonFaces", mergeGeometries([raised(L.power, 0.008, 0.0022, 0.0045), raised(L.start, 0.008, 0.0022, 0.0045)]), panelM));
+// the keys' and buttons' print: a flat piece 0.9 mm over each face, placed as raised() places the face
+for (const [k, d] of Object.entries(DECALS)) {
+  if (d.on !== "key" && d.on !== "button") continue;
+  const [depth, lift] = d.on === "key" ? [0.0045, 0.0024] : [0.008, 0.0045];
+  const [u0, v0, u1, v1] = d.rect;
+  const x0 = u0 * W - W / 2, x1 = u1 * W - W / 2, yT = 0.85 - v0 * 0.128, yB = 0.85 - v1 * 0.128, xc = (x0 + x1) / 2, yc = (yT + yB) / 2;
+  const g = flipV(new THREE.PlaneGeometry(x1 - x0, yT - yB));
+  g.translate(0, 0, depth / 2 + 0.0009).rotateX(tilt(stripZ, yc)).translate(xc, yc, stripZ(yc) + lift - depth / 2);
+  cab.add(mesh(`PrintDecal_${k}`, g, printMat(`Print_${k}`, d.on)));
+}
 // the dial: a smoked ring with a bright edge round a gloss black cap, 15 mm proud (side photo), with its cyan lamp at the ring's top
 // right (close photo); radius from the front photo (29.7 mm)
 {
@@ -389,6 +421,7 @@ const trayL = 0.26;
   const rows = uniq([...stripRows, ...range(pk.y0, lipY - 0.0007, 18), lipY - 0.0007, lipY, lipY + 0.001]);
   const cols = uniq([...range(dx0, dx1, 20), ...range(pk.x0, pk.x0 + pkRamp, 6), ...range(pk.x1 - pkRamp, pk.x1, 6)]);
   drawer.add(grid("DrawerFace", rows.length, cols.length, (i, j) => [cols[j], rows[i], stripZ(rows[i]) - pocketDepth(cols[j], rows[i])], panelUV, panelM));
+  decalsOn(drawer, "drawer", 0.0009);
   const yr = stripRows, dep = 0.012;
   // 3.5 mm in from the face's edge: at the edge it shared a plane with the inset left return (the z-fight pass moved them)
   drawer.add(grid("DrawerRimL", yr.length, 2, (i, j) => [dx0 + 0.0035, yr[i], stripZ(yr[i]) - (j ? 0 : dep)], null, bodyDark));
@@ -576,6 +609,7 @@ const grain = { dir: `${TEX}/grain`, materials: {
 await exportGLB(root, clips, OUT, {
   Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Rear: `${T}/rear.jpg`, Panel: `${T}/panel.jpg`,
   PanelGlass: `${T}/panel.jpg`, Tray: `${T}/tray.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`, LabelBEE: `${T}/${F0.label}`,
+  ...printTex,
 }, grain);
 
 // the band and the display glass carry the same print: one copy of panel.jpg; then the colours as material variants
@@ -606,6 +640,7 @@ await exportGLB(root, clips, OUT, {
     FlapFace: (m, f) => m.setBaseColorFactor([...lin(f.body), 1]),
     TopPlate: (m, f) => m.setBaseColorFactor([...lin(f.top), 1]),
     LabelBEE: (m, f) => m.setBaseColorTexture(tex(`${T}/${f.label}`)),
+    ...Object.fromEntries(Object.keys(DECALS).map((k) => [`Print_${k}`, (m, f) => m.setBaseColorTexture(tex(`${T}/print_${k}${f.suf}.jpg`))])),
   };
   const alt = {};
   for (const [name, set] of Object.entries(SET)) {

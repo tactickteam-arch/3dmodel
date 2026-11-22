@@ -46,6 +46,14 @@ PAGE = None
 if "--photos" in args:
     PAGE = args[args.index("--photos") + 1]
     del args[args.index("--photos"):args.index("--photos") + 2]
+# --hi <px per mm>: draw only the control band, in both colours, at that density and on a ground without noise, and cut its
+# print into the decals the builder lays over the band, the drawer face, the display glass, the five keys and the two buttons
+# (print_*.jpg / print_*_ax.jpg and decals.json: each piece's rectangle in the band's UVs and the surface it lies on);
+# panel*.jpg and the rest are left alone
+HI = None
+if "--hi" in args:
+    HI = float(args[args.index("--hi") + 1])
+    del args[args.index("--hi"):args.index("--hi") + 2]
 PHOTOS, MANUAL, LOGOS, OUT = args[:4]
 P = os.path.join(PHOTOS, "samsung_ww70fg")
 D = os.path.join(OUT, "samsung_ww70fg")
@@ -108,9 +116,10 @@ PXmm = lambda px: (px - FX0) / FPX
 PHmm = lambda py: (FY0 - py) / FPY
 
 # ── the band's texture space ──
-PX = 4096 / 600.0                               # px per mm
+PX = HI or 4096 / 600.0                         # px per mm
 H0, H1 = 722.0, 850.0
-TW, TH = 4096, round((H1 - H0) * PX)
+TW, TH = round(600 * PX), round((H1 - H0) * PX)
+KS = PX / (4096 / 600.0)                        # the slot's inset and blur below are in panel.jpg px: scaled for --hi
 
 
 def cx_(x):
@@ -207,12 +216,12 @@ def panel(ink, C):
     g = np.linspace(1.06, 0.96, th)[:, None]
     img[:, left] = (C["drawer"][None, None, :] * g[..., None])[:, :1, :].repeat(left.sum(), 1)
     img[:, ~left] = (C["panel"][None, None, :] * np.linspace(1.03, 0.98, th)[:, None, None])[:, :1, :].repeat((~left).sum(), 1)
-    img += rng.normal(0, 0.6, (th, TW, 1))
+    img += rng.normal(0, 0 if HI else 0.6, (th, TW, 1))
     # the grip slot: a little darker inside (the 3D scoop adds its own shade)
     x0, y0, x1, y1 = tbox(POCKET)
     pm = np.zeros((th, TW), np.float32)
-    cv2.rectangle(pm, (int(x0 + 40), int(y0 + 15)), (int(x1 - 40), int(y1 - 10)), 1.0, -1)
-    img *= (1 - 0.12 * cv2.GaussianBlur(pm, (0, 0), 25))[..., None]
+    cv2.rectangle(pm, (int(x0 + 40 * KS), int(y0 + 15 * KS)), (int(x1 - 40 * KS), int(y1 - 10 * KS)), 1.0, -1)
+    img *= (1 - 0.12 * cv2.GaussianBlur(pm, (0, 0), 25 * KS))[..., None]
     canvas = img
 
     def shape(c, fn, colour):
@@ -548,8 +557,59 @@ def tray():
     save(t, "tray.jpg", 88)
 
 
+# the decals of --hi: mm boxes (x0, h0, x1, h1) and the surface each lies on, each cut from the band drawn at HI px/mm
+KEY_BOXES = [(2882, 3290), (3303, 3697), (3710, 4104), (4117, 4511), (4524, 4936)]       # the keys, drawing px (see layout.json)
+
+
+def dbox(X0, Y0, X1, Y1):                       # drawing px box -> mm box
+    (a0, b0), (a1, b1) = d2p(X0, Y0), d2p(X1, Y1)
+    return pbox(a0, b0, a1, b1)
+
+
+def decal_boxes():
+    lx0, lh0, lx1, lh1 = LOGO
+    boxes = {
+        "logo": ((lx0 - 1.5, lh0 - 1.5, lx1 + 1.5, lh1 + 1.5), "drawer"),
+        # the programme names and their leader lines, round the dial
+        "dial": ((PXmm(1058), PHmm(134), PXmm(1275), PHmm(51)), "fascia"),
+        # the symbols under the keys and their brackets; *3 sec over the display
+        "hints": (dbox(3140, 1680, 4245, 1790), "fascia"),
+        "sec": (dbox(4620, 320, 4880, 430), "fascia"),
+    }
+    # the display glass, from just over the keys (the builder's glass starts 0.4 mm over them) to just inside its top
+    gx0, gh0, gx1, gh1 = pbox(*GLASS_PX)
+    ktop = dbox(2882, 1424, 2890, 1631)[3]
+    boxes["display"] = ((gx0 + 0.3, ktop + 0.7, gx1 - 0.3, gh1 - 0.3), "glass")
+    # each key's face (the builder's: 0.3 mm in from the box at the sides), 0.5 mm in from its edges, clear of the rounded rim
+    for i, (k0, k1) in enumerate(KEY_BOXES):
+        x0, h0, x1, h1 = dbox(k0 + 6, 1424, k1 - 6, 1631)
+        boxes[f"key{i}"] = ((x0 + 0.8, h0 + 0.5, x1 - 0.8, h1 - 0.5), "key")
+    # the buttons' raised faces, 0.7 mm in from their edges (their corners are 2.2 mm round in 3D)
+    for n, b in (("power", POWER_PX), ("start", START_PX)):
+        x0, h0, x1, h1 = pbox(*b)
+        boxes[n] = ((x0 + 0.7, h0 + 0.7, x1 - 0.7, h1 - 0.7), "button")
+    return boxes
+
+
+def cut_decals(ink):
+    out = {}
+    for suf, C in COLOURS.items():
+        img = (np.asarray(panel(ink, C).convert("RGB")).astype(np.float32) * SHADE["panel"]).clip(0, 255).astype(np.uint8)
+        img = Image.fromarray(img)
+        for n, (b, on) in decal_boxes().items():
+            x0, y0, x1, y1 = (round(v) for v in tbox(b))
+            img.crop((x0, y0, x1, y1)).save(os.path.join(D, f"print_{n}{suf}.jpg"), quality=88, subsampling=0, optimize=True)
+            out[n] = {"file": f"print_{n}.jpg", "rect": [x0 / TW, y0 / TH, x1 / TW, y1 / TH], "on": on}
+            print(f"decal print_{n}{suf}.jpg: {x1 - x0} x {y1 - y0} px on the {on}")
+    with open(os.path.join(D, "decals.json"), "w") as f:
+        json.dump(out, f, indent=1)
+
+
 def main():
     ink = drawing()
+    if HI:
+        cut_decals(ink)
+        return
     for suf, C in COLOURS.items():
         save(panel(ink, C), f"panel{suf}.jpg", 90)
         save(flat(C["body"], (256, 512), (1.04, 0.94)), f"front{suf}.jpg", 86)
