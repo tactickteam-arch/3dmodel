@@ -975,5 +975,41 @@ def main(cfg, argv):
     impeller(out, cfg.get("impeller"))
 
 
+HI_PX_MM = 12      # the print decals' density on the model
+TEX_MAX = 4096     # the largest texture a phone or headset loads (showroom.js TEX_MAX)
+
+
+def panel_halves(cfg, photos, out):
+    """the panel drawn again at HI_PX_MM by the same drawing as panel.jpg and cut in two at the emptiest column between
+    the two halves' size limits (each under TEX_MAX); writes panel_a.jpg, panel_b.jpg and decals.json (each half's u, v
+    rectangle on the panel face), which the builder lays over the face with decal_curved.mjs"""
+    global PX_MM
+    keep = PX_MM
+    PX_MM = HI_PX_MM
+    try:
+        img = Panel(cfg, photos, None).draw()
+    finally:
+        PX_MM = keep
+    a = np.asarray(img).astype(np.float32).max(2)
+    W = a.shape[1]
+    lo, hi = W - TEX_MAX + 16, TEX_MAX - 16
+    ink = (a > 40).sum(0).astype(np.float32)
+    ink = np.convolve(ink, np.ones(25), "same")        # an empty strip, not just one empty column
+    cut = int(lo + np.argmin(ink[lo:hi]))
+    rects = {}
+    for key, (name, x0, x1) in {"panelA": ("panel_a.jpg", 0, cut), "panelB": ("panel_b.jpg", cut, W)}.items():
+        img.crop((x0, 0, x1, img.height)).save(os.path.join(out, name), quality=92, subsampling=0, optimize=True)
+        rects[key] = {"file": name, "rect": [x0 / W, 0, x1 / W, 1]}
+    with open(os.path.join(out, "decals.json"), "w") as f:
+        json.dump(rects, f, indent=1)
+    print("wrote panel_a.jpg, panel_b.jpg", img.size, "cut at", cut, "px; ink there", float(ink[cut]))
+
+
 if __name__ == "__main__":
-    main(CFG, sys.argv[1:])
+    # --halves-only: only the two print decals (a full run also rewrites label.png from label.jpg; the redrawn label
+    # comes from pipeline/scripts/bee_redraw/, so re-run that after a full run)
+    only = "--halves-only" in sys.argv
+    argv = [x for x in sys.argv[1:] if x != "--halves-only"]
+    if not only:
+        main(CFG, argv)
+    panel_halves(CFG, argv[0], os.path.join(argv[1], CFG["slug"]))

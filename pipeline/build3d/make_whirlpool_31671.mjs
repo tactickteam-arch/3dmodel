@@ -11,6 +11,7 @@
 import { THREE, mat, mesh, box, group, flipV, inward, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import fs from "node:fs";
+import { uvDecals } from "./decal_curved.mjs";
 
 export function buildBloomwash(K) {
   const { W, H, D } = K;
@@ -193,6 +194,23 @@ export function buildBloomwash(K) {
     s.lineTo(-X + r, Y1); s.absarc(-X + r, Y1 - r, r, Math.PI / 2, Math.PI, false); s.lineTo(-X, Y0 + r); s.absarc(-X + r, Y0 + r, r, Math.PI, 1.5 * Math.PI, false);
     cab.add(prism("PlinthLow", s, () => K.footH, () => K.notchTop, plinthM, { caps: [] }));
     cab.add(box("BasePlate", W - 0.03, 0.003, D - 0.03, footM, 0, K.footH + 0.006, 0));
+    // the bands above are open at the bottom: seen from below (AR, a phone near the floor) the gap between the cabinet and
+    // the 4 mm inset plinth, and the front notch, looked into the hollow body. A flat sheet facing down under the cabinet (at
+    // the plinth's top) and one over the notch (at the notch's top) close them; each runs 0.3 mm past its band's outline so
+    // no corner facet leaves a crack, and has no sides, so nothing lies in the plane of a wall or a decal
+    const downSheet = (name, shape, y) => {
+      const g = new THREE.ShapeGeometry(shape, 12);
+      g.rotateX(-Math.PI / 2);
+      const ix = g.index.array;
+      for (let i = 0; i < ix.length; i += 3) [ix[i + 1], ix[i + 2]] = [ix[i + 2], ix[i + 1]];
+      const nn = g.attributes.normal;
+      for (let i = 0; i < nn.count; i++) nn.setXYZ(i, 0, -1, 0);
+      g.translate(0, y, 0);
+      return mesh(name, g, plinthM);
+    };
+    const o = 0.0003;
+    cab.add(downSheet("CabinetFloor", roundRect(new THREE.Shape(), -W / 2 - o, W / 2 + o, -o, D + o, K.cornerR + o, K.cornerR + o), K.plinthTop));
+    cab.add(downSheet("PlinthFloor", roundRect(new THREE.Shape(), -W / 2 + pi - o, W / 2 - pi + o, pi - o, D - pi + o, r + o, r + o), K.notchTop));
     for (const sx of [-1, 1]) for (const xf of K.feetXf) cab.add(cyl("Foot", K.footR, K.footR, K.footH, footM, sx * K.feetX, K.footH / 2, xz(xf), 20));
   }
 
@@ -202,7 +220,10 @@ export function buildBloomwash(K) {
     cab.add(prism("Cabinet", s, () => K.plinthTop, (xf) => seam(xf) - 0.0015, bodyM, { caps: [] }));
     // the joint between the cabinet and the top cover: a dark groove 1.5 mm tall, 2 mm deep
     const gr = (y) => ringPts(-W / 2 + 0.002, W / 2 - 0.002, 0.002, D - 0.002, K.cornerR - 0.002, 5).map(([px, xf]) => [px, seam(xf) + y, xz(xf)]);
-    cab.add(loft("SeamGroove", [gr(-0.0015), gr(0)], [grooveM]));
+    // a closed channel: its floor (the cabinet's top edge), its back wall and its ceiling (the top cover's bottom edge), so a
+    // steep look into the joint meets the groove, not the hollow body behind the cabinet's edge
+    const go = (y) => ringPts(-W / 2, W / 2, 0, D, K.cornerR, 5).map(([px, xf]) => [px, seam(xf) + y, xz(xf)]);
+    cab.add(loft("SeamGroove", [go(-0.0015), gr(-0.0015), gr(0), go(0)], [grooveM]));
     // the side panels' relief (the G-shaped raised panel and the handle pocket), drawn from Whirlpool's 3/4 photos, on each side
     const R = K.cornerR, d = D - 2 * R, h = K.sideH;
     for (const [sx, m] of [[-1, sideL], [1, sideR]]) {
@@ -255,6 +276,14 @@ export function buildBloomwash(K) {
     const well = roundRect(new THREE.Path(), -K.well.x, K.well.x, K.well.f0, K.well.f1, K.well.r, K.well.r);
     top.holes.push(well);
     cab.add(prism("TopCoverTop", top, (xf) => seat(xf) - 0.004, seat, coverM, { caps: ["top"], curve: 10 }));
+    // and on under the panel housing to the back, as a flat sheet on the same slope (the housing sits 1 mm above it), so
+    // the slit under the housing's edges shows the cover, not the hollow inside; no sides, so nothing doubles a wall
+    const ug = new THREE.ShapeGeometry(roundRect(new THREE.Shape(), -TOPW, TOPW, K.housing0, D, 0.001, K.cornerR), 10);
+    ug.rotateX(-Math.PI / 2);
+    const up = ug.attributes.position;
+    for (let i = 0; i < up.count; i++) up.setY(i, seat(zF - up.getZ(i)));
+    ug.computeVertexNormals();
+    cab.add(mesh("TopCoverUnder", ug, coverM));
   }
 
   // ── the well: a rounded-square bowl from the top cover down to the steel drum's ring; the drum, the impeller, the filter ──
@@ -281,7 +310,12 @@ export function buildBloomwash(K) {
       return best;
     };
     for (let i = 0; i < ringN * 2; i++) byAngle.push(rimAt((i / (ringN * 2)) * Math.PI * 2));
-    const rings = [];
+    // a flange 1.5 mm out under the top cover's rim, so the joint between the rim's edge and the bowl's top never opens
+    // a crack onto the hollow inside
+    const rings = [byAngle.map(([x, xf], i) => {
+      const a = (i / (ringN * 2)) * Math.PI * 2;
+      return [x + 0.0015 * Math.cos(a), seat(xf) - 0.002, xz(xf + 0.0015 * Math.sin(a))];
+    })];
     const steps = [0, 0.12, 0.25, 0.38, 0.5, 0.62, 0.75, 0.88, 1];
     for (const t of steps) {
       const s = 1 - Math.pow(1 - t, 1.8);           // the wall curls round toward the ring
@@ -296,6 +330,10 @@ export function buildBloomwash(K) {
     // the balancing ring at the top of the drum: chrome, rounded
     const ring = new THREE.LatheGeometry([[K.ringR + 0.002, 0.0], [K.ringR - 0.004, 0.008], [K.ringR - 0.014, 0.006], [K.drumR, -0.012], [K.drumR, -0.03]].map(([r, y]) => new THREE.Vector2(r, y)), 72);
     cab.add(mesh("BalanceRing", ring, ringM, 0, K.ringY - 0.006, dz));
+    // the bowl's lip carried down behind the ring: the bowl ends 3 mm above the ring's outer edge, and a steep look across
+    // the drum went through that slot into the hollow cabinet. A short band 1.5 mm outside the ring's radius, from inside
+    // the bowl's lip to under the ring's top, closes it (hidden behind the bowl above and the ring below)
+    cab.add(mesh("BowlLip", new THREE.CylinderGeometry(K.ringR + 0.0015, K.ringR + 0.0015, 0.011, 72, 1, true), tubCover, 0, K.ringY - 0.0015, dz));
     // the stainless drum, its bloom pattern a texture, eight tiles round
     const g = new THREE.CylinderGeometry(K.drumR, K.drumR, K.drumDepth, 72, 1, true);
     const uv = g.attributes.uv;
@@ -304,7 +342,8 @@ export function buildBloomwash(K) {
     inward(g);
     const drumTop = K.ringY - 0.036, drumFloor = drumTop - K.drumDepth;
     cab.add(mesh("SteelDrum", g, drumM, 0, drumTop - K.drumDepth / 2, dz));
-    const fl = new THREE.CircleGeometry(K.drumR, 64); fl.rotateX(-Math.PI / 2);
+    // the floor runs 3 mm past the wall (hidden outside it), so the wall's and the floor's facets never leave a crack
+    const fl = new THREE.CircleGeometry(K.drumR + 0.003, 72); fl.rotateX(-Math.PI / 2);
     cab.add(mesh("DrumFloor", fl, floorM, 0, drumFloor, dz));
     // the Hexa Bloom impeller: a white dish (its holes are the texture), three long swept vanes from a chrome tri-star hub and
     // three short vanes between them, grey, as in top_open.jpg
@@ -358,13 +397,15 @@ export function buildBloomwash(K) {
   }
 
   // ── lid: hinged at its back edge; one tinted glass over the whole top, a grey frame under it, a chrome edge at the front ──
+  // (the frame stands 0.9 mm off the top cover, just over the flicker gap: at 2 mm a grazing look ran along the slit under
+  // the closed lid and out the far side)
   const PIV = [seat(K.lid1), K.lid1];
   const lid = group("Lid", 0, PIV[0], xz(PIV[1]));
   {
     const off = (m) => { m.geometry.translate(0, -PIV[0], -xz(PIV[1])); return m; };
     const s = roundRect(new THREE.Shape(), -TOPW, TOPW, K.lid0, K.lid1, 0.02, 0.004);
     s.holes.push(roundRect(new THREE.Path(), -TOPW + K.lidBorder[1], TOPW - K.lidBorder[1], K.lid0 + K.lidBorder[0], K.lid1 - K.lidBorder[2], 0.03, 0.03));
-    lid.add(off(prism("LidFrame", s, (xf) => seat(xf) + 0.002, (xf) => lidTop(xf) - 0.0065, lidFrameM, { curve: 6 })));
+    lid.add(off(prism("LidFrame", s, (xf) => seat(xf) + 0.0009, (xf) => lidTop(xf) - 0.0065, lidFrameM, { curve: 6 })));
     const gs = roundRect(new THREE.Shape(), -TOPW, TOPW, K.lid0, K.lid1, 0.02, 0.004);
     lid.add(off(prism("LidGlass", gs, (xf) => lidTop(xf) - 0.006, lidTop, glassM, { bev: 0.0015, curve: 6 })));
     // the chrome edge along the front and round the front corners
@@ -526,12 +567,15 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const T = `${TEX}/whirlpool_31671`;
   // the back's paths, measured on back.jpg by tex_whirlpool_31671.py
   const root = buildBloomwash({ ...K31671, rear: JSON.parse(fs.readFileSync(`${T}/rear_paths.json`, "utf8")) });
+  // the panel's print at 12 px per mm for a close look: two halves (each under the 4096 px a phone loads) laid over the
+  // panel face, the same drawing as panel.jpg (tex_whirlpool_31671.py panel_halves), the face's satin finish
+  const printTex = uvDecals(root.getObjectByName("PanelFace"), `${T}/decals.json`, (n) => mat(n, 0xffffff, { rough: 0.38 }), { cell: [0.05, 0.05] });
   const parts = productParts(PRODUCTS, ID);
   const clips = stateClips(root, parts);
   saveZones(PRODUCTS, ID, root, parts);
   await exportGLB(root, clips, OUT, {
     SideL: `${T}/side.jpg`, SideR: `${T}/side.jpg`, PanelFace: `${T}/panel.jpg`, LabelBEE: `${T}/label.png`, BackPanel: `${T}/back.jpg`,
-    SteelDrum: `${T}/drum.jpg`, Impeller: `${T}/impeller.jpg`,
+    SteelDrum: `${T}/drum.jpg`, Impeller: `${T}/impeller.jpg`, ...printTex,
   }, { dir: `${TEX}/grain`, materials: {
     // Grain (BENCHMARK.md section 10). Whirlpool names the finish Midnight Grey, finish type "Solid": painted steel, so the
     // cabinet, its sides and the top cover get the soft peel; the moulded plinth, the black back and the lid's grey inner frame
