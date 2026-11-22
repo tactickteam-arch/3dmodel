@@ -16,6 +16,7 @@
 import fs from "node:fs";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { THREE, mat, mesh, box, faced, group, lathe, frontWithHoles, inward, stateClips, exportGLB, productParts, saveZones, tidyJSON } from "./lib.mjs";
+import { uvDecals } from "./decal_curved.mjs";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "haier-hw70-im12929bk";
@@ -194,7 +195,8 @@ const seam = mm(L.seam);                                      // the drawer's ri
 const xl = -W / 2 + 0.0025, xr = W / 2 - 0.0025;
 const PDEPTH = 0.065;                                         // the band's body behind its face (ESTIMATED; it is hidden)
 const bandProf = [[panelBot, zF], [lipTop, zF], [H, zF - setBack], [H, zF - PDEPTH], [panelBot, zF - PDEPTH]];
-cab.add(band("ControlPanel", seam + g0, xr, bandProf, [0, 1], [panelM, glassEdge]));
+const controlPanel = band("ControlPanel", seam + g0, xr, bandProf, [0, 1], [panelM, glassEdge]);
+cab.add(controlPanel);
 // the dial: a chrome-edged knob, 48 mm across and 9 mm proud of the face (ESTIMATED; the photo shows it from the front only),
 // its top dark with the four-diamond mark (knob_top.jpg); the ring round it is printed
 {
@@ -209,16 +211,20 @@ cab.add(band("ControlPanel", seam + g0, xr, bandProf, [0, 1], [panelM, glassEdge
   cab.add(knob);
 }
 // the six keys (Delay, Steam, Temp., Speed, Extra Rinse, Start/Pause): raised 1 mm off the face (ESTIMATED; the photo shows
-// them as lighter rounded tiles), their faces carrying their own print from panel.jpg
+// them as lighter rounded tiles), their faces carrying their own print: keys.jpg, the same drawing as panel.jpg at 12 px per
+// mm over the six keys (keys.json: its box as a fraction of panel.jpg's u and v)
+const KB = JSON.parse(fs.readFileSync(`${T}/keys.json`, "utf8")).rect;
+const keyM = mat("KeyFace", 0xffffff, { rough: 0.12 });
+const keyUV = (u, v) => [(u - KB[0]) / (KB[2] - KB[0]), (v - KB[1]) / (KB[3] - KB[1])];
 {
   const [ya, yb] = L.key_y.map(mm), yMid = (ya + yb) / 2;
   const s0 = (H - yb) / Math.cos(TILT), s1 = (H - ya) / Math.cos(TILT), sMid = (s0 + s1) / 2, len = s1 - s0, kd = 0.0013;
   for (const [k0, k1] of L.keys) {
     const x0 = mm(k0), x1 = mm(k1), w = x1 - x0;
     const g = new THREE.BoxGeometry(w, len, kd), p = g.attributes.position, uv = g.attributes.uv;
-    for (let i = 16; i < 20; i++) uv.setXY(i, panelU(x0 + w / 2 + p.getX(i)), (sMid - p.getY(i)) * 1000 * PS / PH);
-    for (const i of [...Array(16).keys(), 20, 21, 22, 23]) uv.setXY(i, 0.002, 0.995);
-    const key = mesh("Key", g, panelM, (x0 + x1) / 2, yMid, slantZ(yMid));
+    for (let i = 16; i < 20; i++) uv.setXY(i, ...keyUV(panelU(x0 + w / 2 + p.getX(i)), (sMid - p.getY(i)) * 1000 * PS / PH));
+    for (const i of [...Array(16).keys(), 20, 21, 22, 23]) uv.setXY(i, 0.004, 0.02);     // keys.jpg's glass corner
+    const key = mesh("Key", g, keyM, (x0 + x1) / 2, yMid, slantZ(yMid));
     key.rotation.x = -TILT;
     key.translateZ(kd / 2 - 0.0003);
     cab.add(key);
@@ -303,6 +309,15 @@ dc.add(box("DoorHingeBracket", 0.022, 0.13, 0.006, hingeM, -(gR + 0.014), 0, -0.
 door.add(dc);
 root.add(door);
 
+// the panel's print at 12 px per mm for a close look (tex_haier_hw70.py: the manual's drawing again at 2400 dpi), cut to the
+// print and laid 0.9 mm over the band's flat faces: the display and the dial on the control panel, the drawer's words on the
+// drawer face (they go with the drawer); the panel's own black glass
+const printM = (n) => mat(n, 0xffffff, { rough: 0.12 });
+const printTex = {
+  ...uvDecals(controlPanel, `${T}/decals_panel.json`, printM, { cell: [0.05, 0.05] }),
+  ...uvDecals(root.getObjectByName("DrawerFace"), `${T}/decals_drawer.json`, printM, { cell: [0.05, 0.05] }),
+};
+
 const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
@@ -318,4 +333,5 @@ const grain = { dir: `${TEX}/grain`, materials: {
 } };
 await exportGLB(root, clips, OUT, {
   SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Panel: `${T}/panel.jpg`, KnobTop: `${T}/knob_top.jpg`, Drum: `${T}/drum.jpg`,
+  KeyFace: `${T}/keys.jpg`, ...printTex,
 }, grain);

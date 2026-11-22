@@ -64,45 +64,58 @@ GREY = (200, 202, 206)            # the drawing's light grey print (the programm
 CYAN = (38, 168, 204)             # the drawing's dim marks, cyan in the photo (Steam, the dial ring, the programme lines)
 BLACK = np.array([12, 12, 13], np.float32)     # the glass (front photo, 11/11/11 where nothing reflects)
 KEY = (40, 41, 44)                # the keys' faces (photo 53/54/55 on a soft photo; the drawing's key fill)
+DRAW_FORE = 185.5 / 244          # the drawing draws the leaning face 0.76 as tall as it is (its dial ring is round on the machine)
 WINDOW = (44, 45, 48)             # the display window (photo 103 with the digits' glow; drawing 90 on 67)
 
-drawing = cv2.imread(os.path.join(SRC, "manual", "manual_p10_929panel_1200dpi.png"), cv2.IMREAD_GRAYSCALE).astype(np.float32)
-# The drawing's own extras, taken out: its black callout lines (level 32; numbers 1 and 2 run through OFF, the dial and Spin,
-# and lines hang from the keys) and the lighter square it puts behind the dial (86 on the panel's 67). Where callout line 1
-# and 2 cross the dial's ring it is drawn again on the drawing's own ellipse (centre 4060, 546.5; 244 x 185.5 px outside, 8 px
-# thick), and Spin's "i", hidden under line 2, is the "i" of the drawing's own "Shirts".
-_dark = cv2.dilate((drawing < 60).astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
-drawing[_dark] = 67
-_sq = drawing[303:813, 3816:4488]
-_sq[(_sq >= 76) & (_sq <= 95)] = 67
-_ring = np.zeros(drawing.shape, np.uint8)
-cv2.ellipse(_ring, (4060 * 16, round(546.5 * 16)), (240 * 16, 182 * 16), 0, 0, 360, 255, 7, cv2.LINE_AA, 4)
-_ring = _ring.astype(np.float32) / 255
-_fix = np.zeros(drawing.shape, bool)
-_fix[340:400, 4040:4085] = True
-_fix[700:760, 4040:4085] = True
-drawing = np.where(_fix, np.maximum(drawing, 67 + (113 - 67) * _ring), drawing)
-# Spin's p and i, under line 2: the p of the drawing's "Sportswear" (its S sits 333 px above Spin's, the same type) and the i
-# of its "Shirts" (baseline 767, Spin's 815)
-_p = drawing[463:491, 4419:4442].copy()
-_i = drawing[744:771, 4545:4554].copy()
-drawing[796:824, 4045:4068] = np.maximum(drawing[796:824, 4045:4068], _p)
-drawing[792:819, 4069:4078] = np.maximum(drawing[792:819, 4069:4078], _i)
+def prep(name, F):
+    """The manual's drawing, rendered from the PDF at F x 1200 dpi (the vector page: manual_p10_929panel_1200dpi.png, and
+    the same crop at 2400 dpi for the close-up decals), with its own extras taken out. Every position below is in 1200 dpi
+    drawing px and is scaled by F."""
+    d = cv2.imread(os.path.join(SRC, "manual", name), cv2.IMREAD_GRAYSCALE).astype(np.float32)
+    # The drawing's own extras, taken out: its black callout lines (level 32; numbers 1 and 2 run through OFF, the dial and
+    # Spin, and lines hang from the keys) and the lighter square it puts behind the dial (86 on the panel's 67). Where callout
+    # line 1 and 2 cross the dial's ring it is drawn again on the drawing's own ellipse (centre 4060, 546.5; 244 x 185.5 px
+    # outside, 8 px thick), and Spin's "i", hidden under line 2, is the "i" of the drawing's own "Shirts".
+    k = 5 if F == 1 else 4 * F + 1
+    _dark = cv2.dilate((d < 60).astype(np.uint8), np.ones((k, k), np.uint8)) > 0
+    d[_dark] = 67
+    _sq = d[303 * F:813 * F, 3816 * F:4488 * F]
+    _sq[(_sq >= 76) & (_sq <= 95)] = 67
+    _ring = np.zeros(d.shape, np.uint8)
+    cv2.ellipse(_ring, (4060 * 16 * F, round(546.5 * 16 * F)), (240 * 16 * F, 182 * 16 * F), 0, 0, 360, 255, 7 * F, cv2.LINE_AA, 4)
+    _ring = _ring.astype(np.float32) / 255
+    _fix = np.zeros(d.shape, bool)
+    _fix[340 * F:400 * F, 4040 * F:4085 * F] = True
+    _fix[700 * F:760 * F, 4040 * F:4085 * F] = True
+    d = np.where(_fix, np.maximum(d, 67 + (113 - 67) * _ring), d)
+    # Spin's p and i, under line 2: the p of the drawing's "Sportswear" (its S sits 333 px above Spin's, the same type) and
+    # the i of its "Shirts" (baseline 767, Spin's 815)
+    _p = d[463 * F:491 * F, 4419 * F:4442 * F].copy()
+    _i = d[744 * F:771 * F, 4545 * F:4554 * F].copy()
+    d[796 * F:824 * F, 4045 * F:4068 * F] = np.maximum(d[796 * F:824 * F, 4045 * F:4068 * F], _p)
+    d[792 * F:819 * F, 4069 * F:4078 * F] = np.maximum(d[792 * F:819 * F, 4069 * F:4078 * F], _i)
+    return d
+
+
+drawing = prep("manual_p10_929panel_1200dpi.png", 1)
+DR, FD = drawing, 1               # the drawing the panel is cut from now, and its scale (x 1200 dpi)
 
 
 def ink(x0, y0, x1, y1, exclude=None):
-    """The drawing's print in a box: alpha and colour, at the drawing's resolution. The local background is a 15 px minimum,
-    each stroke's own level a 7 px maximum; the level picks the colour (white >= 200, grey 125-199, dim 100-124)."""
-    L = drawing[y0:y1, x0:x1]
-    bg = cv2.erode(L, np.ones((15, 15), np.uint8))
-    pk = cv2.dilate(L, np.ones((7, 7), np.uint8))
+    """The drawing's print in a box (1200 dpi drawing px): alpha and colour, at the current drawing's resolution (FD x the
+    box). The local background is a 15 px minimum, each stroke's own level a 7 px maximum (at 1200 dpi); the level picks the
+    colour (white >= 200, grey 125-199, dim 100-124)."""
+    F = FD
+    L = DR[y0 * F:y1 * F, x0 * F:x1 * F]
+    bg = cv2.erode(L, np.ones((14 * F + 1, 14 * F + 1), np.uint8))
+    pk = cv2.dilate(L, np.ones((6 * F + 1, 6 * F + 1), np.uint8))
     a = np.clip((L - bg - 6) / np.maximum(pk - bg - 6, 1), 0, 1) * (pk - bg > 25) * (pk >= 100)
     col = np.zeros(L.shape + (3,), np.float32)
     col[:] = CYAN
     col[pk >= 125] = GREY
     col[pk >= 200] = WHITE
     if exclude is not None:
-        a = a * exclude(np.arange(x0, x1)[None, :], np.arange(y0, y1)[:, None])
+        a = a * exclude(np.arange(x0 * F, x1 * F)[None, :] / F, np.arange(y0 * F, y1 * F)[:, None] / F)
     return a, col
 
 
@@ -122,7 +135,7 @@ def group_map(dx0, dy0, mx, my):
     front-photo height by my(dy); both are linear."""
     x_a, x_b = tX(mx(dx0)), tX(mx(dx0 + 1000))
     y_a, y_b = tY(my(dy0)), tY(my(dy0 + 1000))
-    return (x_b - x_a) / 1000, x_a, (y_b - y_a) / 1000, y_a
+    return (x_b - x_a) / 1000 / FD, x_a, (y_b - y_a) / 1000 / FD, y_a
 
 
 def rrect(canvas, x0, y0, x1, y1, r, colour, feather=1.0):
@@ -188,10 +201,6 @@ def save(img, name, q=88):
     print("wrote", p, img.shape[1], "x", img.shape[0])
 
 
-# ════════ the panel ════════
-P = np.zeros((PH, PW, 3), np.float32)
-P[:] = BLACK
-
 # ── the layout from the front photo (projected mm; ESTIMATED to +-1.5 mm, the photo is 1 px per mm) ──
 SEAM = fX(421.5)                                    # the drawer's right edge (a fine vertical seam right through the band)
 KEYS = [(fX(460.8), fX(484.2)), (fX(487.5), fX(510.8)), (fX(513.0), fX(537.0)), (fX(541.0), fX(564.0)),
@@ -201,87 +210,98 @@ KNOB = dict(x=fX(730.0), y=fY(160.3))               # the dial's centre
 GRIP = (fX(280.0), fY(184.0), fX(374.0), fY(165.3))  # the drawer's dark finger recess
 WIN = (fX(505.0), fY(148.7), fX(570.0), fY(127.8))  # the display window
 
-# key faces and the display window (drawn first, the print goes over them)
-for (x0, x1) in KEYS:
-    rrect(P, tX(x0), tY(KEY_Y[1]), tX(x1), tY(KEY_Y[0]), 1.2 * S, KEY)
-rrect(P, tX(WIN[0]), tY(WIN[3]), tX(WIN[2]), tY(WIN[1]), 1.0 * S, WINDOW)
-# the drawer's finger recess: a darker rounded slot with a faint lit lower lip
-rrect(P, tX(GRIP[0]), tY(GRIP[3]), tX(GRIP[2]), tY(GRIP[1]), 3 * S, (6, 6, 7))
-rrect(P, tX(GRIP[0]) + 2 * S, tY(GRIP[1]) - 1.0 * S, tX(GRIP[2]) - 2 * S, tY(GRIP[1]) - 0.4 * S, 0.3 * S, (34, 35, 38))
+# ════════ the panel ════════
+def draw_panel(s_px, F):
+    """the panel's print unfolded (slope rows, then the lip), at s_px px per mm, cut from the drawing at F x 1200 dpi"""
+    global S, PW, PH, OUT_SLANT, OUT_H, DR, FD
+    S, PW, PH = s_px, round(W_MM * s_px), round((H_MM - PANEL_BOT) * s_px)
+    OUT_SLANT, OUT_H = round(SLANT * s_px), round(SLANT * s_px) + round((LIP_TOP - PANEL_BOT) * s_px)
+    DR, FD = (drawing, 1) if F == 1 else (prep("manual_p10_929panel_2400dpi.png", F), F)
+    P = np.zeros((PH, PW, 3), np.float32)
+    P[:] = BLACK
 
-# ── the display, the six icons over the keys, their line, the keys' words, the child-lock mark: one group of the drawing.
-# Its scale from the photo: the icons' line (drawing x 1811-3414, y 583) runs from column 448.3 to 626.7 at row 165; the
-# keys' words (drawing y 701) sit at row 183. Checked: Delay's centre lands 0.1 mm and Start/Pause's 1.3 mm from the photo's,
-# the display's 1.6 mm.
-mxC = lambda dx: fX(448.3) + (dx - 1811) / ((3414 - 1811) / (fX(626.7) - fX(448.3)))
-myC = lambda dy: fY(165.0) - (dy - 583) / ((701 - 583) / (fY(165.0) - fY(183.0)))
-cx0, cy0, cx1, cy1 = 1780, 300, 3440, 800
-a, col = ink(cx0, cy0, cx1, cy1)
-# the drawing's digits are outlines; the photo shows them solid: they are set below, so the drawing's are left out
-dmask = np.ones_like(a)
-dmask[330 - cy0:470 - cy0, 2380 - cx0:2850 - cx0] = 0
-a = a * dmask
-place(P, a, col, cx0, cy0, *group_map(cx0, cy0, mxC, myC))
-# the time, 88:88, solid and lit as in the photo, inside the drawing's digit box
-dx0, dx1, dy0, dy1 = 2392, 2846, 338, 452
-X0, X1 = tX(mxC(dx0)), tX(mxC(dx1))
-Y0, Y1 = tY(myC(dy0)), tY(myC(dy1))
-dw = (X1 - X0) / (4 + 4 * 0.21 * 0.55 + 0.21 * 1.6 / 1.0) * 1.0
-seven_seg(P, "88:88", X0, Y0, dw, Y1 - Y0, WHITE)
+    # key faces and the display window (drawn first, the print goes over them)
+    for (x0, x1) in KEYS:
+        rrect(P, tX(x0), tY(KEY_Y[1]), tX(x1), tY(KEY_Y[0]), 1.2 * S, KEY)
+    rrect(P, tX(WIN[0]), tY(WIN[3]), tX(WIN[2]), tY(WIN[1]), 1.0 * S, WINDOW)
+    # the drawer's finger recess: a darker rounded slot with a faint lit lower lip
+    rrect(P, tX(GRIP[0]), tY(GRIP[3]), tX(GRIP[2]), tY(GRIP[1]), 3 * S, (6, 6, 7))
+    rrect(P, tX(GRIP[0]) + 2 * S, tY(GRIP[1]) - 1.0 * S, tX(GRIP[2]) - 2 * S, tY(GRIP[1]) - 0.4 * S, 0.3 * S, (34, 35, 38))
 
-# ── the dial's group: the ring, the programme names, their lines and icons, OFF and Spin. Its scale from the photo: the names
-# span columns 664-794 (drawing x 3500-4607) and rows 132.8-189 (Cotton to Delicate, drawing y 329-764); the knob (inside the
-# ring, drawing radius 205 px across) is a raised part of its own and is left out here.
-mxK = lambda dx: fX(730.0) + (dx - 4053.5) / ((4607 - 3500) / (fX(794) - fX(664)))
-myK = lambda dy: fY(160.3) - (dy - 546) / ((764 - 329) / (fY(132.8) - fY(189.0)))
-kx0, ky0, kx1, ky1 = 3470, 250, 4660, 828          # below 828 the drawing has the panel's dashed lower edge
-knob_out = lambda X, Y: (((X - 4060) / 222.0) ** 2 + ((Y - 546) / 172.0) ** 2 > 1).astype(np.float32)
-a, col = ink(kx0, ky0, kx1, ky1, exclude=knob_out)
-place(P, a, col, kx0, ky0, *group_map(kx0, ky0, mxK, myK))
+    # ── the display, the six icons over the keys, their line, the keys' words, the child-lock mark: one group of the drawing.
+    # Its scale from the photo: the icons' line (drawing x 1811-3414, y 583) runs from column 448.3 to 626.7 at row 165; the
+    # keys' words (drawing y 701) sit at row 183. Checked: Delay's centre lands 0.1 mm and Start/Pause's 1.3 mm from the photo's,
+    # the display's 1.6 mm.
+    mxC = lambda dx: fX(448.3) + (dx - 1811) / ((3414 - 1811) / (fX(626.7) - fX(448.3)))
+    myC = lambda dy: fY(165.0) - (dy - 583) / ((701 - 583) / (fY(165.0) - fY(183.0)))
+    cx0, cy0, cx1, cy1 = 1780, 300, 3440, 800
+    a, col = ink(cx0, cy0, cx1, cy1)
+    # the drawing's digits are outlines; the photo shows them solid: they are set below, so the drawing's are left out
+    dmask = np.ones_like(a)
+    dmask[(330 - cy0) * FD:(470 - cy0) * FD, (2380 - cx0) * FD:(2850 - cx0) * FD] = 0
+    a = a * dmask
+    place(P, a, col, cx0, cy0, *group_map(cx0, cy0, mxC, myC))
+    # the time, 88:88, solid and lit as in the photo, inside the drawing's digit box
+    dx0, dx1, dy0, dy1 = 2392, 2846, 338, 452
+    X0, X1 = tX(mxC(dx0)), tX(mxC(dx1))
+    Y0, Y1 = tY(myC(dy0)), tY(myC(dy1))
+    dw = (X1 - X0) / (4 + 4 * 0.21 * 0.55 + 0.21 * 1.6 / 1.0) * 1.0
+    seven_seg(P, "88:88", X0, Y0, dw, Y1 - Y0, WHITE)
 
-# ── the drawer's words: Inverter, and the 525 DRUM and REFRESH badges; each drawing box set where the photo has it (its width
-# from the photo, its height kept in the drawing's proportion along the slope)
-DRAW_FORE = 185.5 / 244
+    # ── the dial's group: the ring, the programme names, their lines and icons, OFF and Spin. Its scale from the photo: the names
+    # span columns 664-794 (drawing x 3500-4607) and rows 132.8-189 (Cotton to Delicate, drawing y 329-764); the knob (inside the
+    # ring, drawing radius 205 px across) is a raised part of its own and is left out here.
+    mxK = lambda dx: fX(730.0) + (dx - 4053.5) / ((4607 - 3500) / (fX(794) - fX(664)))
+    myK = lambda dy: fY(160.3) - (dy - 546) / ((764 - 329) / (fY(132.8) - fY(189.0)))
+    kx0, ky0, kx1, ky1 = 3470, 250, 4660, 828          # below 828 the drawing has the panel's dashed lower edge
+    knob_out = lambda X, Y: (((X - 4060) / 222.0) ** 2 + ((Y - 546) / 172.0) ** 2 > 1).astype(np.float32)
+    a, col = ink(kx0, ky0, kx1, ky1, exclude=knob_out)
+    place(P, a, col, kx0, ky0, *group_map(kx0, ky0, mxK, myK))
+
+    # ── the drawer's words: Inverter, and the 525 DRUM and REFRESH badges; each drawing box set where the photo has it (its width
+    # from the photo, its height kept in the drawing's proportion along the slope)
+    def word_group(bx, photo_x0, photo_x1, photo_yc):
+        x0, y0, x1, y1 = bx
+        a, col = ink(x0, y0, x1, y1)
+        ys, xs = np.where(a > 0.3)
+        a, col = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1], col[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+        w_tex = tX(photo_x1) - tX(photo_x0)
+        ax = w_tex / a.shape[1]
+        # the drawing draws the leaning face 0.76 as tall as it is (its dial ring, 244 x 185.5 px, is round on the machine); the
+        # front photo sees it cos 30 as tall
+        ay = ax / DRAW_FORE * math.cos(TILT)
+        yc = tY(photo_yc)
+        place(P, a, col, 0, 0, ax, tX(photo_x0), ay, yc - a.shape[0] * ay / 2)
+
+    word_group((440, 525, 670, 590), fX(283.3), fX(305.3), fY(157.0))
+    word_group((970, 535, 1370, 595), fX(335.3), fX(372.7), fY(158.0))
+
+    # ── the Haier wordmark (logos/haier.png), light grey, where the photo has it (columns 283.3-318, rows 127.8-138.3)
+    logo = np.asarray(Image.open(os.path.join(LOGOS, "haier.png")).convert("RGBA")).astype(np.float32)
+    la = logo[..., 3] / 255
+    ys, xs = np.where(la > 0.1)
+    la = la[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    lw = tX(fX(318.0)) - tX(fX(283.3))
+    lh = lw * la.shape[0] / la.shape[1] * math.cos(TILT)         # the logo's own shape, seen on the leaning face
+    lyc = tY(fY(133.0))
+    lm = cv2.resize(la, (round(lw), round(lh)), interpolation=cv2.INTER_AREA)
+    X, Y = round(tX(fX(283.3))), round(lyc - lh / 2)
+    A = lm[..., None]
+    P[Y:Y + lm.shape[0], X:X + lm.shape[1]] = P[Y:Y + lm.shape[0], X:X + lm.shape[1]] * (1 - A) + np.array([214, 216, 220], np.float32) * A
+
+    # the band's foot: a thin light edge (front photo row 219, 1 px)
+    P[PH - round(0.8 * S):, :] = P[PH - round(0.8 * S):, :] * 0.4 + np.array([96, 99, 106], np.float32) * 0.6
+
+    # unfold: texture rows 0..OUT_SLANT run down the leaning face along its slope, the rest down the upright lip
+    r = np.arange(OUT_H, dtype=np.float32)
+    src_row = np.where(r < OUT_SLANT, r * math.cos(TILT), (H_MM - LIP_TOP) * S + (r - OUT_SLANT))
+    mapy = np.repeat(src_row[:, None], PW, 1).astype(np.float32)
+    mapx = np.repeat(np.arange(PW, dtype=np.float32)[None, :], OUT_H, 0)
+    P = cv2.remap(P, mapx, mapy, cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return P
 
 
-def word_group(bx, photo_x0, photo_x1, photo_yc):
-    x0, y0, x1, y1 = bx
-    a, col = ink(x0, y0, x1, y1)
-    ys, xs = np.where(a > 0.3)
-    a, col = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1], col[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-    w_tex = tX(photo_x1) - tX(photo_x0)
-    ax = w_tex / a.shape[1]
-    # the drawing draws the leaning face 0.76 as tall as it is (its dial ring, 244 x 185.5 px, is round on the machine); the
-    # front photo sees it cos 30 as tall
-    ay = ax / DRAW_FORE * math.cos(TILT)
-    yc = tY(photo_yc)
-    place(P, a, col, 0, 0, ax, tX(photo_x0), ay, yc - a.shape[0] * ay / 2)
-
-word_group((440, 525, 670, 590), fX(283.3), fX(305.3), fY(157.0))
-word_group((970, 535, 1370, 595), fX(335.3), fX(372.7), fY(158.0))
-
-# ── the Haier wordmark (logos/haier.png), light grey, where the photo has it (columns 283.3-318, rows 127.8-138.3)
-logo = np.asarray(Image.open(os.path.join(LOGOS, "haier.png")).convert("RGBA")).astype(np.float32)
-la = logo[..., 3] / 255
-ys, xs = np.where(la > 0.1)
-la = la[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-lw = tX(fX(318.0)) - tX(fX(283.3))
-lh = lw * la.shape[0] / la.shape[1] * math.cos(TILT)         # the logo's own shape, seen on the leaning face
-lyc = tY(fY(133.0))
-lm = cv2.resize(la, (round(lw), round(lh)), interpolation=cv2.INTER_AREA)
-X, Y = round(tX(fX(283.3))), round(lyc - lh / 2)
-A = lm[..., None]
-P[Y:Y + lm.shape[0], X:X + lm.shape[1]] = P[Y:Y + lm.shape[0], X:X + lm.shape[1]] * (1 - A) + np.array([214, 216, 220], np.float32) * A
-
-# the band's foot: a thin light edge (front photo row 219, 1 px)
-P[PH - round(0.8 * S):, :] = P[PH - round(0.8 * S):, :] * 0.4 + np.array([96, 99, 106], np.float32) * 0.6
-
-# unfold: texture rows 0..OUT_SLANT run down the leaning face along its slope, the rest down the upright lip
-r = np.arange(OUT_H, dtype=np.float32)
-src_row = np.where(r < OUT_SLANT, r * math.cos(TILT), (H_MM - LIP_TOP) * S + (r - OUT_SLANT))
-mapy = np.repeat(src_row[:, None], PW, 1).astype(np.float32)
-mapx = np.repeat(np.arange(PW, dtype=np.float32)[None, :], OUT_H, 0)
-P = cv2.remap(P, mapx, mapy, cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+P = draw_panel(7.0, 1)
 save(P, "panel.jpg", 90)
 
 # ── the knob's top: dark, with the drawing's four-diamond mark in the middle (drawing centre 4060, 546) ──
@@ -375,3 +395,66 @@ layout = {
 with open(os.path.join(D, "layout.json"), "w") as f:
     json.dump(layout, f, indent=1)
 print(json.dumps({k: layout[k] for k in ("seam", "knob", "door", "flap", "feet_x", "bolts", "inlet")}, indent=None))
+
+# ════════ the close-up print: the panel at 12 px per mm ════════
+# panel.jpg is 7 px per mm (the whole band in one texture). For a shopper who steps up close, the same print is drawn again
+# at 12 px per mm from the drawing rendered at 2400 dpi (manual_p10_929panel_2400dpi.png: the PDF's vector page again, not
+# an enlargement) and cut into pieces, each cropped to its print and under 4096 px: the drawer's words and mark, the display
+# with its icons, the dial's programmes (decals laid on the leaning face, 0.9 mm off it, by make_haier_hw70.mjs with
+# decal_curved.mjs), and the six keys' faces (keys.jpg, the keys' own texture). The decals stop short of the raised keys
+# (their faces stand 1.0 mm off the face), so no decal sits inside a key.
+HI = 12
+panel_lo = dict(S=S, PW=PW, PH=PH, OUT_SLANT=OUT_SLANT, OUT_H=OUT_H)
+Phi = draw_panel(HI, 2)
+HPW, HOUT_H, HOUT_SLANT = PW, OUT_H, OUT_SLANT
+S, PW, PH, OUT_SLANT, OUT_H = (panel_lo[k] for k in ("S", "PW", "PH", "OUT_SLANT", "OUT_H"))
+DR, FD = drawing, 1
+Phi_s = Phi * SHADE["panel.jpg"]                                   # as save() writes panel.jpg
+inkm = np.abs(Phi_s - BLACK * SHADE["panel.jpg"]).max(2) > 18       # print, key faces, window, recess: anything not glass
+col_px = lambda x: (x + W_MM / 2) * HI                              # mm across -> hi-res column
+row_px = lambda y: (H_MM - y) / math.cos(TILT) * HI                 # a height on the leaning face -> hi-res row (slope)
+key_top, key_bot = row_px(KEY_Y[1]), row_px(KEY_Y[0])
+
+
+def piece(name, x0, x1, r0, r1, pad=1.0):
+    """the print inside columns x0..x1 and rows r0..r1 (hi-res px), cropped to its ink plus pad mm; returns the crop box"""
+    x0, x1, r0, r1 = (int(round(v)) for v in (x0, x1, r0, r1))
+    m = inkm[r0:r1, x0:x1]
+    ys, xs = np.where(m)
+    if not len(ys):
+        return None
+    p = round(pad * HI)
+    bx0, bx1 = max(x0, x0 + xs.min() - p), min(x1, x0 + xs.max() + 1 + p)
+    by0, by1 = max(r0, r0 + ys.min() - p), min(r1, r0 + ys.max() + 1 + p)
+    assert bx1 - bx0 <= 4096 and by1 - by0 <= 4096, (name, bx1 - bx0, by1 - by0)
+    Image.fromarray(np.clip(Phi_s[by0:by1, bx0:bx1], 0, 255).astype(np.uint8)).save(os.path.join(D, name), quality=88, optimize=True, subsampling=0)
+    print("wrote", name, bx1 - bx0, "x", by1 - by0, "px at", HI, "px/mm")
+    return bx0, by0, bx1, by1
+
+
+rect = lambda b: [b[0] / HPW, b[1] / HOUT_H, b[2] / HPW, b[3] / HOUT_H]
+gap = 0.6 * HI                                                      # clear of the keys' edges
+mid = (KEYS[-1][1] + KNOB["x"] - 30) / 2                            # between Start/Pause and the dial's programme names
+decals_panel, decals_drawer = {}, {}
+lip_end = HOUT_H - 1.5 * HI                                         # above the band's light foot
+# each piece lies on one flat face: the leaning face (rows 0 .. HOUT_SLANT) or the lip under it (where "Spin" runs on)
+for name, x0, x1, r0, r1, into in (
+        ("drawer", col_px(-W_MM / 2 + 3), col_px(SEAM - 1), 0, HOUT_SLANT, decals_drawer),
+        ("drawer_lip", col_px(-W_MM / 2 + 3), col_px(SEAM - 1), HOUT_SLANT, lip_end, decals_drawer),
+        ("display", col_px(SEAM + 1.5), col_px(mid), 0, key_top - gap, decals_panel),
+        ("under", col_px(SEAM + 1.5), col_px(mid), key_bot + gap, HOUT_SLANT, decals_panel),
+        ("mid_lip", col_px(SEAM + 1.5), col_px(mid), HOUT_SLANT, lip_end, decals_panel),
+        ("dial", col_px(mid), col_px(W_MM / 2 - 3.5), 0, HOUT_SLANT, decals_panel),
+        ("dial_lip", col_px(mid), col_px(W_MM / 2 - 3.5), HOUT_SLANT, lip_end, decals_panel)):
+    b = piece(f"print_{name}.jpg", x0, x1, r0, r1)
+    if b:
+        into[name] = {"file": f"print_{name}.jpg", "rect": rect(b)}
+# the keys' faces: one texture over the six keys and their gaps, 1 mm round them; keys.json gives its box as a fraction of
+# panel.jpg's u and v, so the builder maps each key face's panel UV into it
+kb = [col_px(KEYS[0][0] - 1), key_top - HI, col_px(KEYS[-1][1] + 1), key_bot + HI]
+kb = [int(round(v)) for v in kb]
+Image.fromarray(np.clip(Phi_s[kb[1]:kb[3], kb[0]:kb[2]], 0, 255).astype(np.uint8)).save(os.path.join(D, "keys.jpg"), quality=90, optimize=True, subsampling=0)
+print("wrote keys.jpg", kb[2] - kb[0], "x", kb[3] - kb[1])
+for name, obj in (("decals_panel.json", decals_panel), ("decals_drawer.json", decals_drawer), ("keys.json", {"rect": rect(kb)})):
+    with open(os.path.join(D, name), "w") as f:
+        json.dump(obj, f, indent=1)
