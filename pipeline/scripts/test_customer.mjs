@@ -141,7 +141,9 @@ await b.evalJS("document.querySelectorAll('#grid .card')[3].scrollIntoView({ blo
 const y0 = await b.evalJS("scrollY");
 await tap("#grid .cell:nth-child(4) .card", true);
 await b.waitFor("location.pathname.startsWith('/p/')", 15000); await sleep(2500);
-await b.evalJS("history.back()"); await sleep(2500);
+await b.evalJS("history.back()");
+// the list is rebuilt after products.json loads (slow when other tests load the machine); then the spot comes back
+await b.waitFor("location.pathname === '/' && document.querySelectorAll('#grid .card').length > 2", 20000).catch(() => {}); await sleep(800);
 const y1 = await b.evalJS("scrollY");
 check(Math.abs(y1 - y0) < 40 && y0 > 300, `back to the catalogue: at the card that was opened (${Math.round(y0)} -> ${Math.round(y1)} px)`);
 
