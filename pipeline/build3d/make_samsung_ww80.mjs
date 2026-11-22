@@ -137,6 +137,25 @@ const range = (a, b, n) => [...Array(n + 1).keys()].map((k) => a + ((b - a) * k)
 const uniq = (a) => [...new Set(a.map((v) => +v.toFixed(6)))].sort((p, q) => p - q);
 // the strip's texture: x -300..300 mm, h 721..850 mm, v down from the top
 const panelUV = (x, y) => [(x + W / 2) / W, (0.85 - y) / 0.129];
+// the print sharp: the strip drawn again at 12 px/mm (tex_samsung_ww80.py --hi), its inked parts cut into pieces (decals.json:
+// each piece's rectangle in the strip's UVs and the surface it lies on), each laid 0.9 mm over its surface where panel.jpg has
+// the same print: on the strip, the drawer face (moving with it), the display glass, each key and each button
+const DECALS = JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8"));
+const printTex = {};
+const printMat = (n, on) => { printTex[n] = `${T}/${DECALS[n.slice(6)].file}`;
+  return on === "glass" ? mat(n, 0xffffff, { metal: 0.85, rough: 0.42 }) : mat(n, 0xffffff, { rough: 0.38 }); };
+// a strip piece: its rows the strip's own rows, each facet the facet under it moved forward by `off`, so the two stay parallel
+// (the flicker check pairs near-parallel facets of a curved strip otherwise)
+const chordZ = (y) => { const i = Math.max(0, Math.min(stripRows.length - 2, stripRows.findIndex((r, k) => stripRows[k + 1] >= y)));
+  const t = (y - stripRows[i]) / (stripRows[i + 1] - stripRows[i]); return stripZ(stripRows[i]) * (1 - t) + stripZ(stripRows[i + 1]) * t; };
+const decalsOn = (parent, on, off) => { for (const [k, d] of Object.entries(DECALS)) {
+  if (d.on !== on) continue;
+  const [u0, v0, u1, v1] = d.rect;
+  const x0 = u0 * W - W / 2, x1 = u1 * W - W / 2, yT = 0.85 - v0 * 0.129, yB = 0.85 - v1 * 0.129;
+  const rows = [yB, ...stripRows.filter((y) => y > yB + 1e-5 && y < yT - 1e-5), yT];
+  parent.add(grid(`PrintDecal_${k}`, rows.length, 2, (i, j) => [j ? x1 : x0, rows[i], chordZ(rows[i]) + off],
+    (x, y) => [(x - x0) / (x1 - x0), (yT - y) / (yT - yB)], printMat(`Print_${k}`, on)));
+} };
 
 // ── cabinet: the sides carry the pressed panels (side photo), the back is Samsung's rear photo with the hoses painted out ──
 // No two faces share a plane: the sides stop 0.5 mm short of the back panel and of the top's skirts.
@@ -320,7 +339,9 @@ cab.add(lathe("DrumBack", [[drumR, drumZ - drumDepth / 2], [0.12, drumZ - drumDe
 const seam = L.seam, stripRows = uniq([...range(SEAM1, 0.848, 50)]);
 {
   const xs = [seam + 0.0005, W / 2];
-  cab.add(grid("Fascia", stripRows.length, 2, (i, j) => [xs[j], stripRows[i], stripZ(stripRows[i])], panelUV, panelM));
+  const fascia = grid("Fascia", stripRows.length, 2, (i, j) => [xs[j], stripRows[i], stripZ(stripRows[i])], panelUV, panelM);
+  cab.add(fascia);
+  decalsOn(cab, "fascia", 0.0009);
 }
 // the display glass, 1.6 mm proud, above the row of keys; its rows are the strip's own rows (ends on the strip's chords), so each
 // glass facet is parallel to the strip facet under it
@@ -329,7 +350,9 @@ const seam = L.seam, stripRows = uniq([...range(SEAM1, 0.848, 50)]);
   const lin = (y) => { const i = Math.min(stripRows.length - 2, stripRows.findIndex((r, k) => stripRows[k + 1] >= y));
     const t = (y - stripRows[i]) / (stripRows[i + 1] - stripRows[i]); return stripZ(stripRows[i]) * (1 - t) + stripZ(stripRows[i + 1]) * t; };
   const rows = [y0, ...stripRows.filter((y) => y > y0 + 1e-5 && y < g.y1 - 1e-5), g.y1];
-  cab.add(grid("DisplayGlass", rows.length, 2, (i, j) => [j ? g.x1 : g.x0, rows[i], lin(rows[i]) + 0.0016], panelUV, glassFace));
+  const glass = grid("DisplayGlass", rows.length, 2, (i, j) => [j ? g.x1 : g.x0, rows[i], lin(rows[i]) + 0.0016], panelUV, glassFace);
+  cab.add(glass);
+  decalsOn(cab, "glass", 0.0016 + 0.0009);
 }
 // the five keys, raised 2.4 mm, and the Power and Start/Pause buttons, raised 4.5 mm in their recesses; the strip's print on
 // their faces
@@ -343,6 +366,16 @@ const raised = (b, depth, rad, lift) => {
 };
 cab.add(mesh("Keys", mergeGeometries(L.keys.map((k) => raised({ ...k, x0: k.x0 + 0.0003, x1: k.x1 - 0.0003 }, 0.0045, 0.0009, 0.0024))), panelM));
 cab.add(mesh("ButtonFaces", mergeGeometries([raised(L.power, 0.008, 0.0022, 0.0045), raised(L.start, 0.008, 0.0022, 0.0045)]), panelM));
+// the keys' and buttons' print: a flat piece 0.9 mm over each face, placed as raised() places the face
+for (const [k, d] of Object.entries(DECALS)) {
+  if (d.on !== "key" && d.on !== "button") continue;
+  const [depth, lift] = d.on === "key" ? [0.0045, 0.0024] : [0.008, 0.0045];
+  const [u0, v0, u1, v1] = d.rect;
+  const x0 = u0 * W - W / 2, x1 = u1 * W - W / 2, yT = 0.85 - v0 * 0.129, yB = 0.85 - v1 * 0.129, xc = (x0 + x1) / 2, yc = (yT + yB) / 2;
+  const g = flipV(new THREE.PlaneGeometry(x1 - x0, yT - yB));
+  g.translate(0, 0, depth / 2 + 0.0009).rotateX(tilt(stripZ, yc)).translate(xc, yc, stripZ(yc) + lift - depth / 2);
+  cab.add(mesh(`PrintDecal_${k}`, g, printMat(`Print_${k}`, d.on)));
+}
 // the dial: a polished chrome ring round a glossy black cap, on the strip's black ring with its 14 lamps (in the print);
 // sizes off the close photo (ring 24.4-28.8 mm), heights ESTIMATED from the 3/4 photos
 {
@@ -369,7 +402,9 @@ const drawer = group("Drawer", 0, 0, 0);
 {
   const rows = uniq([...stripRows, ...range(pk.y0, lipY - 0.0007, 18), lipY - 0.0007, lipY, lipY + 0.001]);
   const cols = uniq([...range(dx0, dx1, 20), ...range(pk.x0, pk.x0 + pkRamp, 6), ...range(pk.x1 - pkRamp, pk.x1, 6)]);
-  drawer.add(grid("DrawerFace", rows.length, cols.length, (i, j) => [cols[j], rows[i], stripZ(rows[i]) - pocketDepth(cols[j], rows[i])], panelUV, panelM));
+  const face = grid("DrawerFace", rows.length, cols.length, (i, j) => [cols[j], rows[i], stripZ(rows[i]) - pocketDepth(cols[j], rows[i])], panelUV, panelM);
+  drawer.add(face);
+  decalsOn(drawer, "drawer", 0.0009);
   // the face's rim: 12 mm deep round its four edges
   const yr = stripRows, dep = 0.012;
   // the left side 3.5 mm inside the face's edge: near the cabinet's front return's plane, the two were pulled apart in pieces and a
@@ -523,6 +558,7 @@ const grain = { dir: `${TEX}/grain`, materials: {
 await exportGLB(root, clips, OUT, {
   Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Rear: `${T}/rear.jpg`, Panel: `${T}/panel.jpg`,
   PanelGlass: `${T}/panel.jpg`, Tray: `${T}/tray.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`, LabelBEE: `${T}/label.png`,
+  ...printTex,
 }, grain);
 // the strip and the display glass carry the same print: keep one copy of panel.jpg in the file
 {

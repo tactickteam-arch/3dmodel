@@ -47,6 +47,14 @@ PAGE = None
 if "--photos" in args:
     PAGE = args[args.index("--photos") + 1]
     del args[args.index("--photos"):args.index("--photos") + 2]
+# --hi <px per mm>: draw only the control strip, at that density and on a ground without noise, and cut its print into the
+# decals the builder lays over the strip, the drawer face, the display glass, the five keys and the two buttons
+# (print_*.jpg and decals.json: each piece's rectangle in the strip's UVs and the surface it lies on); panel.jpg and the rest
+# are left alone
+HI = None
+if "--hi" in args:
+    HI = float(args[args.index("--hi") + 1])
+    del args[args.index("--hi"):args.index("--hi") + 2]
 PHOTOS, MANUAL, LOGOS, OUT = args[:4]
 P = os.path.join(PHOTOS, "samsung_ww80")
 D = os.path.join(OUT, "samsung_ww80")
@@ -96,8 +104,9 @@ def blend(canvas, m, X, Y, colour):
 
 
 # ── the strip's texture space ──
-PX = 4096 / 600.0                               # px per mm
-TW, TH = 4096, round(129 * PX)                  # x -300..300, h 721..850
+PX = HI or 4096 / 600.0                         # px per mm
+TW, TH = round(600 * PX), round(129 * PX)       # x -300..300, h 721..850
+KS = PX / (4096 / 600.0)                        # the blur and inset sizes below are in panel.jpg px: scaled for --hi
 DH = 3.0                                        # rectified close photo -> true height (ESTIMATED, see above)
 
 
@@ -207,12 +216,12 @@ def panel(rect, ink):
     th = TH
     # the flat graphite, a touch lighter at the rounded top edge
     g = np.linspace(1.05, 0.97, th)[:, None, None]
-    img = np.ones((th, TW, 3), np.float32) * BODY * g + rng.normal(0, 0.7, (th, TW, 1))
+    img = np.ones((th, TW, 3), np.float32) * BODY * g + rng.normal(0, 0 if HI else 0.7, (th, TW, 1))
     # the pocket: a little darker inside (the 3D scoop adds its own shade)
     x0, y0, x1, y1 = tbox(POCKET)
     pm = np.zeros((th, TW), np.float32)
-    cv2.rectangle(pm, (int(x0 + 60), int(y0 + 20)), (int(x1 - 60), int(y1 - 10)), 1.0, -1)
-    pm = cv2.GaussianBlur(pm, (0, 0), 30)
+    cv2.rectangle(pm, (int(x0 + 60 * KS), int(y0 + 20 * KS)), (int(x1 - 60 * KS), int(y1 - 10 * KS)), 1.0, -1)
+    pm = cv2.GaussianBlur(pm, (0, 0), 30 * KS)
     img *= (1 - 0.1 * pm)[..., None]
     canvas = img
 
@@ -588,9 +597,51 @@ def tray():
     save(t, "tray.jpg", 88)
 
 
+# the decals of --hi: rectified mm (x0, h0, x1, h1) and the surface each lies on; each is cut from the strip drawn at HI px/mm
+KEY_BOXES = [(2883, 3287), (3303, 3696), (3711, 4104), (4120, 4523), (4535, 4934)]       # the keys, drawing px (see layout.json)
+
+
+def decal_boxes():
+    boxes = {
+        "logo": ((LOGO[0] - 1.5, LOGO[1] - 1.5, LOGO[2] + 1.5, LOGO[3] + 1.5), "drawer"),
+        "eco": ((DRAWER_TEXT[0] - 1.0, DRAWER_TEXT[1] - 0.8, DRAWER_TEXT[2] + 1.0, DRAWER_TEXT[3] + 1.0), "drawer"),
+        # the programme names, their leader lines and the dial's black ring with its 14 lamps
+        "dial": ((-74.0, DIAL[1] - BEZEL - 1.0, 75.0, 826.5), "fascia"),
+        # the symbols under the keys and their brackets; *(3 sec) over the display
+        "hints": ((107.8, 744.2, 177.8, 751.8), "fascia"),
+        "sec": ((AX * 4630 + BX - 0.6, AY * 320 + BY - 0.6, AX * 4870 + BX + 0.6, AY * 240 + BY + 0.6), "fascia"),
+    }
+    # the display glass, from just over the keys (the builder's glass starts 0.4 mm over them) to just inside its top
+    ktop = AY * 1340 + BY
+    boxes["display"] = ((GLASS_BOX[0] + 0.3, ktop + 0.7, GLASS_BOX[2] - 0.3, GLASS_BOX[3] - 0.3), "glass")
+    # each key's face (the builder's: 0.3 mm in from the box at the sides), 0.5 mm in from its edges, clear of the rounded rim
+    for i, (k0, k1) in enumerate(KEY_BOXES):
+        x0, x1, h0, h1 = AX * k0 + BX, AX * k1 + BX, AY * 1562 + BY, AY * 1340 + BY
+        boxes[f"key{i}"] = ((x0 + 0.8, h0 + 0.5, x1 - 0.8, h1 - 0.5), "key")
+    # the buttons' raised faces, 0.7 mm in from their edges (their corners are 2.2 mm round in 3D)
+    boxes["power"] = ((POWER[0] + 0.7, POWER[1] + 0.7, POWER[2] - 0.7, POWER[3] - 0.7), "button")
+    boxes["start"] = ((START[0] + 0.7, START[1] + 0.7, START[2] - 0.7, START[3] - 0.7), "button")
+    return boxes
+
+
+def cut_decals(img):
+    img = Image.fromarray((np.asarray(img.convert("RGB")).astype(np.float32) * SHADE["panel.jpg"]).clip(0, 255).astype(np.uint8))
+    out = {}
+    for n, (b, on) in decal_boxes().items():
+        x0, y0, x1, y1 = (round(v) for v in tbox(b))
+        img.crop((x0, y0, x1, y1)).save(os.path.join(D, f"print_{n}.jpg"), quality=88, subsampling=0, optimize=True)
+        out[n] = {"file": f"print_{n}.jpg", "rect": [x0 / TW, y0 / TH, x1 / TW, y1 / TH], "on": on}
+        print(f"decal print_{n}.jpg: {x1 - x0} x {y1 - y0} px on the {on}")
+    with open(os.path.join(D, "decals.json"), "w") as f:
+        json.dump(out, f, indent=1)
+
+
 def main():
     rect = rect_photo()
     ink = drawing()
+    if HI:
+        cut_decals(panel(rect, ink))
+        return
     save(panel(rect, ink), "panel.jpg", 90)
     save(flat(BODY, (512, 768), (1.04, 0.92)), "front.jpg", 85)
     label()
