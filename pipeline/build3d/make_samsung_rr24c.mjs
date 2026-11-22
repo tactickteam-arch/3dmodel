@@ -46,7 +46,8 @@ const dripBot = 1.181, dripTop = 1.212;              // the drip tray under the 
 const ctBot = 1.085, ctTop = 1.178, ctZ1 = 0.115;    // the chiller tray
 const s1 = 0.969, s2 = 0.798, s3 = 0.647;            // the glass shelves' tops (front rims)
 const coverY = 0.528;                                // the vegetable box's cover
-const vbBot = 0.236, vbTop = 0.505, vbLip = 0.477;   // the vegetable box: its sides, its lower front
+const vbBot = 0.236, vbTop = 0.502, vbLip = 0.477;   // the vegetable box: its sides, its lower front (its sides
+// top out at 502 mm, 1.5 mm under the cover's rails; at 505 they ran through the rails, 21 Nov)
 const frontFridge = 0.0975;                          // shelves and the box stop 7 mm short of the shut door's deepest pocket
 // the door
 const pw = Wc - 0.002, dh = H - doorBot;
@@ -604,6 +605,9 @@ const fridgeDoor = group("FridgeDoor", Wc / 2 - 0.001, doorBot, zDoor);
       const zc = Pz - (Pz + 0.008) * (1 - Math.sqrt(Math.max(0, 1 - t * t)));
       q.setXYZ(i, q.getX(i), s, q.getY(i) + zc);
     }
+    // swapping y and z mirrors the solid, so turn every triangle back to face out (it showed inside-out from the front)
+    const ix = g.index;
+    for (let i = 0; i < ix.count; i += 3) { const t = ix.getX(i + 1); ix.setX(i + 1, ix.getX(i + 2)); ix.setX(i + 2, t); }
     g.computeVertexNormals();
     return g;
   };
