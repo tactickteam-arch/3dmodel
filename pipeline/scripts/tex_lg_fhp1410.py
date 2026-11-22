@@ -43,7 +43,7 @@ COND = "/System/Library/Fonts/Avenir Next Condensed.ttc"
 SUP = "/System/Library/Fonts/Supplemental/"
 ARIAL_B = SUP + "Arial Bold.ttf"
 
-S = 7.2                               # px per mm on the strip and the drawer
+S = float(os.environ.get("STRIP_PXMM", "7.2"))  # STRIP_PXMM: redraw only the strip and the drawer at that density (21 Nov: 10.5); px per mm on the strip and the drawer
 PX0, PSX = 120.8, 815.6 / 600         # front_mz: the cabinet's left edge, px per mm across
 FLOOR, PSY = 1248.0, 1.3647           # front_mz: the floor row, px per mm up
 W = 600.0
@@ -383,7 +383,9 @@ def panel_strip():
         bx, by = X(c[0]), Y(c[1])
         for r, col in [(12.6, (44, 44, 46)), (11.4, (54, 54, 57))]:
             d.ellipse([bx - r * S, by - r * S, bx + r * S, by + r * S], fill=col)
-    save(img, "panel.jpg", 90)
+    # flat ground snapped to its colour (the type is drawn on a flat ground) and q80: inside the 3.5 MB Apple-file budget at 10.5 px/mm
+    a = np.asarray(img).astype(np.int16); g = np.array(STRIP_RGB, np.int16); a[np.abs(a - g).max(2) <= 2] = g
+    save(Image.fromarray(a.astype(np.uint8)), "panel.jpg", 80)
     return img
 
 
@@ -624,6 +626,8 @@ def compare_strip(panel):
 if __name__ == "__main__":
     pan = panel_strip()
     drawer_face()
+    if os.environ.get("STRIP_PXMM"):
+        sys.exit(0)
     knob_top()
     drum_texture()
     hose_texture()

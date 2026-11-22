@@ -106,6 +106,9 @@ cab.add(box("Top", W, H - lid0, D - wrap, topM, 0, (H + lid0) / 2, zB + (D - wra
   }
   cab.add(box("StripCap", W - 0.003, 0.0015, wrap - 0.001, stripEdge, 0, stripTop - 0.00075, zF - wrap / 2 - 0.0005));
 }
+// a dark strip under the top plate's rear edge, inside the cabinet: the joint between the top plate and the back shows this,
+// not the hollow cabinet and the room behind it (handover pass 21 Nov: a see-through slit from above and behind)
+cab.add(box("RearSeamBacker", W - 2 * t - 0.002, 0.001, 0.03, dark, 0, lid0 - 0.002, zB + 0.016));
 cab.add(box("Base", W - 2 * t, 0.004, D - 0.01, dark, 0, yb + 0.002, 0));
 cab.add(box("SeamBacker", W - 2 * t, 0.012, 0.002, dark, 0, strip0, zF - 0.012));
 { // the back: LG's rear photo (hose and cord painted out) from the cabinet's lower edge up to the lid
@@ -302,7 +305,8 @@ cab.add(box("LockSlot", 0.013, 0.024, 0.006, dark, cx + lockX, cy, zF + dishZ(lo
 // the pump-filter housing behind the cover: a dark box, the drain plug and the round filter cap with its grip (manual)
 {
   const g = group("PumpBay", flapC.x, flapC.y, zF);
-  g.add(mesh("BayBox", inward(new THREE.BoxGeometry(flapC.w - 0.008, flapC.h - 0.008, 0.07)), bayM, 0, 0, -0.039));
+  // 3 mm wider and taller than the front's opening, so the gap round the cover shows the bay, not the hollow cabinet (21 Nov)
+  g.add(mesh("BayBox", inward(new THREE.BoxGeometry(flapC.w + 0.004, flapC.h + 0.004, 0.07)), bayM, 0, 0, -0.039));
   const fc = mesh("FilterCap", new THREE.CylinderGeometry(0.0285, 0.0285, 0.026, 36), filterM, 0.014, -0.006, -0.036); fc.rotation.x = Math.PI / 2; g.add(fc);
   g.add(box("FilterGrip", 0.052, 0.009, 0.007, steel, 0.014, -0.006, -0.0215));
   const dp = mesh("DrainPlug", new THREE.CylinderGeometry(0.0085, 0.0085, 0.02, 16), mat("DrainPlugM", 0x2a2b2e, { rough: 0.5 }), -0.043, 0.026, -0.034); dp.rotation.x = Math.PI / 2; g.add(dp);
