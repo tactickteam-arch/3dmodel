@@ -217,6 +217,21 @@ const drawer = group("Drawer", dX, dY, zF);
 }
 cab.add(drawer);
 
+// the band's print at 12 px per mm for a close look (tex_godrej_rgl9014.py band_hi: the same drawing again, cut to the print):
+// flat decals 0.9 mm in front of the glass, the drawer's on the drawer (it goes with it), the panel's in two pieces; the
+// band's own finish
+const printTex = {};
+for (const [k, d] of Object.entries(JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8")))) {
+  const [u0, v0, u1, v1] = d.rect, bh = H - bandBot;
+  const x0 = u0 * W - W / 2, x1 = u1 * W - W / 2, yT = H - v0 * bh, yB = H - v1 * bh;
+  const g = new THREE.PlaneGeometry(x1 - x0, yT - yB);
+  const p = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, p.getX(i) / (x1 - x0) + 0.5, 0.5 - p.getY(i) / (yT - yB));   // v = 0 at the top row
+  const m = mesh(`PrintDecal_${k}`, g, mat(`Print_${k}`, 0xffffff, { rough: 0.3 }), (x0 + x1) / 2, (yT + yB) / 2, zF + 0.0009);
+  if (d.drawer) { m.position.sub(new THREE.Vector3(dX, dY, zF)); drawer.add(m); } else cab.add(m);
+  printTex[`Print_${k}`] = `${T}/${d.file}`;
+}
+
 // ── the door: chrome rim, the dark grey ring under a tinted outer glass, the grey inner frame and the clear bowl behind ──
 // Radii from the front photo: the chrome 234.4-246.6 mm; the dark ring's inner edge round the opening's centre (the photo
 // shows the window high in the door, over the opening), 160 mm (ESTIMATED from the open-door photos).
@@ -253,4 +268,5 @@ const grain = { dir: `${TEX}/grain`, materials: {
 } };
 await exportGLB(root, clips, OUT, {
   Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Band: `${T}/band.jpg`, Back: `${T}/back.jpg`, Drum: `${T}/drum.jpg`,
+  ...printTex,
 }, grain);

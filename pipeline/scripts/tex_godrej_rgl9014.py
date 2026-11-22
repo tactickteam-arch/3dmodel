@@ -77,6 +77,7 @@ GLASS = np.array([35, 31, 32], np.float32)       # the panel's black, as the man
 SHADE = {"front.jpg": 0.74, "band": 0.67, "side_l.jpg": 0.82, "side_r.jpg": 0.82, "back.jpg": 0.9, "drum.jpg": 0.6}
 
 S = 4096 / W_MM                       # band texture px per mm (6.87)
+BW = 4096                             # band texture width
 BH = round((H_MM - BAND_BOT) * S)     # band texture height
 
 
@@ -95,9 +96,57 @@ def save(a, name, q=88):
     print("wrote", p, a.shape[1], a.shape[0])
 
 
+def band_hi(px_mm=12.0, tex_max=4096):
+    """The band drawn again at px_mm by the same code (the manual's art is about 15 px per mm, so it is only reduced) and the
+    print cut out of it for a close look: the drawer's words and marks (print_drawer.jpg) and the panel's art, in two pieces
+    at its emptiest column (print_panel_a.jpg, print_panel_b.jpg), each cropped to its print plus 1 mm and under tex_max px,
+    all inside the black glass. decals.json gives each piece's rectangle as a fraction of band.jpg's u and v and whether it
+    sits on the drawer; make_godrej_rgl9014.mjs lays them as flat decals 0.9 mm in front of the band."""
+    global S, BW, BH
+    keep = (S, BW, BH)
+    S, BW = px_mm, round(W_MM * px_mm)
+    BH = round((H_MM - BAND_BOT) * S)
+    try:
+        alpha, a, pp, inner = band(None)
+    finally:
+        hw, hh = BW, BH
+        S, BW, BH = keep
+    glass_in = cv2.erode((alpha > 0.5).astype(np.uint8), np.ones((round(1.5 * px_mm), round(1.5 * px_mm)), np.uint8)) > 0
+    lum = a.mean(2)
+    ink = glass_in & (np.abs(lum - lum[glass_in].mean()) > 30)    # the print: anything on the glass far from its black
+    pad = round(1.0 * px_mm)
+    out = {}
+
+    def piece(key, file, x0, x1, drawer, r1=None):
+        m = ink[:r1, x0:x1]
+        ys, xs = np.where(m)
+        bx0, bx1 = x0 + xs.min() - pad, x0 + xs.max() + 1 + pad
+        by0, by1 = ys.min() - pad, min(ys.max() + 1 + pad, r1 or hh)
+        assert bx1 - bx0 <= tex_max and by1 - by0 <= tex_max, (key, bx1 - bx0)
+        assert glass_in[by0:by1, bx0:bx1].any()
+        Image.fromarray(np.clip(a[by0:by1, bx0:bx1], 0, 255).astype(np.uint8)).save(os.path.join(D, file), quality=88, optimize=True, subsampling=0)
+        out[key] = {"file": file, "rect": [bx0 / hw, by0 / hh, bx1 / hw, by1 / hh], "drawer": drawer}
+        print("wrote", file, bx1 - bx0, "x", by1 - by0, "px at", px_mm, "px/mm")
+
+    seam = round((fX(434.75) + W_MM / 2) * px_mm)                  # between the drawer (to 433.5) and the panel (from 436)
+    # the drawer's piece stops over its finger recess (the face is cut away under GRIP_TOP, 752.6 mm; its lowest print,
+    # "Digi Inverter", ends at 759.7 mm)
+    piece("drawer", "print_drawer.jpg", round((DRAWER[0] + W_MM / 2) * px_mm) + pad, seam, True, round((H_MM - (GRIP_TOP + 3)) * px_mm))
+    cols = np.where(ink[:, seam:].any(0))[0] + seam
+    lo, hi = cols.min(), cols.max() + 1
+    c = np.convolve(ink[:, lo:hi].sum(0).astype(np.float32), np.ones(25), "same")
+    mid = (lo + hi) // 2
+    span = range(max(lo + 50, hi - tex_max + 2 * pad + 16), min(hi - 50, lo + tex_max - 2 * pad - 16))
+    cut = min(span, key=lambda k: (c[k - lo], abs(k - mid)))
+    piece("panel_a", "print_panel_a.jpg", seam, cut, False)
+    piece("panel_b", "print_panel_b.jpg", cut, hw, False)
+    with open(os.path.join(D, "decals.json"), "w") as f:
+        json.dump(out, f, indent=1)
+
+
 def band_grid():
     """Front photo coordinates of every band texture pixel."""
-    u, v = np.meshgrid(np.arange(4096, dtype=np.float32) + 0.5, np.arange(BH, dtype=np.float32) + 0.5)
+    u, v = np.meshgrid(np.arange(BW, dtype=np.float32) + 0.5, np.arange(BH, dtype=np.float32) + 0.5)
     X, Y = u / S - W_MM / 2, H_MM - v / S
     return (X0 + X * K1).astype(np.float32), (YB - Y * K1).astype(np.float32)
 
@@ -148,7 +197,7 @@ def panel_print():
     small = cv2.resize(a, (round(a.shape[1] * ax), round(a.shape[0] * ay)), interpolation=cv2.INTER_AREA)
     sx, sy = a.shape[1] * ax / small.shape[1], a.shape[0] * ay / small.shape[0]
     M = np.float32([[sx, 0, bx], [0, sy, by]])
-    return cv2.warpAffine(small, M, (4096, BH), flags=cv2.INTER_LINEAR, borderValue=(255, 255, 255))
+    return cv2.warpAffine(small, M, (BW, BH), flags=cv2.INTER_LINEAR, borderValue=(255, 255, 255))
 
 
 def drawer_print(c):
@@ -174,7 +223,7 @@ def drawer_print(c):
     place(c, text_ink("Digi Inverter", 6), (-139.9 + dx, -109.6 + dx, 759.7, 764.4), white)
 
 
-def band():
+def band(name="band.jpg"):
     """The panel band across the top, 596 x 116.6 mm (723.4-840 mm up), 6.87 px per mm: the champagne frame as the front
     photo shows it (enlarged), the black glass of the drawer and of the panel in the photo's outline, and the print sharp."""
     ph = load("front.png")
@@ -202,15 +251,16 @@ def band():
     a = a * SHADE["band"]
     glass = np.broadcast_to(GLASS, a.shape).copy()
     pp = panel_print()
-    right = (np.arange(4096) >= bu(fX(436)))[None, :, None]
+    right = (np.arange(BW) >= bu(fX(436)))[None, :, None]
     inner = cv2.erode((alpha[..., 0] > 0.5).astype(np.uint8), np.ones((5, 5), np.uint8))[..., None].astype(np.float32)
     glass = np.where(right & (inner > 0), pp, glass)
     drawer_print(glass)
     lum = glass.mean(2, keepdims=True)                             # the glass's black a little deeper: the render's gloss
     glass = glass * (0.68 + 0.32 * np.clip((lum - 35) / 60, 0, 1))  # lifts it (front photo 26, the art 35 before this)
     a = a * (1 - alpha) + glass * alpha
-    save(a, "band.jpg", 92)
-    return alpha[..., 0]
+    if name:
+        save(a, name, 92)
+    return alpha[..., 0], a, pp, inner[..., 0]
 
 
 def front():
@@ -334,6 +384,7 @@ def drum():
 
 
 band()
+band_hi()
 front()
 side_r()
 back()
