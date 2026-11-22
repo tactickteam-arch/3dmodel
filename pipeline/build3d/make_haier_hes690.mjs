@@ -165,10 +165,10 @@ for (const s of [-1, 1]) {
   // the cord: Haier's rear photo shows it leaving the box at x +23 mm and lying in a loop on the box's top to x +77 mm.
   // Lying there it showed over the box in the front and three-quarter views (the page's camera is above the top), which our
   // rule for cords rules out, so (as on Haier's HRT-683) it leaves the back panel by a white grommet 12 mm under the cabinet's
-  // top at x +23 mm, runs along the back to x +77 mm 1.5 mm off the panel, drops, and swings in to a three-pin plug hung flat
+  // top at x +23 mm, runs along the back to x +77 mm against the panel, drops, and swings in to a three-pin plug hung flat
   // on the back near the centre line, 0.95 m up (ESTIMATED: Haier shows nothing past the box). Below the top and near the
-  // centre, the cord (9.5 mm proud) and the plug (17 mm) stay hidden behind the cabinet in the side views.
-  const cx = rp.cord_exit, cf = rp.cord_far, cr = 0.004, yc = yTop - 0.012, zc = zBack - cr - 0.0015;
+  // centre, the cord (7 mm proud) and the plug (17 mm) stay hidden behind the cabinet in the side views.
+  const cx = rp.cord_exit, cf = rp.cord_far, cr = 0.004, yc = yTop - 0.012, zc = zBack - cr + 0.001;
   const grom = cyl("Grommet", 0.007, 0.007, 0.003, white, cx, yc, zBack - 0.0013, 12);
   grom.rotation.x = Math.PI / 2;
   cab.add(grom);
@@ -609,15 +609,41 @@ function linerBlock(name, x0, x1, y0, y1, zl, zb, d, m) {
   return mesh(name, geo, m);
 }
 // the gasket round the opening, the liner block inside it and the bins standing on the liner's face (door space)
-function doorInside(g, name, c) {
+// how far from its hinge a door bin may reach on the door's free side: a deep bin's far corner swings towards the middle
+// by up to 2 cm before it leaves the opening, so the bins stop where that swing clears the mullion (2 mm to spare), as the
+// real door opens past it. xm: the mullion's face from the hinge, zc: the cabinet's front, zs: the bin's depths (door frame)
+function clearReach(xm, zc, zs, angle = 120) {
+  let lo = 0, hi = xm;
+  for (let k = 0; k < 40; k++) {
+    const r = (lo + hi) / 2;
+    let ok = true;
+    for (let a = 0; a <= angle && ok; a += 0.5) {
+      const t = a * Math.PI / 180;
+      for (const z of zs) if (z * Math.cos(t) + r * Math.sin(t) < zc && r * Math.cos(t) - z * Math.sin(t) > xm) ok = false;
+    }
+    if (ok) lo = r; else hi = r;
+  }
+  return lo;
+}
+function doorInside(g, name, c, lim = {}) {
   const L = (x) => x - g.position.x, y0 = yFloor - yD0, y1 = yCeil - yD0, zg0 = zB - 0.0145, zl = linerFace - zPiv;
-  const ox0 = L(c.x0) - 0.018, ox1 = L(c.x1) + 0.018, oy0 = y0 - 0.018, oy1 = y1 + 0.018;
+  // the gasket band is 18 mm wide, but never past the door's own edge (lim, world x): the fridge door's band stopped 9 mm
+  // under the freezer door and caught its grip slot as the door began to open. It runs up to the cabinet's top and down to
+  // the door's own bottom edge, so the 15 mm gap behind the doors is closed there too (from the side, low down, the floor
+  // showed through it under the bottom band)
+  const ox0 = Math.max(L(c.x0) - 0.018, lim.x0 != null ? L(lim.x0) + 0.0005 : -1), ox1 = Math.min(L(c.x1) + 0.018, lim.x1 != null ? L(lim.x1) - 0.0005 : 1), oy0 = 0.0005, oy1 = yTop - yD0 - 0.0005;
   g.add(span(name + "GasketT", ox0, ox1, y1, oy1, zg0, zB, gasket));
   g.add(span(name + "GasketB", ox0, ox1, oy0, y0, zg0, zB, gasket));
   g.add(span(name + "GasketL", ox0, L(c.x0), y0, y1, zg0, zB, gasket));
   g.add(span(name + "GasketR", L(c.x1), ox1, y0, y1, zg0, zB, gasket));
   g.add(linerBlock(name + "Liner", L(c.x0) + 0.004, L(c.x1) - 0.004, y0 + 0.004, y1 - 0.004, zl, zB, 0.008, doorBack));
-  const B = BINS[name], bx0 = L(c.x0) + 0.016, bx1 = L(c.x1) - 0.016, out = [];
+  const B = BINS[name], out = [];
+  // the fridge door's bins stop 33 mm in from the opening's hinge side (ESTIMATED), so with the door open the trays slide
+  // their full 240 mm out past the bins' hinge ends
+  let bx0 = L(c.x0) + 0.016, bx1 = L(c.x1) - (g.position.x > 0 ? 0.033 : 0.016);
+  { const zs = [zl, zl - B.d], zc = zCab - zPiv + 0.001;
+    if (g.position.x < 0) bx1 = Math.min(bx1, clearReach(L(c.x1) - 0.002, zc, zs));
+    else bx0 = Math.max(bx0, -clearReach(-L(c.x0) - 0.002, zc, zs)); }
   B.at.forEach(([fy, h], i) => {
     const f = fy - yD0, za = zl, zb = zl - B.d;
     g.add(span(`${name}Bin${i}Floor`, bx0, bx1, f, f + 0.004, zb, za, clear));
@@ -639,7 +665,7 @@ const freezerDoor = group("FreezerDoor", -pivX, yD0, zPiv);
   freezerDoor.add(span("FreezerDoorTrim", L(fzFace1), L(fzEdge) + 0.0002, 0, doorH, zF - 0.0045, zF + 0.0005, trimM));
   // a thin bright line down the hinge side's front corner too (both 3/4 photos)
   freezerDoor.add(span("FreezerDoorTrimOut", L(-xo) - 0.0002, L(-xo) + 0.0025, 0, doorH, zF - 0.004, zF + 0.0005, trimM));
-  const bins = doorInside(freezerDoor, "FreezerDoor", FZ);
+  const bins = doorInside(freezerDoor, "FreezerDoor", FZ, { x1: fzEdge });
   const packs = [["fresho_green_peas", "viswas_parotta", "amul_paneer"], ["nitya_parotta", "fresho_green_peas", "amul_paneer"], ["viswas_parotta", "amul_paneer", "fresho_green_peas"]];
   bins.forEach((b, i) => row(freezerDoor, b, packs[i].map((k, j) => pouch(`FzPack${j}`, k, true, 0.5))));
 }
@@ -661,9 +687,10 @@ const fridgeDoor = group("FridgeDoor", pivX, yD0, zPiv);
   fridgeDoor.add(mesh("DisplayGlass", new THREE.ExtrudeGeometry(sh, { depth: 0.002, bevelEnabled: false, curveSegments: 1 }), [dispM, dispM], 0, 0, zStep));
   fridgeDoor.add(plane("DisplayPrint", 0.043, 0.216, printDisp, (a + b) / 2, doorH - 0.248, zStep + 0.0027));
   // the Haier wordmark top right (front photo: 78 mm wide, centred 367 mm right of the middle and 1675 mm up)
-  // (logo.png carries 6 clear pixels round the 562 x 173 px ink, so the plane is that much larger)
-  fridgeDoor.add(plane("HaierMarkDecal", 0.078 * 574 / 562, 0.078 / 3.249 * 185 / 173, logoM, L(0.3667), 1.6748 - yD0, zF + 0.0007));
-  const bins = doorInside(fridgeDoor, "FridgeDoor", FR);
+  // (logo.png is drawn at 12 px per mm with 10 clear pixels round the ink: the plane is the PNG's size / 12000)
+  { const b = fs.readFileSync(`${T}/logo.png`);
+    fridgeDoor.add(plane("HaierMarkDecal", b.readUInt32BE(16) / 12000, b.readUInt32BE(20) / 12000, logoM, L(0.3667), 1.6748 - yD0, zF + 0.0007)); }
+  const bins = doorInside(fridgeDoor, "FridgeDoor", FR, { x0: frX0 });
   row(fridgeDoor, bins[0], [eggTray("EggTray", 8)]);
   row(fridgeDoor, bins[1], [brandJar("MothersPickle", "mothers_mango_pickle", 0.036, 0.07, K.jarGreen, K.goldLid), brandJar("MothersPickle2", "mothers_mango_pickle", 0.036, 0.07, K.jarGreen, K.goldLid),
     brandJar("AavinGhee", "aavin_ghee_jar", 0.034, 0.07, K.amber, K.goldLid), pouch("SakthiSambar", "sakthi_sambar_powder", true, 0.8)]);

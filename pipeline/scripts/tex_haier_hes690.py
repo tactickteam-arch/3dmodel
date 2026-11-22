@@ -15,7 +15,7 @@ usage: python3 -I tex_haier_hes690.py <photos dir> <logos dir> <out dir> [--comp
     door_freezer_ss.jpg, door_fridge_ss.jpg  the same for Shiny Silver, with its horizontal brushing
     channel_gk.jpg, channel_ss.jpg       the step down the fridge door's left edge, below the display: the photo's own
                                            fall down that strip
-    display_print.png                    every word, digit and icon on the display, set again sharp at 7.2 px per mm
+    display_print.png                    every word, digit and icon on the display, set again sharp at 12 px per mm
     logo.png                             the Haier wordmark in white, from Haier's own logo file
     rear.jpg, rear_paths.json            the rear panel (Haier's rear photo) and the compressor bay's slots, in metres
     print_*.png                          the words Haier prints inside (DEO FRESH, MAGIC COOLING, MAGICZONE, FREEZEBOX,
@@ -39,7 +39,7 @@ D = os.path.join(OUT, "haier_hes690")
 os.makedirs(D, exist_ok=True)
 rng = np.random.default_rng(690)
 AV = "/System/Library/Fonts/Avenir Next.ttc"      # faces: 0 Bold, 5 Medium, 7 Regular, 10 Ultra Light
-PXMM = 7.2                                          # print resolution (the display)
+PXMM = 12.0                                         # print resolution (the display and the wordmark): 12 px per mm on the model
 PRINT_PXMM = 15                                     # the words inside: the builder lays them about 0.8 x their size here, 12 px/mm on the model
 
 
@@ -146,8 +146,9 @@ def logo():
     out = Image.new("RGBA", al.size, (240, 242, 246, 0))
     out.putalpha(al)
     # 6 clear pixels round the ink: with the ink on the image's edge, the texture's wrap pulled the H's stem in next to the r
-    pad = Image.new("RGBA", (out.width + 12, out.height + 12), (240, 242, 246, 0))
-    pad.paste(out, (6, 6))
+    # (10 px at 12 px per mm; the builder sizes the plane from this PNG at 12 px per mm)
+    pad = Image.new("RGBA", (out.width + 20, out.height + 20), (240, 242, 246, 0))
+    pad.paste(out, (10, 10))
     out = pad
     save(out, "logo.png")
     print("logo aspect", round(al.width / al.height, 3))
