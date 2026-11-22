@@ -31,7 +31,7 @@ from collections import deque
 site.addsitedir(os.path.expanduser("~/Library/Python/3.9/lib/python/site-packages"))  # run with -I: only this folder is added
 import cv2  # noqa: E402
 import numpy as np  # noqa: E402
-from PIL import Image, ImageFilter  # noqa: E402
+from PIL import Image, ImageDraw, ImageFilter, ImageFont  # noqa: E402
 
 PHOTOS, LOGOS, OUT = sys.argv[1:4]
 SRC = os.path.join(PHOTOS, "samsung_rr21")
@@ -247,8 +247,15 @@ def doors():
 
 def mark():
     # Samsung's own wordmark, in the inks the fronts show (a light grey on the prints, a dark grey on the steel)
-    lg = Image.open(os.path.join(LOGOS, "samsung.png")).convert("RGBA")
-    a = np.asarray(lg).astype(float)
+    # the wordmark from Samsung's SVG, drawn at 12 px per mm of its 72 mm ink (21 Nov; samsung.png gave about 7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_samsung_standmark as _smk
+    _w = round(72 * 12)
+    cov = _smk.wordmark(LOGOS, _w)
+    cov = _smk.wordmark(LOGOS, round(_w * _w / cov.shape[1]))     # the SVG has a margin: draw again so the ink is 72 mm
+    lg = np.zeros(cov.shape + (4,))
+    lg[..., 3] = cov
+    a = lg
     inks = colours["mark_ink"]
     light = np.mean([v for k, v in inks.items() if k != "elegant_inox"], 0)
     # the dark ink is the photo's darkest tenth, but the viewer's light lifts a dark decal on bright steel: at the photo's
@@ -260,7 +267,6 @@ def mark():
         out[..., 3] = (a[..., 3] * 0.95).clip(0, 255).astype(np.uint8)
         im = Image.fromarray(out)
         im = im.crop(im.getchannel("A").getbbox())
-        im = im.resize((480, round(480 * im.height / im.width)), Image.LANCZOS)
         pad = Image.new("RGBA", (im.width + 20, im.height + 20), col + (0,))
         pad.paste(im, (10, 10))
         save(pad, f"mark_{name}.png")
@@ -324,9 +330,26 @@ def label():
         ys, xs = np.where(b.min(2) < 225)
         ox, oy = xs.min() - 2, ys.min() - 2
         strip = s.crop((ox + CODE[0], oy + CODE[1], ox + CODE[2], oy + CODE[3]))
-        sw = round((CODE[2] - CODE[0]) * sc)   # at the label's own scale (the photo's pixels, not enlarged)
-        strip = strip.resize((sw, round(sw * strip.height / strip.width)), Image.LANCZOS)
-        save(strip, f"model_{slug}.jpg", q=88)
+        # set again sharp at 12 px per mm (21 Nov; the photo crop was 7.3): "<code>/HL" as this colour's own label prints
+        # it (read off each crop: the colour's code, then "/HL"), in Arial Bold stretched to the crop's own ink box, in its
+        # ink, on its cream
+        k = 12 * 93 / (xs.max() - xs.min())
+        g = np.asarray(strip.convert("L")).astype(float)
+        bg = np.median(g)
+        ink = g < bg - 0.5 * (bg - g.min())
+        iy, ix = np.where(ink)
+        a = np.asarray(strip).astype(float)
+        cream = tuple(int(round(v)) for v in np.median(a[~ink], 0))
+        dark = a[ink][g[ink] <= np.percentile(g[ink], 40)].mean(0)
+        W2, H2 = round(strip.width * k), round(strip.height * k)
+        out = Image.new("RGB", (W2, H2), cream)
+        f = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Bold.ttf", 400)
+        t = Image.new("L", (6000, 600), 0)
+        ImageDraw.Draw(t).text((20, 20), code + "/HL", font=f, fill=255)
+        t = t.crop(t.getbbox())
+        bw, bh = round((ix.max() + 1 - ix.min()) * k), round((iy.max() + 1 - iy.min()) * k)
+        out.paste(Image.new("RGB", (bw, bh), tuple(int(round(v)) for v in dark)), (round(ix.min() * k), round(iy.min() * k)), t.resize((bw, bh), Image.LANCZOS))
+        save(out, f"model_{slug}.jpg", q=92)
 
 
 def side_colours():

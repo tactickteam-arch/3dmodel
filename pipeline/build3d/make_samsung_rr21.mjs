@@ -284,7 +284,9 @@ cab.add(mesh("VentSlots", mergeGeometries([...Array(11)].map((_, i) => new THREE
   cab.add(mesh("IceTray", mergeGeometries(cells), white));
 }
 // the flap: clear, hinged on its right edge (Samsung's freezer close-up shows it swung open to the right)
-const flap = group("FreezerFlap", flX1, 0, fbZ1);
+// its hinge 3 mm in front of the frame: the exporter lifts the frame's face 0.8-2.4 mm off the box (z-fight), and at the
+// frame's own plane the flap's rims cut into it as it swung (21 Nov)
+const flap = group("FreezerFlap", flX1, 0, fbZ1 + 0.003);
 {
   const w = flX1 - flX0, yc = (flY0 + flY1) / 2, h = flY1 - flY0;
   flap.add(box("FlapPanel", w - 0.012, h - 0.012, 0.004, flapM, -w / 2, yc, 0.004));
@@ -380,8 +382,11 @@ const dTop = standTop - 0.002, dBot = standFoot + 0.002;
   // the finger pocket's slot along the top (fronts: 400 mm wide, its dark line 112-118 mm up)
   drawer.add(box("DrawerSlot", 0.4, 0.006, 0.02, dark, 0, 0.115, zNose - 0.012));
   const zb = zNose - bow - 0.012;
-  drawer.add(box("DrawerFrontBack", fw, dTop - dBot, 0.012, standM, 0, (dTop + dBot) / 2, zb - 0.006));
-  drawer.add(box("DrawerFrontTop", fw, 0.004, zNose - bow - zb + 0.006, standM, 0, dTop - 0.002, (zb + zNose - bow) / 2 - 0.002));
+  // the front's back plate between the stand's floor and deck, and its top cap in front of the deck (21 Nov: both reached
+  // into the deck and floor, and slid out through them in the first 2 cm)
+  const bb0 = standFoot + 0.006, bb1 = standTop - 0.007, zs1 = zNose - 0.012;
+  drawer.add(box("DrawerFrontBack", fw, bb1 - bb0, 0.012, standM, 0, (bb0 + bb1) / 2, zb - 0.006));
+  drawer.add(box("DrawerFrontTop", fw, 0.004, zNose - bow - zs1, standM, 0, dTop - 0.002, (zs1 + zNose - bow) / 2 + 0.001));
   for (const sx of [-1, 1]) drawer.add(box("DrawerFrontEnd", 0.004, dTop - dBot, zNose - bow - zb + 0.004, standM, sx * (fw / 2 - 0.002), (dTop + dBot) / 2, (zb + zNose - bow) / 2));
 }
 const dbW = W - 0.05, dbZ0 = -0.16, dbZ1 = zNose - bow - 0.026, dbFloor = 0.024, dbTop = 0.135;
@@ -649,6 +654,9 @@ const fridgeDoor = group("FridgeDoor", W / 2, doorBot, zDoor);
       const zc = zMid - (zMid - zEnd) * (1 - Math.sqrt(Math.max(0, 1 - t * t)));
       q.setXYZ(i, s, yc + q.getY(i), zc + q.getX(i));
     }
+    // swapping x and z mirrors the solid, so turn every triangle back to face out (it showed inside-out from the front)
+    const ix = hg.index;
+    for (let i = 0; i < ix.count; i += 3) { const t = ix.getX(i + 1); ix.setX(i + 1, ix.getX(i + 2)); ix.setX(i + 2, t); }
     hg.computeVertexNormals();
     fridgeDoor.add(mesh("HandleBar", hg, chrome, -pw / 2, 0, 0));
     // its underside, where the fingers go, is dark (the fronts, taken from below the handle, show a dark band under the
