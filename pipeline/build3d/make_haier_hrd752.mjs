@@ -171,7 +171,8 @@ for (const sx of [-1, 1]) for (const z of [zFront - 0.025, zBack + 0.03]) {
   cab.add(cyl("FootStem", 0.005, 0.005, footH - 0.019 + 0.001, chrome, sx * 0.204, 0.019 + (footH - 0.019) / 2, z, 12));
 }
 cab.add(B("HingeBottom", xHalf - 0.03, footH - 0.003, zFront - 0.03, xHalf, footH, zFace - 0.004, chrome));
-cab.add(cyl("HingePin", 0.003, 0.003, doorBot - footH + 0.004, chrome, xHalf - 0.012, footH + (doorBot - footH + 0.004) / 2 - 0.0005, zDB + 0.012, 12));
+// (the pin stops 0.5 mm under the door: 4 mm into it, the door's foot strip passed through it as the door swung)
+cab.add(cyl("HingePin", 0.003, 0.003, doorBot - footH - 0.0005, chrome, xHalf - 0.012, footH + (doorBot - footH - 0.0005) / 2, zDB + 0.012, 12));
 
 // ── inside: the freezer box, its flap, the control panel and knob ──
 {
@@ -194,22 +195,23 @@ cab.add(cyl("HingePin", 0.003, 0.003, doorBot - footH + 0.004, chrome, xHalf - 0
 }
 // the flap: clear, across the box's front, FREEZER moulded in it, the white tab at its foot (the open photo: the
 // lettering 95 mm wide at row 411, the tab at columns 340-420, rows 450-462). It is the third part, hinged along its top
-// and lifted out and up by the tab (ESTIMATED: no photo shows it open; the tab at its foot is where it is pulled)
+// and lifted out and up by the tab (ESTIMATED: no photo shows it open; the tab at its foot is where it is pulled).
+// It hangs in front of the box's walls (zFl = zF + 4.8 mm, its back 0.8 mm clear of the walls' fronts): set into them, its edges cut through them as it swung
 const flap = group("FreezerFlap");
 cab.add(flap);
 {
-  const x0 = fz.x0 + 0.002, x1 = fz.x1 - 0.002, y0 = fz.y0 + 0.002, y1 = fz.y1 - 0.002;
-  flap.add(B("FlapClear", x0, y0, zF - 0.004, x1, y1, zF, flapM));
+  const x0 = fz.x0 + 0.002, x1 = fz.x1 - 0.002, y0 = fz.y0 + 0.002, y1 = fz.y1 - 0.002, zFl = zF + 0.0048;
+  flap.add(B("FlapClear", x0, y0, zFl - 0.004, x1, y1, zFl, flapM));
   // its frosted frame (the open photo: a light rim round the clear face)
-  flap.add(B("FlapRim", x0, y1 - 0.006, zF - 0.004, x1, y1, zF + 0.002, frosted));
-  flap.add(B("FlapRimFoot", x0, y0, zF - 0.004, x1, y0 + 0.005, zF + 0.002, frosted));
-  flap.add(B("FlapRimL", x0, y0 + 0.005, zF - 0.004, x0 + 0.005, y1 - 0.006, zF + 0.002, frosted));
-  flap.add(B("FlapRimR", x1 - 0.005, y0 + 0.005, zF - 0.004, x1, y1 - 0.006, zF + 0.002, frosted));
+  flap.add(B("FlapRim", x0, y1 - 0.006, zFl - 0.004, x1, y1, zFl + 0.002, frosted));
+  flap.add(B("FlapRimFoot", x0, y0, zFl - 0.004, x1, y0 + 0.005, zFl + 0.002, frosted));
+  flap.add(B("FlapRimL", x0, y0 + 0.005, zFl - 0.004, x0 + 0.005, y1 - 0.006, zFl + 0.002, frosted));
+  flap.add(B("FlapRimR", x1 - 0.005, y0 + 0.005, zFl - 0.004, x1, y1 - 0.006, zFl + 0.002, frosted));
   const fw = INFO.flap.mm[0] / 1000 * INFO.flap.padded[0] / (INFO.flap.padded[0] - 20), fh = fw * INFO.flap.padded[1] / INFO.flap.padded[0];
-  flap.add(plane("PrintFreezer", fw, fh, flapPrint, 0.019, 0.420, zF + 0.0008));
-  flap.add(rbox("FlapTab", 0.062, 0.01, 0.008, 0.002, white, 0.023, 0.383, zF + 0.002));
+  flap.add(plane("PrintFreezer", fw, fh, flapPrint, 0.019, 0.420, zFl + 0.0008));
+  flap.add(rbox("FlapTab", 0.062, 0.01, 0.008, 0.002, white, 0.023, 0.383, zFl + 0.002));
   // the hinge along its top edge
-  const pivot = new THREE.Vector3(0, y1, zF - 0.002);
+  const pivot = new THREE.Vector3(0, y1, zFl - 0.002);
   for (const c of flap.children) c.position.sub(pivot);
   flap.position.copy(pivot);
 }
@@ -266,6 +268,9 @@ root.add(fridgeDoor);
   const gi = 0.012, gw = 0.016, gz0 = -0.006, gz1 = 0;
   fridgeDoor.add(B("GasketTop", L + gi, dh - gi - gw, gz0, R - gi, dh - gi, gz1, gasketM));
   fridgeDoor.add(B("GasketBottom", L + gi, gi, gz0, R - gi, gi + gw, gz1, gasketM));
+  // under it a dark strip down to the door's bottom edge: from the side, low down, the floor showed through the 6 mm gap
+  // between the door and the cabinet there (it stops short of the spare hinge's cap on the free side)
+  fridgeDoor.add(B("GasketSkirt", L + 0.017, 0.0005, gz0, R - gi, gi, gz1, gasketM));
   fridgeDoor.add(B("GasketLeft", L + gi, gi + gw, gz0, L + gi + gw, dh - gi - gw, gz1, gasketM));
   fridgeDoor.add(B("GasketRight", R - gi - gw, gi + gw, gz0, R - gi, dh - gi - gw, gz1, gasketM));
   fridgeDoor.add(B("DoorLinerFlat", L + gi + gw, gi + gw, -0.002, R - gi - gw, dh - gi - gw, 0, liner));

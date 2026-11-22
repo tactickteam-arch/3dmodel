@@ -22,7 +22,7 @@ usage: python3 -I tex_haier_hrd752.py <photos dir> <logos dir> <out dir> [--debu
     panel.jpg    the control panel's face: the photo (its small print is too soft to read and stays as photographed),
                  "Temperature Setting" set again sharp; the knob is modelled
     flap.png     FREEZER, moulded into the clear flap, set again sharp (frosted light grey on clear)
-Every word is set at 7.2 px per mm or more in Avenir Next or Arial.
+Every word is set at 12 px per mm or more in Avenir Next or Arial.
 """
 import json
 import os
@@ -113,9 +113,9 @@ def font(path, px, index=0):
 
 
 def panel():
-    # g02: the panel x 500-578, rows 332-483 (64 x 125 mm at 0.79 / 0.83 mm per px). Upscaled 6x (soft as the photo is);
+    # g02: the panel x 500-578, rows 332-483 (64 x 125 mm at 0.79 / 0.83 mm per px). Upscaled 10x (soft as the photo is);
     # "Temperature Setting" (x 516-557, rows 445-451) painted out and set again sharp
-    K = 6
+    K = 10                                       # 12 px per mm on the 64 mm panel (the soft print stays as photographed)
     x0, y0, x1, y1 = 500, 332, 578, 483
     src = Image.open(os.path.join(P, "g02_open_empty.jpg")).convert("RGB")
     a = np.asarray(src).astype(np.uint8)
@@ -147,7 +147,7 @@ def flap():
     # FREEZER, 95 mm wide and 18 mm tall on the flap (g02: x 315-435, rows 400-422); bold, frosted: a light grey that
     # reads on the white back wall as the photo's faint letters do, and light over food (g06)
     INK = (176, 184, 194)
-    PX = 8
+    PX = 12
     w, h = 95, 18
     img = Image.new("RGBA", (w * PX + 2 * PAD, h * PX + 2 * PAD), INK + (0,))
     d = ImageDraw.Draw(img)
