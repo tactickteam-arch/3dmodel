@@ -19,7 +19,7 @@ usage: python3 tex_haier_hrf3182iensa.py <photos dir> <logos dir> <out dir>
     hexvent3.png, hexvent2.png   the freezer's dark hexagon vents: groups of three on its back panel over the tray, two under it
     fz_control.png    the freezer's slider control: its window and the dark label plates (their small words can't be read:
                       left out)
-Every word is set at 7.2 px per mm in Avenir Next (Demi Bold for the first word, Regular for the second, as printed).
+Every word is set at 12 px per mm in Avenir Next (Demi Bold for the first word, Regular for the second, as printed).
 """
 import os
 import sys
@@ -33,7 +33,7 @@ D = os.path.join(OUT, "haier_hrf3182iensa")
 os.makedirs(D, exist_ok=True)
 AV = "/System/Library/Fonts/Avenir Next.ttc"
 DEMI, REG, BOLD = 2, 7, 0
-S = 7.2                                     # px per mm for print
+S = 12.0                                    # px per mm for print (12 on the model)
 rng = np.random.default_rng(31821)
 
 # the doors' silver. Haier's front reads 170 of 255 on average over both doors (0.67 of the page's white, against 0.76 on
