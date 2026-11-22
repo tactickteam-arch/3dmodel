@@ -217,8 +217,8 @@ const tw = inW - 0.012;
   rails("VegCoverRail", sCover - 0.006, zIn, z1 - 0.01);
 }
 // the Big Box (FzBox* are the names qa_bounds reads): one clear drawer, "Big Box" and three fruit icons on its front; it
-// stops short of the compressor bay's step at the back
-const bbW = inW - 0.014, bbZ0 = zBack + bayD + 0.012 + 0.012, bbZ1 = frontFridge, bbD = bbZ1 - bbZ0, bbZ = (bbZ0 + bbZ1) / 2;
+// stops short of the compressor bay's step at the back; its sides 2 mm inside the cover rails, so they slide past them
+const bbW = inW - 0.024, bbZ0 = zBack + bayD + 0.012 + 0.012, bbZ1 = frontFridge, bbD = bbZ1 - bbZ0, bbZ = (bbZ0 + bbZ1) / 2;
 {
   const hh = bbTop - bbBottom;
   trays.add(box("FzBoxFloor", bbW, 0.004, bbD, binMat, 0, bbBottom + 0.002, bbZ));
@@ -240,7 +240,7 @@ stock.shelves(trays, {
   zIn1: zIn, inW, inD: frontFridge - zIn, s1: sFresh - 0.0025, s2: sSlide - 0.0025, s3: s3 - 0.0025, fz: bbFloor, fit: true,
   vz0: bbZ0 + 0.02, vk: 0.7,
   shelfB: { hw: inW / 2 - 0.03, z0: zDuct + 0.02, z1: frontFridge - 0.025 },
-  drawerB: { hw: bbW / 2 - 0.014, z0: bbZ0 + 0.02, z1: bbZ1 - 0.008, y0: bbFloor },
+  drawerB: { hw: bbW / 2 - 0.009, z0: bbZ0 + 0.02, z1: bbZ1 - 0.008, y0: bbFloor },
   drawerCeil: sCover - 0.006 - 0.01 - bbFloor,      // the heap stays 1 cm under the cover
 });
 stock.fresh0(trays, { y: sCover, z: (zIn + frontFridge) / 2 + 0.01 });
@@ -260,7 +260,8 @@ const icW = 0.188, icX = -inW / 2 + 0.045 + icW / 2, icH = 0.18, icD = 0.2, icZ1
   cab.add(box("IceHousingTop", icW, 0.008, icD, white, icX, y0 + icH - 0.004, zc));
   for (const sx of [-1, 1]) cab.add(box("IceHousingSide", 0.005, icH - 0.008, icD, white, icX + sx * (icW / 2 - 0.0025), y0 + (icH - 0.008) / 2, zc));
   cab.add(box("IceHousingBack", icW - 0.01, icH - 0.008, 0.005, white, icX, y0 + (icH - 0.008) / 2, icZ0 + 0.0025));
-  for (let i = 0; i < 11; i++) cab.add(box("FloorGrille", 0.03, 0.003, 0.005, grille, -0.16 + i * 0.037, fzFloor + 0.0015, frontFreezer - 0.008));
+  // the floor grille 1.6 mm high (was 3), so the ice bin, its floor 2 mm up, slides out over it instead of through it
+  for (let i = 0; i < 11; i++) cab.add(box("FloorGrille", 0.03, 0.0016, 0.005, grille, -0.16 + i * 0.037, fzFloor + 0.0008, frontFreezer - 0.008));
 }
 const ice = group("IceMaker", icX, fzFloor, 0);
 {
@@ -280,6 +281,10 @@ const ice = group("IceMaker", icX, fzFloor, 0);
   for (let i = 0; i < 14; i++) {
     const c = mesh("IceCube", cube, iceCube, -0.055 + (i % 4) * 0.036 + (Math.floor(i / 4) % 2) * 0.012, 0.022 + Math.floor(i / 8) * 0.023, zf - 0.04 - Math.floor((i % 8) / 4) * 0.06 - (i % 3) * 0.012);
     c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
+    // each tipped cube rests on the bin's floor (its top 6 mm up) instead of dipping through it (21 Nov: down to 1.5 mm)
+    c.updateMatrix();
+    const cb = new THREE.Box3().setFromBufferAttribute(cube.attributes.position).applyMatrix4(c.matrix);
+    if (cb.min.y < 0.0065) c.position.y += 0.0065 - cb.min.y;
     ice.add(c);
   }
 }
@@ -407,7 +412,8 @@ function settle(items, { tries = 1, spread = 0, bounds = null, ceil = Infinity, 
   if (tipped.length) console.warn(`settle: no steady spot for ${tipped.join(", ")}`);
 }
 {
-  const v = trays.getObjectByName("FreshZoneStock"), drawerB = { hw: bbW / 2 - 0.014, z0: bbZ0 + 0.02, z1: bbZ1 - 0.008 };
+  // the food's bounds stay where they were before the box was narrowed 10 mm (5 mm clear of each wall), so it settles as before
+  const v = trays.getObjectByName("FreshZoneStock"), drawerB = { hw: bbW / 2 - 0.009, z0: bbZ0 + 0.02, z1: bbZ1 - 0.008 };
   const c = v.getObjectByName("Cauliflower");
   if (c) for (const m of c.children) if (m.isMesh && (m.rotation.x || m.rotation.z)) {
     m.updateMatrix();

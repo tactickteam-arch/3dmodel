@@ -359,7 +359,7 @@ def deodorizer():
         text(d, (45.5 * PX, h / 2), "D", font(AV, 11 * PX, 0), (236, 238, 241, 255))
         text(d, (56 * PX, h / 2 - 3.6 * PX), "Deodorizing", font(AV, 6.2 * PX, 0), ink, anchor="lm")
         text(d, (56 * PX, h / 2 + 4.0 * PX), "Filter", font(AV, 6.0 * PX, 4), (110, 114, 120, 255), anchor="lm")
-    decal("deodorizer.png", 135, 35, b, PX=8, bg=(0, 0, 0, 0))
+    decal("deodorizer.png", 135, 35, b, PX=12, bg=(0, 0, 0, 0))  # 12 px per mm (was 8)
 
 
 def coolpack():
