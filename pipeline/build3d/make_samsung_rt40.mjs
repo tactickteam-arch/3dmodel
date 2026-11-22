@@ -239,7 +239,8 @@ const icW = 0.188, icX = -inW / 2 + 0.045 + icW / 2, icH = 0.18, icD = 0.2, icZ1
   for (const sx of [-1, 1]) cab.add(box("IceHousingSide", 0.005, icH - 0.008, icD, white, icX + sx * (icW / 2 - 0.0025), y0 + (icH - 0.008) / 2, zc));
   cab.add(box("IceHousingBack", icW - 0.01, icH - 0.008, 0.005, white, icX, y0 + (icH - 0.008) / 2, icZ0 + 0.0025));
   // the floor grille (close-up: 410 mm along the floor's front, from x -0.175)
-  for (let i = 0; i < 11; i++) cab.add(box("FloorGrille", 0.03, 0.003, 0.005, grille, -0.16 + i * 0.037, fzFloor + 0.0015, frontFreezer - 0.008));
+  // the floor grille 1.6 mm high (was 3), so the ice bin, its floor 2 mm up, slides out over it instead of through it
+  for (let i = 0; i < 11; i++) cab.add(box("FloorGrille", 0.03, 0.0016, 0.005, grille, -0.16 + i * 0.037, fzFloor + 0.0008, frontFreezer - 0.008));
 }
 const ice = group("IceMaker", icX, fzFloor, 0);
 {
@@ -257,6 +258,10 @@ const ice = group("IceMaker", icX, fzFloor, 0);
   for (let i = 0; i < 14; i++) {
     const c = mesh("IceCube", cube, iceCube, -0.055 + (i % 4) * 0.036 + (Math.floor(i / 4) % 2) * 0.012, 0.022 + Math.floor(i / 8) * 0.023, zf - 0.04 - Math.floor((i % 8) / 4) * 0.06 - (i % 3) * 0.012);
     c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
+    // each tipped cube rests on the bin's floor (its top 6 mm up) instead of dipping through it (21 Nov: down to 1.5 mm)
+    c.updateMatrix();
+    const cb = new THREE.Box3().setFromBufferAttribute(cube.attributes.position).applyMatrix4(c.matrix);
+    if (cb.min.y < 0.0065) c.position.y += 0.0065 - cb.min.y;
     ice.add(c);
   }
 }
