@@ -24,11 +24,25 @@
 //   on or over the floor, under the partition tops) and clear of every other model and its open parts; the hall's
 //   faces never fight for the same depth (z-fighting), from the entrance, down an aisle, at the far end, close to a
 //   partition and from far out;
+// - round 4: filters (brand, 3 stars and up, Clear) dim the rest under veils; a tap on the floor plan walks there;
+//   the guided tour starts, steps to the next category and stops; on the card a swatch reloads the model in that
+//   colour, "View in your room" links that colour's product page, Fill the fridge fills it, Share copies the
+//   ?focus link and Compare opens /compare with both; ?aisle= and ?q= links; Tab reaches every control in page
+//   order; reduced motion moves at once; ?kiosk starts the tour when left alone and a touch stops it; a model
+//   that fails keeps its stand-in and loads on Try again; without WebGL a message links the catalogue; on a phone
+//   the floor plan starts folded; the hint, floor plan, buttons, loading bar and card never overlap (phone, and a
+//   1366x768 laptop with the card open); in a headset the floor plan, tour bar, filters and search list step aside;
+// - growth: served ~130 products in place of products.json (40 clones, a new category, a hidden one), every
+//   product stands once, the new category gets an aisle, no product or open door reaches another, each stays in
+//   its aisle, signs, panels, talkers, room sets, plants and the shop front clear every product and each other,
+//   the hall is built to its new size, search finds a clone, the overview still fits (laptop and phone), draw
+//   calls stay under 1000, the hidden one is absent;
 // - no console errors.
 // Emulation only: headless Chrome (SwiftShader) and IWER, not a real phone, Quest or Vision Pro.
 // usage: node test_showroom.mjs <base url> <out dir> <iwer.min.js>   (PORT and PORT+1: the two browsers' debugging ports)
 import fs from "node:fs";
 import { launch, sleep } from "./cdp.mjs";
+import { finishPath } from "../../site.js"; // the card links each colour's product page, as the catalogue does
 
 const [base, out, iwerPath = "tools/iwer.min.js"] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
@@ -144,6 +158,8 @@ await b.waitFor("window.__showroom.slots().every((s) => s.loaded || s.stand.phot
 let si = await standIns();
 check(si.n > 0 && !si.bad.length, `the ${si.n} not loaded stand as a box in their colour with their photo on the front; the loaded ones don't${si.bad.length ? `: ${si.bad.slice(0, 2).join(", ")}` : ""}`);
 check(ld.loaded <= ld.cap && ld.maxSeen <= ld.cap && !ld.failed.length, `from the entrance: ${ld.loaded} loaded (most at once ${ld.maxSeen}), none failed`);
+const tags0 = await sr("labels()");
+check(tags0.length > 0 && tags0.length <= 14 && !(await tagsUnderUI()).length, `with no card open, name tags on the ${tags0.length} products nearest in your aisle, none under the page's buttons`);
 // it opens at eye height just inside the entrance, after a slow step in, looking down the middle aisle
 await settle();
 const cam0 = await sr("camera()");
@@ -209,17 +225,17 @@ let card = await sr("card()");
 let cam = await sr("camera()");
 let sx = await slotOf(X.id);
 const camDist = Math.hypot(...cam.pos.map((v, i) => v - sx.center[i]));
-check(await sr("selected()") === X.id && card.shown && card.name === X.shortName && card.link === `/p/${X.id}`, `the ${X.id} chip opens its card (${card.name}, ${card.link})`);
+check(await sr("selected()") === X.id && card.shown && card.name === X.shortName && card.link === finishPath(X, 0), `the ${X.id} chip opens its card (${card.name}, ${card.link})`);
 check(camDist > 1.2 && camDist < 3 && hyp(cam.target, sx.center) < 0.05, `and flies to it: ${camDist.toFixed(2)} m from it, looking at it`);
 const labels = await sr("labels()");
 const cut = await b.evalJS(`(() => { const st = document.getElementById("stage").getBoundingClientRect();
   return [...document.querySelectorAll("#labels .tag")].filter((t) => t.style.display !== "none").filter((t) => { const r = t.getBoundingClientRect(); return r.top < st.top || r.left < st.left || r.right > st.right; }).length; })()`);
-check(labels.length > 0 && labels.length <= 14 && !cut, `up close, whole name tags on ${labels.length} products near it (${cut} cut off)`);
+check(!labels.length && !cut, `with its card open the card names it: no name tags crowd the view (${labels.join(", ") || "none"})`);
 let under = await tagsUnderUI();
 check(!under.length, `no name tag under the buttons, card or dock${under.length ? `: ${under.join(", ")}` : ""}`);
 check(await loadedSoon(X.id), "its 3D model loads");
 await sleep(600);
-check(await b.evalJS(`[...document.querySelectorAll("#pcParts button")].length === ${X.parts.length} && [...document.querySelectorAll("#pcParts button")].every((x) => !x.disabled)`), `the card has its ${X.parts.length} part buttons, enabled once loaded`);
+check(await b.evalJS(`[...document.querySelectorAll("#pcParts button[data-key]")].length === ${X.parts.length} && [...document.querySelectorAll("#pcParts button")].every((x) => !x.disabled)`), `the card has its ${X.parts.length} part buttons, enabled once loaded`);
 sx = await slotOf(X.id);
 check(sx.meshes > 0 && sx.meshes < 160, `its model is drawn with ${sx.meshes} meshes (fixed parts merged, food left out)`);
 await b.shot(`${out}/showroom-product.png`);
@@ -437,7 +453,7 @@ lay = await sr("layout()");
 const qc = await sr("caps");
 check(qc.canVR && qc.canAR && qc.CAP === 6 && qc.CAP_XR === 6 && qc.TEX_MAX === 1024, `Quest: VR and passthrough offered, ${qc.CAP} models at once, textures up to ${qc.TEX_MAX} px`);
 if (await enter("btnVR", "vr")) {
-  check(await b.evalJS(`document.body.classList.contains("in-xr") && getComputedStyle(document.getElementById("dock")).display === "none"`), "the page's buttons step aside");
+  check(await b.evalJS(`document.body.classList.contains("in-xr") && ["dock", "minimap", "tourbar", "filters", "results"].every((id) => getComputedStyle(document.getElementById(id)).display === "none")`), "the page's buttons, floor plan, tour bar, filters and search list step aside");
   let info = await xi();
   sx = await slotOf(X.id);
   const stand = sx.center.map((v, i) => v + sx.front[i] * (sz(X).d / 2 + 1.25));
@@ -573,5 +589,311 @@ if (await enter("btnAR", "ar")) {
 const xrErrs = errorsIn(b.logs);
 check(!xrErrs.length, xrErrs.length ? `console errors: ${xrErrs.slice(0, 3).join(" | ")}` : "no console errors in the headset");
 b.close();
+// ───────────── round 4: filters, the floor plan, the tour and kiosk, the card's colours, food, compare and share,
+// deep links, reduced motion, no WebGL, a model that fails, the keyboard ─────────────
+{
+  const R = `${out}/r4`; fs.mkdirSync(R, { recursive: true });
+  // a browser just closed can hold its debugging port for a moment: wait until the port is free before the next one
+  const portFree = async (port) => { for (let i = 0; i < 60; i++) { try { await fetch(`http://127.0.0.1:${port}/json/version`); } catch { return; } await sleep(250); } };
+  const r4open = async (url, { port = PORT, view = [1440, 900, false, MAC], flags = [], before = null } = {}) => {
+    await portFree(port);
+    const br = await launch({ profile: `${R}/prof-${port}-${Math.random().toString(36).slice(2, 7)}`, port, flags });
+    await br.viewport(...view);
+    if (before) await before(br);
+    await br.go(url);
+    return br;
+  };
+  const r4ready = (br) => br.waitFor("!!window.__showroom && !document.getElementById('loading')", 120000);
+  const r4sr = (br, e) => br.evalJS(`window.__showroom.${e}`);
+  const r4settle = async (br) => { await sleep(200); await br.waitFor("!window.__showroom.camera().flying", 60000); await sleep(300); };
+  const specOf = (p, re) => (p.specs || []).find(([k]) => re.test(k))?.[1];
+  const starsOf = (p) => { const m = String(specOf(p, /^energy rating$/i) || "").match(/(\d)\s*star/i); return m ? +m[1] : null; };
+
+  console.log("\n[filters]");
+  let br = await r4open(`${base}/showroom`);
+  check(await r4ready(br), "the showroom opens");
+  await br.evalJS("document.getElementById('btnFilters').click()");
+  await sleep(300);
+  const brand = "LG", nBrand = products.filter((p) => p.brand === brand).length;
+  await br.evalJS(`document.querySelector('#filters [data-brand="${brand}"]').click()`);
+  await sleep(300);
+  let dim = await r4sr(br, "dimmed()"), cnt = await br.evalJS("document.getElementById('fCount').textContent");
+  check(dim.length === products.length - nBrand && dim.every((id) => byId.get(id).brand !== brand) && cnt.startsWith(`${nBrand} of ${products.length}`), `${brand}: ${nBrand} stay lit, the other ${dim.length} dim ("${cnt}")`);
+  check(await r4sr(br, "veils()") === dim.length, "a veil over each dimmed product");
+  await br.evalJS(`document.querySelector('#filters [data-stars="3"]')?.click()`);
+  await sleep(300);
+  dim = await r4sr(br, "dimmed()");
+  const lit = products.filter((p) => !dim.includes(p.id));
+  check(lit.length > 0 && lit.every((p) => p.brand === brand && starsOf(p) >= 3), `and 3 stars and up: ${lit.length} lit, each ${brand} with 3 stars or more in its specs`);
+  await br.evalJS("document.getElementById('fClear').click()");
+  await sleep(300);
+  check((await r4sr(br, "dimmed()")).length === 0 && await r4sr(br, "veils()") === 0, "Clear filters lights them all again");
+  await br.evalJS("document.getElementById('btnFilters').click()");
+
+  console.log("\n[the floor plan]");
+  const lay4 = await r4sr(br, "layout()"), a2 = lay4.aisles[1];
+  const mp = await r4sr(br, `mmPoint(${a2.mid}, -5)`);
+  check(!!mp, "a laptop shows the floor plan");
+  for (const type of ["mousePressed", "mouseReleased"]) await br.send("Input.dispatchMouseEvent", { type, x: mp[0], y: mp[1], button: "left", clickCount: 1 });
+  await r4settle(br);
+  let c4 = await r4sr(br, "camera()");
+  check(Math.abs(c4.pos[0] - a2.mid) < 0.4 && Math.abs(c4.pos[2] + 5) < 0.8 && Math.abs(c4.pos[1] - 1.6) < 0.05, `a tap on it walks you there (aisle 2 at 5 m: camera ${c4.pos})`);
+
+  console.log("\n[the guided tour]");
+  await br.evalJS("document.getElementById('btnTour').click()");
+  await r4settle(br);
+  let t = await r4sr(br, "tour()");
+  check(t.on && t.playing && t.at === t.stops[0] && await r4sr(br, "selected()") === t.stops[0] && !(await br.evalJS("document.getElementById('tourbar').classList.contains('hide')")), `Guided tour starts at the first category's first product (${t.stops[0]}), its card open`);
+  await br.evalJS("document.getElementById('tourNext').click()");
+  await r4settle(br);
+  t = await r4sr(br, "tour()");
+  const sel = await r4sr(br, "selected()");
+  check(t.at === t.stops[1] && sel === t.stops[1] && byId.get(sel).category !== byId.get(t.stops[0]).category, `Next walks to the next aisle's first product (${sel})`);
+  await br.evalJS("document.getElementById('tourPlay').click()");
+  check(!(await r4sr(br, "tour()")).playing, "Pause pauses it");
+  await br.evalJS("document.getElementById('tourStop').click()");
+  check(!(await r4sr(br, "tour()")).on && await br.evalJS("document.getElementById('tourbar').classList.contains('hide')"), "and the cross ends it");
+
+  console.log("\n[the card: colour, food, compare, share]");
+  const MF = products.find((p) => (p.finishes || []).length > 1 && p.category === "Refrigerator") || products.find((p) => (p.finishes || []).length > 1);
+  await br.evalJS(`document.querySelector('.chip[data-id="${MF.id}"]').click()`);
+  await r4settle(br);
+  await br.waitFor(`window.__showroom.slots().find((s) => s.id === "${MF.id}").loaded`, 120000);
+  const loads0 = (await r4sr(br, "loader()")).loads;
+  await br.evalJS(`document.querySelector('#pcSwatches button[data-i="1"]').click()`);
+  await sleep(500);
+  await br.waitFor(`window.__showroom.slots().find((s) => s.id === "${MF.id}").loaded`, 120000);
+  check(await r4sr(br, `finish("${MF.id}")`) === 1 && (await r4sr(br, "loader()")).loads > loads0 && await br.evalJS(`document.querySelector('#pcSwatches button[data-i="1"]').getAttribute("aria-pressed")`) === "true",
+    `a swatch shows ${MF.id} in ${MF.finishes[1].name}, in place (its model loaded again in that colour)`);
+  const href = await br.evalJS("document.getElementById('pcLink').getAttribute('href')");
+  check(href === finishPath(MF, 1), `"View in your room" opens the product page's AR for that colour (${href})`);
+  // food: a fridge whose model has it
+  await br.evalJS(`document.querySelector('.chip[data-id="${X.id}"]').click()`);
+  await r4settle(br);
+  await br.waitFor(`window.__showroom.slots().find((s) => s.id === "${X.id}").loaded`, 120000);
+  const hasFill = await br.evalJS("!!document.querySelector('#pcParts button[data-fill]')");
+  if (hasFill) {
+    check(await r4sr(br, `stock("${X.id}")`) === 0, "the fridges stand empty, as the product page opens them");
+    await br.evalJS("document.querySelector('#pcParts button[data-fill]').click()");
+    await sleep(500);
+    await br.waitFor(`window.__showroom.slots().find((s) => s.id === "${X.id}").loaded && window.__showroom.stock("${X.id}") > 0`, 120000);
+    check(await r4sr(br, `stock("${X.id}")`) > 0 && await br.evalJS("document.querySelector('#pcParts button[data-fill]').textContent") === "Empty the fridge", `Fill the fridge fills ${X.id} (${await r4sr(br, `stock("${X.id}")`)} pieces)`);
+  } else check(false, `${X.id}'s card offers Fill the fridge`);
+  // a shorter laptop screen: the card, the floor plan, the buttons and the hint never sit on each other
+  await br.viewport(1366, 768, false, MAC);
+  await sleep(800);
+  const lapOv = await br.evalJS(`(() => {
+    const els = ["hint", "minimap", "tools", "pcard"].map((id) => document.getElementById(id))
+      .filter((e) => e && e.offsetParent && !e.classList.contains("gone") && getComputedStyle(e).visibility !== "hidden").map((e) => [e.id, e.getBoundingClientRect()]);
+    const out = [];
+    for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const [a, r] = els[i], [c, u] = els[j];
+      if (r.left < u.right && u.left < r.right && r.top < u.bottom && u.top < r.bottom) out.push(a + " / " + c); }
+    return out; })()`);
+  check(!lapOv.length, `at 1366x768 with the card open, nothing on screen covers anything else${lapOv.length ? `: ${lapOv.join(", ")}` : ""}`);
+  await br.viewport(1440, 900, false, MAC);
+  await sleep(500);
+  // share: the link to this spot
+  await br.evalJS("window.__copied = null; navigator.clipboard.writeText = async (t) => { window.__copied = t; };");
+  await br.evalJS("document.getElementById('pcShare').click()");
+  await sleep(300);
+  const copied = await br.evalJS("window.__copied");
+  check(copied === `${new URL(base).origin}/showroom?focus=${X.id}`, `Share this spot copies ${copied}`);
+  // compare: this one, then another
+  await br.evalJS("document.getElementById('pcCompare').click()");
+  await br.evalJS(`document.querySelector('.chip[data-id="${MF.id}"]').click()`);
+  await sleep(300);
+  const ctext = await br.evalJS("document.getElementById('pcCompare').textContent");
+  check(ctext.startsWith("Compare with"), `on a second product the button reads "${ctext}"`);
+  await br.evalJS("document.getElementById('pcCompare').click()");
+  await br.waitFor("location.pathname === '/compare'", 20000);
+  const cu = new URL(await br.evalJS("location.href"));
+  check(cu.searchParams.get("a") === X.id && cu.searchParams.get("b") === MF.id, `and opens the two side by side (${cu.pathname}${cu.search})`);
+  const e1 = errorsIn(br.logs.filter((l) => !/compare/i.test(l)));
+  check(!e1.length, e1.length ? `console errors: ${e1.slice(0, 3).join(" | ")}` : "no console errors");
+  br.close();
+
+  console.log("\n[links, the keyboard, reduced motion]");
+  const Ylk = products.filter((p) => p.category === "Washing machine").at(-1) || products.at(-1);
+  br = await r4open(`${base}/showroom?aisle=2`, { port: PORT + 1 });
+  await r4ready(br); await r4settle(br);
+  c4 = await r4sr(br, "camera()");
+  check(Math.abs(c4.pos[0] - lay4.aisles[1].mid) < 0.3 && Math.abs(c4.target[0] - lay4.aisles[1].mid) < 0.3, `?aisle=2 opens at aisle 2 (camera x ${c4.pos[0]}, aisle ${lay4.aisles[1].mid})`);
+  br.close();
+  br = await r4open(`${base}/showroom?q=${encodeURIComponent(Ylk.model)}`);
+  await r4ready(br); await r4settle(br);
+  check(await r4sr(br, "selected()") === Ylk.id, `?q=${Ylk.model} walks to ${Ylk.id}`);
+  // Tab reaches every control, in order
+  const seen = [];
+  await br.evalJS("document.activeElement?.blur()");
+  for (let i = 0; i < 40; i++) {
+    await br.send("Input.dispatchKeyEvent", { type: "rawKeyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    await br.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    seen.push(await br.evalJS("(document.activeElement.id || document.activeElement.className || document.activeElement.tagName) + ''"));
+  }
+  const need = ["mmToggle", "btnOverview", "btnTour", "pcClose", "btnFilters", "q"];
+  check(need.every((id) => seen.includes(id)) && seen.some((x) => /chip/.test(x)), `Tab reaches the floor plan, the buttons, the card, the filters, the search and the chips (${need.filter((id) => !seen.includes(id)).join(", ") || "all"})`);
+  check(need.map((id) => seen.indexOf(id)).every((v, i, a) => !i || v > a[i - 1]), "in the order they stand on the page");
+  br.close();
+  br = await r4open(`${base}/showroom`, { before: (x) => x.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] }) });
+  await r4ready(br);
+  await sleep(500);
+  c4 = await r4sr(br, "camera()");
+  check(!c4.flying && Math.abs(c4.pos[1] - 1.6) < 0.05, `with reduce motion it opens at the door without the step in (camera ${c4.pos})`);
+  await br.evalJS(`document.querySelector('.chip[data-id="${X.id}"]').click()`);
+  await sleep(150);
+  c4 = await r4sr(br, "camera()");
+  const sx4 = (await r4sr(br, "slots()")).find((s) => s.id === X.id);
+  check(!c4.flying && hyp(c4.target, sx4.center) < 0.05, "and a chip moves you to its product at once, no flight");
+  br.close();
+
+  console.log("\n[kiosk: the tour on its own]");
+  br = await r4open(`${base}/showroom?kiosk&idle=3`);
+  await r4ready(br);
+  await br.waitFor("window.__showroom.tour().on", 20000);
+  t = await r4sr(br, "tour()");
+  check(t.on && t.kiosk, "?kiosk starts the tour after the screen is left alone (3 s here, a minute by default)");
+  for (const type of ["mousePressed", "mouseReleased"]) await br.send("Input.dispatchMouseEvent", { type, x: 700, y: 400, button: "left", clickCount: 1 });
+  await sleep(300);
+  check(!(await r4sr(br, "tour()")).on, "and a touch stops it");
+  br.close();
+
+  console.log("\n[a model that won't load]");
+  const Z = products.find((p) => p.id !== X.id && p.category === "Refrigerator" && !p.glb.includes(X.id)) || products[1];
+  br = await r4open(`${base}/showroom?focus=${Z.id}`, { before: async (x) => {
+    x.on("Fetch.requestPaused", (e) => (x.block && e.request.url.includes(Z.glb) ? x.send("Fetch.failRequest", { requestId: e.requestId, errorReason: "Failed" }) : x.send("Fetch.continueRequest", { requestId: e.requestId })));
+    x.block = true;
+    await x.send("Fetch.enable", { patterns: [{ urlPattern: "*.glb*" }] });
+  } });
+  await r4ready(br);
+  await br.waitFor(`window.__showroom.loader().failed.includes("${Z.id}")`, 60000);
+  const zs = (await r4sr(br, "slots()")).find((s) => s.id === Z.id);
+  check(zs.stand.shown && !zs.loaded, `${Z.id} fails to load: its stand-in stays`);
+  check(!(await br.evalJS("document.getElementById('pcRetry').classList.contains('hide')")), "and its card offers to try again");
+  br.block = false;
+  await br.evalJS("document.getElementById('pcRetry').click()");
+  check(await br.waitFor(`window.__showroom.slots().find((s) => s.id === "${Z.id}").loaded`, 120000), "which loads it");
+  const e2 = errorsIn(br.logs);
+  check(!e2.length, e2.length ? `console errors: ${e2.slice(0, 3).join(" | ")}` : "no console errors (a failed model is a warning, not an error)");
+  br.close();
+
+  console.log("\n[no WebGL]");
+  br = await r4open(`${base}/showroom`, { flags: ["--disable-webgl", "--disable-3d-apis"] });
+  await br.waitFor("!!document.getElementById('nogl')", 30000);
+  check(await br.evalJS("!!document.querySelector('#nogl a[href=\"/\"]') && getComputedStyle(document.getElementById('dock')).display === 'none'"), "without WebGL: a plain message and a link to the catalogue, no empty 3D page");
+  const e3 = errorsIn(br.logs);
+  check(!e3.length, e3.length ? `console errors: ${e3.slice(0, 3).join(" | ")}` : "and no console errors");
+  br.close();
+
+  console.log("\n[phone: the floor plan and filters]");
+  br = await r4open(`${base}/showroom`, { view: [390, 844, true, IPHONE], port: PORT + 1 });
+  await r4ready(br);
+  // the corner pieces (hint, floor plan, the buttons, the loading pill) never sit on each other
+  const overlaps = () => br.evalJS(`(() => {
+    const els = ["hint", "minimap", "tools", "progress"].map((id) => document.getElementById(id))
+      .filter((e) => e && e.offsetParent && !e.classList.contains("gone") && !e.classList.contains("hide") && getComputedStyle(e).visibility !== "hidden").map((e) => [e.id, e.getBoundingClientRect()]);
+    const out = [];
+    for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const [a, r] = els[i], [c, u] = els[j];
+      if (r.left < u.right && u.left < r.right && r.top < u.bottom && u.top < r.bottom) out.push(a + " / " + c); }
+    return out; })()`);
+  let ov = await overlaps();
+  check(!ov.length, `on a phone the hint, floor plan, buttons and loading bar don't overlap${ov.length ? `: ${ov.join(", ")}` : ""}`);
+  check(await r4sr(br, "mmPoint(0, -5)") === null && await br.evalJS("!!document.getElementById('mmToggle').offsetParent"), "on a phone the floor plan starts folded, with a button to open it");
+  await br.evalJS("document.getElementById('mmToggle').click()");
+  check(Array.isArray(await r4sr(br, "mmPoint(0, -5)")), "which opens it");
+  for (let i = 0; i < 12 && (ov = await overlaps()).length; i++) await sleep(250);
+  check(!ov.length, `opened, it overlaps nothing either${ov.length ? `: ${ov.join(", ")}` : ""}`);
+  check(await br.evalJS("!!document.getElementById('btnFilters').offsetParent && document.documentElement.scrollWidth <= innerWidth"), "the filters button is there and nothing is wider than the screen");
+  await br.shot(`${R}/phone.png`);
+  const e4 = errorsIn(br.logs);
+  check(!e4.length, e4.length ? `console errors: ${e4.slice(0, 3).join(" | ")}` : "no console errors on the phone");
+  br.close();
+}
+// ───────────── growth: the hall lays itself out again for a much bigger catalogue ─────────────
+// Served a bigger products.json (the real list, 40 clones with new ids, models and item codes, a new category with no
+// sign artwork of its own, and a hidden product) in place of the real one, only in this browser.
+{
+  const G = `${out}/growth`; fs.mkdirSync(G, { recursive: true });
+  const real = await (await fetch(`${base}/products.json`)).json();
+  const shown = real.products.filter((p) => !p.hidden);
+  const tag = (p, k, extra = {}) => ({ ...structuredClone(p), id: `${p.id}-${k}`, model: `${p.model}${k.toUpperCase()}`,
+    finishes: (p.finishes || []).map((f) => ({ ...f, itemCode: f.itemCode && `${f.itemCode}${k.toUpperCase()}`, code: f.code && `${f.code}${k.toUpperCase()}` })), ...extra });
+  const clones = shown.slice(0, 40).map((p) => tag(p, "x2"));
+  const small = shown.filter((p) => p.placement !== "wall").sort((a, c) => parseFloat(a.size.h) - parseFloat(c.size.h)).slice(0, 4);
+  const micro = [...Array(10)].map((_, i) => tag(small[i % small.length], `mw${i}`, { category: "Microwave", hidden: false }));
+  const hidden = tag(shown[0], "hid", { hidden: true });
+  const body = Buffer.from(JSON.stringify({ ...real, products: [...real.products, ...clones, ...micro, hidden] })).toString("base64");
+  const N = shown.length + clones.length + micro.length;
+  const gopen = async (viewport, port) => {
+    for (let i = 0; i < 60; i++) { try { await fetch(`http://127.0.0.1:${port}/json/version`); } catch { break; } await sleep(250); }
+    const g = await launch({ profile: `${G}/prof-${viewport[0]}`, port });
+    g.on("Fetch.requestPaused", (e) => (/\/products\.json(\?|$)/.test(e.request.url)
+      ? g.send("Fetch.fulfillRequest", { requestId: e.requestId, responseCode: 200, responseHeaders: [{ name: "Content-Type", value: "application/json" }], body })
+      : g.send("Fetch.continueRequest", { requestId: e.requestId })));
+    await g.send("Fetch.enable", { patterns: [{ urlPattern: "*products.json*" }] });
+    await g.viewport(...viewport);
+    await g.go(`${base}/showroom`);
+    await g.waitFor("!!window.__showroom && !document.getElementById('loading')", 120000);
+    return g;
+  };
+  const gsr = (g, e) => g.evalJS(`window.__showroom.${e}`);
+  const gsettle = async (g) => { await sleep(200); await g.waitFor("!window.__showroom.camera().flying", 60000); await sleep(300); };
+  const hit = (a, c, tol) => a.min[0] < c.max[0] - tol && c.min[0] < a.max[0] - tol && a.min[1] < c.max[1] - tol && c.min[1] < a.max[1] - tol && a.min[2] < c.max[2] - tol && c.min[2] < a.max[2] - tol;
+
+  console.log(`\n[growth: ${N} products on show (${shown.length} real, ${clones.length} clones, ${micro.length} in a new category), one hidden]`);
+  let g = await gopen([1440, 900, false, MAC], PORT);
+  const gl = await gsr(g, "layout()"), gs = await gsr(g, "slots()"), ids = new Set(gs.map((s) => s.id));
+  check(gs.length === N && [...clones, ...micro].every((p) => ids.has(p.id)), `every product stands in the hall once (${gs.length} of ${N})`);
+  check(!ids.has(hidden.id), "the hidden one isn't there");
+  check(gl.aisles.some((a) => a.cat === "Microwave"), `the new category gets its own aisle: ${gl.aisles.map((a) => `${a.cat}${a.of > 1 ? ` ${a.part}/${a.of}` : ""} (${a.n})`).join(", ")}`);
+  const plan = await gsr(g, "plan()");
+  const clash = [];
+  for (let i = 0; i < plan.length; i++) for (let j = i + 1; j < plan.length; j++)
+    for (const x of plan[i].boxes) for (const y of plan[j].boxes) if (hit(x, y, 0.001)) { clash.push(`${plan[i].id}${x.open ? " (open)" : ""} / ${plan[j].id}${y.open ? " (open)" : ""}`); break; }
+  check(!clash.length, `no product or open door reaches another${clash.length ? `: ${clash.slice(0, 3).join(", ")}` : ""}`);
+  const outside = plan.filter((p) => { const a = gl.aisles[p.aisle]; return p.boxes.some((x) => x.min[0] < a.x[0] - 0.001 || x.max[0] > a.x[1] + 0.001 || x.max[2] > 0.001 || x.min[2] < -gl.D || x.max[1] > gl.WALL_H); });
+  check(!outside.length, `every one, doors open, inside its aisle and the hall${outside.length ? `: ${outside.slice(0, 3).map((p) => p.id).join(", ")}` : ""}`);
+  const fx = await gsr(g, "fixtures()");
+  const fxp = [];
+  for (const f of fx) for (const p of plan) if (p.boxes.some((x) => hit(f, x, 0.002))) fxp.push(`${f.tag} / ${p.id}`);
+  check(!fxp.length, `signs, panels, talkers, the reception, the room sets, plants and the shop front (${fx.length} pieces) keep clear of every product${fxp.length ? `: ${[...new Set(fxp)].slice(0, 4).join(", ")}` : ""}`);
+  const ff = [];
+  for (let i = 0; i < fx.length; i++) for (let j = i + 1; j < fx.length; j++) if (fx[i].tag !== fx[j].tag && hit(fx[i], fx[j], 0.002)) ff.push(`${fx[i].tag} / ${fx[j].tag}`);
+  check(!ff.length, `and of each other${ff.length ? `: ${[...new Set(ff)].slice(0, 4).join(", ")}` : ""}`);
+  const hb = await gsr(g, "hallBox()");
+  const W0 = typeof lay !== "undefined" ? lay.W : 0;
+  check(gl.W > W0 && Math.abs(hb.min[0] + gl.W / 2) < 0.1 && Math.abs(hb.max[0] - gl.W / 2) < 0.1 && Math.abs(hb.min[2] + gl.D) < 0.1 && hb.max[1] >= gl.WALL_H - 0.01,
+    `the walls, floor and ceiling grow with it: ${W0 || "the real hall's"} m wide becomes ${gl.W} x ${gl.D} m, built ${(hb.max[0] - hb.min[0]).toFixed(2)} x ${(-hb.min[2]).toFixed(2)} m`);
+  const C = clones.at(-1);
+  await g.evalJS("document.getElementById('q').focus()");
+  await g.send("Input.insertText", { text: C.model });
+  await sleep(300);
+  await g.send("Input.dispatchKeyEvent", { type: "rawKeyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+  await g.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+  await gsettle(g);
+  check(await gsr(g, "selected()") === C.id, `search finds the clone ${C.model} and walks to it`);
+  await g.evalJS("document.getElementById('btnOverview').click()");
+  await gsettle(g);
+  await g.waitFor("window.__showroom.loader().loading === 0", 120000);
+  await sleep(500);
+  const far = [[-gl.W / 2, 0, -gl.D], [gl.W / 2, 0, -gl.D], [-gl.W / 2, gl.WALL_H, -gl.D], [gl.W / 2, gl.WALL_H, -gl.D]];
+  const corners = await gsr(g, `project(${JSON.stringify([...far, [-gl.W / 2, 0, 0], [gl.W / 2, 0, 0]])})`);
+  check(corners.every(([x, y]) => Math.abs(x) <= 1.02 && Math.abs(y) <= 1.02), "from above the whole hall is still in view");
+  const draws = await gsr(g, "draws()");
+  check(draws < 1000, `${draws} draw calls from above with ${(await gsr(g, "loader()")).loaded} models loaded (cap 1000)`);
+  await g.shot(`${G}/overview.png`);
+  const ge = errorsIn(g.logs);
+  check(!ge.length, ge.length ? `console errors: ${ge.slice(0, 3).join(" | ")}` : "no console errors");
+  g.close();
+  g = await gopen([390, 844, true, IPHONE], PORT + 1);
+  await g.evalJS("document.getElementById('btnOverview').click()");
+  await gsettle(g);
+  const pc = await gsr(g, `project(${JSON.stringify(far)})`);
+  check(pc.every(([x, y]) => Math.abs(x) <= 1.02 && Math.abs(y) <= 1.02), "on a phone, from above, the far end is in view");
+  await g.shot(`${G}/phone-overview.png`);
+  const gpe = errorsIn(g.logs);
+  check(!gpe.length, gpe.length ? `console errors: ${gpe.slice(0, 3).join(" | ")}` : "no console errors on the phone");
+  g.close();
+}
+
 console.log(`\n${passed} passed, ${failed} failed checks`);
 process.exit(failed ? 1 : 0);

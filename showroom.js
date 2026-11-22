@@ -22,7 +22,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { Reflector } from "three/addons/objects/Reflector.js";
-import { esc, cm, partAt, needsOf, CATEGORIES } from "/site.js";
+import { esc, cm, partAt, needsOf, CATEGORIES, finishPath, finishSlug } from "/site.js";
 import { shownProducts } from "/live.js";
 import { radialTexture, roundRect, wrapText, makeTooltip, makeCard } from "/xr.js";
 import { loadPrices, mopOf, mopText } from "/prices.js";
@@ -38,7 +38,9 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const Y = new THREE.Vector3(0, 1, 0);
 const AXES = { x: new THREE.Vector3(1, 0, 0), y: Y, z: new THREE.Vector3(0, 0, 1) };
-const SWING_MS = 900;
+// with "reduce motion" on, nothing eases: flights, the view sliding aside for the card and doors all move at once
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SWING_MS = reduceMotion ? 1 : 900;
 function toast(text, ms = 3500) {
   const t = $("toast");
   t.textContent = text;
@@ -183,7 +185,17 @@ const L = makeLayout();
 
 // ── renderer and scene ──
 const stage = $("stage");
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+// No WebGL (switched off, or an old or locked-down browser): say so plainly and offer the catalogue, and stop here.
+let renderer = null;
+try {
+  const probe = document.createElement("canvas");
+  if (probe.getContext("webgl2") || probe.getContext("webgl")) renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+} catch { renderer = null; }
+if (!renderer) {
+  $("loading").innerHTML = `<div class="nogl glass" id="nogl"><h2>This browser can’t show the 3D showroom</h2>3D graphics (WebGL) are switched off or not available here. Every product is still in the catalogue, with its photos and details.<br><a href="/">See every product</a></div>`;
+  $("dock").classList.add("hide"); $("tools").classList.add("hide"); $("hint").classList.add("hide"); $("minimap").classList.add("hide");
+  await new Promise(() => {}); // (the rest of the page needs WebGL)
+}
 renderer.setPixelRatio(Math.min(devicePixelRatio, light ? 1.5 : 2));
 renderer.setSize(stage.clientWidth, stage.clientHeight, false);
 // filmic tone mapping and a warm key light over a neutral studio environment, as a lit shop floor
@@ -255,9 +267,14 @@ const softRect = (inset, blur, alpha) => canvasTexture(256, 256, (g) => {
 // one mesh per material for everything that never moves
 const bins = new Map();
 const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), ONE = new THREE.Vector3(1, 1, 1);
+// The room's fixtures (signs, panels, talkers, the reception, the room sets, plants, the shop front), each piece's box
+// under its kind: the layout checks keep products and fixtures apart however the catalogue grows.
+const fixtures = [];
+let fixtureTag = null;
 function put(mat, geo, pos, rot = [0, 0, 0], frame = null) {
   geo.applyMatrix4(M4.compose(new THREE.Vector3(...pos), Q.setFromEuler(E.set(...rot)), ONE));
   if (frame) geo.applyMatrix4(frame);
+  if (fixtureTag) { geo.computeBoundingBox(); fixtures.push({ tag: fixtureTag, box: geo.boundingBox.clone() }); }
   if (!bins.has(mat)) bins.set(mat, []);
   bins.get(mat).push(geo);
 }
@@ -473,6 +490,7 @@ mats.trim.userData.block = false;
   put(washMat(D), new THREE.PlaneGeometry(D, WH), [W / 2 - 0.004, FASCIA - WH / 2, -D / 2], [0, -Math.PI / 2, 0]);
   put(washMat(W), new THREE.PlaneGeometry(W, WH), [0, FASCIA - WH / 2, -D + 0.004], [0, 0, 0]);
 
+  fixtureTag = "aisle sign";
   // a hanging sign at each aisle's entrance, both faces: its number, the category, how many and which brands
   L.aisles.forEach((a, i) => {
     a.n = i + 1;
@@ -521,6 +539,7 @@ mats.trim.userData.block = false;
     }
   });
 
+  fixtureTag = null;
   // the aisle's number and category on the floor at its entrance, for the view from above (the hanging sign is
   // nearly edge-on from there)
   {
@@ -546,6 +565,7 @@ mats.trim.userData.block = false;
     });
   }
 
+  fixtureTag = "reception";
   // the logo wall at the far end, with a counter in front of it
   const LW = Math.min(7, W * 0.4), LH = WALL_H;
   put(mats.trim, new THREE.BoxGeometry(LW, LH + 0.02, 0.08), [0, (LH - 0.02) / 2, -D + 0.04]);
@@ -593,6 +613,7 @@ mats.trim.userData.block = false;
   L.counter = { x: [-(CW + 0.05) / 2, (CW + 0.05) / 2], z: [cz - RD / 2 - 0.02, cz + RD / 2 + 0.04] };
 }
 
+fixtureTag = null;
 // ── the plinths, their name plates and the brand panels (from the layout) ──
 // A floor-standing product stands on a plinth 6 cm high, as deep as the deepest on its side of the aisle (so their
 // fronts line up), with its brand and name on the front; a product on the wall has the same plate under it. A brand
@@ -601,7 +622,8 @@ const PLATE = { w: 512, h: 48, cols: 4 }; // the name plates' cells in one textu
 const plateTex = canvasTexture(PLATE.w * PLATE.cols, 2 ** Math.ceil(Math.log2(Math.ceil(L.places.length / PLATE.cols) * PLATE.h)), () => {});
 const plateOf = new Map();
 const logoCells = new Map(); // brand -> cell in the logo texture
-const logoTex = canvasTexture(1024, 512, () => {});
+// (four brands to a row of cells, as many rows as the brands need)
+const logoTex = canvasTexture(1024, Math.max(512, 2 ** Math.ceil(Math.log2(Math.ceil(new Set(products.map((p) => p.brand)).size / 4) * 80))), () => {});
 {
   const pg = plateTex.image.getContext("2d");
   L.places.forEach((pl, i) => {
@@ -658,6 +680,7 @@ const logoTex = canvasTexture(1024, 512, () => {});
     // the pool of light from the downlight over it, on the floor in front
     put(pool, flat(pw + 0.7, 1.3), [0, 0.0016, front + 0.6], [0, 0, 0], frame);
   }
+  fixtureTag = "brand panel";
   // brand panels: one over each run of a brand along a side (floor-standing products only)
   const brands = [...new Set(products.map((p) => p.brand))];
   brands.forEach((b, i) => logoCells.set(b, [(i % 4) * 256, Math.floor(i / 4) * 80]));
@@ -682,7 +705,7 @@ const logoTex = canvasTexture(1024, 512, () => {});
   logoTex.needsUpdate = true;
   const panel = (b, w) => {
     const [x, y] = logoCells.get(b), g = new THREE.PlaneGeometry(w, w * 80 / 256), uv = g.attributes.uv;
-    for (let i = 0; i < uv.count; i++) uv.setXY(i, (x + (uv.getX(i) ? 256 : 0)) / 1024, 1 - (y + (uv.getY(i) ? 0 : 80)) / 512);
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, (x + (uv.getX(i) ? 256 : 0)) / 1024, 1 - (y + (uv.getY(i) ? 0 : 80)) / logoTex.image.height);
     return g;
   };
   // (on a partition: a charcoal header board on its cap, on that side's half of it, so the two sides' boards never
@@ -709,10 +732,11 @@ const logoTex = canvasTexture(1024, 512, () => {});
     }
   });
 
+  fixtureTag = "aisle panel";
   // a lit panel on the bare stretch of partition or wall between the entrance and each side's first product: the
   // aisle and category, and the logos of the brands along that side
-  const LP = { w: 512, h: 340, cols: 4, rows: 3 }, lk = HQ ? 1 : 0.5;
-  const lightTex = canvasTexture(LP.w * LP.cols * lk, 1024 * lk, () => {});
+  const LP = { w: 512, h: 340, cols: 4, rows: Math.ceil(L.aisles.length * 2 / 4) }, lk = HQ ? 1 : 0.5, LPH = Math.max(1024, 2 ** Math.ceil(Math.log2(LP.rows * LP.h)));
+  const lightTex = canvasTexture(LP.w * LP.cols * lk, LPH * lk, () => {});
   const lpg = lightTex.image.getContext("2d");
   const lightMat = onTop(new THREE.MeshBasicMaterial({ map: lightTex, toneMapped: false }), 1);
   let cell = 0;
@@ -754,15 +778,16 @@ const logoTex = canvasTexture(1024, 512, () => {});
       for (const b of runBrands) { if (!onLogo.has(b)) onLogo.set(b, []); onLogo.get(b).push(draw); }
       // a charcoal frame and the panel
       put(mats.trim, new THREE.BoxGeometry(0.03, ph + 0.05, pw + 0.05), [px + face * 0.015, y, z]);
-      const g = new THREE.PlaneGeometry(pw, ph), uv = g.attributes.uv, TW = LP.w * LP.cols, TH = 1024;
+      const g = new THREE.PlaneGeometry(pw, ph), uv = g.attributes.uv, TW = LP.w * LP.cols, TH = LPH;
       for (let i = 0; i < uv.count; i++) uv.setXY(i, (cx + (uv.getX(i) ? LP.w : 0)) / TW, 1 - (cy + (uv.getY(i) ? 0 : LP.h)) / TH);
       put(lightMat, g, [px + face * 0.032, y, z], [0, face * Math.PI / 2, 0]);
     }
   });
 }
+fixtureTag = null;
 // ── shelf talkers: a small card on the partition beside each product, where there is room: its brand, its name
 // and two of its listed specs (from the catalogue, word for word) ──
-const TALK = { w: 192, h: 256, cols: 10 }, TALK_SPECS = {
+const TALK = { w: 192, h: 256, cols: L.places.length > 150 ? 20 : 10 }, TALK_SPECS = {
   Refrigerator: ["Energy rating", "Compressor", "Type", "Convertible"],
   "Washing machine": ["Max spin", "Energy rating", "Motor", "Programmes"],
   "Air conditioner": ["Energy rating", "Inverter", "Capacity"],
@@ -830,10 +855,12 @@ const TALK = { w: 192, h: 256, cols: 10 }, TALK_SPECS = {
     const face = pl.side === "L" ? 1 : -1, px = pl.side === "L" ? pl.aisle.x0 + (outer ? 0 : PT / 2) : pl.aisle.x1 - (outer ? 0 : PT / 2);
     const z = edge + Math.min(room / 2, CW / 2 + 0.06);
     frame.identity();
+    fixtureTag = "talker";
     put(mats.trim, new THREE.BoxGeometry(0.012, CH + 0.016, CW + 0.016), [px + face * 0.006, 1.42, z]);
     const geo = new THREE.PlaneGeometry(CW, CH), uv = geo.attributes.uv;
     for (let j = 0; j < uv.count; j++) uv.setXY(j, (x + (uv.getX(j) ? TALK.w : 0)) / TW, 1 - (y + (uv.getY(j) ? 0 : TALK.h)) / TH);
     put(mat, geo, [px + face * 0.0135, 1.42, z], [0, face * Math.PI / 2, 0]);
+    fixtureTag = null;
   });
   tex.needsUpdate = true;
 }
@@ -920,6 +947,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
   const ball = (mat, r, x, y, z) => put(mat, new THREE.SphereGeometry(r, 14, 10), [x, y, z]);
   const boxR = (mat, w, h, d, pos, rot) => put(mat, new THREE.BoxGeometry(w, h, d), pos, rot);
   const TOP = 0.92; // worktops' height
+  fixtureTag = "kitchen";
   // the kitchen: oak base cabinets with steel handles under a veined stone top, a sink and tap, a black glass hob,
   // a tiled splashback lit from under gloss-white wall cabinets, and a few things on the counter
   const k0 = -W / 2 + 0.4, k1 = Math.min(-LW / 2 - 0.5, k0 + 4.2), kw = k1 - k0, kx = (k0 + k1) / 2;
@@ -969,6 +997,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
     });
     decor.push([k0, k1, -D, -D + 0.65]);
   }
+  fixtureTag = "laundry";
   // the laundry corner: a tall cabinet, a worktop over a washer bay and a dryer bay, baskets, shelves of
   // folded towels in colour and a rail of hanging ones
   const l1 = W / 2 - 0.4, l0 = Math.max(LW / 2 + 0.5, l1 - 3.4), lx = (l0 + l1) / 2;
@@ -1006,6 +1035,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
     [0, 2, 4].forEach((c, i) => { const x = r0 + (r1 - r0) * (0.2 + i * 0.3); box(m.towel2[c], 0.36, 0.32, 0.012, x, 1.36 - 0.16, -D + 0.33); });
     decor.push([l0, l1, -D, -D + 0.65]);
   }
+  fixtureTag = "living room";
   // under the air conditioners, a living room: wooden slats on the wall, a sofa with cushions, a rug, a side
   // table with a lamp, and a framed abstract print
   const acs = L.places.filter((pl) => pl.p.placement === "wall");
@@ -1037,6 +1067,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
     put(m.print, new THREE.PlaneGeometry(0.76, 0.48), [X(0.056), 1.2, zc], [0, face * Math.PI / 2, 0]);
     decor.push([Math.min(px, X(1.0)), Math.max(px, X(1.0)), tz - 0.3, zc + SL / 2]);
   }
+  fixtureTag = "shop front";
   // the shop front, seen from inside: glass between slim charcoal mullions, an open door across each walkway
   // with its sliding leaves parked behind the fixed glass, and a lit header with the orange line. Every face looks
   // into the hall only, so from the entrance, the step in and the view from above it isn't there (the dollhouse).
@@ -1085,6 +1116,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
       }
     }
   }
+  fixtureTag = "plant";
   // plants: a tall leafy one in a dark pot, standing where there is room
   const plant = (x, z, h = 1.1) => {
     put(m.pot, new THREE.CylinderGeometry(0.2, 0.16, 0.42, 20), [x, 0.21, z]);
@@ -1098,10 +1130,11 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
     decor.push([x - 0.3, x + 0.3, z - 0.3, z + 0.3]);
   };
   const c = L.counter;
-  plant(c.x[0] - 0.7, -D + 0.45); plant(c.x[1] + 0.7, -D + 0.45);
+  plant(c.x[0] - 0.7, -D + 0.75); plant(c.x[1] + 0.7, -D + 0.75); // (far enough off the logo wall for the leaves)
   plant(-W / 2 + 0.45, 0.9, 1.2); plant(W / 2 - 0.45, 0.9, 1.2);
 }
 
+fixtureTag = null;
 bakeAll();
 plainFloor = hall.children.find((m) => m.material === mats.floor);
 // the polished floor shows only from inside the hall, under the ceiling (the view from above keeps the plain floor)
@@ -1305,8 +1338,18 @@ async function load(s) {
   } finally {
     s.loading = false;
     ldr.inFlight--;
+    if (s.again) { s.again = false; reload(s); }
+    if (selected === s) renderCard();
     planSoon();
   }
+}
+// A product's model again: in another colour, filled or emptied, or after it failed. (One already on its way is
+// loaded again as soon as it lands.)
+function reload(s) {
+  s.failed = false;
+  if (s.loading) { s.again = true; return; }
+  unload(s);
+  load(s);
 }
 // A model that reaches further back than its slot allows (a cord or hose behind its published depth) is stood forward
 // just enough, so nothing goes into the partition or the wall behind it.
@@ -1356,9 +1399,9 @@ async function prepare(s, gltf) {
   // full anisotropic filtering on every texture, as xr.js: print and grain stay sharp at a slant
   const aniso = renderer.capabilities.getMaxAnisotropy();
   const sharpen = (m) => texturesOf(m).forEach((t) => (t.anisotropy = aniso));
-  // its first finish, as the product page opens it (KHR_materials_variants, as xr.js)
+  // its colour: the first, as the product page opens it, or the one picked on its card (KHR_materials_variants, as xr.js)
   const variants = gltf.userData.gltfExtensions?.KHR_materials_variants?.variants?.map((v) => v.name) || [];
-  const vi = variants.indexOf(s.p.finishes[0]?.variant);
+  const vi = variants.indexOf(s.p.finishes[s.finish || 0]?.variant);
   if (vi >= 0) {
     const jobs = [];
     root.traverse((o) => {
@@ -1372,8 +1415,9 @@ async function prepare(s, gltf) {
   // the fridge's food ("Fill the fridge" on the product page) stays out of the showroom, as the page starts empty
   const stock = [];
   root.traverse((o) => { if (o.userData.stock) stock.push(o); });
+  s.hasStock = stock.length > 0;
   const dropped = new THREE.Group();
-  for (const o of stock) if (!stock.includes(o.parent)) dropped.add(o);
+  if (!s.filled) for (const o of stock) if (!stock.includes(o.parent)) dropped.add(o);
   // the moving parts, as xr.js swings them
   const nodes = new Map();
   for (const part of s.p.parts || []) { const n = root.getObjectByName(part.node); if (n) nodes.set(n, part); }
@@ -1533,6 +1577,7 @@ function setFilter(c) {
   $("cats").querySelectorAll(".cat").forEach((b) => b.setAttribute("aria-pressed", String((b.dataset.cat || null) === c)));
   $("chips").querySelectorAll(".chip").forEach((b) => b.classList.toggle("hide", !!c && byId.get(b.dataset.id).p.category !== c));
   $("chips").scrollLeft = 0;
+  if (!$("filters").classList.contains("hide")) renderFilters();
 }
 $("chips").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => select(byId.get(b.dataset.id), { fly: true })));
 
@@ -1563,7 +1608,7 @@ function measureTags() {
 }
 measureTags();
 document.fonts?.ready.then(() => { measureTags(); redraw(); });
-const FIXED = ["hint", "btnOverview", "btnVR", "btnAR", "pcard", "dock"];
+const FIXED = ["hint", "tools", "pcard", "dock", "minimap", "tourbar", "filters", "results", "progress"];
 function fixedRects() {
   const st = stage.getBoundingClientRect();
   return FIXED.map((id) => $(id)).filter((e) => e && e.offsetParent && !e.classList.contains("gone") && getComputedStyle(e).opacity !== "0")
@@ -1583,6 +1628,7 @@ function updateLabels() {
     s.group.localToWorld(s.labelAt);
     const d = s.labelAt.distanceTo(c);
     if (d > LABEL_RANGE || (inside && s.aisle !== mine) || !s.group.visible) continue;
+    if (selected) continue; // a product open: its card names it, and tags would only crowd the top of the view
     proj.copy(s.labelAt).project(camera);
     if (proj.z > 1 || proj.x < -1.05 || proj.x > 1.05 || proj.y < -1.05) continue; // above the view is handled below
     const [tw, th] = tagSize.get(s) || [160, 28], x = (proj.x + 1) / 2 * W;
@@ -1621,10 +1667,12 @@ function select(s, { fly = false } = {}) {
   for (const t of slots) t.tag.setAttribute("aria-pressed", String(t === s));
   $("chips").querySelectorAll(".chip").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.id === s?.p.id)));
   renderCard();
+  if (filterCount()) applyFilters();
+  mmDirty = true;
   if (!s) return;
   if (catFilter && s.p.category !== catFilter) setFilter(null);
   const chip = $("chips").querySelector(`.chip[data-id="${CSS.escape(s.p.id)}"]`);
-  if (chip) $("chips").scrollTo({ left: chip.offsetLeft - ($("chips").clientWidth - chip.offsetWidth) / 2, behavior: "smooth" });
+  if (chip) $("chips").scrollTo({ left: chip.offsetLeft - ($("chips").clientWidth - chip.offsetWidth) / 2, behavior: reduceMotion ? "auto" : "smooth" });
   if (fly) { const v = viewFor(s); flyTo(v.pos, v.target); }
   hintGone();
 }
@@ -1641,11 +1689,56 @@ function renderCard() {
   $("pcCat").textContent = `${p.brand} · ${p.category}`;
   $("pcName").textContent = p.shortName;
   $("pcMeta").textContent = `Model ${p.model} · W ${parseFloat(p.size.w)} × H ${parseFloat(p.size.h)} × D ${parseFloat(p.size.d)} cm${s.model ? "" : s.failed ? " · its 3D model couldn’t load" : " · loading its 3D model…"}`;
-  $("pcMop").textContent = mopText(mopOf(prices, p, s.finish || 0));
-  $("pcLink").href = `/p/${encodeURIComponent(p.id)}`;
-  $("pcParts").innerHTML = (p.parts || []).map((x) => `<button type="button" data-key="${esc(x.key)}" aria-pressed="${!!s.state[x.key]}" ${s.model ? "" : "disabled"}>${esc(partText(x, !!s.state[x.key]))}</button>`).join("");
-  $("pcParts").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => pressPart(s, b.dataset.key)));
+  const fi = s.finish || 0, fins = p.finishes || [];
+  $("pcMop").textContent = mopText(mopOf(prices, p, fi));
+  // its colours: the one picked is shown in place (its model loads again in that colour)
+  $("pcSwatches").classList.toggle("hide", fins.length < 2);
+  $("pcSwatches").innerHTML = fins.length < 2 ? "" : fins.map((f, i) => `<button type="button" data-i="${i}" aria-pressed="${i === fi}" aria-label="${esc(f.name)}" title="${esc(f.name)}" style="background:${esc(f.swatchColor || "#ddd")}"></button>`).join("") + `<span>${esc(fins[fi]?.name || "")}</span>`;
+  $("pcSwatches").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => chooseFinish(s, +b.dataset.i)));
+  // the product page for this colour: its "View in your room" is the AR every phone and headset knows
+  $("pcLink").href = finishPath(p, fi);
+  $("pcParts").innerHTML = (p.parts || []).map((x) => `<button type="button" data-key="${esc(x.key)}" aria-pressed="${!!s.state[x.key]}" ${s.model ? "" : "disabled"}>${esc(partText(x, !!s.state[x.key]))}</button>`).join("")
+    + (s.hasStock ? `<button type="button" data-fill="1" aria-pressed="${!!s.filled}" ${s.model && !s.loading ? "" : "disabled"}>${s.filled ? "Empty the fridge" : "Fill the fridge"}</button>` : "");
+  $("pcParts").querySelectorAll("button[data-key]").forEach((b) => b.addEventListener("click", () => pressPart(s, b.dataset.key)));
+  $("pcParts").querySelector("button[data-fill]")?.addEventListener("click", () => { s.filled = !s.filled; reload(s); renderCard(); });
+  $("pcRetry").classList.toggle("hide", !s.failed);
+  const other = compareWith && compareWith !== s && byId.get(compareWith.p.id) ? compareWith : null;
+  $("pcCompare").querySelector("span").textContent = other ? `Compare with ${other.p.brand} ${other.p.shortName}` : compareWith === s ? "Picked to compare · pick another" : "Compare";
+  $("pcCompare").setAttribute("aria-pressed", String(compareWith === s));
 }
+// a colour picked on the card
+function chooseFinish(s, i) {
+  if ((s.finish || 0) === i) return;
+  s.finish = i;
+  reload(s);
+  renderCard();
+}
+$("pcRetry").addEventListener("click", () => { if (selected) { reload(selected); renderCard(); } });
+// Compare: the first product picked waits; on a second one's card the button opens the two side by side
+let compareWith = null;
+$("pcCompare").addEventListener("click", () => {
+  const s = selected;
+  if (!s) return;
+  if (compareWith && compareWith !== s) {
+    const u = new URL("/compare", location.origin);
+    u.searchParams.set("a", compareWith.p.id); u.searchParams.set("b", s.p.id);
+    if (compareWith.finish) u.searchParams.set("fa", finishSlug(compareWith.p.finishes[compareWith.finish].name));
+    if (s.finish) u.searchParams.set("fb", finishSlug(s.p.finishes[s.finish].name));
+    location.href = u.pathname + u.search;
+    return;
+  }
+  compareWith = compareWith === s ? null : s;
+  if (compareWith) toast("Now pick another product to compare it with");
+  renderCard();
+});
+// Share this spot: a link that opens the showroom in front of this product
+$("pcShare").addEventListener("click", async () => {
+  const s = selected;
+  if (!s) return;
+  const url = `${location.origin}/showroom?focus=${encodeURIComponent(s.p.id)}`;
+  try { await navigator.clipboard.writeText(url); toast("Link copied: it opens the showroom right here"); }
+  catch { toast(url, 8000); }
+});
 $("pcClose").addEventListener("click", () => select(null));
 pricesReady.then((m) => { if (m.size && selected) renderCard(); });
 
@@ -1669,7 +1762,7 @@ function findProducts(q) {
 }
 {
   const q = $("q"), list = $("results");
-  if (isPhone || matchMedia("(max-width: 900px)").matches) q.placeholder = "Search";
+  if (isPhone || matchMedia("(max-width: 900px)").matches) q.placeholder = "Search brand or model code";
   let found = [], active = -1;
   const mark = (text, toks) => {
     let html = esc(text);
@@ -1718,6 +1811,198 @@ function findProducts(q) {
   q.addEventListener("focus", () => keys.clear());
 }
 
+// ── filters: brand, capacity and star rating, from products.json's specs alone. The products that match stay lit,
+// the rest dim behind a dark veil, and their chips step aside ──
+const specOf = (p, re) => (p.specs || []).find(([k]) => re.test(k))?.[1];
+const capOf = (p) => {
+  const v = specOf(p, /^(total )?capacity$/i) ?? specOf(p, /capacity/i);
+  const m = v && String(v).match(/([\d.]+)\s*(L|litres?|kg|tons?|tonnes?)\b/i);
+  if (!m) return null;
+  const u = m[2].toLowerCase().startsWith("l") ? "L" : m[2].toLowerCase().startsWith("k") ? "kg" : "ton";
+  return { n: +m[1], u };
+};
+const starsOf = (p) => { const m = String(specOf(p, /^energy rating$/i) || "").match(/(\d)\s*star/i); return m ? +m[1] : null; };
+const facts = new Map(slots.map((s) => [s, { brand: s.p.brand, cap: capOf(s.p), stars: starsOf(s.p) }]));
+const filt = { brands: new Set(), cap: {}, stars: 0 }; // cap: unit -> [min, max]
+const filterCount = () => filt.brands.size + Object.keys(filt.cap).length + (filt.stars ? 1 : 0);
+function passes(s) {
+  const f = facts.get(s);
+  if (filt.brands.size && !filt.brands.has(f.brand)) return false;
+  if (filt.stars && !(f.stars >= filt.stars)) return false;
+  for (const [u, [a, b]] of Object.entries(filt.cap)) if (f.cap?.u === u && (f.cap.n < a || f.cap.n > b)) return false;
+  for (const u of Object.keys(filt.cap)) if (!f.cap || f.cap.u !== u) { if (slots.some((t) => t.p.category === s.p.category && facts.get(t).cap?.u === u)) return false; }
+  return true;
+}
+// the veil over a product that doesn't match: one instanced box for all of them
+const veil = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x1c1c1f, transparent: true, opacity: 0.55, depthWrite: false }), slots.length);
+veil.count = 0; veil.frustumCulled = false; veil.renderOrder = 3; veil.raycast = noRay;
+world.add(veil);
+function applyFilters() {
+  const on = filterCount() > 0, m4 = new THREE.Matrix4(), local = new THREE.Matrix4();
+  let n = 0;
+  for (const s of slots) {
+    s.dim = on && !passes(s) && s !== selected; // (the one you picked is never veiled)
+    if (!s.dim) continue;
+    local.compose(new THREE.Vector3(0, s.size.h / 2, s.wall ? s.size.d / 2 : 0), new THREE.Quaternion(), new THREE.Vector3(s.size.w + 0.06, s.size.h + 0.05, s.size.d + 0.06));
+    veil.setMatrixAt(n++, m4.multiplyMatrices(s.group.matrixWorld, local));
+  }
+  veil.count = n; veil.instanceMatrix.needsUpdate = true;
+  $("chips").querySelectorAll(".chip").forEach((b) => b.classList.toggle("dimmed", !!byId.get(b.dataset.id).dim));
+  $("btnFilters").classList.toggle("on", on);
+  $("btnFilters").querySelector(".lbl").innerHTML = on ? `Filters <span class="n">${filterCount()}</span>` : "Filters";
+  mmDirty = true;
+  redraw();
+}
+function renderFilters() {
+  const scope = slots.filter((s) => !catFilter || s.p.category === catFilter);
+  const brands = [...new Set(scope.map((s) => s.p.brand))].sort((a, b) => a.localeCompare(b));
+  const units = [...new Set(scope.map((s) => facts.get(s).cap?.u).filter(Boolean))];
+  const catOfUnit = (u) => [...new Set(scope.filter((s) => facts.get(s).cap?.u === u).map((s) => s.p.category))].join(", ");
+  const stars = [...new Set(scope.map((s) => facts.get(s).stars).filter(Boolean))].sort();
+  const n = slots.filter((s) => !filterCount() || passes(s)).length;
+  $("filters").innerHTML = `
+    <section><h3>Brand</h3><div class="fpills">${brands.map((b) => `<button type="button" data-brand="${esc(b)}" aria-pressed="${filt.brands.has(b)}">${esc(b)}</button>`).join("")}</div></section>
+    ${units.map((u) => {
+      const vals = [...new Set(scope.map((s) => facts.get(s).cap).filter((c) => c?.u === u).map((c) => c.n))].sort((a, b) => a - b);
+      const [a, b] = filt.cap[u] || [vals[0], vals.at(-1)];
+      const opts = (sel) => vals.map((v) => `<option value="${v}" ${v === sel ? "selected" : ""}>${v} ${u}</option>`).join("");
+      return `<section><h3>Capacity · ${esc(catOfUnit(u))}</h3><div class="frange"><select data-unit="${u}" data-end="0" aria-label="Smallest capacity">${opts(a)}</select> to <select data-unit="${u}" data-end="1" aria-label="Largest capacity">${opts(b)}</select></div></section>`;
+    }).join("")}
+    ${stars.length ? `<section><h3>Energy rating</h3><div class="fpills"><button type="button" data-stars="0" aria-pressed="${!filt.stars}">Any</button>${stars.map((k) => `<button type="button" data-stars="${k}" aria-pressed="${filt.stars === k}">${k} star${k < 5 ? " and up" : ""}</button>`).join("")}</div></section>` : ""}
+    <div class="ffoot"><span id="fCount"><b>${n}</b> of ${slots.length} match</span><button type="button" id="fClear" ${filterCount() ? "" : "disabled"}>Clear filters</button></div>`;
+  $("filters").querySelectorAll("[data-brand]").forEach((b) => b.addEventListener("click", () => { const k = b.dataset.brand; filt.brands.has(k) ? filt.brands.delete(k) : filt.brands.add(k); changed(); }));
+  $("filters").querySelectorAll("[data-stars]").forEach((b) => b.addEventListener("click", () => { filt.stars = +b.dataset.stars; changed(); }));
+  $("filters").querySelectorAll("select").forEach((sel) => sel.addEventListener("change", () => {
+    const u = sel.dataset.unit, ends = [...$("filters").querySelectorAll(`select[data-unit="${u}"]`)].map((x) => +x.value).sort((a, b) => a - b);
+    const vals = [...sel.options].map((o) => +o.value);
+    if (ends[0] === vals[0] && ends[1] === vals.at(-1)) delete filt.cap[u]; else filt.cap[u] = ends;
+    changed();
+  }));
+  $("fClear").addEventListener("click", () => { filt.brands.clear(); filt.cap = {}; filt.stars = 0; changed(); });
+  function changed() { applyFilters(); renderFilters(); }
+}
+{
+  const panel = $("filters"), btn = $("btnFilters");
+  const open = (on) => { panel.classList.toggle("hide", !on); btn.setAttribute("aria-expanded", String(on)); if (on) { renderFilters(); $("results").classList.add("hide"); } };
+  btn.addEventListener("click", () => open(panel.classList.contains("hide")));
+  addEventListener("pointerdown", (e) => { if (!e.target.closest?.("#filters, #btnFilters")) open(false); });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.classList.contains("hide")) { open(false); btn.focus(); } });
+}
+
+// ── the floor plan: the aisles, the products, where you stand and which way you look; a tap walks you there ──
+let mmDirty = true;
+const mm = { el: $("minimap"), cv: $("mmCanvas"), x0: -L.W / 2 - 0.3, x1: L.W / 2 + 0.3, z0: -L.D - 0.3, z1: 1.2 };
+{
+  const small = isPhone || matchMedia("(max-width: 900px)").matches;
+  const maxW = small ? 150 : 230, maxH = small ? 120 : 160, aw = mm.x1 - mm.x0, ad = mm.z1 - mm.z0;
+  mm.k = Math.min(maxW / aw, maxH / ad);
+  mm.w = Math.round(aw * mm.k); mm.h = Math.round(ad * mm.k);
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  mm.cv.width = mm.w * dpr; mm.cv.height = mm.h * dpr; mm.cv.style.width = `${mm.w}px`; mm.cv.style.height = `${mm.h}px`;
+  mm.g = mm.cv.getContext("2d"); mm.g.scale(dpr, dpr);
+  const setOpen = (on) => {
+    mm.el.classList.toggle("closed", !on);
+    $("mmToggle").setAttribute("aria-expanded", String(on));
+    $("mmToggle").setAttribute("aria-label", on ? "Hide the floor plan" : "Show the floor plan");
+    $("mmToggle").querySelector("path").setAttribute("d", on ? "M6 15l6-6 6 6" : "M6 9l6 6 6-6");
+    mmDirty = true;
+  };
+  setOpen(!small);
+  // (opened, it covers the hint's corner on a phone: the hint has done its job by then)
+  $("mmToggle").addEventListener("click", () => { const on = mm.el.classList.contains("closed"); setOpen(on); if (on) $("hint").classList.add("gone"); });
+  mm.cv.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const r = mm.cv.getBoundingClientRect(), x = mm.x0 + (e.clientX - r.left) / mm.k, z = mm.z0 + (e.clientY - r.top) / mm.k;
+    stopTour(true);
+    select(null);
+    walkTo(new THREE.Vector3(x, 0, z));
+    hintGone();
+  });
+}
+const mmX = (x) => (x - mm.x0) * mm.k, mmZ = (z) => (z - mm.z0) * mm.k;
+function drawMinimap() {
+  if (mm.el.classList.contains("closed") || xr) return;
+  const g = mm.g;
+  g.clearRect(0, 0, mm.w, mm.h);
+  g.fillStyle = "#F3F0EB"; g.fillRect(mmX(-L.W / 2), mmZ(-L.D), L.W * mm.k, L.D * mm.k);
+  g.strokeStyle = "#2A2A2D"; g.lineWidth = 1.5; g.strokeRect(mmX(-L.W / 2), mmZ(-L.D), L.W * mm.k, L.D * mm.k);
+  // partitions
+  g.strokeStyle = "#8C8C92"; g.lineWidth = 1.2;
+  for (const a of L.aisles.slice(0, -1)) { g.beginPath(); g.moveTo(mmX(a.x1), mmZ(0)); g.lineTo(mmX(a.x1), mmZ(-L.LEN)); g.stroke(); }
+  // products: lit or dimmed, the picked one in orange
+  for (const s of slots) {
+    const w = (s.wall ? 0.25 : s.size.d) * mm.k, h = s.size.w * mm.k;
+    g.fillStyle = s === selected ? "#F58A29" : s.dim ? "#CFCCC6" : "#55565C";
+    g.fillRect(mmX(s.center.x) - w / 2, mmZ(s.center.z) - h / 2, Math.max(1.5, w), Math.max(1.5, h));
+  }
+  // the counter
+  const c = L.counter;
+  g.fillStyle = "#2A2A2D"; g.fillRect(mmX(c.x[0]), mmZ(c.z[0]), (c.x[1] - c.x[0]) * mm.k, (c.z[1] - c.z[0]) * mm.k);
+  // you
+  const p = camera.position, t = controls.target, ang = Math.atan2(t.x - p.x, t.z - p.z);
+  const px = clamp(mmX(p.x), 4, mm.w - 4), pz = clamp(mmZ(p.z), 4, mm.h - 4);
+  g.fillStyle = "rgba(245,138,41,0.28)";
+  g.beginPath(); g.moveTo(px, pz); g.arc(px, pz, 22, -ang + Math.PI / 2 - 0.55, -ang + Math.PI / 2 + 0.55); g.closePath(); g.fill();
+  g.fillStyle = "#F58A29"; g.strokeStyle = "#fff"; g.lineWidth = 2;
+  g.beginPath(); g.arc(px, pz, 4.5, 0, Math.PI * 2); g.fill(); g.stroke();
+  mmDirty = false;
+}
+
+// ── the guided tour: aisle by aisle, the first product of each category with its card; ?kiosk starts it on its
+// own after a minute with nobody at the screen (?idle=<seconds> to change that), and any touch stops it ──
+const KIOSK = params.has("kiosk"), IDLE_S = clamp(+params.get("idle") || 60, 2, 3600), DWELL_MS = 7000;
+const tourStops = [...new Set(L.aisles.map((a) => a.cat))].map((cat) => order.find((s) => s.p.category === cat)).filter(Boolean);
+const tour = { on: false, playing: false, i: -1, timer: 0, kiosk: false };
+function tourShow() {
+  $("tourbar").classList.toggle("hide", !tour.on);
+  if (!tour.on) return;
+  const s = tourStops[tour.i];
+  $("tourText").textContent = `Tour · ${tour.i + 1} of ${tourStops.length} · ${L.aisles.find((a) => a.cat === s.p.category).title}: ${s.p.brand} ${s.p.shortName}`;
+  $("tourPlay").setAttribute("aria-label", tour.playing ? "Pause the tour" : "Play the tour");
+  $("tourPlay").innerHTML = tour.playing ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>' : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+}
+function tourGo(i) {
+  clearTimeout(tour.timer);
+  if (i >= tourStops.length) { if (tour.kiosk) i = 0; else { stopTour(); return; } }
+  tour.i = i;
+  setFilter(null);
+  select(tourStops[i], { fly: true });
+  tourShow();
+  if (tour.playing) tourWait();
+}
+// the next stop once it has arrived and you've had time to look
+function tourWait() {
+  clearTimeout(tour.timer);
+  const t0 = performance.now();
+  const tick = () => { if (!tour.playing) return; if (flight && performance.now() - t0 < 20000) { tour.timer = setTimeout(tick, 250); return; } tour.timer = setTimeout(() => tour.playing && tourGo(tour.i + 1), DWELL_MS); };
+  tour.timer = setTimeout(tick, 250);
+}
+function startTour(kiosk = false) {
+  if (xr || !tourStops.length) return;
+  Object.assign(tour, { on: true, playing: true, kiosk });
+  tourGo(0);
+}
+function stopTour(byUser = false) {
+  if (!tour.on) return;
+  clearTimeout(tour.timer);
+  Object.assign(tour, { on: false, playing: false, i: -1 });
+  tourShow();
+  if (byUser && KIOSK) idleSoon();
+}
+$("btnTour").addEventListener("click", () => startTour(false));
+$("tourPlay").addEventListener("click", () => { tour.playing = !tour.playing; if (tour.playing) tourWait(); else clearTimeout(tour.timer); tourShow(); });
+$("tourNext").addEventListener("click", () => tourGo(tour.i + 1));
+$("tourStop").addEventListener("click", () => stopTour(true));
+// you take over: in a kiosk any touch ends the tour; otherwise a drag or a key pauses it
+let idleTimer = 0;
+const idleSoon = () => { clearTimeout(idleTimer); if (KIOSK && !xr) idleTimer = setTimeout(() => { if (!tour.on) startTour(true); }, IDLE_S * 1000); };
+for (const ev of ["pointerdown", "keydown", "wheel"]) addEventListener(ev, (e) => {
+  if (e.target.closest?.("#tourbar, #btnTour")) return;
+  if (tour.on && (tour.kiosk || e.target === renderer.domElement || ev === "keydown")) { if (tour.kiosk) stopTour(true); else if (tour.playing) { tour.playing = false; clearTimeout(tour.timer); tourShow(); } }
+  idleSoon();
+}, { capture: true, passive: true });
+idleSoon();
+
 // ── the camera: where it goes for a product, an aisle and the whole hall, and how it flies there ──
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -1750,6 +2035,10 @@ function fitCamera() {
   const card = $("pcard"), cr = card.getBoundingClientRect(), wide = cr.width > w * 0.8, shown = !card.classList.contains("gone");
   covered = clamp(Math.max(h - top($("dock")), shown && wide ? h - top(card) : 0), 0, h * 0.45);
   sideTo = shown && !wide ? clamp(cr.right - stage.getBoundingClientRect().left + 16, 0, w * 0.45) : 0;
+  if (reduceMotion) side = sideTo;
+  // on a short screen the card reaches up over the floor plan: the plan steps aside while the card is open
+  const plan = $("minimap"), pr = plan.getBoundingClientRect();
+  plan.classList.toggle("under", shown && pr.bottom > cr.top && pr.top < cr.bottom && pr.left < cr.right && cr.left < pr.right);
   renderer.setSize(w, h, false);
   applyView();
   redraw();
@@ -1757,7 +2046,7 @@ function fitCamera() {
 let sideAt = 0; // when the slide was last stepped
 function stepSide(now) {
   if (side === sideTo) { sideAt = now; return false; }
-  const k = Math.min(1, (now - sideAt) / 120); // about 0.3 s, whatever the frame rate
+  const k = reduceMotion ? 1 : Math.min(1, (now - sideAt) / 120); // about 0.3 s, whatever the frame rate
   sideAt = now;
   side = Math.abs(sideTo - side) < 1 ? sideTo : side + (sideTo - side) * k;
   applyView();
@@ -1781,13 +2070,12 @@ function viewFor(s) {
 // the screen to the logo wall.
 function homeView() {
   const w = stage.clientWidth, h = stage.clientHeight, tall = h > w * 1.15;
-  const az = tall ? 0 : -0.3, el = tall ? 1.05 : 0.84;
+  // a portrait screen sees the hall from its side, at three quarters: the aisles stack down the screen and the whole
+  // floor fills the height (seen down the aisles, the hall is wider than deep and left a band empty above and below)
+  const az = tall ? 1.3 : -0.3, el = tall ? 1.12 : 0.84;
   const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
   const pts = [];
-  // (on a phone the width is fitted from the first products back, so the corners of the entrance may go off the
-  // sides and the hall fills the height)
-  for (const x of [-L.W / 2, L.W / 2]) for (const [z, y] of [[-L.D, 0], [-L.D, WALL_H], [0, WALL_H], [tall ? 0.3 : APRON * 0.5, 0]]) pts.push(Object.assign(new THREE.Vector3(x, y, z), { fx: !tall || z < -1 }));
-  if (tall) for (const x of [-L.W / 2, L.W / 2]) pts.push(Object.assign(new THREE.Vector3(x, 0, -ENTRY), { fx: true }));
+  for (const x of [-L.W / 2, L.W / 2]) for (const [z, y] of [[-L.D, 0], [-L.D, WALL_H], [0, WALL_H], [APRON * 0.5, 0]]) pts.push(new THREE.Vector3(x, y, z));
   const cam = camera.clone(); // (as it will be with no card at the side)
   cam.aspect = w / (h + covered); cam.setViewOffset(w, h + covered, 0, covered, w, h); cam.updateProjectionMatrix();
   const target = new THREE.Vector3(0, 0.5, -L.D / 2);
@@ -1799,7 +2087,7 @@ function homeView() {
     cam.lookAt(target);
     cam.updateMatrixWorld(true);
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-    for (const p of pts) { const v = p.clone().project(cam); if (p.fx) { x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); } y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
+    for (const p of pts) { const v = p.clone().project(cam); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
     const right = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
     target.addScaledVector(right, ((x0 + x1) / 2) * dist * kx).addScaledVector(up, ((y0 + y1) / 2 - (top + bottom) / 2) * dist * ky);
     dist *= Math.max((x1 - x0) / (2 * side), (y1 - y0) / (top - bottom));
@@ -1810,7 +2098,9 @@ function aisleView(a) {
   return { pos: new THREE.Vector3(a.mid, 3.4, 3.2), target: new THREE.Vector3(a.mid, 0.6, -a.len * 0.5) };
 }
 let flight = null;
+// (with "reduce motion" set on the device, every move is instant)
 function flyTo(pos, target, ms = 1000, lift = null) {
+  if (reduceMotion) { flight = null; jumpTo({ pos: pos.clone(), target: target.clone() }); planSoon(); return; }
   const d = camera.position.distanceTo(pos);
   flight = { p0: camera.position.clone(), t0: controls.target.clone(), p1: pos, t1: target, start: performance.now(), ms, lift: lift ?? Math.min(3, d * 0.25) };
 }
@@ -1919,10 +2209,11 @@ $("btnOverview").addEventListener("click", () => { select(null); setFilter(null)
 const raycaster = new THREE.Raycaster();
 const ndc = new THREE.Vector2();
 let press = null;
-renderer.domElement.addEventListener("pointerdown", (e) => { press = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+// a tap is timed by when the finger went down and came up (the events' own times), not when a busy page got round to them
+renderer.domElement.addEventListener("pointerdown", (e) => { press = { x: e.clientX, y: e.clientY, t: e.timeStamp }; });
 renderer.domElement.addEventListener("pointerup", (e) => {
   if (!press) return;
-  const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y), quick = Date.now() - press.t < 450;
+  const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y), quick = e.timeStamp - press.t < 450;
   press = null;
   if (moved > 6 || !quick) return;
   tapAt(e.clientX, e.clientY);
@@ -1964,6 +2255,7 @@ function watchPerf(dt) {
   perf.n = perf.slow = 0;
 }
 renderer.setAnimationLoop((time, frame) => {
+  veil.visible = !xr && veil.count > 0; // (the filters' veils are for the screen only)
   if (xr) return xrFrame(time, frame);
   const now = performance.now();
   let moved = stepFlight(now);
@@ -1976,6 +2268,7 @@ renderer.setAnimationLoop((time, frame) => {
   loopAt = now;
   // not on the way: what a flight passes would load only to be dropped (it plans again when it lands)
   if (!flight && now - lastPlan > 300) { lastPlan = now; planLoads(); }
+  if (moved || mmDirty) drawMinimap();
   if (moved || dirty > 0) {
     pickFloor(camera);
     if (lastDraw && now - lastDraw < 100) watchPerf(now - lastDraw);
@@ -1996,7 +2289,10 @@ fitCamera();
 
 // ── where it opens: ?focus=<id> in front of that product, else the whole hall ──
 const focus = focusId ? byId.get(focusId) : null;
+// ?aisle=<n>: at that aisle's entrance (its number on the signs); ?q=<words>: the search, with what it finds
+const aisleN = Math.round(+params.get("aisle")), openAisle = !focus && L.aisles[aisleN - 1];
 if (focus) { select(focus); jumpTo(viewFor(focus)); }
+else if (openAisle) { const v = aisleView(openAisle); jumpTo(v); }
 else {
   // just inside the door at eye height, after a slow step in from outside
   const v = entranceView();
@@ -2007,6 +2303,12 @@ else {
 }
 planLoads();
 $("loading").remove();
+if (params.get("q") && !focus) {
+  $("q").value = params.get("q").slice(0, 80);
+  $("q").dispatchEvent(new Event("input"));
+  const found = findProducts($("q").value);
+  if (found.length === 1) { $("q").value = ""; $("results").classList.add("hide"); select(found[0].it.s, { fly: true }); }
+}
 
 // ── headsets ──
 $("btnVR").classList.toggle("hide", !canVR);
@@ -2371,6 +2673,26 @@ function makeMenu() {
 // ── read-only views for automated checks ──
 const v3 = (v) => v.toArray().map((n) => +n.toFixed(3));
 window.__showroom = {
+  dimmed: () => slots.filter((s) => s.dim).map((s) => s.p.id),
+  veils: () => veil.count,
+  tour: () => ({ on: tour.on, playing: tour.playing, kiosk: tour.kiosk, at: tour.on ? tourStops[tour.i].p.id : null, stops: tourStops.map((s) => s.p.id) }),
+  // where a spot on the floor is on the floor plan, in page pixels (null when the plan is folded away)
+  mmPoint: (x, z) => { if (mm.el.classList.contains("closed")) return null; const r = mm.cv.getBoundingClientRect(); return [r.left + mmX(x), r.top + mmZ(z)]; },
+  finish: (id) => byId.get(id)?.finish || 0,
+  // how many of the fridge's food pieces its model shows
+  stock: (id) => { let n = 0; byId.get(id)?.model?.traverse((o) => { if (o.userData.stock) n++; }); return n; },
+  // every product's planned boxes in the hall (its body, and each part's reach when open), from products.json alone
+  plan: () => L.places.map((pl) => {
+    const m = new THREE.Matrix4().compose(new THREE.Vector3(...pl.pos), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, pl.rot, 0)), ONE);
+    return { id: pl.p.id, aisle: L.aisles.indexOf(pl.aisle), side: pl.side, wall: pl.p.placement === "wall",
+      boxes: boxesOf(pl.p).map((b) => { const x = new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max)).applyMatrix4(m); return { open: b.open, min: v3(x.min), max: v3(x.max) }; }) };
+  }),
+  // points in the hall to where they fall in the view the dock and card leave clear (-1..1 across and up)
+  project: (pts) => pts.map((p) => new THREE.Vector3(...p).project(camera).toArray().slice(0, 2).map((n) => +n.toFixed(3))),
+  // the fixtures' pieces, by kind
+  fixtures: () => fixtures.map((f) => ({ tag: f.tag, min: v3(f.box.min), max: v3(f.box.max) })),
+  // the hall's own size, as built (walls, floor and ceiling)
+  hallBox: () => { const b = new THREE.Box3(); hall.children.filter((m) => m.material === mats.wall || m.material === mats.floor).forEach((m) => b.expandByObject(m)); return { min: v3(b.min), max: v3(b.max) }; },
   layout: () => ({ W: +L.W.toFixed(2), D: +L.D.toFixed(2), LEN: +L.LEN.toFixed(2), PT, PART_H, PART_TALL, partH: L.partH, WALL_H, aisles: L.aisles.map((a) => ({ cat: a.cat, part: a.part, of: a.of, n: a.items.length, x: [+a.x0.toFixed(2), +a.x1.toFixed(2)], walk: a.walk.map((v) => +v.toFixed(2)), mid: +a.mid.toFixed(2), len: +a.len.toFixed(2) })) }),
   slots: () => slots.map((s) => {
     let meshes = 0;
