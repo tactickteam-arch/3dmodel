@@ -1,8 +1,9 @@
 // The 3D showroom (/showroom): every product on show, standing in one hall.
 // - The hall is laid out from products.json each time the page opens, so a new product finds its place with
 //   nothing to change here: an aisle per category (a long one is split in two or more), the products along both
-//   sides facing the walkway, a sign over each aisle's entrance, a cross aisle at the back and the Sangeetha plaque
-//   on the back wall. Walls are single-sided, so from outside the hall reads as a dollhouse.
+//   sides facing the walkway on low plinths with their names, a hanging sign at each aisle's entrance, brand panels
+//   over each brand's run, a cross aisle at the back and the Sangeetha logo wall with a counter at the far end. Walls
+//   and the ceiling are single-sided, so from outside and above the hall reads as a dollhouse.
 // - Phone and laptop: drag to look round (OrbitControls); a chip or a name flies the camera to a product; a tap on
 //   a door opens it (the mesh's part, else the parts' zones: partAt in site.js).
 // - Meta Quest and Vision Pro ("immersive-vr"): point at the floor and pull the trigger (or look and pinch) to go
@@ -10,7 +11,8 @@
 // - Meta Quest passthrough ("immersive-ar"): the hall is hidden and one category at a time stands in a ring about
 //   2.4 m round you, facing you; air conditioners hang on small wall panels.
 // Only the models near you are loaded, CAP at most at once, nearest and most in front first; the rest stand as a
-// box of their real size in their colour, with their photo on the front, until you come close. A model left behind is
+// box of their real size in their colour, with their photo on the front, until you come close (then the box fades
+// away round the model; a slim bar at the top says how many of those near you are in). A model left behind is
 // disposed. Each fridge's food (the "Fill the fridge" stock) is dropped and its fixed parts merged, so a headset
 // draws a few dozen meshes per product instead of hundreds.
 // ?focus=<id> (or /showroom/<id>) opens with that product in front of you; ?cap=<n> sets how many load at once.
@@ -79,7 +81,8 @@ const PT = 0.1;        // partition thickness
 const ENTRY = 1.4;     // floor inside an aisle before its first product
 const END = 0.8, CROSS = 2.2;       // after an aisle's last product; the cross aisle along the back wall
 const MAX_RUN = 12;    // the longest row of products along one side of an aisle
-const PART_H = 2.6, WALL_H = 3.2, SIGN_Y = 2.98;
+// partitions are low enough to see over from the overview; the one by a wall of air conditioners stands taller
+const PART_H = 2.05, PART_TALL = 2.6, WALL_H = 3.2;
 const AC_Y = 2.05;     // an air conditioner's centre height, as in xr.js
 const RING_R = 2.4;    // passthrough: the ring round you
 const sizeOf = (p) => ({ w: cm(p.size.w) / 100, h: cm(p.size.h) / 100, d: cm(p.size.d) / 100 });
@@ -145,7 +148,7 @@ function makeLayout() {
   }
   const places = [];
   let x = 0;
-  for (const a of aisles) {
+  for (const [ai, a] of aisles.entries()) {
     const { sides, at, len } = fillAisle(a.items);
     a.sides = sides;
     const zone = (list) => Math.max(0.5, ...list.map((p) => sizeOf(p).d + (p.placement === "wall" ? 0.05 : BACK + 0.12)));
@@ -155,7 +158,9 @@ function makeLayout() {
     a.len = len;
     x = a.x1;
     for (const side of ["L", "R"]) {
-      const face = side === "L" ? 1 : -1, back = side === "L" ? a.x0 + PT / 2 : a.x1 - PT / 2;
+      // backs to the partition's face, or to the hall's own wall at either end
+      const outer = side === "L" ? ai === 0 : ai === aisles.length - 1;
+      const face = side === "L" ? 1 : -1, back = side === "L" ? a.x0 + (outer ? 0 : PT / 2) : a.x1 - (outer ? 0 : PT / 2);
       a.sides[side].forEach((p, i) => {
         const s = sizeOf(p), wall = p.placement === "wall";
         // floor units stand by the middle of their footprint; wall units hang by their back (the builders' origin)
@@ -176,21 +181,25 @@ const stage = $("stage");
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, light ? 1.5 : 2));
 renderer.setSize(stage.clientWidth, stage.clientHeight, false);
-renderer.toneMapping = THREE.NeutralToneMapping;
+// filmic tone mapping and a warm key light over a neutral studio environment, as a lit shop floor
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.92;
 renderer.setClearColor(0x000000, 0); // see-through where nothing is drawn: passthrough shows the room
 renderer.xr.enabled = true;
 renderer.domElement.style.touchAction = "none";
 stage.prepend(renderer.domElement);
 const scene = new THREE.Scene();
-const BG = new THREE.Color(0xe9e7e3);
+const BG = new THREE.Color(0xeeebe6);
 scene.background = BG;
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.85;
-scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7f70, 0.6));
-const sun = new THREE.DirectionalLight(0xffffff, 1.3);
-sun.position.set(3, 9, 6);
-scene.add(sun);
+scene.environmentIntensity = 0.9;
+scene.add(new THREE.HemisphereLight(0xfff7ec, 0xb8aa96, 0.5));
+const sun = new THREE.DirectionalLight(0xffeed6, 1.35); // the warm key, from the front left and above
+sun.position.set(-5, 10, 7);
+const fill = new THREE.DirectionalLight(0xe9eef8, 0.4);  // a cool fill from the other side
+fill.position.set(6, 5, -3);
+scene.add(sun, fill);
 const world = new THREE.Group(); // everything; lowered in a headset that can't find the floor
 const hall = new THREE.Group();  // the room itself, hidden in passthrough
 world.add(hall);
@@ -204,113 +213,386 @@ let xr = null; // the headset session's state, while there is one
 await Promise.race([document.fonts?.load(`600 40px Outfit`), new Promise((r) => setTimeout(r, 2000))]).catch(() => {});
 
 // ── the hall ──
+// A finished shop floor, built once from the layout: polished porcelain tiles; walls with a charcoal fascia over a
+// thin orange line; display partitions with a charcoal cap, end trims and skirting; a ceiling with a light strip over
+// every walkway (seen only from inside: from above the hall stays open, as a dollhouse); a hanging sign at each
+// aisle's entrance; a brand panel over each brand's run; a low plinth with a name plate under every floor-standing
+// product; and a logo wall with a counter at the far end. The fixed pieces are merged by material, so the whole room
+// is a couple of dozen draw calls.
+const HQ = !light; // a laptop's signs and plates are drawn at twice a phone's resolution
 function canvasTexture(w, h, draw) {
   const c = document.createElement("canvas");
   c.width = w; c.height = h;
-  draw(c.getContext("2d"));
+  draw(c.getContext("2d"), c);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = renderer.capabilities.getMaxAnisotropy();
   return t;
 }
-// Flat things laid on another surface (the runners on the floor, a shadow under a product, the plaque on the wall) are
-// drawn as if a little nearer, so from across the hall the two never flicker through each other (z-fighting).
+// Flat things laid on another surface (runners, shadows, plates, the logo) are drawn as if a little nearer, so from
+// across the hall the two never flicker through each other (z-fighting).
 const onTop = (m, k = 1) => Object.assign(m, { polygonOffset: true, polygonOffsetFactor: -k, polygonOffsetUnits: -4 * k });
-const blockers = []; // walls and partitions: a pointer stops at them
+const blockers = []; // walls, partitions, the counter: a pointer stops at them
 const signs = [];
+const PLINTH = 0.06;   // the plinth under a floor-standing product (its top is where the product stands)
+const APRON = 2;       // finished floor in front of the hall, where you come in
+const SINK = 0.05;     // walls and partitions run this far under the floor and past the corners: no hairline gaps
+// a texture painted from the floor up, in metres (for the walls and partitions: their bands run along them)
+function stripTexture(height, from, paint) {
+  return canvasTexture(4, 1024, (g) => { g.setTransform(1, 0, 0, -1024 / height, 0, 1024); g.translate(0, -from); paint(g, 4); });
+}
+// a soft-edged dark rectangle, for the shadows on the floor and under each product
+const softRect = (inset, blur, alpha) => canvasTexture(256, 256, (g) => {
+  g.shadowColor = `rgba(20,16,12,${alpha})`; g.shadowBlur = blur; g.shadowOffsetX = 1000;
+  g.fillStyle = "#000"; roundRect(g, inset - 1000, inset, 256 - 2 * inset, 256 - 2 * inset, 18); g.fill();
+});
+// one mesh per material for everything that never moves
+const bins = new Map();
+const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), ONE = new THREE.Vector3(1, 1, 1);
+function put(mat, geo, pos, rot = [0, 0, 0], frame = null) {
+  geo.applyMatrix4(M4.compose(new THREE.Vector3(...pos), Q.setFromEuler(E.set(...rot)), ONE));
+  if (frame) geo.applyMatrix4(frame);
+  if (!bins.has(mat)) bins.set(mat, []);
+  bins.get(mat).push(geo);
+}
+function bakeAll() {
+  for (const [mat, geos] of bins) {
+    const mesh = new THREE.Mesh(mergeGeometries(geos.map((g) => (g.index ? g.toNonIndexed() : g)), false), mat);
+    geos.forEach((g) => g.dispose());
+    mesh.renderOrder = mat.userData.order || 0;
+    hall.add(mesh);
+    if (mat.userData.block) blockers.push(mesh);
+  }
+  bins.clear();
+}
+const flat = (w, d) => new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2); // on the floor, facing up
+let seed = 11;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const CHARCOAL = "#28282B";
+const mats = {
+  floor: null,
+  wall: null,
+  part: null,
+  trim: new THREE.MeshStandardMaterial({ color: 0x29292c, roughness: 0.45, metalness: 0.2 }),
+  plinth: new THREE.MeshStandardMaterial({ color: 0xf6f4f0, roughness: 0.38, metalness: 0 }),
+  copper: new THREE.MeshStandardMaterial({ color: 0xf58a29, roughness: 0.4, metalness: 0.1 }),
+  counterTop: new THREE.MeshStandardMaterial({ color: 0xfbfaf8, roughness: 0.25, metalness: 0 }),
+  light: new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }),
+  ground: new THREE.MeshBasicMaterial({ color: BG, toneMapped: false }),
+};
+mats.trim.userData.block = false;
 {
   const { W, D, LEN } = L;
-  const floorTex = canvasTexture(256, 256, (g) => {
-    g.fillStyle = "#DCD7CF"; g.fillRect(0, 0, 256, 256);
-    g.strokeStyle = "rgba(255,255,255,.6)"; g.lineWidth = 3; g.strokeRect(1.5, 1.5, 253, 253);
+  // the porcelain floor: 60 cm tiles, each a shade of its own with faint clouding, and fine grout
+  const T = 1024, TILE = 0.6;
+  const floorTex = canvasTexture(T, T, (g) => {
+    const n = T / 2;
+    for (let i = 0; i < 4; i++) {
+      const x = (i % 2) * n, y = (i >> 1) * n, v = Math.round((rnd() - 0.5) * 5);
+      g.fillStyle = `rgb(${221 + v},${215 + v},${206 + v})`; g.fillRect(x, y, n, n);
+      g.save(); g.beginPath(); g.rect(x, y, n, n); g.clip();
+      for (let k = 0; k < 26; k++) {
+        const cx = x + rnd() * n, cy = y + rnd() * n, r = n * (0.08 + rnd() * 0.35);
+        const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r);
+        const dark = rnd() < 0.5;
+        gr.addColorStop(0, dark ? "rgba(150,138,120,0.05)" : "rgba(255,255,255,0.10)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = gr; g.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+      }
+      g.restore();
+    }
+    g.fillStyle = "rgba(140,128,112,0.7)";
+    const gw = Math.max(1, T / 512);
+    g.fillRect(0, 0, T, gw); g.fillRect(0, n - gw / 2, T, gw); g.fillRect(0, 0, gw, T); g.fillRect(n - gw / 2, 0, gw, T);
   });
   floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-  floorTex.anisotropy = 4; // it covers most of the view: more filtering costs a phone's GPU frames
-  // the floor runs on well past the hall, so out of the entrance there is no edge where it stops (in a headset
-  // the fog takes it before it ends)
-  const FW = W + 80, FD = D + 80;
-  floorTex.repeat.set(FW / 0.8, FD / 0.8);
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(FW, FD), new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.9 }));
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.set(0, 0, -D / 2);
-  hall.add(floor);
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0xf2eee7, roughness: 0.95 });
-  const partMat = new THREE.MeshStandardMaterial({ color: 0xebe6de, roughness: 0.9 });
-  const edgeMat = new THREE.MeshStandardMaterial({ color: 0xf58a29, roughness: 0.7 });
-  const runnerMat = onTop(new THREE.MeshStandardMaterial({ color: 0xcfc8bd, roughness: 0.95 }));
-  // single-sided walls: the back, and the two outer sides from the entrance to the back. Each runs 5 cm past the
-  // corners and under the floor, so no hairline of sky shows where two meet
-  const SINK = 0.05;
-  const wall = (w, x, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, WALL_H + SINK), wallMat); m.position.set(x, (WALL_H - SINK) / 2, z); m.rotation.y = ry; hall.add(m); blockers.push(m); };
+  floorTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); // it covers most of the view
+  const FW = W, FD = D + APRON;
+  floorTex.repeat.set(FW / (2 * TILE), FD / (2 * TILE));
+  mats.floor = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.34, metalness: 0 });
+  put(mats.floor, flat(FW, FD), [0, 0, (APRON - D) / 2]);
+  // round the hall: a plain ground a step lower, the colour of the sky, with a soft shadow round the hall
+  put(mats.ground, flat(400, 400), [0, -0.03, -D / 2]);
+  const pad = onTop(new THREE.MeshBasicMaterial({ map: softRect(40, 60, 0.35), transparent: true, depthWrite: false, toneMapped: false }), 1);
+  put(pad, flat(W + 5, FD + 5), [0, -0.029, (APRON - D) / 2]);
+  // the step's edge round the apron
+  put(mats.trim, new THREE.BoxGeometry(W + 0.02, 0.03, 0.02), [0, -0.015, APRON]);
+  for (const sx of [-1, 1]) put(mats.trim, new THREE.BoxGeometry(0.02, 0.03, APRON + SINK), [sx * (W / 2 + 0.01), -0.015, (APRON - SINK) / 2]);
+
+  // walls: warm white, darker just above the floor, a charcoal fascia along the top over a thin orange line
+  const FASCIA = 2.8;
+  mats.wall = new THREE.MeshStandardMaterial({ roughness: 0.92, map: stripTexture(WALL_H + SINK, -SINK, (g, w) => {
+    g.fillStyle = "#F2EFEA"; g.fillRect(0, -SINK, w, WALL_H + SINK);
+    const ao = g.createLinearGradient(0, 0, 0, 0.8); ao.addColorStop(0, "rgba(70,58,44,0.14)"); ao.addColorStop(1, "rgba(70,58,44,0)");
+    g.fillStyle = ao; g.fillRect(0, 0, w, 0.8);
+    g.fillStyle = "#F58A29"; g.fillRect(0, FASCIA - 0.03, w, 0.03);
+    g.fillStyle = CHARCOAL; g.fillRect(0, FASCIA, w, WALL_H - FASCIA + 0.01);
+  }) });
+  mats.wall.userData.block = true;
+  // single-sided: the back, and the two sides from the entrance to the back
+  const wall = (w, x, z, ry) => put(mats.wall, new THREE.PlaneGeometry(w, WALL_H + SINK), [x, (WALL_H - SINK) / 2, z], [0, ry, 0]);
   wall(W + 2 * SINK, 0, -D, 0);
   wall(D + SINK, -W / 2, -(D + SINK) / 2, Math.PI / 2);
   wall(D + SINK, W / 2, -(D + SINK) / 2, -Math.PI / 2);
-  // partitions between aisles, with an orange edge at the entrance end
-  L.aisles.slice(0, -1).forEach((a) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(PT, PART_H + 0.02, LEN), partMat);
-    m.position.set(a.x1, (PART_H - 0.02) / 2, -LEN / 2);
-    hall.add(m); blockers.push(m);
-    const e = new THREE.Mesh(new THREE.BoxGeometry(PT + 0.012, PART_H + 0.024, 0.054), edgeMat);
-    e.position.set(a.x1, (PART_H + 0.004 - 0.02) / 2, -0.023);
-    hall.add(e);
+  // skirting along the walls
+  const SK = 0.1;
+  put(mats.trim, new THREE.BoxGeometry(W, SK + 0.02, 0.016), [0, (SK - 0.02) / 2, -D + 0.006]);
+  for (const sx of [-1, 1]) put(mats.trim, new THREE.BoxGeometry(0.016, SK + 0.02, D), [sx * (W / 2 - 0.006), (SK - 0.02) / 2, -D / 2]);
+
+  // display partitions between the aisles: a pale panel, darker near the floor, a charcoal cap, skirting both sides,
+  // and a charcoal trim on each end
+  mats.part = new THREE.MeshStandardMaterial({ roughness: 0.85, map: stripTexture(PART_H + 0.02, -0.02, (g, w) => {
+    g.fillStyle = "#E7E2DA"; g.fillRect(0, -0.02, w, PART_H + 0.02);
+    const ao = g.createLinearGradient(0, 0, 0, 0.7); ao.addColorStop(0, "rgba(70,58,44,0.13)"); ao.addColorStop(1, "rgba(70,58,44,0)");
+    g.fillStyle = ao; g.fillRect(0, 0, w, 0.7);
+  }) });
+  mats.part.userData.block = true;
+  L.partH = L.aisles.slice(0, -1).map((a, i) => L.places.some((pl) => pl.p.placement === "wall" && ((pl.aisle === a && pl.side === "R") || (pl.aisle === L.aisles[i + 1] && pl.side === "L"))) ? PART_TALL : PART_H);
+  L.aisles.slice(0, -1).forEach((a, i) => {
+    const H = L.partH[i];
+    put(mats.part, new THREE.BoxGeometry(PT, H + 0.02, LEN), [a.x1, (H - 0.02) / 2, -LEN / 2]);
+    put(mats.trim, new THREE.BoxGeometry(PT + 0.02, 0.045, LEN - 0.01), [a.x1, H + 0.0125, -LEN / 2]); // the cap
+    for (const zc of [-0.021, -LEN + 0.021]) put(mats.trim, new THREE.BoxGeometry(PT + 0.032, H + 0.08, 0.05), [a.x1, (H + 0.06) / 2, zc]);
+    for (const sx of [-1, 1]) put(mats.trim, new THREE.BoxGeometry(0.016, SK + 0.02, LEN - 0.02), [a.x1 + sx * (PT / 2 + 0.006), (SK - 0.02) / 2, -LEN / 2]);
   });
-  // a darker runner down each walkway, and a sign over each entrance (both faces)
+  // a soft shadow on the floor along every wall and partition
+  const aoTex = canvasTexture(4, 128, (g) => { const gr = g.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, "rgba(30,24,18,0.22)"); gr.addColorStop(1, "rgba(30,24,18,0)"); g.fillStyle = gr; g.fillRect(0, 0, 4, 128); });
+  const aoMat = onTop(new THREE.MeshBasicMaterial({ map: aoTex, transparent: true, depthWrite: false }), 2);
+  const AO = 0.45;
+  // (the gradient's dark edge, v = 1, is the strip's -z side; turned by ry it meets the wall)
+  const aoStrip = (len, x, z, ry) => put(aoMat, flat(len, AO), [x, 0.001, z], [0, ry, 0]);
+  aoStrip(W, 0, -D + AO / 2 + 0.01, 0);
+  aoStrip(D, -W / 2 + AO / 2 + 0.01, -D / 2, Math.PI / 2);
+  aoStrip(D, W / 2 - AO / 2 - 0.01, -D / 2, -Math.PI / 2);
+  for (const a of L.aisles.slice(0, -1)) {
+    aoStrip(LEN, a.x1 - PT / 2 - AO / 2, -LEN / 2, -Math.PI / 2);
+    aoStrip(LEN, a.x1 + PT / 2 + AO / 2, -LEN / 2, Math.PI / 2);
+  }
+
+  // the ceiling (faces down only) with a light strip down each walkway and two across the back
+  const ceilTex = canvasTexture(256, 256, (g) => {
+    g.fillStyle = "#F4F2EE"; g.fillRect(0, 0, 256, 256);
+    g.fillStyle = "rgba(150,140,125,0.35)"; g.fillRect(0, 0, 256, 2); g.fillRect(0, 0, 2, 256); g.fillRect(0, 127, 256, 2); g.fillRect(127, 0, 2, 256);
+  });
+  ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping;
+  ceilTex.repeat.set((W + 2 * SINK) / 1.2, (D + SINK) / 1.2);
+  const ceilMat = new THREE.MeshBasicMaterial({ map: ceilTex, color: 0xe6e2dc });
+  put(ceilMat, new THREE.PlaneGeometry(W + 2 * SINK, D + SINK), [0, WALL_H, -(D + SINK) / 2], [Math.PI / 2, 0, 0]);
+  // (each in a charcoal frame; all of them face down, so from above they vanish with the ceiling)
+  const frameMat = new THREE.MeshBasicMaterial({ color: 0x3a3a3d });
   for (const a of L.aisles) {
-    const r = new THREE.Mesh(new THREE.PlaneGeometry(a.walk[1] - a.walk[0] - 0.3, a.len), runnerMat);
-    r.rotation.x = -Math.PI / 2;
-    r.position.set(a.mid, 0.002, -a.len / 2);
-    hall.add(r);
+    const len = Math.max(1, a.len - 1.6);
+    put(frameMat, new THREE.PlaneGeometry(0.26, len + 0.1), [a.mid, WALL_H - 0.006, -a.len / 2 - 0.2], [Math.PI / 2, 0, 0]);
+    put(mats.light, new THREE.PlaneGeometry(0.16, len), [a.mid, WALL_H - 0.012, -a.len / 2 - 0.2], [Math.PI / 2, 0, 0]);
+  }
+  for (const z of [-LEN - (D - LEN) * 0.3, -LEN - (D - LEN) * 0.7]) {
+    put(frameMat, new THREE.PlaneGeometry(W - 1.5, 0.2), [0, WALL_H - 0.006, z], [Math.PI / 2, 0, 0]);
+    put(mats.light, new THREE.PlaneGeometry(W - 1.6, 0.12), [0, WALL_H - 0.012, z], [Math.PI / 2, 0, 0]);
+  }
+
+  // a hanging sign at each aisle's entrance, both faces: its number, the category, how many and which brands
+  L.aisles.forEach((a, i) => {
+    a.n = i + 1;
+    const brands = [...new Set(a.items.map((p) => p.brand))];
     const count = a.items.length;
-    const tex = canvasTexture(2048, 512, (g) => {
-      g.scale(2, 2);
-      g.fillStyle = NAVY; roundRect(g, 0, 0, 1024, 256, 40); g.fill();
-      g.fillStyle = COPPER; g.fillRect(60, 62, 12, 132);
-      g.fillStyle = "#FFFFFF"; g.font = `600 92px ${FONT}`; g.textBaseline = "alphabetic"; g.textAlign = "left";
-      g.fillText(a.of > 1 ? `${a.title} ${a.part}` : a.title, 104, 140, 880);
-      g.fillStyle = "#C9C9CC"; g.font = `500 46px ${FONT}`;
-      g.fillText(`${count} model${count === 1 ? "" : "s"} · open any door`, 106, 206, 880);
+    const SW = HQ ? 2048 : 1024, SH = SW * 0.28, k = SW / 1024;
+    const tex = canvasTexture(SW, SH, (g) => {
+      g.scale(k, k);
+      const w = 1024, h = 286.72;
+      g.fillStyle = "#1F1F21"; g.fillRect(0, 0, w, h);
+      g.fillStyle = COPPER; roundRect(g, 40, 40, 206, 206, 28); g.fill();
+      g.fillStyle = NAVY; g.textAlign = "center"; g.textBaseline = "middle";
+      g.font = `600 30px ${FONT}`; if (g.letterSpacing !== undefined) g.letterSpacing = "4px"; g.fillText("AISLE", 143, 86);
+      if (g.letterSpacing !== undefined) g.letterSpacing = "0px";
+      g.font = `700 112px ${FONT}`; g.fillText(String(a.n), 143, 170);
+      g.textAlign = "left"; g.textBaseline = "alphabetic"; g.fillStyle = "#FFFFFF";
+      g.font = `600 96px ${FONT}`; g.fillText(a.title, 290, 148, 700);
+      g.fillStyle = "#B9B9BE"; g.font = `500 38px ${FONT}`;
+      const part = a.of > 1 ? `Part ${a.part} of ${a.of} · ` : "";
+      const line = wrapText(g, `${part}${count} model${count === 1 ? "" : "s"} · ${brands.join(", ")}`, 700);
+      g.fillText(line[0] + (line.length > 1 ? "…" : ""), 292, 212, 700);
+      g.fillStyle = COPPER; g.fillRect(292, 236, 72, 5);
     });
-    const sw = Math.min(2.3, a.walk[1] - a.walk[0]), mat = new THREE.MeshBasicMaterial({ map: tex, toneMapped: false });
+    const sw = Math.min(2.3, a.walk[1] - a.walk[0] - 0.1), sh = sw * 0.28, y = 2.68, z = -1.0;
+    const face = new THREE.MeshBasicMaterial({ map: tex, toneMapped: false });
+    put(mats.trim, new THREE.BoxGeometry(sw + 0.04, sh + 0.04, 0.05), [a.mid, y, z]);
+    for (const sx of [-1, 1]) put(mats.trim, new THREE.CylinderGeometry(0.006, 0.006, WALL_H - (y + sh / 2), 8), [a.mid + sx * (sw / 2 - 0.15), (WALL_H + y + sh / 2) / 2, z]);
     for (const ry of [0, Math.PI]) {
-      const s = new THREE.Mesh(new THREE.PlaneGeometry(sw, sw / 4), mat);
-      s.position.set(a.mid, SIGN_Y, ry ? -0.03 : 0.03);
+      const s = new THREE.Mesh(new THREE.PlaneGeometry(sw, sh), onTop(face.clone(), 1));
+      s.material.map = tex;
+      s.position.set(a.mid, y, z + (ry ? -0.027 : 0.027));
       s.rotation.y = ry;
       s.userData.aisle = a;
       hall.add(s); signs.push(s);
     }
-  }
-  // the Sangeetha plaque on the back wall, over the cross aisle
+  });
+
+  // the logo wall at the far end, with a counter in front of it
+  const LW = Math.min(7, W * 0.4), LH = WALL_H;
+  put(mats.trim, new THREE.BoxGeometry(LW, LH + 0.02, 0.08), [0, (LH - 0.02) / 2, -D + 0.04]);
   const logo = new Image();
-  const plaque = canvasTexture(2048, 768, () => {});
-  const drawPlaque = () => {
-    const g = plaque.image.getContext("2d");
-    g.setTransform(2, 0, 0, 2, 0, 0);
-    g.clearRect(0, 0, 1024, 384);
-    g.fillStyle = NAVY; roundRect(g, 0, 0, 1024, 384, 44); g.fill();
-    if (logo.naturalWidth) { const w = 520, h = w * logo.naturalHeight / logo.naturalWidth; g.drawImage(logo, (1024 - w) / 2, 70, w, h); }
-    g.fillStyle = COPPER; g.font = `600 44px ${FONT}`; g.textAlign = "center";
-    if (g.letterSpacing !== undefined) g.letterSpacing = "10px";
-    g.fillText("3D SHOWROOM", 512, 330);
-    plaque.needsUpdate = true;
+  const logoTex = canvasTexture(HQ ? 2048 : 1024, HQ ? 1024 : 512, () => {});
+  const drawLogo = () => {
+    const c = logoTex.image, g = c.getContext("2d"), k = c.width / 1024;
+    g.setTransform(k, 0, 0, k, 0, 0);
+    g.clearRect(0, 0, 1024, 512);
+    const glow = g.createRadialGradient(512, 230, 20, 512, 230, 520); glow.addColorStop(0, "rgba(255,255,255,0.07)"); glow.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = glow; g.fillRect(0, 0, 1024, 512);
+    if (logo.naturalWidth) { const w = 640, h = w * logo.naturalHeight / logo.naturalWidth; g.drawImage(logo, (1024 - w) / 2, 250 - h / 2 - 40, w, h); }
+    g.fillStyle = COPPER; g.font = `600 40px ${FONT}`; g.textAlign = "center"; g.textBaseline = "alphabetic";
+    if (g.letterSpacing !== undefined) g.letterSpacing = "14px";
+    g.fillText("3D SHOWROOM", 512 + 7, 410);
+    logoTex.needsUpdate = true;
     redraw();
   };
-  drawPlaque();
-  logo.onload = drawPlaque;
+  drawLogo();
+  logo.onload = drawLogo;
   logo.src = "/logos/sangeetha.png";
-  const pm = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.9), onTop(new THREE.MeshBasicMaterial({ map: plaque, toneMapped: false })));
-  pm.position.set(0, 2.05, -D + 0.01);
-  hall.add(pm);
+  const lm = new THREE.Mesh(new THREE.PlaneGeometry(LW * 0.78, LW * 0.39), onTop(new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, toneMapped: false, depthWrite: false }), 2));
+  lm.position.set(0, 1.95, -D + 0.081);
+  lm.renderOrder = 2;
+  hall.add(lm);
+  // a strip of light along the top and bottom of the logo wall
+  put(mats.light, new THREE.PlaneGeometry(LW - 0.1, 0.025), [0, LH - 0.12, -D + 0.081]);
+  put(mats.copper, new THREE.BoxGeometry(LW - 0.1, 0.02, 0.006), [0, 0.12, -D + 0.083]);
+  // the counter: a white top on a charcoal body with an orange line
+  const CW = Math.min(2.6, LW * 0.45), cz = -D + Math.min(1.25, (D - LEN) * 0.55);
+  put(mats.trim, new THREE.BoxGeometry(CW, 0.98, 0.56), [0, 0.49, cz]);
+  put(mats.counterTop, new THREE.BoxGeometry(CW + 0.06, 0.04, 0.64), [0, 1.0, cz]);
+  put(mats.copper, new THREE.BoxGeometry(CW + 0.002, 0.018, 0.562), [0, 0.86, cz]);
+  const counter = new THREE.Mesh(new THREE.BoxGeometry(CW + 0.06, 1.02, 0.64), new THREE.MeshBasicMaterial({ visible: false }));
+  counter.position.set(0, 0.51, cz);
+  hall.add(counter); blockers.push(counter);
+  L.counter = { x: [-(CW + 0.06) / 2, (CW + 0.06) / 2], z: [cz - 0.32, cz + 0.32] };
 }
 
+// ── the plinths, their name plates and the brand panels (from the layout) ──
+// A floor-standing product stands on a plinth 6 cm high, as deep as the deepest on its side of the aisle (so their
+// fronts line up), with its brand and name on the front; a product on the wall has the same plate under it. A brand
+// panel hangs on the partition over each brand's run.
+const PLATE = { w: 512, h: 48, cols: 4 }; // the name plates' cells in one texture
+const plateTex = canvasTexture(PLATE.w * PLATE.cols, 2 ** Math.ceil(Math.log2(Math.ceil(L.places.length / PLATE.cols) * PLATE.h)), () => {});
+const plateOf = new Map();
+const logoCells = new Map(); // brand -> cell in the logo texture
+const logoTex = canvasTexture(1024, 512, () => {});
+{
+  const pg = plateTex.image.getContext("2d");
+  L.places.forEach((pl, i) => {
+    const x = (i % PLATE.cols) * PLATE.w, y = Math.floor(i / PLATE.cols) * PLATE.h;
+    plateOf.set(pl.p.id, [x, y]);
+    const brand = pl.p.brand.toUpperCase();
+    let name = pl.p.shortName, size = 30;
+    const widths = () => { pg.font = `700 ${size * 0.8}px ${FONT}`; const bw = pg.measureText(brand).width + size * 0.55; pg.font = `500 ${size}px ${FONT}`; return [bw, bw + pg.measureText(name).width]; };
+    let [bw, all] = widths();
+    while (all > PLATE.w - 24 && size > 20) { size--; [bw, all] = widths(); }
+    while (all > PLATE.w - 24 && name.length > 6) { name = name.slice(0, -2).trimEnd() + "…"; [bw, all] = widths(); }
+    const x0 = x + (PLATE.w - all) / 2, mid = y + PLATE.h / 2 + 1;
+    pg.textBaseline = "middle"; pg.textAlign = "left";
+    pg.fillStyle = COPPER_DK; pg.font = `700 ${size * 0.8}px ${FONT}`; pg.fillText(brand, x0, mid);
+    pg.fillStyle = "#2A2A2D"; pg.font = `500 ${size}px ${FONT}`; pg.fillText(name, x0 + bw, mid);
+  });
+  plateTex.needsUpdate = true;
+  const plateMat = onTop(new THREE.MeshBasicMaterial({ map: plateTex, transparent: true, depthWrite: false }), 2);
+  plateMat.userData.order = 1;
+  const panelMat = onTop(new THREE.MeshStandardMaterial({ map: logoTex, transparent: true, alphaTest: 0.4, roughness: 0.5 }), 1);
+  // a plate's quad, with its cell's corner of the texture
+  const plate = (id, w) => {
+    const [x, y] = plateOf.get(id), g = new THREE.PlaneGeometry(w, w * PLATE.h / PLATE.w), uv = g.attributes.uv, TW = plateTex.image.width, TH = plateTex.image.height;
+    const u0 = x / TW, u1 = (x + PLATE.w) / TW, v0 = 1 - (y + PLATE.h) / TH, v1 = 1 - y / TH;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) ? u1 : u0, uv.getY(i) ? v1 : v0);
+    return g;
+  };
+  // the depth of the plinths on each side of each aisle: the deepest product there
+  const deepest = new Map();
+  for (const pl of L.places) if (pl.p.placement !== "wall") { const k = `${L.aisles.indexOf(pl.aisle)}${pl.side}`; deepest.set(k, Math.max(deepest.get(k) || 0, sizeOf(pl.p).d)); }
+  const contact = onTop(new THREE.MeshBasicMaterial({ map: softRect(30, 26, 0.55), transparent: true, depthWrite: false }), 2);
+  const floorShade = onTop(new THREE.MeshBasicMaterial({ map: softRect(50, 50, 0.3), transparent: true, depthWrite: false }), 2);
+  const frame = new THREE.Matrix4();
+  for (const pl of L.places) {
+    const s = sizeOf(pl.p), wall = pl.p.placement === "wall";
+    frame.compose(new THREE.Vector3(pl.pos[0], 0, pl.pos[2]), Q.setFromEuler(E.set(0, pl.rot, 0)), ONE);
+    if (wall) {
+      // its plate on the wall under it
+      put(plateMat, plate(pl.p.id, 0.48), [0, pl.pos[1] - 0.16, 0.009], [0, 0, 0], frame);
+      continue;
+    }
+    const maxD = deepest.get(`${L.aisles.indexOf(pl.aisle)}${pl.side}`), pw = s.w + 0.1, pd = maxD + 0.1;
+    const zc = (-s.d + maxD + 0.02) / 2, front = zc + pd / 2;
+    put(mats.plinth, new THREE.BoxGeometry(pw, PLINTH - 0.012, pd), [0, 0.012 + (PLINTH - 0.012) / 2, zc], [0, 0, 0], frame);
+    put(mats.trim, new THREE.BoxGeometry(pw - 0.03, 0.014, pd - 0.03), [0, 0.006, zc], [0, 0, 0], frame);
+    put(plateMat, plate(pl.p.id, Math.min(0.46, pw - 0.06)), [0, 0.012 + (PLINTH - 0.012) / 2, front + 0.0015], [0, 0, 0], frame);
+    put(contact, flat(s.w + 0.12, s.d + 0.12), [0, PLINTH + 0.001, 0], [0, 0, 0], frame);
+    put(floorShade, flat(pw + 0.45, pd + 0.45), [0, 0.0012, zc], [0, 0, 0], frame);
+  }
+  // brand panels: one over each run of a brand along a side (floor-standing products only)
+  const brands = [...new Set(products.map((p) => p.brand))];
+  brands.forEach((b, i) => logoCells.set(b, [(i % 4) * 256, Math.floor(i / 4) * 80]));
+  const lg = logoTex.image.getContext("2d");
+  for (const b of brands) {
+    const [x, y] = logoCells.get(b);
+    lg.fillStyle = "#FFFFFF"; roundRect(lg, x + 2, y + 2, 252, 76, 14); lg.fill();
+    const src = products.find((p) => p.brand === b)?.brandLogo;
+    if (!src) continue;
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(196 / img.naturalWidth, 44 / img.naturalHeight), w = img.naturalWidth * k, h = img.naturalHeight * k;
+      lg.drawImage(img, x + (256 - w) / 2, y + (80 - h) / 2, w, h);
+      logoTex.needsUpdate = true;
+      redraw();
+    };
+    img.src = src;
+  }
+  logoTex.needsUpdate = true;
+  const panel = (b, w) => {
+    const [x, y] = logoCells.get(b), g = new THREE.PlaneGeometry(w, w * 80 / 256), uv = g.attributes.uv;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, (x + (uv.getX(i) ? 256 : 0)) / 1024, 1 - (y + (uv.getY(i) ? 0 : 80)) / 512);
+    return g;
+  };
+  // (on a partition: a charcoal header board on its cap, on that side's half of it, so the two sides' boards never
+  // share a face; on the hall's own wall: the card on the wall)
+  const PW = 0.78, PH = PW * 80 / 256;
+  L.aisles.forEach((a, ai) => {
+    for (const side of ["L", "R"]) {
+      const list = L.places.filter((pl) => pl.aisle === a && pl.side === side).sort((p, q) => q.pos[2] - p.pos[2]);
+      if (!list.length || list.some((pl) => pl.p.placement === "wall")) continue;
+      const outer = side === "L" ? ai === 0 : ai === L.aisles.length - 1;
+      const face = side === "L" ? 1 : -1, px = side === "L" ? a.x0 : a.x1, H = outer ? 0 : L.partH[side === "L" ? ai - 1 : ai];
+      for (let i = 0; i < list.length;) {
+        let j = i;
+        while (j + 1 < list.length && list[j + 1].p.brand === list[i].p.brand) j++;
+        const z = (list[i].pos[2] + list[j].pos[2]) / 2;
+        if (outer) put(panelMat, panel(list[i].p.brand, PW), [px + face * 0.012, 2.25, z], [0, face * Math.PI / 2, 0]);
+        else {
+          const y = H + 0.03 + (PH + 0.03) / 2;
+          put(mats.trim, new THREE.BoxGeometry(0.03, PH + 0.03, PW + 0.03), [px + face * 0.016, y, z]);
+          put(panelMat, panel(list[i].p.brand, PW), [px + face * 0.034, y, z], [0, face * Math.PI / 2, 0]);
+        }
+        i = j + 1;
+      }
+    }
+  });
+}
+bakeAll();
+
 // ── a slot per product: where it stands, its stand-in, and its model once loaded ──
-const unitBox = new THREE.BoxGeometry(1, 1, 1), unitPlane = new THREE.PlaneGeometry(1, 1);
-// A product not loaded yet stands as a box of its real size in its first colour, with its catalogue photo, cropped
-// to the product, on the front: from across the hall it reads as that product, not as a placeholder.
+const unitPlane = new THREE.PlaneGeometry(1, 1);
+// A product not loaded yet stands as a box of its real size in its first colour, with a sheen like painted metal and
+// its catalogue photo, cropped to the product, on the front: from across the hall it reads as that product. The box
+// is drawn in two calls (its front, and the rest). When its model arrives, the box fades away round it.
 const tints = new Map(); // one material per colour, shared by the stand-ins' sides, tops and backs
 const tintOf = (hex) => {
-  if (!tints.has(hex)) tints.set(hex, new THREE.MeshStandardMaterial({ color: new THREE.Color(hex || "#d9d9dc"), roughness: 0.5, metalness: 0.15 }));
+  if (!tints.has(hex)) tints.set(hex, new THREE.MeshStandardMaterial({ color: new THREE.Color(hex || "#d9d9dc"), roughness: 0.32, metalness: 0.3 }));
   return tints.get(hex);
 };
+function standGeometry(w, h, d) {
+  // a box whose five plain faces come first and the front (+z) last, as two groups
+  const g = new THREE.BoxGeometry(w, h, d), idx = g.index.array, order = [0, 1, 2, 3, 5, 4], out = [];
+  for (const f of order) { const gr = g.groups[f]; for (let i = 0; i < gr.count; i++) out.push(idx[gr.start + i]); }
+  g.setIndex(out);
+  g.clearGroups();
+  g.addGroup(0, 30, 0);
+  g.addGroup(30, 6, 1);
+  return g;
+}
 const blobMat = onTop(new THREE.MeshBasicMaterial({ map: radialTexture([[0, "rgba(0,0,0,0.4)"], [0.55, "rgba(0,0,0,0.16)"], [1, "rgba(0,0,0,0)"]]), transparent: true, depthWrite: false }), 2);
 const noRay = () => {};
 const probe = document.createElement("canvas");
@@ -347,24 +629,24 @@ const slots = L.places.map((pl, i) => {
   const { p } = pl, size = sizeOf(p), wall = p.placement === "wall";
   const group = new THREE.Group();
   const stand = new THREE.Group();
-  // a box's faces in BoxGeometry's order: +x, -x, +y, -y, +z (the front), -z
   const tint = p.finishes?.[0]?.swatchColor, body = tintOf(tint);
-  const front = new THREE.MeshStandardMaterial({ map: frontTexture(p.thumb, tint), roughness: 0.5 });
-  const box = new THREE.Mesh(unitBox, [body, body, body, body, front, body]);
-  box.scale.set(size.w, size.h, size.d);
+  const front = new THREE.MeshStandardMaterial({ map: frontTexture(p.thumb, tint), roughness: 0.35, metalness: 0.05 });
+  const box = new THREE.Mesh(standGeometry(size.w, size.h, size.d), [body, front]);
   box.position.set(0, size.h / 2, wall ? size.d / 2 : 0);
   stand.add(box);
-  // a soft shadow under a floor unit, behind a wall unit
+  // a soft shadow under a floor unit, behind a wall unit: in passthrough only (in the hall the plinths carry theirs)
   const blob = new THREE.Mesh(unitPlane, blobMat);
   if (wall) { blob.scale.set(size.w + 0.3, size.h + 0.3, 1); blob.position.set(0, size.h / 2, 0.003); }
   else { blob.scale.set(size.w + 0.35, size.d + 0.35, 1); blob.rotation.x = -Math.PI / 2; blob.position.y = 0.004; }
   blob.raycast = noRay;
+  blob.visible = false;
   group.add(stand, blob);
   world.add(group);
-  const s = { i, p, size, wall, aisle: pl.aisle, home: pl, group, stand, blob, model: null, loading: false, failed: false,
+  const home = { ...pl, pos: [pl.pos[0], wall ? pl.pos[1] : PLINTH, pl.pos[2]] };
+  const s = { i, p, size, wall, aisle: pl.aisle, home, group, stand, box, blob, model: null, loading: false, failed: false, fade: 0,
     moving: new Map(), state: {}, center: new THREE.Vector3(), front: new THREE.Vector3(), dist: 0, score: 0, arWall: null };
   group.userData.slot = s;
-  placeSlot(s, pl.pos, pl.rot);
+  placeSlot(s, home.pos, home.rot);
   return s;
 });
 function placeSlot(s, pos, rot) {
@@ -376,6 +658,31 @@ function placeSlot(s, pos, rot) {
   s.front.set(Math.sin(rot), 0, Math.cos(rot));
 }
 const byId = new Map(slots.map((s) => [s.p.id, s]));
+// the stand-in fades out over its model, which is already in place inside it
+const FADE_MS = 450;
+function fadeStand(s) {
+  s.fade = performance.now();
+  s.box.material = s.box.material.map((m) => Object.assign(m.clone(), { transparent: true, depthWrite: false }));
+}
+function endFade(s) {
+  if (!s.fade) return;
+  s.fade = 0;
+  s.box.material.forEach((m) => m.dispose());
+  s.box.material = [tintOf(s.p.finishes?.[0]?.swatchColor), s.frontMat];
+  s.stand.visible = !s.model;
+}
+function stepFades(now) {
+  let any = false;
+  for (const s of slots) {
+    if (!s.fade) continue;
+    const k = (now - s.fade) / FADE_MS;
+    if (k >= 1) { endFade(s); any = true; continue; }
+    for (const m of s.box.material) m.opacity = 1 - ease(k);
+    any = true;
+  }
+  return any;
+}
+for (const s of slots) s.frontMat = s.box.material[1];
 
 // ── loading: the nearest models, CAP at most, one or two at a time ──
 const gltfLoader = new GLTFLoader();
@@ -415,6 +722,24 @@ function planLoads() {
     load(s);
   }
   seen();
+  progress(wanted);
+}
+// a slim bar at the top of the view while the models near you load
+let progressTimer = 0;
+function progress(wanted) {
+  const el = $("progress");
+  if (!el || xr) return;
+  const n = wanted.size, done = [...wanted].filter((s) => s.model || s.failed).length;
+  const busy = n > 0 && done < n;
+  if (busy) {
+    clearTimeout(progressTimer);
+    el.classList.remove("gone");
+    el.querySelector("i").style.transform = `scaleX(${(0.08 + 0.92 * done / n).toFixed(3)})`;
+    el.querySelector("span").textContent = `Loading 3D models near you · ${done} of ${n}`;
+  } else if (!el.classList.contains("gone")) {
+    el.querySelector("i").style.transform = "scaleX(1)";
+    progressTimer = setTimeout(() => el.classList.add("gone"), 500);
+  }
 }
 let planTimer = 0;
 const planSoon = () => { clearTimeout(planTimer); planTimer = setTimeout(planLoads, 60); };
@@ -431,7 +756,7 @@ async function load(s) {
     fitSlot(s, gltf.scene);
     s.model = gltf.scene;
     s.group.add(s.model);
-    s.stand.visible = false;
+    fadeStand(s);
     ldr.log.push(`+${s.p.id}`);
     if (selected === s) renderCard();
     if (xr) xr.card.current = null; // its card in the headset says it can be opened now
@@ -456,6 +781,7 @@ function fitSlot(s, root) {
 }
 function unload(s) {
   if (!s.model) return;
+  endFade(s);
   s.model.removeFromParent();
   disposeTree(s.model);
   s.model = null;
@@ -648,8 +974,8 @@ const inModel = (s, o) => { for (; o && o !== s.group; o = o.parent) if (o === s
 const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const touch = matchMedia("(pointer: coarse)").matches || isPhone;
 $("hint").innerHTML = `${svg('<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.6 16a1.6 1.6 0 0 1 2.4-2.1L9 15.5"/>')}<span>${touch
-  ? "Drag to look around · Pinch to zoom · Tap a product to walk up to it, then tap a door"
-  : "Drag to look around · Scroll to zoom · Click a product to walk up to it, then click a door"}</span>`;
+  ? "<b>Drag</b> to look around · <b>pinch</b> to zoom · <b>tap</b> a product, then a door to open it"
+  : "<b>Drag</b> to look around · <b>scroll</b> to zoom · <b>click</b> a product to walk up to it, then a door to open it"}</span>`;
 let hintTimer = 0;
 const hintGone = () => { clearTimeout(hintTimer); hintTimer = setTimeout(() => $("hint").classList.add("gone"), 400); };
 
@@ -658,7 +984,7 @@ const order = [...slots].sort((a, b) => L.aisles.indexOf(a.aisle) - L.aisles.ind
 const cats = [[null, "All"], ...[...new Set(L.aisles.map((a) => a.cat))].map((c) => [c, L.aisles.find((a) => a.cat === c).title])];
 let catFilter = null;
 $("cats").innerHTML = cats.map(([c, label]) => `<button class="cat" type="button" data-cat="${esc(c ?? "")}" aria-pressed="${c === null}">${esc(label)}<span class="n">${slots.filter((s) => !c || s.p.category === c).length}</span></button>`).join("");
-$("chips").innerHTML = order.map((s) => `<button class="chip" type="button" data-id="${esc(s.p.id)}" aria-pressed="false"><img src="${esc(s.p.thumb)}" alt="" loading="lazy" width="40" height="40"><span><b>${esc(s.p.brand)}</b>${esc(s.p.shortName)}</span></button>`).join("");
+$("chips").innerHTML = order.map((s) => `<button class="chip" type="button" data-id="${esc(s.p.id)}" aria-pressed="false"><img src="${esc(s.p.thumb)}" alt="" loading="lazy" width="40" height="40"><span><b>${esc(s.p.brand)}</b><span class="nm">${esc(s.p.shortName)}</span></span></button>`).join("");
 $("cats").querySelectorAll(".cat").forEach((b) => b.addEventListener("click", () => {
   setFilter(b.dataset.cat || null);
   if (catFilter) flyToAisle(L.aisles.find((a) => a.cat === catFilter)); else flyHome();
@@ -683,7 +1009,7 @@ for (const s of slots) {
   $("labels").appendChild(b);
   s.tag = b;
 }
-const LABEL_RANGE = 9, LABEL_MAX = 14;
+const LABEL_RANGE = 8, LABEL_MAX = light ? 3 : 4; // only the nearest few; those further off fade
 const proj = new THREE.Vector3();
 // A tag never sits under the page's own buttons, card or dock, or half off the view: one that would is left out. Each tag's size is
 // measured once (again when the font arrives); the fixed parts are measured each time the tags move.
@@ -709,7 +1035,7 @@ function updateLabels() {
   const blocked = fixedRects();
   const c = camera.position;
   // inside the hall, below the partitions: only the names in your own aisle (the others are behind a partition)
-  const inside = c.z < 0.2 && c.z > -L.D && Math.abs(c.x) < L.W / 2 && c.y < PART_H;
+  const inside = c.z < 0.2 && c.z > -L.D && Math.abs(c.x) < L.W / 2 && c.y < PART_H - 0.1;
   const mine = inside ? L.aisles.find((a) => c.x >= a.x0 && c.x <= a.x1) : null;
   const near = [];
   for (const s of slots) {
@@ -743,7 +1069,11 @@ function updateLabels() {
   }
   const show = new Set(placed.map((n) => n[0]));
   for (const s of slots) if (!show.has(s)) s.tag.style.display = "none";
-  for (const [s, , x, y] of placed) { s.tag.style.display = ""; s.tag.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`; }
+  for (const [s, d, x, y] of placed) {
+    s.tag.style.display = "";
+    s.tag.style.opacity = d < 0 ? "1" : clamp((LABEL_RANGE - d) / 3, 0.25, 1).toFixed(2);
+    s.tag.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
+  }
 }
 
 let selected = null;
@@ -819,11 +1149,30 @@ function viewFor(s) {
   pos.y = s.wall ? 1.55 : clamp(s.size.h * 0.95, 1.2, 1.7);
   return { pos, target };
 }
+// The whole hall from a corner above the entrance, three-quarters on, framed tight in the part of the view the page
+// leaves clear (under the buttons, above the dock): on a tall phone screen, more from the side and from higher up.
 function homeView() {
-  const { v: tanV, h: tanH } = tans();
-  const target = new THREE.Vector3(0, 0.4, -L.D * 0.48);
-  const dist = Math.max(L.W * 1.08 / (2 * tanH), L.D * 0.95 / (2 * tanV)) + 2;
-  return { pos: target.clone().addScaledVector(new THREE.Vector3(0, 1.15, 1).normalize(), dist), target };
+  const w = stage.clientWidth, h = stage.clientHeight, tall = h > w * 1.15;
+  const az = tall ? -1.22 : -0.3, el = tall ? 1.2 : 0.84;
+  const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+  const pts = [];
+  for (const x of [-L.W / 2, L.W / 2]) for (const [z, y] of [[-L.D, 0], [-L.D, WALL_H], [0, WALL_H], [tall ? 0.3 : APRON * 0.5, 0]]) pts.push(new THREE.Vector3(x, y, z));
+  const cam = camera.clone();
+  const target = new THREE.Vector3(0, 0.5, -L.D / 2);
+  const top = 1 - 2 * (tall ? 64 : 76) / h, bottom = -1 + 2 * (covered + (tall ? 60 : 16)) / h, side = 1 - 2 * (tall ? 10 : 30) / w;
+  const tanF = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), kx = tanF * camera.aspect, ky = tanF * h / (h + covered);
+  let dist = Math.max(L.W, L.D) * 1.4;
+  for (let i = 0; i < 14; i++) {
+    cam.position.copy(target).addScaledVector(dir, dist);
+    cam.lookAt(target);
+    cam.updateMatrixWorld(true);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const p of pts) { const v = p.clone().project(cam); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
+    const right = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
+    target.addScaledVector(right, ((x0 + x1) / 2) * dist * kx).addScaledVector(up, ((y0 + y1) / 2 - (top + bottom) / 2) * dist * ky);
+    dist *= Math.max((x1 - x0) / (2 * side), (y1 - y0) / (top - bottom));
+  }
+  return { pos: target.clone().addScaledVector(dir, dist), target };
 }
 function aisleView(a) {
   return { pos: new THREE.Vector3(a.mid, 3.4, 3.2), target: new THREE.Vector3(a.mid, 0.6, -a.len * 0.5) };
@@ -886,6 +1235,7 @@ renderer.setAnimationLoop((time, frame) => {
   if (!flight && controls.update()) moved = true;
   if (controls.target.y < 0) controls.target.y = 0;
   if (animateParts(now)) moved = true;
+  if (stepFades(now)) moved = true;
   // not on the way: what a flight passes would load only to be dropped (it plans again when it lands)
   if (!flight && now - lastPlan > 300) { lastPlan = now; planLoads(); }
   if (moved || dirty > 0) {
@@ -895,6 +1245,10 @@ renderer.setAnimationLoop((time, frame) => {
   }
 });
 new ResizeObserver(() => { if (!xr) fitCamera(); }).observe(stage);
+// the card, the buttons and the progress bar sit just above the dock, however tall it is
+const dockFit = () => stage.style.setProperty("--dock-h", `${Math.round(stage.getBoundingClientRect().bottom - $("dock").getBoundingClientRect().top)}px`);
+new ResizeObserver(dockFit).observe($("dock"));
+dockFit();
 fitCamera();
 
 // ── where it opens: ?focus=<id> in front of that product, else the whole hall ──
@@ -946,7 +1300,8 @@ async function startXR(session, mode) {
   for (const s of slots) placeSlot(s, [s.group.position.x, s.group.position.y, s.group.position.z], s.group.rotation.y); // centres move with the floor
   document.body.classList.add("in-xr");
   ldr.cap = CAP_XR; ldr.near = NEAR_XR;
-  if (ar) { scene.background = null; hall.visible = false; }
+  $("progress")?.classList.add("gone");
+  if (ar) { scene.background = null; hall.visible = false; for (const s of slots) s.blob.visible = true; }
   else scene.fog = new THREE.Fog(BG, 24, 46); // the far floor fades into the sky, past the hall's far corner
 
   // the pointer, its tooltip on a door, the product card and the panel by your side
@@ -1128,6 +1483,7 @@ function xrFrame(time, frame) {
   if (!xr.started && pose && poseB) { xr.started = true; startPose(); }
   if (xr.placeMenu && pose && xr.started) { xr.placeMenu = false; placeMenu(); }
   animateParts(now);
+  stepFades(now);
   if (now - xr.lastPlan > 300) { xr.lastPlan = now; planLoads(); }
 
   let tip = null, card = null, ret = null, hoverButton = null;
@@ -1179,7 +1535,7 @@ function endXR() {
   xr = null;
   world.position.y = 0;
   world.updateMatrixWorld(true);
-  for (const s of slots) { s.group.visible = true; if (s.arWall) s.arWall.removeFromParent(); placeSlot(s, s.home.pos, s.home.rot); }
+  for (const s of slots) { s.group.visible = true; s.blob.visible = false; if (s.arWall) s.arWall.removeFromParent(); placeSlot(s, s.home.pos, s.home.rot); }
   hall.visible = true;
   scene.background = BG;
   scene.fog = null;
@@ -1238,8 +1594,10 @@ function makeMenu() {
       roundRect(g, x, y, w, bh, 26); g.fill();
       if (!it.pressed) { g.lineWidth = 3; g.strokeStyle = on ? NAVY : HAIR; g.stroke(); }
       g.fillStyle = it.pressed ? "#FFFFFF" : it.id === "exit" ? COPPER_DK : NAVY;
-      g.font = `600 38px ${FONT}`; g.textBaseline = "middle";
-      g.fillText(wrapText(g, it.label, w - 60)[0] || "", x + 30, y + bh / 2 + 1);
+      let fs = 40;
+      do g.font = `600 ${fs}px ${FONT}`; while (g.measureText(it.label).width > w - 60 && --fs > 24);
+      g.textBaseline = "middle";
+      g.fillText(it.label, x + 30, y + bh / 2 + 1, w - 60);
       g.textBaseline = "alphabetic";
       buttons.push({ ...it, x, y, w, h: bh });
       if (it.wide || col === 1) { y += bh + gap; col = 0; } else col = 1;
@@ -1264,32 +1622,42 @@ function makeMenu() {
 // ── read-only views for automated checks ──
 const v3 = (v) => v.toArray().map((n) => +n.toFixed(3));
 window.__showroom = {
-  layout: () => ({ W: +L.W.toFixed(2), D: +L.D.toFixed(2), LEN: +L.LEN.toFixed(2), PT, PART_H, WALL_H, aisles: L.aisles.map((a) => ({ cat: a.cat, part: a.part, of: a.of, n: a.items.length, x: [+a.x0.toFixed(2), +a.x1.toFixed(2)], walk: a.walk.map((v) => +v.toFixed(2)), mid: +a.mid.toFixed(2), len: +a.len.toFixed(2) })) }),
+  layout: () => ({ W: +L.W.toFixed(2), D: +L.D.toFixed(2), LEN: +L.LEN.toFixed(2), PT, PART_H, PART_TALL, partH: L.partH, WALL_H, aisles: L.aisles.map((a) => ({ cat: a.cat, part: a.part, of: a.of, n: a.items.length, x: [+a.x0.toFixed(2), +a.x1.toFixed(2)], walk: a.walk.map((v) => +v.toFixed(2)), mid: +a.mid.toFixed(2), len: +a.len.toFixed(2) })) }),
   slots: () => slots.map((s) => {
     let meshes = 0;
     s.model?.traverse((o) => { if (o.isMesh) meshes++; });
-    const box = s.stand.children[0];
     return { id: s.p.id, cat: s.p.category, loaded: !!s.model, loading: s.loading, visible: s.group.visible, center: v3(s.center), front: v3(s.front), state: { ...s.state }, meshes,
-      stand: { shown: s.stand.visible, tint: `#${box.material[0].color.getHexString()}`, photo: !!box.material[4].map.userData.cropped } };
+      stand: { shown: s.stand.visible && !s.fade, tint: `#${s.box.material[0].color.getHexString()}`, photo: !!s.frontMat.map.userData.cropped } };
   }),
   loader: () => ({ cap: ldr.cap, near: ldr.near, loaded: slots.filter((s) => s.model).length, loading: slots.filter((s) => s.loading).length, maxSeen: ldr.maxSeen, loads: ldr.loads, unloads: ldr.unloads, failed: slots.filter((s) => s.failed).map((s) => s.p.id) }),
   resetMax: () => { ldr.maxSeen = busyCount(); },
   camera: () => ({ pos: v3(camera.position), target: v3(controls.target), flying: !!flight }),
+  look: (pos, target) => { flight = null; jumpTo({ pos: new THREE.Vector3(...pos), target: new THREE.Vector3(...target) }); planLoads(); },
   selected: () => selected?.p.id || null,
   card: () => ({ shown: !$("pcard").classList.contains("gone"), name: $("pcName").textContent, link: $("pcLink").getAttribute("href") }),
   // a point in a product's own model space, on the screen
   screenOf: (id, p) => { const s = byId.get(id); const v = s.group.localToWorld(new THREE.Vector3(...p)).project(camera); const r = renderer.domElement.getBoundingClientRect(); return v.z > 1 ? null : [r.left + (v.x + 1) / 2 * r.width, r.top + (1 - v.y) / 2 * r.height]; },
   draws: () => renderer.info.render.calls,
+  // what a tap at a point on the page would land on: a product's id, an aisle's sign, or a wall
+  hitAt: (x, y) => {
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    const hit = raycaster.intersectObjects(pickables(), true).find((h) => shown(h.object));
+    return !hit ? null : hit.object.userData.aisle ? "sign" : slotOf(hit.object)?.p.id || "wall";
+  },
   // Z-fighting and holes in the hall: from camera position `pos` looking at `target`, the hall alone (products hidden)
-  // is drawn on magenta, then again from 1 mm away. flicker: the share of pixels that change a lot (two faces fighting
-  // for the same depth flip between frames; anything else barely moves). holes: magenta pixels in the lower 60% of the
+  // is drawn on magenta, then again from 1 mm away, each at twice the size and averaged down, as a 2x screen shows it.
+  // flicker: the share of pixels that change a lot (two faces fighting for the same depth flip between frames; an
+  // edge only slides a fraction of a pixel). holes: magenta pixels in the lower 60% of the
   // view (with no ceiling the sky is above the walls; below them it can only show through a gap).
-  flicker: (pos, target) => {
+  flicker: (pos, target, png = false) => {
     const was = slots.map((s) => s.group.visible);
     slots.forEach((s) => (s.group.visible = false));
     const bg = scene.background;
     scene.background = new THREE.Color(0xff00ff);
-    const w = 640, h = 400, rt = new THREE.WebGLRenderTarget(w, h, { samples: 0 }), buf = [new Uint8Array(w * h * 4), new Uint8Array(w * h * 4)];
+    const w = 640, h = 400, rt = new THREE.WebGLRenderTarget(2 * w, 2 * h, { samples: 4 }), buf = [new Uint8Array(w * h * 4), new Uint8Array(w * h * 4)];
+    const big = new Uint8Array(16 * w * h);
     const cam = new THREE.PerspectiveCamera(FOV, w / h, camera.near, camera.far);
     let changed = 0;
     for (const off of [0, 0.001]) {
@@ -1298,7 +1666,12 @@ window.__showroom = {
       cam.updateMatrixWorld(true);
       renderer.setRenderTarget(rt);
       renderer.render(scene, cam);
-      renderer.readRenderTargetPixels(rt, 0, 0, w, h, buf[off ? 1 : 0]);
+      renderer.readRenderTargetPixels(rt, 0, 0, 2 * w, 2 * h, big);
+      const out = buf[off ? 1 : 0];
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) for (let c = 0; c < 4; c++) {
+        const i = (2 * y * 2 * w + 2 * x) * 4 + c, j = i + 2 * w * 4;
+        out[(y * w + x) * 4 + c] = (big[i] + big[i + 4] + big[j] + big[j + 4] + 2) >> 2;
+      }
     }
     renderer.setRenderTarget(null);
     let holes = 0;
@@ -1310,7 +1683,18 @@ window.__showroom = {
     scene.background = bg;
     slots.forEach((s, i) => (s.group.visible = was[i]));
     redraw();
-    return { flicker: +(changed / (w * h)).toFixed(5), holes };
+    let image;
+    if (png) { // the first frame, upright, with the changed pixels in red
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const g = c.getContext("2d"), im = g.createImageData(w, h);
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const i = ((h - 1 - y) * w + x) * 4, o = (y * w + x) * 4;
+        const hot = Math.max(Math.abs(buf[0][i] - buf[1][i]), Math.abs(buf[0][i + 1] - buf[1][i + 1]), Math.abs(buf[0][i + 2] - buf[1][i + 2])) > 48;
+        im.data.set(hot ? [255, 0, 0, 255] : [buf[0][i], buf[0][i + 1], buf[0][i + 2], 255], o);
+      }
+      g.putImageData(im, 0, 0); image = c.toDataURL();
+    }
+    return { flicker: +(changed / (w * h)).toFixed(5), holes, image };
   },
   memory: () => ({ ...renderer.info.memory }),
   labels: () => slots.filter((s) => s.tag.style.display !== "none").map((s) => s.p.id),

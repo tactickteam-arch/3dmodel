@@ -142,6 +142,8 @@ let si = await standIns();
 check(si.n > 0 && !si.bad.length, `the ${si.n} not loaded stand as a box in their colour with their photo on the front; the loaded ones don't${si.bad.length ? `: ${si.bad.slice(0, 2).join(", ")}` : ""}`);
 check(ld.loaded <= ld.cap && ld.maxSeen <= ld.cap && !ld.failed.length, `from the entrance: ${ld.loaded} loaded (most at once ${ld.maxSeen}), none failed`);
 check((await sr("labels()")).length === 0, "from the entrance the aisle signs name things, not a tag on every product");
+const draws = await sr("draws()");
+check(draws < 1000, `the whole hall with ${ld.loaded} models loaded is ${draws} draw calls (the room itself merged into a few dozen)`);
 await b.shot(`${out}/showroom-overview.png`);
 
 console.log("\n[a chip, a door, the card]");
@@ -196,8 +198,13 @@ await b.evalJS("document.getElementById('btnOverview').click()");
 await settle();
 check(await sr("selected()") === null && !(await sr("card()")).shown, "Whole showroom closes the card");
 // the product nearest the entrance, tapped on its top from the overview
+// (on its top, else the middle of its front: whichever a sign or partition doesn't hide)
 const near = slots.filter((s) => s.id !== X.id && byId.get(s.id).placement !== "wall").sort((a, c) => c.center[2] - a.center[2])[0];
-pt = await sr(`screenOf("${near.id}", [0, ${sz(byId.get(near.id)).h - 0.01}, 0])`);
+pt = null;
+for (const p of [[0, sz(byId.get(near.id)).h - 0.01, 0], [0, sz(byId.get(near.id)).h * 0.6, sz(byId.get(near.id)).d / 2], [0, sz(byId.get(near.id)).h * 0.3, sz(byId.get(near.id)).d / 2]]) {
+  const at = await sr(`screenOf("${near.id}", ${JSON.stringify(p)})`);
+  if (at && (await sr(`hitAt(${at[0]}, ${at[1]})`)) === near.id) { pt = at; break; }
+}
 if (pt && await canvasAt(pt)) {
   await mouse(pt[0], pt[1]);
   await settle();
@@ -236,8 +243,10 @@ check(boxes.size === products.length, `every model loaded and measured (${boxes.
   const T = 0.005, all = [...boxes].flatMap(([id, bx]) => placed(id, bx));
   const slotsNow = await sr("slots()"), lay2 = await sr("layout()");
   const aisleOf = (id) => { const c = slotsNow.find((s) => s.id === id).center; return lay2.aisles.find((a) => c[0] >= a.x[0] && c[0] <= a.x[1]); };
+  // the first and last aisles end at the hall's own walls; the rest at a partition's face
   const out = all.filter((x) => { const a = aisleOf(x.id), wall = byId.get(x.id).placement === "wall";
-    return x.min[0] < a.x[0] + lay2.PT / 2 - T || x.max[0] > a.x[1] - lay2.PT / 2 + T || x.min[1] < -T || x.max[1] > (wall ? lay2.WALL_H : lay2.PART_H) || x.max[2] > -T || x.min[2] < -lay2.D; })
+    const lo = a === lay2.aisles[0] ? a.x[0] : a.x[0] + lay2.PT / 2, hi = a === lay2.aisles.at(-1) ? a.x[1] : a.x[1] - lay2.PT / 2;
+    return x.min[0] < lo - T || x.max[0] > hi + T || x.min[1] < -T || x.max[1] > (wall ? lay2.WALL_H : lay2.PART_H) || x.max[2] > -T || x.min[2] < -lay2.D; })
     .map((x) => `${x.id} ${x.k} [${x.min}]-[${x.max}]`);
   check(!out.length, `every model and its open parts inside its aisle: off the partitions and walls, on the floor, under the tops${out.length ? `: ${out.slice(0, 3).join("; ")}` : ""}`);
   const hits = clashes(all);
@@ -358,7 +367,7 @@ async function enter(button, mode) {
   await b.click(p[0], p[1]);
   const ok = await b.waitFor("!!(window.__showroomXR.info() && window.__showroomXR.info().started)", 30000);
   await b.evalJS("window.__dev.position.set(0, 1.6, 0); window.__dev.quaternion.set(0, 0, 0, 1)");
-  await aimDev("left", [-0.2, 1.2, -0.2], [-0.4, 3, -0.6]); // the left hand points up, at nothing
+  await aimDev("left", [-0.2, 1.0, 0], [-0.8, 2.5, 1.5]); // the left hand points up and back, at nothing (and out of view)
   await sleep(800);
   await showView();
   check(ok && (await xi()).mode === mode, `${button} starts ${mode === "vr" ? "VR" : "passthrough"}`);

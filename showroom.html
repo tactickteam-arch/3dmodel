@@ -53,11 +53,13 @@
   .back svg { width: 18px; height: 18px; }
   .pill { font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--navy); background: var(--copper); padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
 
-  .stage { position: relative; height: calc(100vh - 64px); height: calc(100dvh - 64px); overflow: hidden; background: #E9E7E3; touch-action: none; }
+  .stage { --dock-h: 128px; position: relative; height: calc(100vh - 64px); height: calc(100dvh - 64px); overflow: hidden; background: #EEEBE6; touch-action: none; }
   .stage canvas { display: block; width: 100%; height: 100%; outline: none; }
   .glass { background: rgba(253,252,249,.94); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 
-  .hint { position: absolute; left: 20px; top: 20px; max-width: min(520px, calc(100% - 300px)); display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 1.35; color: var(--slate); padding: 9px 14px 9px 10px; border-radius: 999px; z-index: 5; transition: opacity .5s; pointer-events: none; }
+  .hint { position: absolute; left: 20px; top: 20px; max-width: calc(100% - 300px); display: flex; align-items: center; gap: 9px; font-size: 13.5px; line-height: 1.35; color: var(--navy); padding: 10px 18px 10px 12px; border-radius: 999px; z-index: 5; transition: opacity .5s; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hint span { overflow: hidden; text-overflow: ellipsis; }
+  .hint b { font-weight: 600; }
   .hint svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
   .hint.gone { opacity: 0; }
   .tools { position: absolute; right: 20px; top: 20px; display: flex; gap: 8px; z-index: 6; }
@@ -68,13 +70,13 @@
 
   /* a name over each product near you */
   .labels { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
-  .tag { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); pointer-events: auto; border: 1px solid var(--hair); background: rgba(253,252,249,.95); border-radius: 999px; padding: 5px 11px; font-size: 12.5px; font-weight: 600; white-space: nowrap; box-shadow: 0 3px 10px rgba(14,14,15,.12); max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
-  .tag b { color: var(--copper-dk); font-weight: 600; }
+  .tag { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); pointer-events: auto; border: 1px solid var(--hair); background: rgba(253,252,249,.96); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 500; white-space: nowrap; box-shadow: 0 4px 14px rgba(14,14,15,.14); max-width: 300px; overflow: hidden; text-overflow: ellipsis; transition: opacity .3s; }
+  .tag b { color: var(--copper-dk); font-weight: 700; margin-right: 3px; }
   .tag[aria-pressed="true"] { background: var(--navy); color: var(--paper); border-color: var(--navy); }
   .tag[aria-pressed="true"] b { color: var(--copper); }
 
   /* the product you picked */
-  .pcard { position: absolute; left: 20px; bottom: 150px; width: min(360px, calc(100% - 40px)); border-radius: 18px; padding: 16px 16px 14px 18px; z-index: 7; transition: opacity .25s, transform .25s; }
+  .pcard { position: absolute; left: 20px; bottom: calc(var(--dock-h) + 30px); width: min(360px, calc(100% - 40px)); border-radius: 18px; padding: 16px 16px 14px 18px; z-index: 7; transition: opacity .25s, transform .25s; }
   .pcard.gone { opacity: 0; transform: translateY(8px); pointer-events: none; }
   .pcard .top { display: flex; align-items: flex-start; gap: 10px; }
   .pcard .logo { height: 20px; width: auto; display: block; margin-bottom: 6px; }
@@ -94,40 +96,52 @@
 
   /* aisles and products along the bottom */
   .dock { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(1100px, calc(100% - 32px)); border-radius: 22px; padding: 10px 10px 8px; z-index: 6; }
-  .cats { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 8px; }
+  .cats { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
   .cats::-webkit-scrollbar, .chips::-webkit-scrollbar { display: none; }
   .cat { flex: none; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
   .cat .n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-left: 6px; padding: 0 5px; border-radius: 999px; background: #F1F1F3; font-size: 11.5px; }
   .cat[aria-pressed="true"] { background: var(--navy); color: var(--paper); border-color: var(--navy); }
   .cat[aria-pressed="true"] .n { background: var(--copper); color: var(--navy); }
   .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
-  .chip { flex: none; display: flex; align-items: center; gap: 8px; max-width: 230px; border: 1px solid var(--hair); background: #fff; border-radius: 14px; padding: 4px 12px 4px 4px; font-size: 13px; font-weight: 500; text-align: left; }
-  .chip img { width: 40px; height: 40px; border-radius: 10px; object-fit: contain; background: #fff; flex: none; }
-  .chip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .chip b { display: block; font-size: 11.5px; font-weight: 600; color: var(--copper-dk); }
+  .chip { flex: none; display: flex; align-items: center; gap: 10px; width: 250px; border: 1px solid var(--hair); background: #fff; border-radius: 14px; padding: 5px 12px 5px 5px; font-size: 13px; font-weight: 500; line-height: 1.25; text-align: left; transition: border-color .15s, box-shadow .15s; }
+  .chip:hover { border-color: #C9C9CE; }
+  .chip img { width: 44px; height: 44px; border-radius: 10px; object-fit: contain; background: #fff; flex: none; }
+  .chip > span { min-width: 0; }
+  .chip .nm { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .chip b { display: block; font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--copper-dk); margin-bottom: 1px; }
   .chip[aria-pressed="true"] { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
 
   .loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 9; font-size: 15px; color: var(--slate); pointer-events: none; }
+  .loading span { display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 999px; background: rgba(253,252,249,.94); box-shadow: var(--shadow); }
+  .loading span::before { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--hair); border-top-color: var(--copper); animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* the models near you, loading */
+  .progress { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; transition: opacity .5s; }
+  .progress.gone { opacity: 0; }
+  .progress span { font-size: 12px; font-weight: 500; color: var(--slate); background: rgba(253,252,249,.9); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .progress .bar { width: 180px; height: 3px; border-radius: 3px; background: rgba(14,14,15,.1); overflow: hidden; }
+  .progress i { display: block; height: 100%; background: var(--copper); transform-origin: left; transform: scaleX(0); transition: transform .4s; }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--navy); color: var(--paper); padding: 12px 18px; border-radius: 10px; font-size: 14px; opacity: 0; transition: all .25s; pointer-events: none; z-index: 60; max-width: calc(100vw - 32px); }
   .toast.show { opacity: 1; transform: translateX(-50%); }
   .missing { max-width: 560px; margin: 80px auto; padding: 0 16px; text-align: center; }
 
   /* in the headset the page sits behind; nothing on it is seen */
-  body.in-xr .hint, body.in-xr .tools, body.in-xr .labels, body.in-xr .pcard, body.in-xr .dock { display: none !important; }
+  body.in-xr .hint, body.in-xr .tools, body.in-xr .labels, body.in-xr .pcard, body.in-xr .dock, body.in-xr .progress { display: none !important; }
 
   @media (max-width: 900px) {
     header { height: 56px; padding: 0 16px; }
     .brand img { height: 28px; }
     .pill { display: none; }
     .stage { height: calc(100vh - 56px); height: calc(100dvh - 56px); }
-    .hint { left: 12px; top: 12px; max-width: calc(100% - 24px); font-size: 12px; border-radius: 16px; }
-    .tools { right: 12px; top: auto; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); flex-direction: column; align-items: flex-end; }
+    .hint { left: 12px; top: 12px; max-width: calc(100% - 24px); font-size: 12px; border-radius: 16px; white-space: normal; }
+    .progress { top: auto; bottom: calc(var(--dock-h) + 14px); }
+    .tools { right: 12px; top: auto; bottom: calc(var(--dock-h) + 12px); flex-direction: column; align-items: flex-end; }
     .tool { padding: 9px 14px 9px 11px; font-size: 13px; }
     .dock { left: 0; right: 0; bottom: 0; transform: none; width: 100%; border-radius: 18px 18px 0 0; padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
     .cat { padding: 6px 11px; font-size: 12.5px; }
-    .chip { max-width: 190px; font-size: 12px; }
-    .chip img { width: 34px; height: 34px; }
-    .pcard { left: 8px; right: 8px; width: auto; bottom: calc(118px + env(safe-area-inset-bottom, 0px)); padding: 12px 12px 10px 14px; }
+    .chip { width: 210px; font-size: 12px; }
+    .chip img { width: 38px; height: 38px; }
+    .pcard { left: 8px; right: 8px; width: auto; bottom: calc(var(--dock-h) + 8px); padding: 12px 12px 10px 14px; }
     .pcard h2 { font-size: 16px; }
     .pcard .logo { height: 16px; }
     .pparts { margin-top: 8px; }
@@ -150,7 +164,8 @@
 </header>
 
 <main class="stage" id="stage">
-  <div class="loading" id="loading">Setting out the showroom…</div>
+  <div class="loading" id="loading"><span>Setting out the showroom…</span></div>
+  <div class="progress gone" id="progress" aria-hidden="true"><div class="bar"><i></i></div><span></span></div>
   <div class="labels" id="labels"></div>
   <div class="hint glass" id="hint"></div>
   <div class="tools" id="tools">
