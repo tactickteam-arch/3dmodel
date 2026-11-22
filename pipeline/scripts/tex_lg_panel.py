@@ -28,7 +28,7 @@ Image.MAX_IMAGE_PIXELS = None
 PHOTOS, OUT = sys.argv[1:3]
 COMPARE = sys.argv[4] if len(sys.argv) > 4 and sys.argv[3] == "--compare" else None
 HERE = os.path.dirname(os.path.abspath(__file__))
-S = 2                                      # output pixels per photo pixel
+S = int(os.environ.get("PANEL_S", "2"))      # output pixels per photo pixel (21 Nov: 3, the panel then cut to 4096 px: 10.5 px/mm)
 TOP, BOTTOM = 150, 554                     # strip rows in the photo: top of the unit down to just under the 'WARRANTY' print (112 mm)
 DRAWER_X0, DRAWER_X1, RIGHT = 4, 762, 2170
 FONT = "/System/Library/Fonts/Avenir Next.ttc"
@@ -213,6 +213,8 @@ def main():
 
     os.makedirs(os.path.join(OUT, "lg"), exist_ok=True)
     panel = full.crop((DRAWER_X1 * S, TOP * S, RIGHT * S, BOTTOM * S))
+    if panel.width > 4096:                 # what a phone or a headset loads
+        panel = panel.resize((4096, round(panel.height * 4096 / panel.width)), Image.LANCZOS)
     panel.save(os.path.join(OUT, "lg", "panel.jpg"), quality=90, optimize=True)
     drawer = full.crop((DRAWER_X0 * S, TOP * S, DRAWER_X1 * S, BOTTOM * S)).filter(ImageFilter.UnsharpMask(2, 60, 2))
     drawer.save(os.path.join(OUT, "lg", "drawer.jpg"), quality=90, optimize=True)

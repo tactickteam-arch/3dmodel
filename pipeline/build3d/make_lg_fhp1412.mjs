@@ -69,7 +69,10 @@ cab.add(mesh("SideLeft", flipV(new THREE.BoxGeometry(t, bodyH, D - 0.004)), [dar
 cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(t, bodyH, D - 0.004)), [sideR, dark, side, side, side, side], W / 2 - t / 2, midY, -0.002));
 cab.add(faced("Top", W, t, D, [topMat, topMat, topMat, dark, topMat, topMat], 0, H - t / 2, 0));
 cab.add(box("Base", W - 2 * t, t, D - 0.01, back, 0, feet + t / 2, -0.005));
-cab.add(mesh("BackPanel", flipV(new THREE.BoxGeometry(W, 0.828, 0.006)), [back, back, back, back, back, rearMat], 0, 0.428, zB + 0.003));
+// the back stops where the top plate starts (838 mm): no overlap, so their rear faces share no area and defight leaves both whole
+// (with the back up to 842 mm it moved the top plate's rear face alone and opened a see-through slit along the top's rear edge)
+cab.add(mesh("BackPanel", flipV(new THREE.BoxGeometry(W, H - t - feet, 0.006)), [back, back, back, back, back, rearMat], 0, feet + (H - t - feet) / 2, zB + 0.003));
+cab.add(box("RearSeamBacker", W - 2 * t - 0.002, 0.001, 0.03, dark, 0, H - t - 0.002, zB + 0.016));
 { // raised steel tub plate (rounded rectangle, outer face = the rear photo's plate), about 30 mm proud (estimated)
   const [[ax, ay], [bx, by]] = rp.plate;           // (x of the right side, y of the bottom) and (x of the left side, y of the top)
   const w = Math.abs(ax - bx), h = Math.abs(by - ay), r = 0.034, d = 0.030;
@@ -192,13 +195,14 @@ for (const [name, ex, ey, m] of [["PowerButton", 876, 479, btnPower], ["StartBut
 }
 { // touch keys: one raised bar, its face the same strip texture so the labels sit on the keys
   const x0 = mx(1499), x1 = mx(2074), y0 = my(418), y1 = my(469);          // photo columns 1499-2074, rows 418-469
-  const g = new THREE.BoxGeometry(x1 - x0, y0 - y1, 0.0012);
+  // 4 mm deep, sunk 2.4 mm into the strip, its face 1.2 mm proud of the strip (handover pass 21 Nov: at 0.8 mm the build nudged it to 0.4 mm off the strip, a pair the flicker check counts)
+  const g = new THREE.BoxGeometry(x1 - x0, y0 - y1, 0.004);
   const uv = g.attributes.uv;
   for (let i = 16; i < 20; i++) { // the +Z face, mapped to where the keys are on the strip texture (390 x 105 mm)
     const u = uv.getX(i), v = uv.getY(i);
     uv.setXY(i, (x0 + u * (x1 - x0) - drawerX1) / stripW, (H - (y1 + v * (y0 - y1))) / stripH);
   }
-  cab.add(mesh("TouchKeys", g, [dark, dark, dark, dark, panel, dark], (x0 + x1) / 2, (y0 + y1) / 2, zF + 0.0006));
+  cab.add(mesh("TouchKeys", g, [dark, dark, dark, dark, panel, dark], (x0 + x1) / 2, (y0 + y1) / 2, zF + 0.0016 - 0.002));
 }
 
 // ── gasket and stainless drum behind the porthole ──
