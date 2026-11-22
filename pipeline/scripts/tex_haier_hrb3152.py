@@ -19,12 +19,13 @@ usage: python3 tex_haier_hrb3152.py <photos dir> <logos dir> <out dir>
     duct.jpg      the moulded air duct on the fridge's back wall: the diamond pattern and NAVI as the open photo shows
                   them (drawn as light and shade, the relief itself is not modelled); the small second line under NAVI
                   can't be read and is left out
+    print_navi.png  the NAVI plate (64 x 60 mm) again at 12 px per mm, laid over the duct as a decal
     rear.jpg      the back: Haier's rear photo cropped to the cabinet
     print_fruit.png, print_bigbox.png, print_freezebox.png, print_icemaker.png, print_bottle.png
                   FRUITBOX, 2XBIGBOX, FREEZEBOX, ICEMAKER, BOTTLEGUARD set again sharp, each followed by the small
                   squares the photo shows after it (3, 1, 3, 1, 1). The icons inside the squares can't be read: the
                   squares are left plain
-Every word is set at 7.2 px per mm in Avenir Next.
+Every word is set at 12 px per mm in Avenir Next.
 """
 import os
 import sys
@@ -40,7 +41,7 @@ D = os.path.join(OUT, SLUG)
 os.makedirs(D, exist_ok=True)
 AV = "/System/Library/Fonts/Avenir Next.ttc"
 DEMI, REG, BOLD = 2, 7, 0
-S = 7.2                                     # px per mm for print
+S = 12.0                                    # px per mm for print (11-12 on the model: the handover clarity pass)
 
 
 def save(img, name, q=88):
@@ -154,6 +155,18 @@ def duct():
     ty = py + round(32 * k)
     d.rounded_rectangle(((w - round(56 * k)) // 2, ty, (w + round(56 * k)) // 2, ty + round(18 * k)), round(5 * k), outline=(150, 154, 160), width=3)
     save(im, "duct.jpg", 88)
+    # the same NAVI plate again as its own decal at S px per mm (the duct's 2.5 px per mm blurs the word up close):
+    # the 64 x 60 mm plate, NAVI 6 mm under its top, the tab's outline 32 mm under it, drawn exactly as above
+    k2 = 3
+    pw2, ph2 = round(64 * S * k2), round(60 * S * k2)
+    pl = Image.new("RGBA", (pw2, ph2), (238, 240, 243, 0))
+    d2 = ImageDraw.Draw(pl)
+    d2.rounded_rectangle((0, 0, pw2 - 1, ph2 - 1), round(6 * S * k2), fill=(238, 240, 243, 255), outline=(214, 217, 221, 255), width=round(0.8 * S * k2))
+    nav2 = words([["NAVI", REG]], 13.0 * k2, (196, 199, 204), track=0.06)
+    pl.alpha_composite(nav2, ((pw2 - nav2.width) // 2, round(6 * S * k2)))
+    tw2, th2 = round(56 * S * k2), round(18 * S * k2)
+    d2.rounded_rectangle(((pw2 - tw2) // 2, round(32 * S * k2), (pw2 + tw2) // 2, round(32 * S * k2) + th2), round(5 * S * k2), outline=(150, 154, 160, 255), width=round(1.2 * S * k2))
+    save(pl.resize((pw2 // k2, ph2 // k2), Image.LANCZOS), "print_navi.png")
 
 
 def rear():

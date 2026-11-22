@@ -9,7 +9,7 @@
 // every HRB-3152 photo), so heights are read up the photos and places across as fractions of the width (private NOTES.md).
 // The fridge is on top and the freezer underneath, each behind a door hinged on the right. Four parts: the fridge door,
 // the fridge's trays (the three glass shelves, the FRUITBOX, the cover and the 2XBIGBOX, with their food), the freezer
-// door and the FREEZEBOX drawer. Haier publishes no manual, door swing or clearances: the doors' 125 degrees and every
+// door and the FREEZEBOX drawer. Haier publishes no manual, door swing or clearances: the doors' 140 degrees (Haier's open photo shows them wider) and every
 // inside height are ESTIMATED from the open-door photos.
 // Stocked for a south Indian kitchen (stock_lg.mjs, fit: true); the fruit goes in the FRUITBOX, as Haier's stocked photo.
 // usage: node make_haier_hrb3152.mjs <entry .json, never products.json> <tex dir> <out.glb>
@@ -101,12 +101,13 @@ const printIce = mat("PrintIcemaker", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const printBigbox = mat("PrintBigbox", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const printFreeze = mat("PrintFreezebox", 0xffffff, { rough: 0.5, opacity: 0.999 });
 const printBottle = mat("PrintBottleguard", 0xffffff, { rough: 0.5, opacity: 0.999 });
+const printNavi = mat("PrintNavi", 0xffffff, { rough: 0.6, opacity: 0.999 });
 
 const root = group("HaierHRB3152");
 const cab = group("Cabinet");
 root.add(cab);
-// the printed words are drawn at 7.2 px per mm (tex_haier_hrb3152.py): a decal's size in metres is its PNG's size / 7200
-const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 7200, b.readUInt32BE(20) / 7200]; };
+// the printed words are drawn at 12 px per mm (tex_haier_hrb3152.py): a decal's size in metres is its PNG's size / 12000
+const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 12000, b.readUInt32BE(20) / 12000]; };
 const plane = (name, w, h, m, x, y, z) => mesh(name, flipV(new THREE.PlaneGeometry(w, h)), m, x, y, z);
 const cyl = (name, rt, rb, h, m, x, y, z, seg = 16) => mesh(name, new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y, z);
 // A box from its corners; drop: faces left out (BoxGeometry order +x, -x, +y, -y, +z, -z) where a face lies against
@@ -162,6 +163,8 @@ const rails = (name, yTop, z0, z1) => { for (const sx of [-1, 1]) cab.add(box(na
   cab.add(plane("DisplayWindow", w, h, displayM, 0, frCeil - dh / 2, zd + 0.0007));
   const dTop = 1.535, dH = 0.6;
   cab.add(plane("DuctPanel", 0.21, dH, ductM, 0, dTop - dH / 2, zIn + 0.0007));
+  // the NAVI plate again, sharp (print_navi.png, 64 x 60 mm, 300 mm under the duct's top), 0.9 mm over the duct
+  cab.add(plane("PrintNaviDecal", 0.064, 0.06, printNavi, 0, dTop - 0.3 - 0.03, zIn + 0.0016));
 }
 
 // what slides out (FridgeTrays): the three shelves, the FRUITBOX, the cover and the 2XBIGBOX, with their food
@@ -230,6 +233,8 @@ const iceM = group("IceMaker", icX, fzShelfTop, 0);
   for (let i = 0; i < 8; i++) {
     const c = mesh("IceCube", cube, ice, -0.055 + (i % 4) * 0.036, 0.014, icZ1 - 0.05 - Math.floor(i / 4) * 0.07 - (i % 2) * 0.012);
     c.rotation.set(0.15 * (i % 3), 0.5 * i, 0.1 * (i % 4));
+    // a tilted cube's low corner stays on the floor it sits on (it poked through the bin's floor)
+    { c.updateMatrix(); const cb = cube.clone().applyMatrix4(c.matrix); cb.computeBoundingBox(); if (cb.boundingBox.min.y < 0.005) c.position.y += 0.005 - cb.boundingBox.min.y; }
     iceM.add(c);
   }
 }
@@ -368,7 +373,10 @@ function settle(items, { tries = 1, spread = 0, bounds = null, ceil = Infinity, 
 }
 
 // ── doors: hinged on the right; flat glass faces on a silver edge band, a recess groove down each door's left side ──
-const pw = W - 0.002, bw = pw - 0.09;
+const pw = W - 0.002;
+// the door bins: 45 mm in from the door's free edge and 70 mm in from its hinge edge (ESTIMATED), so with the door at
+// its 140-degree stop the bins' hinge ends stand clear of the cabinet's opening and the crisper trays slide out past them
+const binX0 = -pw + 0.045, binX1 = -0.07, bw = binX1 - binX0, bxc = (binX0 + binX1) / 2;
 // gapSide: the door's face towards the other door, dark as the gap reads on Haier's front and 3/4 photos
 function door(pivot, prefix, h, g, gapSide) {
   const gz0 = doorT / 2 - g.w / 2, gz1 = doorT / 2 + g.w / 2, xg = -pw + g.d, E = doorEdge, F = doorFace;
@@ -395,15 +403,15 @@ const fridgeDoor = group("FridgeDoor", W / 2, frBot, zFront);
   fridgeDoor.add(plane("BadgeDecal", cw, ch, badgeM, -0.033 - cw / 2, 0.01 + ch / 2, doorT + 0.0007));
   BINS.forEach((b, i) => {
     const zc = -linerFace - b.d / 2, zl = -linerFace - b.d, nm = `FridgeDoorBin${i}`;
-    fridgeDoor.add(box(nm + "Floor", bw, 0.004, b.d, clear, -pw / 2, b.f + 0.002, zc));
-    fridgeDoor.add(box(nm + "Lip", bw, b.h * 0.8, 0.004, clear, -pw / 2, b.f + b.h * 0.4, zl + 0.002));
-    fridgeDoor.add(box(nm + "Rim", bw, 0.007, 0.005, frosted, -pw / 2, b.f + b.h * 0.8 - 0.0035, zl + 0.0025));
-    for (const sx of [-1, 1]) fridgeDoor.add(box(nm + "End", 0.004, b.h, b.d, clear, -pw / 2 + sx * (bw / 2 - 0.002), b.f + b.h / 2, zc));
+    fridgeDoor.add(box(nm + "Floor", bw, 0.004, b.d, clear, bxc, b.f + 0.002, zc));
+    fridgeDoor.add(box(nm + "Lip", bw, b.h * 0.8, 0.004, clear, bxc, b.f + b.h * 0.4, zl + 0.002));
+    fridgeDoor.add(box(nm + "Rim", bw, 0.007, 0.005, frosted, bxc, b.f + b.h * 0.8 - 0.0035, zl + 0.0025));
+    for (const sx of [-1, 1]) fridgeDoor.add(box(nm + "End", 0.004, b.h, b.d, clear, bxc + sx * (bw / 2 - 0.002), b.f + b.h / 2, zc));
     // BOTTLEGUARD on its bin's front, towards the free end (open photo); it faces the room when the door is open
-    if (b.print) { const [w, hh] = png("print_bottle.png"); fridgeDoor.add(plane("PrintBottleguardDecal", w, hh, printBottle, -pw / 2 - bw / 2 + 0.05 + w / 2, b.f + b.h * 0.5, zl - 0.0007).rotateY(Math.PI)); }
+    if (b.print) { const [w, hh] = png("print_bottle.png"); fridgeDoor.add(plane("PrintBottleguardDecal", w, hh, printBottle, binX0 + 0.05 + w / 2, b.f + b.h * 0.5, zl - 0.0007).rotateY(Math.PI)); }
   });
 }
-const EGGS = [0, 1, 2, 3, 4, 5].map((i) => -pw / 2 + bw / 2 - 0.004 - 0.03 - i * 0.05);
+const EGGS = [0, 1, 2, 3, 4, 5].map((i) => binX1 - 0.004 - 0.03 - i * 0.05);
 { const b = BINS[3], zc = -linerFace - b.d / 2; for (const x of EGGS) { const c = mesh("EggCup", new THREE.SphereGeometry(0.02, 12, 4, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), clear, x, b.f, zc); c.scale.y = 0.7; fridgeDoor.add(c); } }
 // the freezer door: the same glass face; inside, its liner moulded with five rows of five round dimples (open photo)
 const freezerDoor = group("FreezerDoor", W / 2, base, zFront);
@@ -427,7 +435,7 @@ const freezerDoor = group("FreezerDoor", W / 2, base, zFront);
 }
 { // what sits in the door bins, so it swings out with the door
   const [b0, b1, b2, b3] = BINS;
-  const inside = (dep) => [-pw / 2 - bw / 2 + 0.004, -pw / 2 + bw / 2 - 0.004, -(linerFace + dep / 2)];
+  const inside = (dep) => [binX0 + 0.004, binX1 - 0.004, -(linerFace + dep / 2)];
   stock.doorFridge(fridgeDoor, { fit: true, eggY: b3.f, eggX: EGGS, eggDY: 0, eggTurn: Math.PI / 2, jarY: b2.f, botY: b1.f, canY: b0.f, deps: { egg: b3.d, jar: b2.d, bottle: b1.d, can: b0.d }, inside });
   // what is taller than its bin's space (to the bin over it, less 1 cm) is left out
   fridgeDoor.updateMatrixWorld(true);
@@ -442,8 +450,39 @@ const freezerDoor = group("FreezerDoor", W / 2, base, zFront);
     if (t && b.max.y > t[1]) { out.push(o.name); o.removeFromParent(); }
   }
   if (out.length) console.log(`left out (taller than its bin's space): ${out.join(", ")}`);
+  // the bins are 25 mm shorter at the hinge end than the stock's rows were laid out for: each bin's row is spread again
+  // across the bin with even gaps, and what does not fit is left out, from the hinge end on
+  const out2 = [];
+  for (const b of BINS) {
+    const row = [...fridgeDoor.children].filter((o) => (o.isGroup || o.isMesh) && !/Bin|Gasket|Fridge|Grip|Haier|Badge|Egg(Cup)?$|Seam|Print/.test(o.name))
+      .map((o) => ({ o, bb: new THREE.Box3().setFromObject(o).applyMatrix4(inv) })).filter((r) => Math.abs(r.bb.min.y - b.f) < 0.02)
+      .sort((p, q) => q.bb.max.x - p.bb.max.x);
+    if (!row.length || b.eggs) continue;
+    const x0 = binX0 + 0.004, x1 = binX1 - 0.004, wd = (r) => r.bb.max.x - r.bb.min.x;
+    while (row.length && row.reduce((a, r) => a + wd(r), 0) + 0.004 * (row.length + 1) > x1 - x0) { const r = row.shift(); out2.push(r.o.name); r.o.removeFromParent(); }
+    const gap = (x1 - x0 - row.reduce((a, r) => a + wd(r), 0)) / (row.length + 1);
+    let x = x0 + gap;
+    for (const r of row.reverse()) { r.o.position.x += x - r.bb.min.x; x += wd(r) + gap; }
+  }
+  if (out2.length) console.error(`left out (no room in the narrower bins): ${out2.join(", ")}`);
 }
 root.add(fridgeDoor, freezerDoor);
+// shelf food that a tall bottle in the shut door's bins reached into (4 mm) is pushed back, 3 mm clear of it
+{
+  root.updateMatrixWorld(true);
+  const doorItems = fridgeDoor.children.filter((o) => (o.isGroup || o.isMesh) && !/Bin|Gasket|Fridge|Grip|Haier|Badge|Egg(Cup)?$|Seam|Print/.test(o.name)).map((o) => new THREE.Box3().setFromObject(o));
+  for (const s of ["Shelf1Stock", "Shelf2Stock", "Shelf3Stock"]) {
+    const g = root.getObjectByName(s);
+    if (!g) continue;
+    for (const o of g.children) {
+      const b = new THREE.Box3().setFromObject(o);
+      for (const d of doorItems) {
+        const ox = Math.min(b.max.x, d.max.x) - Math.max(b.min.x, d.min.x), oy = Math.min(b.max.y, d.max.y) - Math.max(b.min.y, d.min.y), oz = b.max.z - d.min.z + 0.003;
+        if (ox > 0 && oy > 0 && oz > 0) { o.position.z -= oz; b.translate(new THREE.Vector3(0, 0, -oz)); o.updateMatrixWorld(true); }
+      }
+    }
+  }
+}
 
 const parts = productParts(PRODUCTS, ID);
 const clips = stateClips(root, parts);
@@ -485,6 +524,7 @@ await exportGLB(root, clips, OUT, only({
   PrintBigbox: `${T}/print_bigbox.png`,
   PrintFreezebox: `${T}/print_freezebox.png`,
   PrintBottleguard: `${T}/print_bottle.png`,
+  PrintNavi: `${T}/print_navi.png`,
   ...stock.textures(),
 }), { dir: `${TEX}/grain`, materials: {
   SidePaint: { type: "peel_soft" }, TopPaint: { type: "peel_soft" }, DoorEdge: { type: "peel_soft" },
