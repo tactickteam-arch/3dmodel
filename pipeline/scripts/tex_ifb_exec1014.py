@@ -34,6 +34,7 @@ os.makedirs(D, exist_ok=True)
 ARIAL = "/System/Library/Fonts/Supplemental/Arial.ttf"
 NARROW = "/System/Library/Fonts/Supplemental/Arial Narrow.ttf"
 AVENIR = "/System/Library/Fonts/Avenir Next.ttc"
+MASK = 240                          # px a fixed-size word is set at before it is scaled into its box (always down)
 
 # ── IFB's size (product page, manual p.77): 598 W x 667 D x 875 H mm ──
 W_MM, H_MM, D_MM = 598.0, 875.0, 667.0
@@ -297,7 +298,7 @@ DIGITS = [("1", (1078.5, 158, 1082, 176.5), False), ("8", (1083, 158, 1093.5, 17
 BASE = 48
 
 
-def panel():
+def panel(name="panel.jpg"):
     x0, y0, x1, y1 = PANEL_BOX
     tw, th = round((x1 - x0) * K), round((y1 - y0) * K)
     # the fascia's tone row by row, from print-free columns (between the display and the dial, and right of the button)
@@ -355,14 +356,15 @@ def panel():
     word(can, "*Press and Hold for 3 sec.", (1154, 116.8, 1208.5, 122.5), org, (170, 170, 170), "r")
     red = (236, 70, 88)
     put(can, power_steam_icon(), (991, 238, 1002.5, 248.5), org, red, keep="fit")
-    m = text_mask("POWER STEAM", 80, ARIAL.replace("Arial.ttf", "Arial Bold.ttf"))
+    m = text_mask("POWER STEAM", MASK, ARIAL.replace("Arial.ttf", "Arial Bold.ttf"))
     put(can, m, (1006, 241.2, 1066.5, 248.4), org, red, keep="w", align="l")
-    put(can, text_mask("®", 80, ARIAL), (1067.5, 239.5, 1071.5, 243.5), org, red, keep="fit")
+    put(can, text_mask("®", MASK, ARIAL), (1067.5, 239.5, 1071.5, 243.5), org, red, keep="fit")
     for s, b in MODEL_LINE:
-        put(can, text_mask(s, 80, AVENIR, 7), b, org, (205, 205, 205), keep="w")
+        put(can, text_mask(s, MASK, AVENIR, 7), b, org, (205, 205, 205), keep="w")
     can = np.clip(can, 0, 255).astype(np.uint8)
-    save(Image.fromarray(can), "panel.jpg", 90)
-    return tw, th
+    if name:
+        save(Image.fromarray(can), name, 90)
+    return can
 
 
 def power_steam_icon():
@@ -516,7 +518,7 @@ def drawer():
             print(f"drawer mark {box}: fill {fill.round(0)}, ink {ink.round(0)}")
             vec(can, org, box, fill, rounded(box, SQ_R))
             vec(can, org, box, ink, marks)
-        put(can, text_mask("ECO INVERTER", 80, DIN), ECO_TEXT, org, PRINT_GREY, keep="xy")
+        put(can, text_mask("ECO INVERTER", MASK, DIN), ECO_TEXT, org, PRINT_GREY, keep="xy")
     save(Image.fromarray(np.clip(can, 0, 255).astype(np.uint8)), "drawer.jpg", 90)
 
 
@@ -648,8 +650,57 @@ def open_layout():
     return ppm
 
 
+
+# ── the prints a shopper reads close up, at 12 px per mm (19-21 Nov clarity pass) ──
+# panel.jpg above stays at T (7 px per mm) as the strip's own texture. The same drawing is made again at HI px per mm for
+# what is laid over it: the strip's flat face in two halves (each under the 4096 px a phone or headset loads), cut at the
+# emptiest column right of the display; the display glass's face as its own texture; and the drawer's
+# face (drawer.jpg, 200 mm across, fits in one texture at HI). decals.json gives each one's rectangle on panel.jpg (u, v).
+HI = 12.0
+TEX_MAX = 4096
+
+
+def save_hi(a, name, q=88):
+    Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(os.path.join(D, name), quality=q, subsampling=0, optimize=True)
+    print("wrote", os.path.join(D, name), a.shape[1], "x", a.shape[0])
+
+
+def panel_hi():
+    can = panel(None)
+    x0, y0 = PANEL_BOX[0], PANEL_BOX[1]
+    h, w = can.shape[:2]
+    # the join: the emptiest column between the display's right edge and the next print (no word, mark or rule there)
+    lo = max(w - TEX_MAX + 16, math.ceil((DISPLAY[2] + 3 - x0) * K))
+    hi = min(TEX_MAX - 16, round((DISPLAY[2] + 110 - x0) * K))
+    g = can.astype(np.float32).max(2)
+    ink = (np.abs(g - np.median(g, axis=1, keepdims=True)) > 14).sum(0).astype(np.float32)
+    ink = np.convolve(ink, np.ones(61), "same")
+    run = np.flatnonzero(ink[lo:hi] == ink[lo:hi].min())
+    run = run[:np.argmax(np.diff(np.r_[run, 10 ** 9]) > 1) + 1]      # the first stretch of the emptiest columns
+    cut = int(lo + run[len(run) // 2])                              # and its middle
+    print("join at photo column", round(x0 + cut / K, 1), "ink there", float(ink[cut]))
+    assert cut <= TEX_MAX and w - cut <= TEX_MAX, (w, cut)
+    a, b = math.floor((DISPLAY[0] - x0) * K) - 2, math.ceil((DISPLAY[2] - x0) * K) + 2
+    c, d = math.floor((DISPLAY[1] - y0) * K) - 2, math.ceil((DISPLAY[3] - y0) * K) + 2
+    save_hi(can[c:d, a:b], "display.jpg")
+    # the strip's halves never show the display (their faces have its opening): flat there, to keep the files small
+    face = can.copy()
+    face[c + 4:d - 4, a + 4:b - 4] = 10
+    save_hi(face[:, :cut], "panel_a.jpg")
+    save_hi(face[:, cut:], "panel_b.jpg")
+    rects = {"panelA": {"file": "panel_a.jpg", "rect": [0.0, 0.0, cut / w, 1.0]},
+             "panelB": {"file": "panel_b.jpg", "rect": [cut / w, 0.0, 1.0, 1.0]},
+             "display": {"file": "display.jpg", "rect": [a / w, c / h, b / w, d / h]}}
+    with open(os.path.join(D, "decals.json"), "w") as f:
+        json.dump(rects, f, indent=1)
+    print("wrote decals.json, cut at", cut, "of", w, "px")
+
+
 panel()
+T, K = HI, HI / PPM
+panel_hi()
 drawer()
+T, K = 7.0, 7.0 / PPM
 front_fall()
 knob_top()
 power_button()
