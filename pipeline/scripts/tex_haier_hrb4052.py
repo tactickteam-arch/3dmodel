@@ -34,7 +34,7 @@ usage: python3 tex_haier_hrb4052.py <photos dir> <logos dir> <out dir>
                         the words inside (MAGIC COOLING with TRIPLE INVERTER & DUAL FAN TECH under it, BOTTLEGUARD, 2XBIGBOX,
                         FREEZEBOX, ICEMAKER, LED LIGHT), set again sharp, as on the HRB-3752 (the same parts, Haier's feature
                         images and the open-door photos). The small icons after the bars can't be read: left out
-Every word is set at 7.2 px per mm in Avenir Next.
+Every word is set at 12 px per mm in Avenir Next.
 """
 import os
 import sys
@@ -50,7 +50,7 @@ D = os.path.join(OUT, SLUG)
 os.makedirs(D, exist_ok=True)
 AV = "/System/Library/Fonts/Avenir Next.ttc"
 DEMI, REG, BOLD = 2, 7, 0
-S = 7.2                                     # px per mm for print
+S = 12.0                                    # px per mm for print (12 on the model)
 rng = np.random.default_rng(4052)
 
 # ── the photo sets: door colour (RGB, before the viewer's light), streak strength, each door's level, and the photo ──
