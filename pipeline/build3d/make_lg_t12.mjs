@@ -203,6 +203,15 @@ cab.add(prism("Cabinet", roundRect(new THREE.Shape(), -W / 2, W / 2, 0, BODY, 0.
   g.rotateX(-Math.PI / 2);
   cab.add(mesh("CabinetTop", g, bodyM, 0, J, 0));
 }
+// a dark floor 1.5 mm under the cabinet's top edge, inside its walls, round the drum: the joint between the cabinet and the top
+// cover shows this, not the hollow cabinet and the room behind it, from every side (handover pass 21 Nov: a see-through slit)
+{
+  const s = roundRect(new THREE.Shape(), -W / 2 + 0.001, W / 2 - 0.001, 0.001, BODY - 0.001, 0.029, 0.014);
+  const h = new THREE.Path(); h.absarc(0, -zc, drumR + 0.004, 0, 2 * Math.PI, true); s.holes.push(h);
+  const g = new THREE.ShapeGeometry(s, 24);
+  g.rotateX(-Math.PI / 2);
+  cab.add(mesh("CabinetFloorTop", g, coverM, 0, J - 0.0015, 0));
+}
 // LG's energy label for T12SJMB1Z, on the front at the right (LG's front photo)
 cab.add(mesh("LabelBEE", flipV(new THREE.PlaneGeometry(0.0655, 0.1206)), labelM, 0.229, 0.648, zF + 0.0007));
 // the back: LG's back photo, straightened, from the plinth to the top cover
