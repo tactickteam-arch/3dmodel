@@ -150,11 +150,13 @@ const panelUV = (x, y) => [(x + W / 2) / W, (0.85 - y) / 0.128];
 // worktop's skirt); the textures span exactly that.
 const sideY0 = 0.025, sideY1 = 0.8215, zBackFace = zB + 0.0015, sideZ0 = zBackFace, sideZ1 = Zm(416);
 {
-  const ys = [sideY0, sideY1], zs = [sideZ0, sideZ1];
-  const vOf = (y) => (sideY1 - y) / (sideY1 - sideY0);
+  // the walls reach 1.5 mm past the back panel to the worktop's back edge (zB), so the back panel's edges sit on them: with
+  // the panel 0.5 mm short of the walls, a hairline at both back corners showed the background (the texture keeps its span)
+  const ys = [sideY0, sideY1], zs = [zB, sideZ1];
+  const vOf = (y) => (sideY1 - y) / (sideY1 - sideY0), cl = (u) => Math.min(1, Math.max(0, u));
   // left: columns run front-to-back... columns along +z give the -x normal
-  cab.add(grid("SideLeft", 2, 2, (i, j) => [-W / 2, ys[i], zs[j]], (x, y, z) => [(sideZ1 - z) / (sideZ1 - sideZ0), vOf(y)], sideL));
-  cab.add(grid("SideRight", 2, 2, (i, j) => [W / 2, ys[i], zs[1 - j]], (x, y, z) => [(z - sideZ0) / (sideZ1 - sideZ0), vOf(y)], sideR));
+  cab.add(grid("SideLeft", 2, 2, (i, j) => [-W / 2, ys[i], zs[j]], (x, y, z) => [cl((sideZ1 - z) / (sideZ1 - sideZ0)), vOf(y)], sideL));
+  cab.add(grid("SideRight", 2, 2, (i, j) => [W / 2, ys[i], zs[1 - j]], (x, y, z) => [cl((z - sideZ0) / (sideZ1 - sideZ0)), vOf(y)], sideR));
 }
 // the worktop: a 10 mm slab over the full width, from the back to 1.5 mm in front of the band's top, with 18.5 mm skirts down the
 // sides and the back (the side photo's band, h 821.5-850 mm). Its top has a narrow rim round the edges and a slightly lower field,
@@ -175,19 +177,24 @@ const zTopF = stripZ(BANDTOP) + 0.0015, zSkirtF = stripZ(BANDTOP) - 0.001;
     g.setIndex(idx); g.computeVertexNormals(); return g;
   };
   const field = new THREE.PlaneGeometry(W - 2 * fieldIn, zTopF - zB - 2 * fieldIn).rotateX(-Math.PI / 2).translate(0, H - drop, (zTopF + zB) / 2);
-  const sk = H - 0.01 - (sideY1 + 0.0005), skY = (H - 0.01 + sideY1 + 0.0005) / 2;
+  // the side skirts reach the walls' top edge exactly and the back skirt 3 mm past the back panel's top: 0.5 mm short, they
+  // left a slit under the worktop on three sides that showed the background
+  const sk = H - 0.01 - sideY1, skY = (H - 0.01 + sideY1) / 2, skB = H - 0.01 - (sideY1 - 0.003), skBY = (H - 0.01 + sideY1 - 0.003) / 2;
   const parts = [...sides.flatMap((sd) => profiles.map((pr) => strip(sd, pr))), field,
     new THREE.BoxGeometry(0.006, sk, zSkirtF - zB).translate(-W / 2 + 0.003, skY, (zSkirtF + zB) / 2),
     new THREE.BoxGeometry(0.006, sk, zSkirtF - zB).translate(W / 2 - 0.003, skY, (zSkirtF + zB) / 2),
-    new THREE.BoxGeometry(W - 0.013, sk, 0.006).translate(0, skY, zB + 0.003)];
+    new THREE.BoxGeometry(W - 0.013, skB, 0.006).translate(0, skBY, zB + 0.003)];
   cab.add(mesh("Top", mergeGeometries(parts), topM));
 }
 // the plinth under the sides and the front (h 13.5-25 mm), recessed: dark
 const FOOT = 0.0135;
-cab.add(box("Base", W - 0.002, sideY0 - FOOT, sideZ1 - sideZ0 - 0.006, dark, 0, (FOOT + sideY0) / 2, (sideZ0 + sideZ1) / 2 - 0.001));
+// it runs from the back edge (zB) to 1.5 mm past the front plinth and 3 mm up behind the walls' foot: shorter, it left slits
+// round the foot (and under the front) that showed the background from below
+{ const z0 = zB, z1 = Zm(414) + 0.0015, y1 = sideY0 + 0.003;
+  cab.add(box("Base", W - 0.003, y1 - FOOT, z1 - z0, dark, 0, (FOOT + y1) / 2, (z0 + z1) / 2)); }
 const backY0 = rp.panel.y0, backY1 = rp.panel.y1;
 { // the back: the rear photo, h 15-821.5 mm
-  const ys = [backY0, backY1], xs = [W / 2 - 0.0005, -W / 2 + 0.0005];
+  const ys = [backY0, backY1], xs = [W / 2, -W / 2];
   cab.add(grid("BackPanel", 2, 2, (i, j) => [xs[j], ys[i], zBackFace], (x, y) => [(W / 2 - x) / W, (backY1 - y) / (backY1 - backY0)], rearM));
 }
 { // four feet: a black pad and a silver nut, 13.5 mm in all; x from the rear photo (276 mm either side), z from the side photo
@@ -255,16 +262,18 @@ cab.add(grid("FrontPlinth", 2, 2, (i, j) => [j ? W / 2 : -W / 2, i ? BOT : FOOT,
   for (const y of range(SEAM1, H - 0.0105, 20)) prof.push([stripZ(y), y]);
   const shape = (sgn) => {
     const s = new THREE.Shape();
-    s.moveTo(sgn * sideZ1, BOT);
+    s.moveTo(sgn * (sideZ1 - 0.01), BOT);
     for (const [z, y] of prof) s.lineTo(sgn * z, y);
     s.lineTo(sgn * zSkirtF, H - 0.0105);
     s.lineTo(sgn * zSkirtF, sideY1);
-    s.lineTo(sgn * sideZ1, sideY1);
-    s.lineTo(sgn * sideZ1, BOT);
+    s.lineTo(sgn * (sideZ1 - 0.01), sideY1);
+    s.lineTo(sgn * (sideZ1 - 0.01), BOT);
     return new THREE.ShapeGeometry(s);
   };
-  const l = mesh("SideReturnL", shape(1), bodyDark, -W / 2, 0, 0); l.rotation.y = -Math.PI / 2; cab.add(l);
-  const r = mesh("SideReturnR", shape(-1), bodyDark, W / 2, 0, 0); r.rotation.y = Math.PI / 2; cab.add(r);
+  // 1.5 mm inside the walls' plane, reaching 10 mm back behind the walls' front edge: in the walls' plane the z-fight pass pulled
+  // them out and left a hairline down both front corners; inside it with no overlap, a slot at the walls' edge showed the background
+  const l = mesh("SideReturnL", shape(1), bodyDark, -W / 2 + 0.0015, 0, 0); l.rotation.y = -Math.PI / 2; cab.add(l);
+  const r = mesh("SideReturnR", shape(-1), bodyDark, W / 2 - 0.0015, 0, 0); r.rotation.y = Math.PI / 2; cab.add(r);
 }
 
 // ── the door seat: the black groove the door's rim sits in, a dish in the body colour, the gasket's rolled lip and its boot back
@@ -274,7 +283,9 @@ const ring = (name, rings, material, segs = 120, uvf = null) => grid(name, rings
   const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
   return [x, y, frontZ(y) + dz];
 }, uvf, material);
-cab.add(ring("SeatGroove", [[seatR, 0], [0.2505, -0.004], [0.2475, -0.0055]], dark));
+// the groove starts at the face's edge and slopes 2 mm out under the front face (1.5 mm behind it): the face's round hole and
+// the groove are cut into different polygons, and the slivers between them showed the background round the door
+cab.add(ring("SeatGroove", [[seatR + 0.002, -0.0015], [seatR, 0], [0.2505, -0.004], [0.2475, -0.0055]], dark));
 const DISH = [[0.2475, -0.0055], [0.24, -0.008], [0.225, -0.011], [0.212, -0.015], [0.207, -0.019]];
 const dishDz = (r) => { for (let i = 1; i < DISH.length; i++) if (r >= DISH[i][0]) { const [r0, z0] = DISH[i - 1], [r1, z1] = DISH[i]; return z1 + ((z0 - z1) * (r - r1)) / (r0 - r1); } return DISH.at(-1)[1]; };
 cab.add(ring("SeatDish", DISH, front, 120, frontUV));
@@ -379,7 +390,8 @@ const trayL = 0.26;
   const cols = uniq([...range(dx0, dx1, 20), ...range(pk.x0, pk.x0 + pkRamp, 6), ...range(pk.x1 - pkRamp, pk.x1, 6)]);
   drawer.add(grid("DrawerFace", rows.length, cols.length, (i, j) => [cols[j], rows[i], stripZ(rows[i]) - pocketDepth(cols[j], rows[i])], panelUV, panelM));
   const yr = stripRows, dep = 0.012;
-  drawer.add(grid("DrawerRimL", yr.length, 2, (i, j) => [dx0, yr[i], stripZ(yr[i]) - (j ? 0 : dep)], null, bodyDark));
+  // 3.5 mm in from the face's edge: at the edge it shared a plane with the inset left return (the z-fight pass moved them)
+  drawer.add(grid("DrawerRimL", yr.length, 2, (i, j) => [dx0 + 0.0035, yr[i], stripZ(yr[i]) - (j ? 0 : dep)], null, bodyDark));
   drawer.add(grid("DrawerRimR", yr.length, 2, (i, j) => [dx1, yr[i], stripZ(yr[i]) - (j ? dep : 0)], null, bodyDark));
   drawer.add(grid("DrawerRimTop", 2, 2, (i, j) => [j ? dx1 : dx0, BANDTOP, stripZ(BANDTOP) - (i ? dep : 0)], null, bodyDark));
   drawer.add(grid("DrawerRimBottom", 2, 2, (i, j) => [j ? dx1 : dx0, SEAM1, stripZ(SEAM1) - (i ? 0 : dep)], null, bodyDark));
@@ -398,12 +410,34 @@ const trayL = 0.26;
 cab.add(drawer);
 // the dark bay the drawer slides out of, under the worktop's slab
 cab.add(mesh("DrawerBay", inward(new THREE.BoxGeometry(dx1 - dx0 + 0.001, H - 0.0105 - SEAM1, 0.29)), dark, (dx0 + dx1) / 2, (SEAM1 + H - 0.0105) / 2, stripZ(BANDTOP) - 0.002 - 0.145));
+// the drawer's opening, from the strip's curved face back to the bay's mouth: walls left, right and below (with the drawer out,
+// the line of sight slipped between the strip and the bay's flat mouth into the hollow cabinet). 1.5 mm or more off every plane
+// near them (the drawer's rims, the left return), so the z-fight pass leaves them alone; two-sided, so no winding to get wrong
+{ const zm = stripZ(BANDTOP) - 0.002, xl = dx0 + 0.0015, xr = dx1 + 0.0015, yb = SEAM1 - 0.0015, collarM = mat("BayCollar", 0x141517, { rough: 0.6, side: THREE.DoubleSide });
+  const ys = stripRows;
+  cab.add(grid("BayCollarL", ys.length, 2, (i, j) => [xl, ys[i], j ? zm : stripZ(ys[i]) - 0.0015], null, collarM));
+  cab.add(grid("BayCollarR", ys.length, 2, (i, j) => [xr, ys[i], j ? zm : stripZ(ys[i]) - 0.0015], null, collarM));
+  // the floor, 1.5 mm under the bay's own, runs on under the strip right of the drawer, out to the left return and 40 mm in under
+  // the bay's floor, so nothing slips past its ends or between the two
+  cab.add(grid("BayCollarB", 2, 2, (i, j) => [j ? W / 2 - 0.0095 : -W / 2 + 0.003, yb, i ? zm - 0.04 : stripZ(yb) - 0.0015], null, collarM)); }
+// a dark fill behind the strip right of the drawer's bay (from the bay's back to 1.5 mm behind the strip's deepest point), and
+// dark bars behind each side wall's top edge, where the worktop's skirt meets it: through the 1 mm groove between the drawer and
+// the strip, and through the hairline at those edges, the line of sight ran into the hollow cabinet and out to the background
+{ const bxg = (x0, x1, y0, y1, z0, z1) => new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0).translate((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+  const zf = stripZ(BANDTOP) - 0.0015, zb = stripZ(BANDTOP) - 0.292, xo = W / 2 - 0.003, xi = W / 2 - 0.0075;    // 1.5 mm off the inset returns and the skirts' inner faces
+  cab.add(mesh("Liner", mergeGeometries([bxg(seam + 0.0015, W / 2 - 0.0095, SEAM1 + 0.003, H - 0.0115, zb, zf),
+    bxg(-xo, -xi, sideY1 - 0.004, sideY1 + 0.004, zB + 0.003, zSkirtF - 0.0015), bxg(xi, xo, sideY1 - 0.004, sideY1 + 0.004, zB + 0.003, zSkirtF - 0.0015),
+    // and behind the worktop's own seam, where its skirts meet its rounded rim (H - 10 mm), on both sides and the back
+    bxg(-xo, -xi, H - 0.014, H - 0.0035, zB + 0.003, zSkirtF - 0.0015), bxg(xi, xo, H - 0.014, H - 0.0035, zB + 0.003, zSkirtF - 0.0015),
+    bxg(-xo, xo, H - 0.014, H - 0.0035, zB + 0.0015, zB + 0.0045)]), dark)); }
 
 // ── the filter cover: a rounded lid hinged along its lower edge over the debris filter's knob and the emergency drain tube ──
 {
   const yc = (fy0 + fy1) / 2, bay = group("FlapBayMount", (fl.x0 + fl.x1) / 2, yc, frontZ(yc));
   bay.rotation.x = tilt(frontZ, yc);
-  bay.add(mesh("FlapBay", inward(new THREE.BoxGeometry(fx1 - fx0, fy1 - fy0, 0.05)), bodyDark, 0, 0, -0.0012 - 0.025));
+  // 3 mm wider and taller than the opening all round, its mouth 1.5 mm behind the front: as wide as the opening, its walls met the
+  // front's (curved) face short of the edge and left a slit down the bay's side that showed the background
+  bay.add(mesh("FlapBay", inward(new THREE.BoxGeometry(fx1 - fx0 + 0.006, fy1 - fy0 + 0.006, 0.05)), bodyDark, 0, 0, -0.0015 - 0.025));
   bay.add(mesh("FlapFilterKnob", new THREE.CylinderGeometry(0.028, 0.028, 0.02, 36).rotateX(Math.PI / 2), filterM, 0.03, -0.004, -0.03));
   bay.add(box("FlapFilterGrip", 0.008, 0.048, 0.012, filterM, 0.03, -0.004, -0.016));
   const tube = new THREE.CatmullRomCurve3([new THREE.Vector3(-0.05, -0.03, -0.04), new THREE.Vector3(-0.046, 0.0, -0.03), new THREE.Vector3(-0.042, 0.022, -0.022)]);

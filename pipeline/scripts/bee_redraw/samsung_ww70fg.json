@@ -1,0 +1,26 @@
+{
+  "_about": "Samsung WW70FG4S02ABTL (Black): Samsung's own 2024-26 label image for this model, as cut out before, above its barcode strip (bee_cut_label.png); tex_samsung_ww70fg_bee.py then adds the strip (bee_cut_barcode.png) under it.",
+  "template": "sw2024",
+  "src": "pipeline/sources/photos/samsung_ww70fg/bee_cut_label.png",
+  "out": "pipeline/tex/samsung_ww70fg/bee_label.png",
+  "width_mm": 64,
+  "words": {
+    "series": "2024 - 26",
+    "value": "0.05",
+    "type": "Front Load",
+    "cap": "7.0",
+    "model": "WW70FG4S02ABTL",
+    "country": "India"
+  },
+  "items": [
+    {
+      "key": "foot2",
+      "win": [
+        0.21,
+        0,
+        0.96,
+        0
+      ]
+    }
+  ]
+}
