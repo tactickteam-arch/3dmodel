@@ -1,0 +1,94 @@
+{
+  "_about": "LG T80SPMB1Z: LG's own 2024-26 label image for this model (gallery), as cut out before (bee_cut_label.png); the same LG layout as the T70's.",
+  "template": "sw2024",
+  "src": "pipeline/sources/photos/lg_t80/bee_cut_label.png",
+  "out": "pipeline/tex/lg_t80/bee_label.png",
+  "width_mm": 64,
+  "words": {
+    "series": "2024 - 26",
+    "value": "0.0079",
+    "type": "Top Load",
+    "cap": "8.0",
+    "model": "T80SPMB1Z",
+    "country": "India"
+  },
+  "items": [
+    {
+      "key": "value",
+      "win": [
+        0.06,
+        0.55,
+        0.605,
+        0.625
+      ]
+    },
+    {
+      "key": "ast",
+      "win": [
+        0.6,
+        0.55,
+        0.69,
+        0.595
+      ]
+    },
+    {
+      "key": "unit",
+      "win": [
+        0.68,
+        0.59,
+        0.94,
+        0.625
+      ]
+    },
+    {
+      "key": "brand",
+      "t": "LG"
+    },
+    {
+      "key": "model",
+      "win": [
+        0.05,
+        0.835,
+        0.85,
+        0.872
+      ]
+    },
+    {
+      "key": "foot1",
+      "win": [
+        0.15,
+        0,
+        0.985,
+        0
+      ],
+      "t": "*Under test conditions, when tested in accordance with relevant standards."
+    },
+    {
+      "key": "foot2",
+      "win": [
+        0.15,
+        0,
+        0.985,
+        0
+      ]
+    },
+    {
+      "key": "foot3",
+      "win": [
+        0.2,
+        0,
+        0.95,
+        0
+      ]
+    }
+  ],
+  "pictures": [
+    {
+      "circle": [
+        0.083,
+        0.955,
+        0.066
+      ]
+    }
+  ]
+}
