@@ -30,8 +30,8 @@ usage: python3 -I tex_samsung_rs76cg8113.py <photos dir> <logos dir> <out dir> [
     rear.jpg, bay.jpg, pcb.jpg         the dimpled back above the compressor cover, the compressor cover with its grilles, and
                                        the raised control-box cover, with the power cord and plug painted out (they are 3D)
     rear_paths.json                    the cord route, the plug, the cover's slots and the control box, in model metres
-    display.png                        the inside display redrawn sharp at 7.2 px per mm
-    print_twin.png                     "Twin Cooling Plus" as printed on the fridge's back wall, redrawn at 7.2 px per mm
+    display.png                        the inside display redrawn sharp at 12 px per mm
+    print_twin.png                     "Twin Cooling Plus" as printed on the fridge's back wall, redrawn at 12 px per mm
 """
 import json
 import os
@@ -304,9 +304,9 @@ def display():
     # The display inside the fridge (Samsung's close-up sl_g_534630970.jpg, the same as the 80X0's g_536089200.jpg plus the two additions below): a frosted white panel with a thin grey frame,
     # "SAMSUNG", "Freezer", -19 in ice-blue segments, "Fridge", 3, the deg C marks, a small icon, a rule and the three
     # touch keys. Boxes are fractions of the panel measured on that photo (panel 210 x 533 px there). The panel's real
-    # size is ESTIMATED at 80 x 203 mm (NOTES.md); drawn at 7.2 px per mm.
+    # size is ESTIMATED at 80 x 203 mm (NOTES.md); drawn at 12 px per mm (was 7.2).
     W, H = 576, 1462
-    S = 3
+    S = 5  # drawn at 5x the 7.2 px/mm layout, so every stroke keeps its width, then reduced to 12 px per mm
     im = Image.new("RGBA", (W * S, H * S), (244, 246, 248, 255))
     dr = ImageDraw.Draw(im)
     fx = lambda f: f * W * S
@@ -375,22 +375,23 @@ def display():
         dr.text(((x0 + x1) / 2 - (l + r) / 2, y0 - t), s, font=f, fill=ink)
         print(f"display: {s!r} set {(r - l) / (W * S):.3f} wide x {(bt - t) / (H * S):.4f} high; photo {b - a:.3f} x {0.980 - 0.9465:.4f}")
     dr.rectangle((fx(0.442) - S, fy(0.9465), fx(0.442) + S, fy(0.972)), fill=ink)
-    save(im.resize((W, H), Image.LANCZOS), "display.png")
+    # 64 colours: the panel is flat grey with dark print, so a palette keeps it sharp at a fifth of the size (GLB budget)
+    save(im.resize((round(80 * 12), round(203 * 12)), Image.LANCZOS).convert("RGB").quantize(64), "display.png")
 
 
 def twin():
     # "Twin Cooling Plus" on the fridge's back wall (open-door photo sl_g_534630966.jpg, framed as the 80X0's g_536089205.jpg: columns 1055-1170 at row 375-392):
-    # "Twin" bold, "Cooling" regular, "Plus" small and raised. Drawn at 7.2 px per mm for a print 165 mm wide (ESTIMATED,
+    # "Twin" bold, "Cooling" regular, "Plus" small and raised. Drawn at 12 px per mm (was 7.2) for a print 165 mm wide (ESTIMATED,
     # the photo's 160 mm at the cabinet's front scale grown for the back wall's distance)
     S = 3
-    W, H = round(165 * 7.2), round(26 * 7.2)
+    W, H = round(165 * 12), round(26 * 12)
     im = Image.new("RGBA", (W * S, H * S), (0, 0, 0, 0))
     dr = ImageDraw.Draw(im)
     ink = (52, 54, 58, 255)
     cap = H * S * 0.62
     fb, fr = font(round(cap / 0.72), 0), font(round(cap / 0.72), 7)
     fp = font(round(cap * 0.5 / 0.72), 5)
-    x, base = 0, H * S * 0.85
+    x, base = 0, H * S * 0.78  # the baseline high enough that the "g" of Cooling keeps its whole tail (0.85 clipped it)
     for s, f, dy in (("Twin", fb, 0), (" Cooling", fr, 0), (" Plus", fp, -cap * 0.55)):
         l, t, r, b = dr.textbbox((0, 0), s, font=f, anchor="ls")
         dr.text((x, base + dy), s, font=f, fill=ink, anchor="ls")

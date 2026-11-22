@@ -57,7 +57,8 @@ for (const c of [FZ, FR]) { c.w = c.x1 - c.x0; c.xc = (c.x0 + c.x1) / 2; }
 // 80X0's g_536089205.jpg to within 3 px: 0.718 px per mm, floor row 1468). The 8113's fridge has two drawers at the
 // freezer drawers' heights, the lowest glass shelf over them
 const SHELF = [1.428, 1.136, 0.872, 0.655];
-const lowDrawer = [0.102, 0.387], upDrawer = [0.405, 0.638];
+const lowDrawer = [0.102, 0.387], upDrawer = [0.405, 0.632];
+// (the upper freezer drawer's top at 632 mm, 3 mm under the lowest shelf's front lip: at 638 its rim ran 3 mm into the lip, 21 Nov)
 // the Rack & Shelf wine rack under the fridge's top shelf: Samsung's feature picture gives 105 mm from the rack to the
 // shelf above (VERIFIED); its depth and the hangers' shape are ESTIMATED from the close-up sl_g_534630968.jpg
 const RACK = { y: SHELF[0] - 0.006 - 0.105, d: 0.27 };
@@ -174,6 +175,8 @@ cab.add(bx("RearPanel", -xo + 0.002, xo - 0.002, bayTop, Hc - 0.002, zRear, zRea
   cab.add(cover);
   // behind the slots: the dark bay (the step's back wall), and its floor
   cab.add(bx("RearBayFloor", -xi, xi, 0.012, 0.016, zRear + 0.004, zStep - 0.04, bayDark));
+  // the bay's front below the base, so the cover's slots look into the dark bay and not through to the floor in front
+  cab.add(bx("RearBayFront", -xi, xi, 0.012, doorBottom, zStep - 0.044, zStep - 0.04, bayDark));
 }
 { // the power cord on Samsung's rear photo's own route: out of the control box's connector, along under its cover, down the
   // back's edge 24 mm from the side and along the bottom of the compressor cover to the plug parked in its clip (cord 8 mm,
@@ -208,7 +211,7 @@ for (const s of [-1, 1]) {
   cab.add(bx("HingeBottom", Math.min(o, s * (pinX - 0.025)), Math.max(o, s * (pinX - 0.025)), 0.026, doorBottom - 0.002, zC - 0.06, pinZ + 0.02, footM));
   cab.add(cyl("FootFront", 0.02, 0.022, 0.012, footM, s * (xo - 0.035), 0.006, zC - 0.03));
   cab.add(cyl("FootThread", 0.008, 0.008, doorBottom - 0.012, threadM, s * (xo - 0.035), 0.012 + (doorBottom - 0.012) / 2, zC - 0.03, 12));
-  cab.add(bx("FootRear", s * (xo - 0.06), s * (xo - 0.02), 0, doorBottom, zRear + 0.03, zRear + 0.07, footM));
+  cab.add(bx("FootRear", Math.min(s * (xo - 0.06), s * (xo - 0.02)), Math.max(s * (xo - 0.06), s * (xo - 0.02)), 0, doorBottom, zRear + 0.03, zRear + 0.07, footM));   // min/max: the left foot was inside-out
 }
 
 // ── inside ──
@@ -372,7 +375,9 @@ function doorInside(g, name, c) {
   g.add(bx(name + "GasketL", ox0, toL(c.x0), y0, y1, zg0, zg1, gasket));
   g.add(bx(name + "GasketR", toL(c.x1), ox1, y0, y1, zg0, zg1, gasket));
   g.add(bx(name + "Liner", toL(c.x0) + 0.004, toL(c.x1) - 0.004, y0 + 0.004, y1 - 0.004, zl, zg0, liner));
-  const B = BINS[name], bc = toL(c.xc);
+  // the fridge door's bins sit 15 mm towards the hinge: centred, their far ends swung 8 mm into the mullion in the first
+  // 20 degrees of opening (21 Nov); 15 mm leaves 6 mm clear at every angle and 5 mm to the hinge-side wall when shut
+  const B = BINS[name], bc = toL(c.xc) + (name === "FridgeDoor" ? 0.015 : 0);
   B.at.forEach(([f, h], i) => {
     const za = zl, zb = zl - B.d, x0 = bc - B.w / 2, x1 = bc + B.w / 2;
     g.add(bx(`${name}Bin${i}Floor`, x0, x1, f, f + 0.004, zb, za, clear));
