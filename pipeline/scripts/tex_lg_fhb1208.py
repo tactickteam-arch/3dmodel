@@ -41,7 +41,7 @@ SUP = "/System/Library/Fonts/Supplemental/"
 ARIAL_B, ARIAL_BLK, ARIAL_N, ARIAL_NB, ARIAL = SUP + "Arial Bold.ttf", SUP + "Arial Black.ttf", SUP + "Arial Narrow.ttf", SUP + "Arial Narrow Bold.ttf", SUP + "Arial.ttf"
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-S = 7.2                               # px per mm on the strip
+S = float(os.environ.get("STRIP_PXMM", "7.2"))  # STRIP_PXMM: redraw only the strip and the drawer at that density (21 Nov: 10.5); px per mm on the strip
 PS = 706 / 600                        # gal1 px per mm
 PX0, PY0 = 646.0, 165.0               # gal1: the cabinet's left edge and top
 STRIP_TOP, STRIP_BOT = 818.5, 728.0   # mm above the floor
@@ -693,6 +693,8 @@ def compare_strip(panel):
 if __name__ == "__main__":
     pan = panel_strip()
     drawer_face()
+    if os.environ.get("STRIP_PXMM"):
+        sys.exit(0)
     front_plate()
     knob_top()
     label()

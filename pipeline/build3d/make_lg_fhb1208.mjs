@@ -97,6 +97,10 @@ cab.add(box("Top", W, H - top0 - 0.0005, D, topM, 0, (H + top0 + 0.0005) / 2, 0)
     cab.add(box("StripWrap", t, top0 - strip0, wrap - 0.010, stripEdge, s * (W / 2 - t / 2), stripMid, zF - 0.010 - (wrap - 0.010) / 2));
   }
 }
+// a dark ceiling 2 mm under the top plate, inside the cabinet from the back to just behind the control strip: the joints
+// between the top plate and the sides and back show this, not the hollow cabinet and the room behind it (handover pass
+// 21 Nov: see-through slits under the top's edges); 1.5 mm over the drawer bay's top and 0.8 mm in from the top plate's back face, so no two faces share a plane
+cab.add(box("TopSeamBacker", W - 0.001, 0.001, D - 0.031, dark, 0, top0 - 0.0015, zB + 0.0008 + (D - 0.031) / 2));
 cab.add(box("Base", W - 2 * t, 0.004, D - 0.01, dark, 0, yb + 0.002, 0));
 cab.add(box("SeamBacker", W - 2 * t, 0.012, 0.002, dark, 0, strip0, zF - 0.012));
 cab.add(box("SeamBackerTop", W - 2 * t, 0.010, 0.002, dark, 0, top0, zF - 0.012));
@@ -310,7 +314,8 @@ cab.add(box("LockSlot", 0.013, 0.022, 0.006, dark, cx + 0.191, cy + 0.003, zF + 
 // the pump-filter housing behind the cover: a dark box, the drain plug and the round filter cap with its grip (manual p.10)
 {
   const g = group("PumpBay", flapC.x, flapC.y, zF);
-  g.add(mesh("BayBox", inward(new THREE.BoxGeometry(flapC.w - 0.008, flapC.h - 0.008, 0.07)), bayM, 0, 0, -0.039));
+  // 3 mm wider and taller than the front's opening, so the gap round the cover shows the bay, not the hollow cabinet (21 Nov)
+  g.add(mesh("BayBox", inward(new THREE.BoxGeometry(flapC.w + 0.004, flapC.h + 0.004, 0.07)), bayM, 0, 0, -0.039));
   const fc = mesh("FilterCap", new THREE.CylinderGeometry(0.0285, 0.0285, 0.026, 36), filterM, 0.014, -0.006, -0.036); fc.rotation.x = Math.PI / 2; g.add(fc);
   g.add(box("FilterGrip", 0.052, 0.009, 0.007, steel, 0.014, -0.006, -0.0215));
   const dp = mesh("DrainPlug", new THREE.CylinderGeometry(0.0085, 0.0085, 0.02, 16), mat("DrainPlugM", 0x2a2b2e, { rough: 0.5 }), -0.043, 0.026, -0.034); dp.rotation.x = Math.PI / 2; g.add(dp);
