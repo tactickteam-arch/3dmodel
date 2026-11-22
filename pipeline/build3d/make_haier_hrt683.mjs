@@ -182,11 +182,11 @@ for (const s of [-1, 1]) {
   // the cord: the rear photo shows it leaving the box by a white grommet at x +22 mm and lying along the box's top to x +257
   // mm. Lying there it shows over the lid in the gate's front view (camera 2.39 m up) and over the box's ends in the side
   // views, which our rule for cords rules out, so here it leaves the back panel by a white grommet 12 mm under the cabinet's top at
-  // x +22 mm, runs along the back to x +257 mm 1.5 mm off the panel, drops, then swings in to a three-pin plug hung flat on
+  // x +22 mm, runs along the back to x +257 mm against the panel, drops, then swings in to a three-pin plug hung flat on
   // the back near the centre line, 0.95 m up (ESTIMATED: Haier's photos show nothing past the top). Below the cabinet's
-  // top and near the centre, the cord (9.5 mm proud) and the plug (17 mm) stay hidden behind the cabinet in both side
+  // top and near the centre, the cord (7 mm proud) and the plug (17 mm) stay hidden behind the cabinet in both side
   // views (by the side view's perspective, up to about 20 mm near the centre and 9.6 mm at x +257 mm).
-  const cx = rp.cord_exit, cf = rp.cord_far, cr = 0.004, yc = yTop - 0.012, zc = zBack - cr - 0.0015;
+  const cx = rp.cord_exit, cf = rp.cord_far, cr = 0.004, yc = yTop - 0.012, zc = zBack - cr + 0.001;
   const grom = cyl("Grommet", 0.007, 0.007, 0.003, white, cx, yc, zBack - 0.0013, 12);
   grom.rotation.x = Math.PI / 2;
   cab.add(grom);
@@ -594,15 +594,40 @@ function linerBlock(name, x0, x1, y0, y1, zl, zb, d, m) {
   return mesh(name, geo, m);
 }
 // the gasket round the opening, the liner block inside it and the bins standing on the liner's face (door space)
-function doorInside(g, name, c) {
+// how far from its hinge a door bin may reach on the door's free side: a deep bin's far corner swings towards the middle
+// by up to 2 cm before it leaves the opening, so the bins stop where that swing clears the mullion (2 mm to spare), as the
+// real door opens past it. xm: the mullion's face from the hinge, zc: the cabinet's front, zs: the bin's depths (door frame)
+function clearReach(xm, zc, zs, angle = 120) {
+  let lo = 0, hi = xm;
+  for (let k = 0; k < 40; k++) {
+    const r = (lo + hi) / 2;
+    let ok = true;
+    for (let a = 0; a <= angle && ok; a += 0.5) {
+      const t = a * Math.PI / 180;
+      for (const z of zs) if (z * Math.cos(t) + r * Math.sin(t) < zc && r * Math.cos(t) - z * Math.sin(t) > xm) ok = false;
+    }
+    if (ok) lo = r; else hi = r;
+  }
+  return lo;
+}
+function doorInside(g, name, c, lim = {}) {
   const L = (x) => x - g.position.x, y0 = c.y0 - g.position.y, y1 = c.y1 - g.position.y, zg0 = zB - 0.0145, zl = linerFace - zPiv;
-  const ox0 = L(c.x0) - 0.018, ox1 = L(c.x1) + 0.018, oy0 = y0 - 0.018, oy1 = y1 + 0.018;
+  // the gasket band is 18 mm wide; at the cabinet's floor and ceiling it runs out to the cabinet's bottom and top, so the
+  // 15 mm gap behind the doors is closed there too (from the side, low down, the floor showed through it)
+  const ox0 = L(c.x0) - 0.018, ox1 = L(c.x1) + 0.018;
+  const oy0 = c.y0 === yFloor ? yBot - g.position.y + 0.0005 : y0 - 0.018, oy1 = c.y1 === yCeil ? yTop - g.position.y - 0.0005 : y1 + 0.018;
   g.add(span(name + "GasketT", ox0, ox1, y1, oy1, zg0, zB, gasket));
   g.add(span(name + "GasketB", ox0, ox1, oy0, y0, zg0, zB, gasket));
   g.add(span(name + "GasketL", ox0, L(c.x0), y0, y1, zg0, zB, gasket));
   g.add(span(name + "GasketR", L(c.x1), ox1, y0, y1, zg0, zB, gasket));
   g.add(linerBlock(name + "Liner", L(c.x0) + 0.004, L(c.x1) - 0.004, y0 + 0.004, y1 - 0.004, zl, zB, 0.008, doorBack));
-  const B = BINS[name], bx0 = L(c.x0) + 0.016, bx1 = L(c.x1) - 0.016, out = [];
+  const B = BINS[name], out = [];
+  // the fridge door's bins stop 33 mm in from the opening's hinge side (ESTIMATED), so with the door open the trays slide
+  // their full 240 mm out past the bins' hinge ends
+  let bx0 = L(c.x0) + 0.016, bx1 = L(c.x1) - (g.position.x > 0 ? 0.033 : 0.016);
+  { const zs = [zl, zl - B.d], zc = zCab - zPiv + 0.001;
+    if (g.position.x < 0) bx1 = Math.min(bx1, clearReach(L(c.x1) - 0.002, zc, zs));
+    else bx0 = Math.max(bx0, -clearReach(-L(c.x0) - 0.002, zc, zs)); }
   B.at.forEach(([fy, h], i) => {
     const f = fy - g.position.y, za = zl, zb = zl - B.d;
     g.add(span(`${name}Bin${i}Floor`, bx0, bx1, f, f + 0.004, zb, za, clear));

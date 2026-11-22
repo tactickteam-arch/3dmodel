@@ -16,7 +16,7 @@ usage: python3 -I tex_haier_hrt683.py <photos dir> <logos dir> <out dir> [--comp
     channel_<c>.jpg                  the step down the fridge door's left edge (the black strip and the chrome recess
                                      handle under the display), Haier's own photo of each colour
     finishes.json                    each colour's measured door, side and edge colours (as a ratio of the backdrop)
-    display_print.png                every word on the display, set again sharp at 7.2 px per mm
+    display_print.png                every word on the display, set again sharp at 12 px per mm
     logo.png, logo_grey.png          the Haier wordmark (white; light grey on Pearl White), from Haier's own logo file
     badge_light.png, badge_dark.png, badge_plate.png   MAGICCONVERTIBLE: white print, grey print, the Inox Steel plate
     rear.jpg, bay.jpg, rear_paths.json   the rear panel and compressor bay (Haier's rear photo) and the bay's slots
@@ -41,7 +41,7 @@ D = os.path.join(OUT, "haier_hrt683")
 os.makedirs(D, exist_ok=True)
 rng = np.random.default_rng(683)
 AV = "/System/Library/Fonts/Avenir Next.ttc"      # faces: 0 Bold, 2 Demi Bold, 5 Medium, 7 Regular, 10 Ultra Light
-PXMM = 7.2
+PXMM = 12.0                                  # print px per mm (12 on the model)
 
 # ── the body on the fronts, in mm: x from the middle, y from the floor (gk_front.jpg at 0.611 px per mm) ──
 W_MM, Y0, Y1 = 905.0, 29.0, 1766.0        # the doors run 29 to 1766 mm up
@@ -67,7 +67,10 @@ LEVEL = {"is": 128.0}
 
 def save(img, name, q=86):
     p = os.path.join(D, name)
-    if name.endswith(".png"):
+    if name.endswith(".png") and name.startswith(("print_", "badge_", "logo", "display_")):
+        # one or two inks on clear: 64 palette colours keep the edges at 12 px per mm and the model in its 3.8 MB budget
+        img.quantize(colors=64, method=Image.FASTOCTREE, dither=Image.Dither.NONE).save(p, optimize=True)
+    elif name.endswith(".png"):
         img.save(p, optimize=True)
     else:
         img.convert("RGB").save(p, quality=q, optimize=True)
@@ -219,16 +222,20 @@ def font(px, face=7):
 
 
 def word(dr, box, s, face, fill, S):
-    """Set s so its ink is as tall as the box (scaled by S px per mm), centred across the box; never stretched."""
+    """Set s with its capitals as tall as the box (scaled by S px per mm), centred across the box, the capitals centred
+    down it (a g or y hangs below, as printed: sized by its own ink, Fridge, Magic Zone and Turbo Icing came out smaller
+    than the other words); never stretched."""
     x0, y0, x1, y1 = [v * S for v in box]
     f = font(200, face)
     l, t, r, b = dr.textbbox((0, 0), s, font=f)
-    k = (y1 - y0) / (b - t)
+    ht, hb = dr.textbbox((0, 0), "H", font=f)[1::2]
+    k = (y1 - y0) / (hb - ht)
     if (r - l) * k > (x1 - x0):
         k = (x1 - x0) / (r - l)
     f = font(200 * k, face)
     l, t, r, b = dr.textbbox((0, 0), s, font=f)
-    dr.text(((x0 + x1) / 2 - (l + r) / 2, (y0 + y1) / 2 - (t + b) / 2), s, font=f, fill=fill)
+    ht, hb = dr.textbbox((0, 0), "H", font=f)[1::2]
+    dr.text(((x0 + x1) / 2 - (l + r) / 2, (y0 + y1) / 2 - (ht + hb) / 2), s, font=f, fill=fill)
 
 
 # ── the display: the words and rules on HRT-683GKU1's black glass (gk_front.jpg, the display off) ──
