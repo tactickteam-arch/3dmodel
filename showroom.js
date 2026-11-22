@@ -340,16 +340,26 @@ mats.trim.userData.block = false;
 
   // display partitions between the aisles: a pale panel, darker near the floor, a charcoal cap, skirting both sides,
   // and a charcoal trim on each end
-  mats.part = new THREE.MeshStandardMaterial({ roughness: 0.85, map: stripTexture(PART_H + 0.02, -0.02, (g, w) => {
-    g.fillStyle = "#E7E2DA"; g.fillRect(0, -0.02, w, PART_H + 0.02);
-    const ao = g.createLinearGradient(0, 0, 0, 0.7); ao.addColorStop(0, "rgba(70,58,44,0.13)"); ao.addColorStop(1, "rgba(70,58,44,0)");
-    g.fillStyle = ao; g.fillRect(0, 0, w, 0.7);
-  }) });
-  mats.part.userData.block = true;
+  // (a charcoal band 16 cm deep along the top over a thin orange line; one material per partition height)
+  const partMats = new Map();
+  const partMat = (H) => {
+    if (!partMats.has(H)) {
+      const m = new THREE.MeshStandardMaterial({ roughness: 0.85, map: stripTexture(H + 0.02, -0.02, (g, w) => {
+        g.fillStyle = "#E7E2DA"; g.fillRect(0, -0.02, w, H + 0.02);
+        const ao = g.createLinearGradient(0, 0, 0, 0.7); ao.addColorStop(0, "rgba(70,58,44,0.13)"); ao.addColorStop(1, "rgba(70,58,44,0)");
+        g.fillStyle = ao; g.fillRect(0, 0, w, 0.7);
+        g.fillStyle = "#F58A29"; g.fillRect(0, H - 0.18, w, 0.018);
+        g.fillStyle = CHARCOAL; g.fillRect(0, H - 0.162, w, 0.2);
+      }) });
+      m.userData.block = true;
+      partMats.set(H, m);
+    }
+    return partMats.get(H);
+  };
   L.partH = L.aisles.slice(0, -1).map((a, i) => L.places.some((pl) => pl.p.placement === "wall" && ((pl.aisle === a && pl.side === "R") || (pl.aisle === L.aisles[i + 1] && pl.side === "L"))) ? PART_TALL : PART_H);
   L.aisles.slice(0, -1).forEach((a, i) => {
     const H = L.partH[i];
-    put(mats.part, new THREE.BoxGeometry(PT, H + 0.02, LEN), [a.x1, (H - 0.02) / 2, -LEN / 2]);
+    put(partMat(H), new THREE.BoxGeometry(PT, H + 0.02, LEN), [a.x1, (H - 0.02) / 2, -LEN / 2]);
     put(mats.trim, new THREE.BoxGeometry(PT + 0.02, 0.045, LEN - 0.01), [a.x1, H + 0.0125, -LEN / 2]); // the cap
     for (const zc of [-0.021, -LEN + 0.021]) put(mats.trim, new THREE.BoxGeometry(PT + 0.032, H + 0.08, 0.05), [a.x1, (H + 0.06) / 2, zc]);
     for (const sx of [-1, 1]) put(mats.trim, new THREE.BoxGeometry(0.016, SK + 0.02, LEN - 0.02), [a.x1 + sx * (PT / 2 + 0.006), (SK - 0.02) / 2, -LEN / 2]);
@@ -399,32 +409,68 @@ mats.trim.userData.block = false;
       g.scale(k, k);
       const w = 1024, h = 286.72;
       g.fillStyle = "#1F1F21"; g.fillRect(0, 0, w, h);
-      g.fillStyle = COPPER; roundRect(g, 40, 40, 206, 206, 28); g.fill();
+      g.fillStyle = COPPER; roundRect(g, 30, 30, 226, 226, 30); g.fill();
       g.fillStyle = NAVY; g.textAlign = "center"; g.textBaseline = "middle";
-      g.font = `600 30px ${FONT}`; if (g.letterSpacing !== undefined) g.letterSpacing = "4px"; g.fillText("AISLE", 143, 86);
+      g.font = `600 28px ${FONT}`; if (g.letterSpacing !== undefined) g.letterSpacing = "4px"; g.fillText("AISLE", 145, 70);
       if (g.letterSpacing !== undefined) g.letterSpacing = "0px";
-      g.font = `700 112px ${FONT}`; g.fillText(String(a.n), 143, 170);
+      g.font = `700 150px ${FONT}`; g.fillText(String(a.n), 143, 166);
+      // the line under the title names every brand: smaller, then without "Part x of y", then on two lines;
+      // never cut short
+      const models = `${count} model${count === 1 ? "" : "s"} · ${brands.join(", ")}`;
+      const tries = a.of > 1 ? [`Part ${a.part} of ${a.of} · ${models}`, models] : [models];
+      let lines = null, size = 38;
+      for (; size >= 30 && !lines; size -= 2) {
+        g.font = `500 ${size}px ${FONT}`;
+        lines = tries.map((t) => [t]).find(([t]) => g.measureText(t).width <= 690) || null;
+      }
+      if (!lines) for (size = 34; size >= 24; size -= 2) { g.font = `500 ${size}px ${FONT}`; lines = wrapText(g, models, 690); if (lines.length <= 2) break; }
       g.textAlign = "left"; g.textBaseline = "alphabetic"; g.fillStyle = "#FFFFFF";
-      g.font = `600 96px ${FONT}`; g.fillText(a.title, 290, 148, 700);
-      g.fillStyle = "#B9B9BE"; g.font = `500 38px ${FONT}`;
-      const part = a.of > 1 ? `Part ${a.part} of ${a.of} · ` : "";
-      const line = wrapText(g, `${part}${count} model${count === 1 ? "" : "s"} · ${brands.join(", ")}`, 700);
-      g.fillText(line[0] + (line.length > 1 ? "…" : ""), 292, 212, 700);
-      g.fillStyle = COPPER; g.fillRect(292, 236, 72, 5);
+      const two = lines.length > 1, ty = two ? 126 : 148;
+      g.font = `600 ${two ? 86 : 96}px ${FONT}`; g.fillText(a.title, 290, ty, 700);
+      g.fillStyle = "#B9B9BE"; g.font = `500 ${size}px ${FONT}`;
+      lines.forEach((l, i) => g.fillText(l, 292, ty + 62 + i * (size + 8)));
+      g.fillStyle = COPPER; g.fillRect(292, ty + 62 + (lines.length - 1) * (size + 8) + 22, 72, 5);
     });
-    const sw = Math.min(2.3, a.walk[1] - a.walk[0] - 0.1), sh = sw * 0.28, y = 2.68, z = -1.0;
+    const sw = Math.min(2.3, a.walk[1] - a.walk[0] - 0.1), sh = sw * 0.28, y = 2.68, z = -0.5;
     const face = new THREE.MeshBasicMaterial({ map: tex, toneMapped: false });
-    put(mats.trim, new THREE.BoxGeometry(sw + 0.04, sh + 0.04, 0.05), [a.mid, y, z]);
-    for (const sx of [-1, 1]) put(mats.trim, new THREE.CylinderGeometry(0.006, 0.006, WALL_H - (y + sh / 2), 8), [a.mid + sx * (sw / 2 - 0.15), (WALL_H + y + sh / 2) / 2, z]);
+    const TILT = 0.2; // its front leans back a little, so it reads from the overview as well as from the door
+    put(mats.trim, new THREE.BoxGeometry(sw + 0.04, sh + 0.04, 0.05), [a.mid, y, z], [-TILT, 0, 0]);
+    const topY = y + Math.cos(TILT) * (sh / 2 + 0.02), topZ = z - Math.sin(TILT) * (sh / 2 + 0.02);
+    for (const sx of [-1, 1]) put(mats.trim, new THREE.CylinderGeometry(0.006, 0.006, WALL_H - topY + 0.01, 8), [a.mid + sx * (sw / 2 - 0.15), (WALL_H + topY) / 2, topZ]);
     for (const ry of [0, Math.PI]) {
       const s = new THREE.Mesh(new THREE.PlaneGeometry(sw, sh), onTop(face.clone(), 1));
       s.material.map = tex;
-      s.position.set(a.mid, y, z + (ry ? -0.027 : 0.027));
-      s.rotation.y = ry;
+      s.position.set(a.mid, y + Math.sin(TILT) * (ry ? -0.027 : 0.027), z + Math.cos(TILT) * (ry ? -0.027 : 0.027));
+      s.rotation.set(-TILT, ry, 0, "XYZ");
       s.userData.aisle = a;
       hall.add(s); signs.push(s);
     }
   });
+
+  // the aisle's number and category on the floor at its entrance, for the view from above (the hanging sign is
+  // nearly edge-on from there)
+  {
+    const FK = HQ ? 1 : 0.5, rows = 2 ** Math.ceil(Math.log2(L.aisles.length));
+    const ftex = canvasTexture(1024 * FK, 256 * rows * FK, (g) => {
+      g.scale(FK, FK);
+      L.aisles.forEach((a, i) => {
+        const y = i * 256 + 128;
+        let fs = 150;
+        for (g.font = `600 ${fs}px ${FONT}`; g.measureText(a.title).width > 1024 - 290 && fs > 60; fs -= 4) g.font = `600 ${fs - 4}px ${FONT}`;
+        const tw = g.measureText(a.title).width, x0 = (1024 - (220 + 40 + tw)) / 2;
+        g.fillStyle = COPPER; g.beginPath(); g.arc(x0 + 110, y, 108, 0, Math.PI * 2); g.fill();
+        g.fillStyle = "#FFFFFF"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = `700 140px ${FONT}`; g.fillText(String(a.n), x0 + 110, y + 8);
+        g.fillStyle = "#2A2A2D"; g.textAlign = "left"; g.font = `600 ${fs}px ${FONT}`; g.fillText(a.title, x0 + 260, y + 6);
+      });
+    });
+    const fmat = onTop(new THREE.MeshBasicMaterial({ map: ftex, transparent: true, depthWrite: false, opacity: 0.92 }), 3);
+    fmat.userData.order = 1;
+    L.aisles.forEach((a, i) => {
+      const fw = Math.min(2.8, a.walk[1] - a.walk[0] - 0.2), g = flat(fw, fw / 4), uv = g.attributes.uv;
+      for (let k = 0; k < uv.count; k++) uv.setY(k, 1 - (i + (uv.getY(k) ? 0 : 1)) / rows);
+      put(fmat, g, [a.mid, 0.002, -0.75]);
+    });
+  }
 
   // the logo wall at the far end, with a counter in front of it
   const LW = Math.min(7, W * 0.4), LH = WALL_H;
@@ -454,15 +500,23 @@ mats.trim.userData.block = false;
   // a strip of light along the top and bottom of the logo wall
   put(mats.light, new THREE.PlaneGeometry(LW - 0.1, 0.025), [0, LH - 0.12, -D + 0.081]);
   put(mats.copper, new THREE.BoxGeometry(LW - 0.1, 0.02, 0.006), [0, 0.12, -D + 0.083]);
-  // the counter: a white top on a charcoal body with an orange line
-  const CW = Math.min(2.6, LW * 0.45), cz = -D + Math.min(1.25, (D - LEN) * 0.55);
-  put(mats.trim, new THREE.BoxGeometry(CW, 0.98, 0.56), [0, 0.49, cz]);
-  put(mats.counterTop, new THREE.BoxGeometry(CW + 0.06, 0.04, 0.64), [0, 1.0, cz]);
-  put(mats.copper, new THREE.BoxGeometry(CW + 0.002, 0.018, 0.562), [0, 0.86, cz]);
-  const counter = new THREE.Mesh(new THREE.BoxGeometry(CW + 0.06, 1.02, 0.64), new THREE.MeshBasicMaterial({ visible: false }));
-  counter.position.set(0, 0.51, cz);
+  // the reception counter: a charcoal front with a raised white ledge over a strip of light, short returns at both
+  // ends, and a lower white desk behind the front for the staff side
+  const CW = Math.min(3, LW * 0.5), cz = -D + Math.min(1.3, (D - LEN) * 0.6), RD = 0.62, CFD = 0.32;
+  const front = cz + RD / 2 - CFD / 2; // the front run's middle
+  put(mats.trim, new THREE.BoxGeometry(CW, 1.06, CFD), [0, 0.53, front]);
+  put(mats.counterTop, new THREE.BoxGeometry(CW + 0.05, 0.035, CFD + 0.05), [0, 1.075, front + 0.015]);
+  put(mats.light, new THREE.BoxGeometry(CW - 0.02, 0.012, 0.004), [0, 1.045, front + CFD / 2 + 0.002]);
+  put(mats.copper, new THREE.BoxGeometry(CW - 0.04, 0.016, 0.006), [0, 0.09, front + CFD / 2 + 0.002]);
+  for (const sx of [-1, 1]) {
+    put(mats.trim, new THREE.BoxGeometry(0.3, 1.06, RD - CFD + 0.01), [sx * (CW / 2 - 0.15), 0.53, cz - CFD / 2 - 0.005]);
+    put(mats.counterTop, new THREE.BoxGeometry(0.35, 0.035, RD - CFD - 0.02), [sx * (CW / 2 - 0.15 + 0.025), 1.07, cz - CFD / 2 - 0.015]);
+  }
+  put(mats.counterTop, new THREE.BoxGeometry(CW - 0.62, 0.03, RD - CFD - 0.02), [0, 0.76, cz - CFD / 2 - 0.01]);
+  const counter = new THREE.Mesh(new THREE.BoxGeometry(CW + 0.05, 1.1, RD + 0.05), new THREE.MeshBasicMaterial({ visible: false }));
+  counter.position.set(0, 0.55, cz + 0.01);
   hall.add(counter); blockers.push(counter);
-  L.counter = { x: [-(CW + 0.06) / 2, (CW + 0.06) / 2], z: [cz - 0.32, cz + 0.32] };
+  L.counter = { x: [-(CW + 0.05) / 2, (CW + 0.05) / 2], z: [cz - RD / 2 - 0.02, cz + RD / 2 + 0.04] };
 }
 
 // ── the plinths, their name plates and the brand panels (from the layout) ──
@@ -526,6 +580,7 @@ const logoTex = canvasTexture(1024, 512, () => {});
   // brand panels: one over each run of a brand along a side (floor-standing products only)
   const brands = [...new Set(products.map((p) => p.brand))];
   brands.forEach((b, i) => logoCells.set(b, [(i % 4) * 256, Math.floor(i / 4) * 80]));
+  const onLogo = new Map(), logoImg = new Map(); // brand -> what to draw once its logo is in, and its image
   const lg = logoTex.image.getContext("2d");
   for (const b of brands) {
     const [x, y] = logoCells.get(b);
@@ -533,10 +588,12 @@ const logoTex = canvasTexture(1024, 512, () => {});
     const src = products.find((p) => p.brand === b)?.brandLogo;
     if (!src) continue;
     const img = new Image();
+    logoImg.set(b, img);
     img.onload = () => {
       const k = Math.min(196 / img.naturalWidth, 44 / img.naturalHeight), w = img.naturalWidth * k, h = img.naturalHeight * k;
       lg.drawImage(img, x + (256 - w) / 2, y + (80 - h) / 2, w, h);
       logoTex.needsUpdate = true;
+      for (const f of (onLogo.get(b) || [])) f(img);
       redraw();
     };
     img.src = src;
@@ -568,6 +625,57 @@ const logoTex = canvasTexture(1024, 512, () => {});
         }
         i = j + 1;
       }
+    }
+  });
+
+  // a lit panel on the bare stretch of partition or wall between the entrance and each side's first product: the
+  // aisle and category, and the logos of the brands along that side
+  const LP = { w: 512, h: 340, cols: 4, rows: 3 }, lk = HQ ? 1 : 0.5;
+  const lightTex = canvasTexture(LP.w * LP.cols * lk, 1024 * lk, () => {});
+  const lpg = lightTex.image.getContext("2d");
+  const lightMat = onTop(new THREE.MeshBasicMaterial({ map: lightTex, toneMapped: false }), 1);
+  let cell = 0;
+  L.aisles.forEach((a, ai) => {
+    for (const side of ["L", "R"]) {
+      const list = L.places.filter((pl) => pl.aisle === a && pl.side === side).sort((p, q) => q.pos[2] - p.pos[2]);
+      if (!list.length || cell >= LP.cols * LP.rows) continue;
+      const bare = -(list[0].pos[2] + sizeOf(list[0].p).w / 2 + 0.05);
+      if (bare < 1.0) continue;
+      const outer = side === "L" ? ai === 0 : ai === L.aisles.length - 1;
+      const face = side === "L" ? 1 : -1, px = side === "L" ? a.x0 + (outer ? 0 : PT / 2) : a.x1 - (outer ? 0 : PT / 2);
+      const pw = Math.min(1.5, bare - 0.4), ph = pw * LP.h / LP.w, z = -bare / 2, y = 1.3;
+      const cx = (cell % LP.cols) * LP.w, cy = Math.floor(cell / LP.cols) * LP.h;
+      cell++;
+      // the panel's face
+      const runBrands = [...new Set(list.map((pl) => pl.p.brand))];
+      const draw = () => {
+        lpg.setTransform(lk, 0, 0, lk, 0, 0);
+        const bg = lpg.createLinearGradient(0, cy, 0, cy + LP.h); bg.addColorStop(0, "#FFFFFF"); bg.addColorStop(1, "#F4F1EC");
+        lpg.fillStyle = bg; lpg.fillRect(cx, cy, LP.w, LP.h);
+        lpg.textAlign = "center"; lpg.textBaseline = "alphabetic";
+        lpg.fillStyle = COPPER_DK; lpg.font = `600 20px ${FONT}`;
+        if (lpg.letterSpacing !== undefined) lpg.letterSpacing = "5px";
+        lpg.fillText(`AISLE ${a.n}`, cx + LP.w / 2 + 2.5, cy + 54);
+        if (lpg.letterSpacing !== undefined) lpg.letterSpacing = "0px";
+        lpg.fillStyle = "#2A2A2D"; lpg.font = `600 52px ${FONT}`; lpg.fillText(a.title, cx + LP.w / 2, cy + 112, LP.w - 60);
+        lpg.fillStyle = COPPER; lpg.fillRect(cx + LP.w / 2 - 30, cy + 130, 60, 4);
+        const cols = runBrands.length <= 3 ? runBrands.length : 3, rows = Math.ceil(runBrands.length / cols), cw = (LP.w - 50) / cols, ch = Math.min(80, 170 / rows);
+        runBrands.forEach((b, i) => {
+          const img = logoImg.get(b);
+          if (!img?.naturalWidth) return;
+          const r = Math.floor(i / cols), inRow = Math.min(cols, runBrands.length - r * cols), x0 = cx + (LP.w - inRow * cw) / 2 + (i % cols) * cw;
+          const k = Math.min((cw - 34) / img.naturalWidth, (ch - 26) / img.naturalHeight), w = img.naturalWidth * k, h = img.naturalHeight * k;
+          lpg.drawImage(img, x0 + (cw - w) / 2, cy + 152 + r * ch + (ch - h) / 2, w, h);
+        });
+        lightTex.needsUpdate = true;
+      };
+      draw();
+      for (const b of runBrands) { if (!onLogo.has(b)) onLogo.set(b, []); onLogo.get(b).push(draw); }
+      // a charcoal frame and the panel
+      put(mats.trim, new THREE.BoxGeometry(0.03, ph + 0.05, pw + 0.05), [px + face * 0.015, y, z]);
+      const g = new THREE.PlaneGeometry(pw, ph), uv = g.attributes.uv, TW = LP.w * LP.cols, TH = 1024;
+      for (let i = 0; i < uv.count; i++) uv.setXY(i, (cx + (uv.getX(i) ? LP.w : 0)) / TW, 1 - (cy + (uv.getY(i) ? 0 : LP.h)) / TH);
+      put(lightMat, g, [px + face * 0.032, y, z], [0, face * Math.PI / 2, 0]);
     }
   });
 }
@@ -1122,22 +1230,39 @@ controls.addEventListener("start", () => { flight = null; hintGone(); });
 // part above it: the camera renders a taller image (setViewOffset) whose lower strip is under the dock. Its lens
 // widens with what is covered, so the clear part always sees FOV degrees: on a phone the card covers nearly half
 // the screen, and a fridge must still fit above it from across the walkway.
-let covered = 0;
+// On a laptop the card stands at the left instead: the picture is centred in the part right of it, the same way
+// sideways (the image is wider by the card's width, its extra strip off the right edge), and slides over as the card
+// comes and goes.
+let covered = 0, side = 0, sideTo = 0;
+function applyView() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  camera.aspect = (w + side) / (h + covered);
+  camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * (h + covered) / Math.max(1, h - covered)));
+  camera.setViewOffset(w + side, h + covered, 0, covered, w, h);
+  camera.updateProjectionMatrix();
+}
 function fitCamera() {
   const w = stage.clientWidth, h = stage.clientHeight;
   if (!w || !h || xr) return; // a headset sizes its own view
   const top = (el) => el.getBoundingClientRect().top - stage.getBoundingClientRect().top;
-  const card = $("pcard"), wide = card.getBoundingClientRect().width > w * 0.8;
-  covered = clamp(Math.max(h - top($("dock")), !card.classList.contains("gone") && wide ? h - top(card) : 0), 0, h * 0.45);
+  const card = $("pcard"), cr = card.getBoundingClientRect(), wide = cr.width > w * 0.8, shown = !card.classList.contains("gone");
+  covered = clamp(Math.max(h - top($("dock")), shown && wide ? h - top(card) : 0), 0, h * 0.45);
+  sideTo = shown && !wide ? clamp(cr.right - stage.getBoundingClientRect().left + 16, 0, w * 0.45) : 0;
   renderer.setSize(w, h, false);
-  camera.aspect = w / (h + covered);
-  camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * (h + covered) / Math.max(1, h - covered)));
-  camera.setViewOffset(w, h + covered, 0, covered, w, h);
-  camera.updateProjectionMatrix();
+  applyView();
   redraw();
 }
+let sideAt = 0; // when the slide was last stepped
+function stepSide(now) {
+  if (side === sideTo) { sideAt = now; return false; }
+  const k = Math.min(1, (now - sideAt) / 120); // about 0.3 s, whatever the frame rate
+  sideAt = now;
+  side = Math.abs(sideTo - side) < 1 ? sideTo : side + (sideTo - side) * k;
+  applyView();
+  return true;
+}
 // tan of half the view's angle, up and across, over the part of it that isn't covered
-const tans = () => { const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), h = stage.clientHeight; return { v: t * (h - covered) / (h + covered), h: t * camera.aspect }; };
+const tans = () => { const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), h = stage.clientHeight, w = stage.clientWidth; return { v: t * (h - covered) / (h + covered), h: t * (w - sideTo) / (h + covered) }; };
 function viewFor(s) {
   // three-quarters on, at eye height, near enough to fill the screen and never past the walkway
   const tan = tans();
@@ -1149,25 +1274,30 @@ function viewFor(s) {
   pos.y = s.wall ? 1.55 : clamp(s.size.h * 0.95, 1.2, 1.7);
   return { pos, target };
 }
-// The whole hall from a corner above the entrance, three-quarters on, framed tight in the part of the view the page
-// leaves clear (under the buttons, above the dock): on a tall phone screen, more from the side and from higher up.
+// The whole hall from above the entrance, framed tight in the part of the view the page leaves clear (under the
+// buttons, above the dock): on a laptop three-quarters on; on a tall phone screen square on, the aisles running up
+// the screen to the logo wall.
 function homeView() {
   const w = stage.clientWidth, h = stage.clientHeight, tall = h > w * 1.15;
-  const az = tall ? -1.22 : -0.3, el = tall ? 1.2 : 0.84;
+  const az = tall ? 0 : -0.3, el = tall ? 1.05 : 0.84;
   const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
   const pts = [];
-  for (const x of [-L.W / 2, L.W / 2]) for (const [z, y] of [[-L.D, 0], [-L.D, WALL_H], [0, WALL_H], [tall ? 0.3 : APRON * 0.5, 0]]) pts.push(new THREE.Vector3(x, y, z));
-  const cam = camera.clone();
+  // (on a phone the width is fitted from the first products back, so the corners of the entrance may go off the
+  // sides and the hall fills the height)
+  for (const x of [-L.W / 2, L.W / 2]) for (const [z, y] of [[-L.D, 0], [-L.D, WALL_H], [0, WALL_H], [tall ? 0.3 : APRON * 0.5, 0]]) pts.push(Object.assign(new THREE.Vector3(x, y, z), { fx: !tall || z < -1 }));
+  if (tall) for (const x of [-L.W / 2, L.W / 2]) pts.push(Object.assign(new THREE.Vector3(x, 0, -ENTRY), { fx: true }));
+  const cam = camera.clone(); // (as it will be with no card at the side)
+  cam.aspect = w / (h + covered); cam.setViewOffset(w, h + covered, 0, covered, w, h); cam.updateProjectionMatrix();
   const target = new THREE.Vector3(0, 0.5, -L.D / 2);
   const top = 1 - 2 * (tall ? 64 : 76) / h, bottom = -1 + 2 * (covered + (tall ? 60 : 16)) / h, side = 1 - 2 * (tall ? 10 : 30) / w;
-  const tanF = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), kx = tanF * camera.aspect, ky = tanF * h / (h + covered);
+  const tanF = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), kx = tanF * cam.aspect, ky = tanF * h / (h + covered);
   let dist = Math.max(L.W, L.D) * 1.4;
   for (let i = 0; i < 14; i++) {
     cam.position.copy(target).addScaledVector(dir, dist);
     cam.lookAt(target);
     cam.updateMatrixWorld(true);
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-    for (const p of pts) { const v = p.clone().project(cam); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
+    for (const p of pts) { const v = p.clone().project(cam); if (p.fx) { x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); } y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
     const right = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
     target.addScaledVector(right, ((x0 + x1) / 2) * dist * kx).addScaledVector(up, ((y0 + y1) / 2 - (top + bottom) / 2) * dist * ky);
     dist *= Math.max((x1 - x0) / (2 * side), (y1 - y0) / (top - bottom));
@@ -1236,6 +1366,7 @@ renderer.setAnimationLoop((time, frame) => {
   if (controls.target.y < 0) controls.target.y = 0;
   if (animateParts(now)) moved = true;
   if (stepFades(now)) moved = true;
+  if (stepSide(now)) moved = true;
   // not on the way: what a flight passes would load only to be dropped (it plans again when it lands)
   if (!flight && now - lastPlan > 300) { lastPlan = now; planLoads(); }
   if (moved || dirty > 0) {
@@ -1631,7 +1762,7 @@ window.__showroom = {
   }),
   loader: () => ({ cap: ldr.cap, near: ldr.near, loaded: slots.filter((s) => s.model).length, loading: slots.filter((s) => s.loading).length, maxSeen: ldr.maxSeen, loads: ldr.loads, unloads: ldr.unloads, failed: slots.filter((s) => s.failed).map((s) => s.p.id) }),
   resetMax: () => { ldr.maxSeen = busyCount(); },
-  camera: () => ({ pos: v3(camera.position), target: v3(controls.target), flying: !!flight }),
+  camera: () => ({ pos: v3(camera.position), target: v3(controls.target), flying: !!flight || side !== sideTo }),
   look: (pos, target) => { flight = null; jumpTo({ pos: new THREE.Vector3(...pos), target: new THREE.Vector3(...target) }); planLoads(); },
   selected: () => selected?.p.id || null,
   card: () => ({ shown: !$("pcard").classList.contains("gone"), name: $("pcName").textContent, link: $("pcLink").getAttribute("href") }),
