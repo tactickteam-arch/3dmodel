@@ -106,8 +106,8 @@ const dotsM = mat("VentDots", 0xffffff, { rough: 0.6, opacity: 0.999 });
 const root = group("HaierHRF3782");
 const cab = group("Cabinet");
 root.add(cab);
-// the printed words are drawn at 7.2 px per mm (tex_haier_hrf3782.py): a decal's size in metres is its PNG's size / 7200
-const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 7200, b.readUInt32BE(20) / 7200]; };
+// the printed words are drawn at 12 px per mm (tex_haier_hrf3782.py): a decal's size in metres is its PNG's size / 12000
+const png = (f) => { const b = fs.readFileSync(`${T}/${f}`); return [b.readUInt32BE(16) / 12000, b.readUInt32BE(20) / 12000]; };
 const plane = (name, w, h, m, x, y, z) => mesh(name, flipV(new THREE.PlaneGeometry(w, h)), m, x, y, z);
 const cyl = (name, rt, rb, h, m, x, y, z, seg = 16) => mesh(name, new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y, z);
 
@@ -140,7 +140,9 @@ for (const sx of [-1, 1]) cab.add(cyl("FootRear", 0.017, 0.018, base, footM, sx 
 // hinges on the right: the silver bracket over the right foot (front and 3/4 photos), the middle hinge plate on the
 // mullion (open photo), and the cover on the cabinet's top behind the freezer door (3/4 photos)
 cab.add(box("HingeBottom", 0.036, 0.006, 0.075, hingeM, W / 2 - 0.031, base - 0.003, zFront + 0.015));
-cab.add(box("HingeMid", 0.045, 0.012, 0.006, hingeM, W / 2 - 0.03, (yFreezer + frTop) / 2, zFront + 0.003));
+// (the plate as thick as the 4 mm gap between the doors less 1 mm: 12 mm thick, the doors' corners passed through it
+// as they opened)
+cab.add(box("HingeMid", 0.045, yFreezer - frTop - 0.001, 0.006, hingeM, W / 2 - 0.03, (yFreezer + frTop) / 2, zFront + 0.003));
 cab.add(box("HingeCoverTop", 0.07, H - cabTop - 0.001, 0.05, topPaint, W / 2 - 0.04, cabTop + (H - cabTop - 0.001) / 2, zFront - 0.026));
 
 // ── inside ──
@@ -148,7 +150,7 @@ const inW = W - 2 * wall;
 const zIn = zBack + backT;                            // the back wall's inner face
 const zDuct = zIn + 0.012;                            // the front of the raised back panels
 const rails = (name, yTop, z0, z1) => { for (const sx of [-1, 1]) cab.add(box(name, 0.01, 0.012, z1 - z0, linerDk, sx * (inW / 2 - 0.005), yTop - 0.012, (z0 + z1) / 2)); };
-// a knob on a back panel: a ring, the printed face, and the scale arc printed round it (its PNG drawn at 7.2 px per mm)
+// a knob on a back panel: a ring, the printed face, and the scale arc printed round it (its PNG drawn at 12 px per mm)
 function knob(name, x, y, faceM, arcM, arcPng, ringR, faceR) {
   cab.add(cyl(name + "Ring", ringR, ringR, 0.012, linerDk, x, y, zDuct + 0.006, 40).rotateX(Math.PI / 2));
   cab.add(cyl(name + "Face", faceR, faceR, 0.006, white, x, y, zDuct + 0.015, 40).rotateX(Math.PI / 2));
@@ -192,6 +194,8 @@ const iceM = group("IceMaker", icX, fzFloor, 0);
   for (let i = 0; i < 10; i++) {
     const c = mesh("IceCube", cube, ice, -0.042 + (i % 4) * 0.028, 0.016 + Math.floor(i / 8) * 0.018, icZ1 - 0.04 - Math.floor((i % 8) / 4) * 0.06 - (i % 2) * 0.012);
     c.rotation.set(0.2 * (i % 3), 0.5 * i, 0.15 * (i % 4));
+    // a tilted cube's low corner stays on the floor it sits on (it poked through the bin's floor)
+    { c.updateMatrix(); const cb = cube.clone().applyMatrix4(c.matrix); cb.computeBoundingBox(); if (cb.boundingBox.min.y < 0.006) c.position.y += 0.006 - cb.boundingBox.min.y; }
     iceM.add(c);
   }
 }

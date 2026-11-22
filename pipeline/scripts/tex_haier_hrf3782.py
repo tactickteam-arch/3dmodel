@@ -27,7 +27,7 @@ usage: python3 tex_haier_hrf3782.py <photos dir> <logos dir> <out dir>
     print_icemaker.png, print_freshbox.png, print_bottleguard.png   the words inside, set again sharp (the small icons
                       after them can't be read: left out)
     dots.png          the vent's 3 x 4 dots on the fridge's top duct
-Every word is set at 7.2 px per mm in Avenir Next (Demi Bold for the first word, Regular for the second, as printed).
+Every word is set at 12 px per mm in Avenir Next (Demi Bold for the first word, Regular for the second, as printed).
 """
 import os
 import sys
@@ -42,7 +42,7 @@ D = os.path.join(OUT, SLUG)
 os.makedirs(D, exist_ok=True)
 AV = "/System/Library/Fonts/Avenir Next.ttc"
 DEMI, REG, BOLD = 2, 7, 0
-S = 7.2                                     # px per mm for print
+S = 12.0                                    # px per mm for print (12 on the model)
 rng = np.random.default_rng(3782)
 
 # the doors' silver. Haier's straight front reads 196 over the fridge door and its 3/4s 174, all crossed by the same soft
