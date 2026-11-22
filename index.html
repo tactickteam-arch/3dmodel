@@ -105,6 +105,10 @@
   .card .brandlogo { height: 20px; width: auto; align-self: flex-start; margin-bottom: 4px; }
   .card h2 { font-weight: 600; font-size: 20px; line-height: 1.25; margin: 0; }
   .card .model { font-size: 14px; color: var(--slate); font-weight: 500; }
+  /* MOP (prices.js): one line, its height kept, so the cards don't move when the prices arrive */
+  .card .mop { height: 22px; line-height: 22px; font-size: 14px; font-weight: 500; color: var(--slate); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .mop b { font-weight: 600; color: var(--ink); letter-spacing: .3px; }
+  .card .mop.has { font-size: 17px; font-weight: 600; color: var(--ink); }
   .card mark { background: var(--orange-bg); color: inherit; border-radius: 3px; }
   .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .tags span { font-size: 12.5px; font-weight: 600; background: #F1F1F3; border-radius: 6px; padding: 4px 8px; }
@@ -186,6 +190,7 @@
 <script type="module">
 import { esc, CATEGORIES, fitCheck } from "/site.js";
 import { shownProducts } from "/live.js";
+import { loadPrices, mopOf, mopText } from "/prices.js";
 // products marked "hidden": true stay in products.json and /models, but are not shown; remove the flag to show one again.
 // The team's approve or decline in the admin's Testing pages wins over the flag (live.js).
 const products = await shownProducts();
@@ -252,6 +257,21 @@ function fitsTag(p) {
   return `<span class="fits ${r.ok ? "yes" : "no"}">${r.ok ? "Fits your space" : "Too big for your space"}</span>`;
 }
 
+// MOP: each card shows its first colour's; the placeholder until the server has /prices.json (prices.js)
+let prices = null;
+const mopHtml = (p) => { const n = mopOf(prices, p, 0); return { n, html: esc(mopText(n)).replace(/^MOP/, "<b>MOP</b>") }; };
+const mopLine = (p) => { const { n, html } = mopHtml(p); return `<div class="mop${n ? " has" : ""}" data-id="${esc(p.id)}">${html}</div>`; };
+loadPrices().then((m) => {
+  prices = m;
+  document.querySelectorAll("#grid .mop[data-id]").forEach((el) => {
+    const p = products.find((x) => x.id === el.dataset.id);
+    if (!p) return;
+    const { n, html } = mopHtml(p);
+    el.innerHTML = html;
+    el.classList.toggle("has", !!n);
+  });
+});
+
 // compare: pick two
 const COMPARE_KEY = "compare-picks";
 let picks = READY.compare ? (store.get(COMPARE_KEY) || []).filter((id) => products.some((p) => p.id === id)).slice(0, 2) : [];
@@ -289,6 +309,7 @@ function render() {
         <img class="brandlogo" src="${p.brandLogo}" alt="${esc(p.brand)}">
         <h2>${esc(p.shortName)}</h2>
         <div class="model">Model ${highlight(p.model, query)}</div>
+        ${mopLine(p)}
         <div class="tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}${fitsTag(p)}</div>
         <div class="open">Open in 3D <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </div>

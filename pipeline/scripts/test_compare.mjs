@@ -123,11 +123,14 @@ await b.shot(`${out}/compare-open.png`);
 
 // the table
 const labels = [...new Set([A, B].flatMap((p) => p.specs.map(([k]) => k)))];
-const t = await b.evalJS(`(() => { const rows = [...document.querySelectorAll("#specs tbody tr")];
+const t = await b.evalJS(`(() => { const rows = [...document.querySelectorAll("#specs tbody tr:not(.mop)")];
   return { head: [...document.querySelectorAll("#specs thead th")].slice(1).map((x) => x.textContent), rows: rows.map((r) => [r.querySelector("th").textContent, ...[...r.querySelectorAll("td")].map((x) => x.textContent)]) }; })()`);
 const size = (p) => `${parseFloat(p.size.w)} × ${parseFloat(p.size.h)} × ${parseFloat(p.size.d)} cm`;
 check(t.head[0] === `${A.brand} ${A.shortName}` && t.head[1] === `${B.brand} ${B.shortName}`, `table heads: ${t.head.join(" | ")}`);
 check(t.rows[0][0] === "Size (W × H × D)" && t.rows[0][1] === size(A) && t.rows[0][2] === size(B), `Size comes first: ${t.rows[0].join(" | ")}`);
+// the MOP row (prices.js), second: each side's price, or the placeholder until the server has /prices.json
+const mop = await b.evalJS(`(() => { const r = document.querySelector("#specs tbody tr:nth-child(2).mop"); return r && [...r.children].map((x) => x.textContent); })()`);
+check(mop && mop[0] === "MOP" && mop.slice(1).every((x) => x === "price coming soon" || /^\D?\s?[\d,]+$/.test(x)), `MOP comes second: ${mop && mop.join(" | ")}`);
 check(t.rows.length === labels.length + 1 && labels.every((k, i) => t.rows[i + 1][0] === k), `then every label either lists, once each (${labels.length})`);
 const cellOk = t.rows.slice(1).every(([k, va, vb]) => va === (A.specs.find(([x]) => x === k)?.[1] || "–") && vb === (B.specs.find(([x]) => x === k)?.[1] || "–"));
 check(cellOk, `each cell holds that product's value, or "–" (${t.rows.slice(1).filter((r) => r.includes("–")).length} rows with a gap)`);

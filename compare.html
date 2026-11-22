@@ -104,6 +104,9 @@
   td { font-weight: 500; }
   td.none { color: #A9AAB0; }
   tr.size td { font-weight: 600; }
+  /* MOP of each side's chosen colour (prices.js), the placeholder until the server has /prices.json */
+  tr.mop td { color: var(--slate); }
+  tr.mop td.has { color: var(--navy); font-weight: 600; }
 
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--navy); color: var(--paper); padding: 12px 18px; border-radius: 10px; font-size: 14px; opacity: 0; transition: all .25s; pointer-events: none; z-index: 60; max-width: calc(100vw - 32px); }
   .toast.show { opacity: 1; transform: translateX(-50%); }
@@ -177,6 +180,7 @@
 import { esc, cm, partAt, needsOf, finishSlug, finishIndexOf, CATEGORIES } from "/site.js";
 import { shownProducts } from "/live.js";
 import { studioLight } from "/light.js";
+import { loadPrices, mopOf, mopText } from "/prices.js";
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -252,6 +256,18 @@ document.title = shown.length === 2 ? `Compare ${shown[0].brand} ${shown[0].mode
 if (shown.length === 2) $("title").textContent = `${shown[0].brand} ${shown[0].shortName} and ${shown[1].brand} ${shown[1].shortName}`;
 else $("title").textContent = "Choose two products to compare";
 
+// ── MOP: one row in the table, each cell the colour shown on its side ──
+let prices = null;
+function renderMop() {
+  for (const s of sides || []) {
+    const td = s.product && document.querySelector(`#specs tr.mop td[data-side="${s.side}"]`);
+    if (!td) continue;
+    const n = mopOf(prices, s.product, s.finishIndex);
+    td.textContent = n ? mopText(n).replace(/^MOP\s*/, "") : mopText(n).replace(/^MOP:?\s*/, "");
+    td.classList.toggle("has", !!n);
+  }
+}
+
 function makeSide(side, p) {
   const col = document.createElement("section");
   col.className = "col";
@@ -305,7 +321,8 @@ function makeSide(side, p) {
     const f = p.finishes[i];
     if (f.variant || p.finishes.length > 1) mv.variantName = f.variant || null;
     swatches.querySelectorAll(".swatch").forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
-    if (!remember) return;
+    if (!remember) return; // the first colour's MOP is filled with the table, below
+    renderMop();
     const u = new URL(location.href);
     u.searchParams.set(`f${side}`, finishSlug(f.name));
     history.replaceState(history.state, "", u.pathname + u.search);
@@ -399,8 +416,11 @@ $("specs").innerHTML = `
   <thead><tr><th scope="col"><span class="hide">Specification</span></th>${picked.map((p) => `<th scope="col">${p ? `${esc(p.brand)} ${esc(p.shortName)}` : "–"}</th>`).join("")}</tr></thead>
   <tbody>
     <tr class="size"><th scope="row">Size (W × H × D)</th>${picked.map(sizeOf).join("")}</tr>
+    <tr class="mop"><th scope="row">MOP</th>${picked.map((p, i) => `<td data-side="${SIDES[i]}">${p ? "price coming soon" : "–"}</td>`).join("")}</tr>
     ${labels.map((k) => `<tr><th scope="row">${esc(k)}</th>${picked.map((p) => cellFor(p, k)).join("")}</tr>`).join("")}
   </tbody>`;
+renderMop();
+loadPrices().then((m) => { prices = m; renderMop(); });
 if (lost) toast("One of those products isn’t in the catalogue any more, so the one most like the other is shown.");
 
 // test hook for automated checks

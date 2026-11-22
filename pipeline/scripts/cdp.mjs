@@ -27,6 +27,9 @@ export async function launch({ port = 9444, profile, flags = [] } = {}) {
     if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
     if (m.method === "Runtime.consoleAPICalled") logs.push(`[${m.params.type}] ` + m.params.args.map((a) => a.value ?? a.description).join(" "));
     if (m.method === "Runtime.exceptionThrown") logs.push("EXCEPTION " + (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text));
+    // /prices.json is on Sangeetha's server only, and absent until the prices arrive (prices.js shows the placeholder):
+    // its 404 is expected, not an error of the page
+    if (m.method === "Log.entryAdded" && m.params.entry.level === "error" && /\/prices\.json(\?|$)/.test(m.params.entry.url || "") && /404/.test(m.params.entry.text)) return;
     if (m.method === "Log.entryAdded" && m.params.entry.level === "error") logs.push("LOG " + m.params.entry.text + " " + (m.params.entry.url || ""));
   };
   await new Promise((r) => (ws.onopen = r));

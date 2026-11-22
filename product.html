@@ -223,6 +223,11 @@
   .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--copper-dk); }
   h1 { font-family: var(--serif); font-weight: 400; font-size: 34px; line-height: 1.14; margin: 8px 0 0; }
   .model-no { display: inline-flex; margin-top: 12px; font-size: 13px; font-weight: 600; letter-spacing: .4px; color: var(--slate); background: #F1F1F3; border-radius: 6px; padding: 5px 9px; }
+  /* MOP of the chosen colour (prices.js): its height kept, so nothing moves when the prices arrive */
+  .mop { display: flex; align-items: baseline; gap: 8px; height: 32px; margin-top: 12px; font-size: 15px; font-weight: 500; color: var(--slate); white-space: nowrap; overflow: hidden; }
+  .mop b { align-self: center; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; color: var(--copper-dk); background: var(--copper-bg); border-radius: 6px; padding: 4px 8px; }
+  .mop span { align-self: center; overflow: hidden; text-overflow: ellipsis; }
+  .mop.has span { font-size: 24px; font-weight: 600; color: var(--navy); }
   .blurb { font-size: 16px; line-height: 1.55; color: var(--slate); margin: 12px 0 0; }
   .label { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--slate); margin-bottom: 12px; }
   .swatches { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -483,6 +488,7 @@
       <div class="eyebrow" id="eyebrow"></div>
       <h1 id="productName"></h1>
       <span class="model-no" id="modelNo"></span>
+      <div class="mop" id="mop"><b>MOP</b><span>price coming soon</span></div>
       <p class="blurb" id="productBlurb"></p>
       <a class="buy hide" id="buyLink" target="_blank" rel="noopener">See price and offers on sangeetha.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
       <div><button class="link-btn share-top" id="btnShare" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>
@@ -590,6 +596,7 @@ import { initRoom } from "/room.js";
 import { initOrganise } from "/organise.js";
 import { studioLight } from "/light.js";
 import { SITE } from "/site-config.js";
+import { loadPrices, mopOf, mopText } from "/prices.js";
 const $ = (id) => document.getElementById(id);
 const mv = $("viewer");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -846,8 +853,17 @@ function renderSwatches() {
   });
   $("arFinishes").classList.toggle("hide", product.finishes.length < 2);
 }
+// MOP: the chosen colour's, or the placeholder until the server has /prices.json (prices.js)
+let prices = null;
+function renderMop() {
+  const n = mopOf(prices, product, finishIndex), t = mopText(n);
+  $("mop").classList.toggle("has", !!n);
+  $("mop").querySelector("span").textContent = n ? t.replace(/^MOP\s*/, "") : t.replace(/^MOP:?\s*/, "");
+}
+loadPrices().then((m) => { prices = m; renderMop(); });
 function applyFinish(i) {
   finishIndex = i;
+  renderMop();
   const f = product.finishes[i];
   if (f.variant || (product.finishes || []).length > 1) mv.variantName = f.variant || null;
   document.querySelectorAll("#swatches .swatch, #arFinishes button").forEach((b) => b.setAttribute("aria-pressed", String([...b.parentNode.children].indexOf(b) === i)));
