@@ -102,12 +102,18 @@ root.add(cab);
 // The sides stop 1.5 mm under the top plate and the top sits 1.5 mm inside the sides' faces, so no two faces share a plane
 // (a shared plane flickers; defight would push it out 0.8 mm).
 const t = 0.012, bodyH = H - 0.0015 - feet, midY = feet + bodyH / 2;
-cab.add(mesh("SideLeft", flipV(new THREE.BoxGeometry(t, bodyH, D - 0.004)), [dark, sideL, bodyDark, bodyDark, bodyDark, bodyDark], -W / 2 + t / 2, midY, -0.002));
-cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(t, bodyH, D - 0.004)), [sideR, dark, bodyDark, bodyDark, bodyDark, bodyDark], W / 2 - t / 2, midY, -0.002));
+// The sides reach 1.5 mm past the back panel's rear face and the base stops 1.5 mm short of it, so that face shares no plane
+// with them (defight moved it alone 0.8 mm back, and the panel's edges into the sides, which opened slits along the back
+// corners and the top's rear edge). The sides' back edges at 591.5 mm stay inside the gate's 3 mm.
+const sideD = D - 0.004 + 0.0015, sideZ = -0.002 - 0.00075;
+cab.add(mesh("SideLeft", flipV(new THREE.BoxGeometry(t, bodyH, sideD)), [dark, sideL, bodyDark, bodyDark, bodyDark, bodyDark], -W / 2 + t / 2, midY, sideZ));
+cab.add(mesh("SideRight", flipV(new THREE.BoxGeometry(t, bodyH, sideD)), [sideR, dark, bodyDark, bodyDark, bodyDark, bodyDark], W / 2 - t / 2, midY, sideZ));
 cab.add(faced("Top", W - 0.003, 0.014, D - 0.003, [topM, topM, topM, dark, topM, topM], 0, H - 0.007, -0.0015));
-cab.add(box("Base", W - 2 * t, t, D - 0.01, dark, 0, feet + t / 2, -0.005));
+cab.add(box("Base", W - 2 * t, t, D - 0.0115, dark, 0, feet + t / 2, -0.00425));
 const backH = H - 0.014 - feet;                                // the rear texture runs from the feet to the top plate (15-834 mm)
-cab.add(mesh("BackPanel", flipV(new THREE.BoxGeometry(W - 2 * t, backH, 0.004)), [dark, dark, dark, dark, dark, rearM], 0, feet + backH / 2, zB + 0.002));
+// its foot 1.5 mm over the base's underside (no shared plane); the rear texture is squeezed 1.5 mm in 819 (0.2%) to fit
+const backLift = 0.0015, bg = new THREE.BoxGeometry(W - 2 * t, backH - backLift, 0.004);
+cab.add(mesh("BackPanel", flipV(bg), [dark, dark, dark, dark, dark, rearM], 0, feet + backLift + (backH - backLift) / 2, zB + 0.002));
 { // four feet, 26 mm across, under the corners (x from the rear frame; ESTIMATED)
   const g = new THREE.CylinderGeometry(0.013, 0.013, feet, 20);
   for (const [fx, fz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) cab.add(mesh("Foot", g, footM, fx * 0.272, feet / 2, fz * (D / 2 - 0.05)));
@@ -225,13 +231,31 @@ const dr = L.drawer, dW = dr.x1 - dr.x0, dH = dr.y1 - dr.y0, dX = (dr.x0 + dr.x1
   // the dark bay the drawer slides out of
   cab.add(mesh("DrawerBay", inward(new THREE.BoxGeometry(dW + 2 * g0, dH + 2 * g0, 0.25)), dark, dX, dY, zF - 0.009 - 0.125));
 }
-{ // the display: black glass standing 1.5 mm proud, its face the strip's own print at that place
+{ // the display: black glass standing 1 mm proud (its print decal then stays within 3 mm of the published depth), its face the strip's own print at that place
   const d = L.display, g = new THREE.BoxGeometry(d.x1 - d.x0, d.y1 - d.y0, 0.002), uv = g.attributes.uv;
   for (let i = 16; i < 20; i++) {
     const u = uv.getX(i), v = uv.getY(i);
     uv.setXY(i, (d.x0 + u * (d.x1 - d.x0) + W / 2) / W, 1 - (d.y0 + v * (d.y1 - d.y0) - stripY) / stripH);
   }
-  cab.add(mesh("DisplayGlass", g, [dark, dark, dark, dark, panelM, dark], (d.x0 + d.x1) / 2, (d.y0 + d.y1) / 2, zF + 0.0015));
+  cab.add(mesh("DisplayGlass", g, [dark, dark, dark, dark, panelM, dark], (d.x0 + d.x1) / 2, (d.y0 + d.y1) / 2, zF + 0.001));
+}
+// the print sharp: the fascia's print drawn again at 12 px/mm (tex_bosch_wga1220.py --hi), laid on planes over the same rectangles
+// of the strip's UVs (decals.json): A and B 0.9 mm in front of the strip (A with the knob's foot cut out, so nothing shares a
+// plane with it), C 0.9 mm in front of the display's glass. Each plane's UVs run over its own picture, rows from the top. Each
+// colour has its own pictures (print_*_dl.jpg for Dark Lake, set below as the variants are).
+const printTex = {};
+const DECALS = JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8"));
+for (const [key, dd] of Object.entries(DECALS)) {
+  const [u0, v0, u1, v1] = dd.rect;
+  const x0 = -W / 2 + u0 * W, x1 = -W / 2 + u1 * W, yT = H - v0 * stripH, yB = H - v1 * stripH;
+  const s = new THREE.Shape();
+  s.moveTo(x0, yB); s.lineTo(x1, yB); s.lineTo(x1, yT); s.lineTo(x0, yT); s.lineTo(x0, yB);
+  const dx = L.dial.x, dy = L.dial.y, kr = 0.0369;
+  if (dd.on === "strip" && dx - kr > x0 && dx + kr < x1 && dy - kr > yB && dy + kr < yT) s.holes.push(new THREE.Path().absarc(dx, dy, kr, 0, Math.PI * 2, true));
+  const g = new THREE.ShapeGeometry(s, 48), pos = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) - x0) / (x1 - x0), (yT - pos.getY(i)) / (yT - yB));
+  cab.add(mesh(`PrintDecal_${key}`, g, mat(`Print_${key}`, 0xffffff, { rough: 0.32 }), 0, 0, dd.on === "display" ? zF + 0.002 + 0.0009 : zF + 0.001 + 0.0009));
+  printTex[`Print_${key}`] = `${T}/${dd.file}`;
 }
 // the dial: a chrome ring with a notch at one o'clock round a black glossy cap (70 mm across, the cap 47.6 mm: measured on the
 // studio photo; 15 mm tall, ESTIMATED from the 3/4 photos)
@@ -327,7 +351,7 @@ root.add(filter);
 // the drum. Radii measured on the studio photo: rim 246.2 mm, the fine line where it meets the glass ring 236.5 mm, glass 161.2 mm. ──
 const door = group("Door", cx - ringR, cy, hingeZ);
 const dc = group("DoorCentre", ringR, 0, zF - hingeZ);        // the profiles below are measured from the body front
-dc.add(lathe("DoorInnerRing", [[glassR, 0.0428], [0.152, 0.0025], [ringR - 0.003, 0.0025]], doorIn));     // 2.5 mm off the front, so no shared plane
+dc.add(lathe("DoorInnerRing", [[glassR, 0.0428], [0.152, 0.0025], [ringR - 0.0015, 0.0025]], doorIn));   // out to the rim's own edge: no open ring     // 2.5 mm off the front, so no shared plane
 dc.add(lathe("DoorRim", [[ringR - 0.0015, 0.0025], [ringR, 0.005], [ringR + 0.0008, 0.0175], [ringR - 0.0025, 0.0285], [chromeIn + 0.0008, 0.0333]], rimBlack));
 dc.add(lathe("DoorRimLine", [[chromeIn + 0.0008, 0.0333], [chromeIn - 0.0004, 0.0339]], rimLine));
 dc.add(lathe("DoorBlack", [[chromeIn - 0.0004, 0.0339], [chromeIn - 0.008, 0.0375], [0.195, 0.0405], [glassR, 0.0428]], ringBlack));
@@ -347,7 +371,7 @@ const grain = { dir: `${TEX}/grain`, materials: {
   TopPlate: { type: "peel_soft" }, FlapFace: { type: "peel_soft" }, DrawerFace: { type: "peel_soft" },
 } };
 await exportGLB(root, clips, OUT, {
-  Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Rear: `${T}/rear.jpg`, Panel: `${T}/panel.jpg`,
+  Front: `${T}/front.jpg`, SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Rear: `${T}/rear.jpg`, Panel: `${T}/panel.jpg`, ...printTex,
   DrawerFace: `${T}/drawer.jpg`, DrawerBar: `${T}/bar.jpg`, Tray: `${T}/tray.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`,
 }, grain);
 
@@ -371,6 +395,7 @@ await exportGLB(root, clips, OUT, {
     SideR: (m, f) => m.setBaseColorTexture(tex(`${T}/side_r${f.suf}.jpg`)),
     Panel: (m, f) => m.setBaseColorTexture(tex(`${T}/panel${f.suf}.jpg`)),
     DrawerFace: (m, f) => m.setBaseColorTexture(tex(`${T}/drawer${f.suf}.jpg`)),
+    ...Object.fromEntries(Object.entries(DECALS).map(([k, dd]) => [`Print_${k}`, (m, f) => m.setBaseColorTexture(tex(`${T}/${dd.file.replace(".jpg", `${f.suf}.jpg`)}`))])),
     BodyDark: (m, f) => m.setBaseColorFactor([...lin(f.body), 1]),
     TopPlate: (m, f) => m.setBaseColorFactor([...lin(f.top), 1]),
     FlapFace: (m, f) => m.setBaseColorFactor([...lin(f.body), 1]),

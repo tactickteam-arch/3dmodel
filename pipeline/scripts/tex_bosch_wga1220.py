@@ -32,7 +32,11 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-PHOTOS, LOGOS, OUT = sys.argv[1:4]
+# --hi: draw only the fascia's print again at 12 px per mm on the model, for each colour, and cut it into the decals the builder
+# lays over the strip (print_a: the programme names and the dial's words; print_b: the words over the display) and on the
+# display's glass (print_c), with decals.json (their places in panel.jpg's UVs); panel.jpg and the other textures are left alone
+HI = "--hi" in sys.argv
+PHOTOS, LOGOS, OUT = [a for a in sys.argv[1:] if a != "--hi"][:3]
 SRC = os.path.join(PHOTOS, "bosch_wga1220")
 D = os.path.join(OUT, "bosch_wga1220")
 os.makedirs(D, exist_ok=True)
@@ -70,9 +74,9 @@ COLOURS = {
              "off": {"top": (11, -1), "off": (3, -1), "left": (3, -1), "right": (2, -2)}},
 }
 STRIP_TOP, STRIP_BOT = ROW0, 534.5                  # the fascia: from the top edge to the groove under it (rows 531-537)
-S = 4096 / 2414                                     # panel texture px per photo px (6.85 px per mm)
+S = 12 * 598.0 / 2413 if HI else 4096 / 2414         # panel texture px per photo px (6.85 px per mm; --hi 12)
 WHITE, DIM = (246, 246, 246), (200, 201, 204)       # the display's lit print, and its divider lines
-SHADE = {"panel": 0.80, "drawer": 0.84, "front": 0.8, "side_l": 0.86, "side_r": 0.86, "rear.jpg": 0.92}
+SHADE = {"panel": 0.80, "print_a": 0.80, "print_b": 0.80, "print_c": 0.80, "drawer": 0.84, "front": 0.8, "side_l": 0.86, "side_r": 0.86, "rear.jpg": 0.92}
 
 
 def save(img, name, q=88):
@@ -229,7 +233,7 @@ def digit(canvas, segs, bb, lit, box, colour):
 
 def panel(c, ph, ink):
     W, H = 2414, STRIP_BOT - STRIP_TOP
-    tw, th = 4096, round(H * S)
+    tw, th = round(W * S), round(H * S)
     INK = c["ink"]
     sh = lambda box, g: (box[0] + c["off"][g][0], box[1] + c["off"][g][1], box[2] + c["off"][g][0], box[3] + c["off"][g][1])
     # the fascia's light and shade, row by row, as the photo has it where nothing is printed
@@ -238,7 +242,8 @@ def panel(c, ph, ink):
     prof = cv2.GaussianBlur(np.median(a[:, cols], axis=1)[:, None, :], (1, 0), sigmaX=0.1, sigmaY=1.0)[:, 0, :]
     rows = STRIP_TOP + (np.arange(th) + 0.5) / S
     img = np.stack([np.interp(rows, np.arange(len(prof)), prof[:, k]) for k in range(3)], 1)[:, None, :] * np.ones((1, tw, 1), np.float32)
-    img += rng.normal(0, 0.8, (th, tw, 1))
+    if not HI:                                                      # the decals' ground stays smooth: it compresses far better
+        img += rng.normal(0, 0.8, (th, tw, 1))
     off = STRIP_TOP * S
 
     def r(y):
@@ -350,7 +355,7 @@ def drawer(c, ph):
 def bar(ph):
     """The chrome grip bar's face: the photo's polished gradient, with Bosch's mark and name set again crisp from logos/bosch.png."""
     x0, y0, x1, y1 = BAR
-    k = 2
+    k = 3                                                      # 12 px per mm: Bosch's mark and name on it are print
     cimg = ph.crop((x0, y0, x1, y1)).resize(((x1 - x0) * k, (y1 - y0) * k), Image.LANCZOS)
     a = np.asarray(cimg).astype(np.float32)
     lx0, lx1 = (380 - x0) * k, (605 - x0) * k            # the logo's span (mark and name, columns 389-594)
@@ -548,8 +553,30 @@ def tray():
     save(Image.fromarray(a.clip(0, 255).astype(np.uint8)), "tray.jpg", 88)
 
 
+# the decals, in photo px: A the programme names, leader lines, "Off" and the wool symbol, from right of the drawer's groove to
+# the display's left edge (the dial's knob stands over its middle; the builder cuts the knob's foot out of it); B the words over
+# the display ("Steam Cycle", "Serie | 4"), from A's edge to the display's right edge, down to the display's top; C the display's
+# own print, exactly the glass's face. The Dark lake print sits up to 11 px off the Silver one; both lie inside these boxes.
+DECALS = {"printA": (914, 44, DISPLAY[0], 420), "printB": (DISPLAY[0], 44, 2284, DISPLAY[1]), "printC": DISPLAY}
+
+
+def print_decals(ink):
+    rects = {}
+    for key, c in COLOURS.items():
+        strip = panel(c, photo(c), ink)
+        for k, (x0, y0, x1, y1) in DECALS.items():
+            name = f"print_{k[-1].lower()}{c['suf']}.jpg"
+            save(strip.crop((round(x0 * S), round((y0 - STRIP_TOP) * S), round(x1 * S), round((y1 - STRIP_TOP) * S))), name, 88)
+            rects[k] = {"file": f"print_{k[-1].lower()}.jpg", "rect": [x0 / 2414, (y0 - STRIP_TOP) / (STRIP_BOT - STRIP_TOP), x1 / 2414, (y1 - STRIP_TOP) / (STRIP_BOT - STRIP_TOP)],
+                        "on": "display" if k == "printC" else "strip"}
+    json.dump(rects, open(os.path.join(D, "decals.json"), "w"), indent=1)
+
+
 def main():
     ink = drawing()
+    if HI:
+        print_decals(ink)
+        return
     sil = COLOURS["silver"]
     ph_s = photo(sil)
     for key, c in COLOURS.items():
