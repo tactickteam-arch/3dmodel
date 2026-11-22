@@ -153,8 +153,14 @@ for (const side of [1, -1]) {
   const outline = [[zB, feet], [zF - rc, feet], [zF - rc, bodyTop], [zB, bodyTop]].map(([z, y]) => [side * z, y]);
   const holes = GROOVES.map((zc) => stadium(zc, gY0, gY1, gW, 12).map(([z, y]) => [side * z, y]));
   const s = new THREE.Shape(outline.map(([u, v]) => new THREE.Vector2(u, v)));
-  // a hole must wind the other way from its outline
-  for (const h of holes) s.holes.push(new THREE.Path((side > 0 ? h : h.slice().reverse()).map(([u, v]) => new THREE.Vector2(u, v))));
+  // a hole must wind the other way from its outline, or ExtrudeGeometry turns its walls into the skin and the background
+  // shows through a 2 mm sliver along each pressed panel (the left side did, 21 Nov 2026)
+  const cw = THREE.ShapeUtils.isClockWise(outline.map(([u, v]) => new THREE.Vector2(u, v)));
+  for (const h of holes) {
+    const hv = h.map(([u, v]) => new THREE.Vector2(u, v));
+    if (THREE.ShapeUtils.isClockWise(hv) === cw) hv.reverse();
+    s.holes.push(new THREE.Path(hv));
+  }
   const g = new THREE.ExtrudeGeometry(s, { depth: 0.002, bevelEnabled: false, curveSegments: 8 });
   g.rotateY(-side * Math.PI / 2);
   cab.add(mesh(side > 0 ? "SideRight" : "SideLeft", g, sideM, side * SX, 0, 0));
@@ -317,10 +323,47 @@ const pu = L.panel_uv, du = L.drawer_uv, dsp = L.display, gr = L.grip;
 const bev = 0.0015, gap = 0.0008;
 // the panel, with an opening for the display glass
 cab.add(slab("ControlStrip", rrect(seam + gap, faceBot, W / 2, H, 0.008, [0, 1, 0, 0], bev), [rrect(dsp.x0 - bev, dsp.y0 - bev, dsp.x1 + bev, dsp.y1 + bev, 0.0015).reverse()], 0.01, bev, [panelM, fascia], pu, zFF));
-{ // the display glass, 0.6 mm behind the panel's face, printed with the panel's own texture
+// ── the prints a shopper reads close up, at 12 px per mm (the texture script's panel_hi, decals.json) ──
+// panel.jpg (7 px per mm) stays the strip's own texture. Over the strip's flat face lie two flat decals 0.9 mm in front of it
+// (just over defight's 0.8 mm), with the face's own outline and display opening, cut at an empty column right of the display
+// (no print runs over the join); the display glass's face is printed from its own texture. Each is the same drawing as panel.jpg, so their edges
+// don't show.
+const hiDecals = JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8")), hiTex = {};
+const toU = (x) => (x - pu.x0) / (pu.x1 - pu.x0), toV = (y) => (pu.y1 - y) / (pu.y1 - pu.y0);
+{
+  const outline = rrect(seam + gap, faceBot, W / 2, H, 0.008, [0, 1, 0, 0], bev);
+  const hole = rrect(dsp.x0 - bev, dsp.y0 - bev, dsp.x1 + bev, dsp.y1 + bev, 0.0015);
+  // the outline (convex) cut at x = xc, keeping the left (keep < 0) or the right (keep > 0) side
+  const clipX = (pts, xc, keep) => {
+    const out = [], inside = (p) => keep * (p[0] - xc) >= 0;
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i], b = pts[(i + 1) % pts.length];
+      if (inside(a)) out.push(a);
+      if (inside(a) !== inside(b)) { const t = (xc - a[0]) / (b[0] - a[0]); out.push([xc, a[1] + t * (b[1] - a[1])]); }
+    }
+    return out;
+  };
+  for (const [key, keep] of [["panelA", -1], ["panelB", 1]]) {
+    const d = hiDecals[key], [r0, r1, r2, r3] = d.rect;
+    const xc = pu.x0 + (keep < 0 ? r2 : r0) * (pu.x1 - pu.x0);
+    const sh = new THREE.Shape(clipX(outline, xc, keep).map(([x, y]) => new THREE.Vector2(x, y)));
+    const hx = hole.map((p) => p[0]);
+    if (keep * (Math.min(...hx) - xc) > 0 || keep * (Math.max(...hx) - xc) > 0) {
+      if (keep * (Math.min(...hx) - xc) <= 0 || keep * (Math.max(...hx) - xc) <= 0) throw new Error(`${key}: the cut runs through the display`);
+      sh.holes.push(new THREE.Path(hole.map(([x, y]) => new THREE.Vector2(x, y))));
+    }
+    const g = new THREE.ShapeGeometry(sh, 1), p = g.attributes.position, uv = g.attributes.uv;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, (toU(p.getX(i)) - r0) / (r2 - r0), (toV(p.getY(i)) - r1) / (r3 - r1));
+    cab.add(mesh(`PrintDecal_${key}`, g, mat(`Print_${key}`, 0xffffff, { rough: 0.3 }), 0, 0, zFF + 0.0009));
+    hiTex[`Print_${key}`] = `${T}/${d.file}`;
+  }
+}
+{ // the display glass, 0.6 mm behind the panel's face, printed with the display's own 12 px per mm texture
+  const [r0, r1, r2, r3] = hiDecals.display.rect;
   const g = new THREE.BoxGeometry(dsp.x1 - dsp.x0, dsp.y1 - dsp.y0, 0.004), uv = g.attributes.uv, p = g.attributes.position;
-  for (let i = 0; i < uv.count; i++) uv.setXY(i, (p.getX(i) + (dsp.x0 + dsp.x1) / 2 - pu.x0) / (pu.x1 - pu.x0), (pu.y1 - (p.getY(i) + (dsp.y0 + dsp.y1) / 2)) / (pu.y1 - pu.y0));
-  cab.add(mesh("DisplayGlass", g, [glassBlack, glassBlack, glassBlack, glassBlack, panelM, glassBlack], (dsp.x0 + dsp.x1) / 2, (dsp.y0 + dsp.y1) / 2, zFF - 0.0006 - 0.002));
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, (toU(p.getX(i) + (dsp.x0 + dsp.x1) / 2) - r0) / (r2 - r0), (toV(p.getY(i) + (dsp.y0 + dsp.y1) / 2) - r1) / (r3 - r1));
+  cab.add(mesh("DisplayGlass", g, [glassBlack, glassBlack, glassBlack, glassBlack, mat("DisplayPrint", 0xffffff, { rough: 0.3 }), glassBlack], (dsp.x0 + dsp.x1) / 2, (dsp.y0 + dsp.y1) / 2, zFF - 0.0006 - 0.002));
+  hiTex.DisplayPrint = `${T}/${hiDecals.display.file}`;
 }
 { // the chin: a black band sloping back from the panel's lower edge to the mocha front (rows 262-288 of the photo)
   const sh = new THREE.Shape([[zFF - 0.0012, faceBot - 0.0002], [zF + 0.0005, chinBot], [zF - 0.02, chinBot], [zF - 0.02, faceBot - 0.0002]].map(([z, y]) => new THREE.Vector2(z, y)));   // just under the panel: no shared side plane
@@ -378,8 +421,12 @@ const drawer = group("Drawer");
   drawer.add(mesh("DrawerBar", lip, chrome, (gr.x0 + gr.x1) / 2, (gr.y1 + gr.lip) / 2 - 0.0004, zFF - 0.0055));
   const tw = BAY.x1 - BAY.x0 - 0.006, th = 0.068, tl = 0.22, tx = (BAY.x0 + BAY.x1) / 2, ty = (faceBot + H) / 2 - 0.004, zc = zFF - 0.028 - tl / 2, wt = 0.0025;   // the tray starts behind the grip pocket
   drawer.add(box("TrayFloor", tw, wt, tl, trayWall, tx, ty - th / 2 + wt / 2, zc));
-  drawer.add(box("TrayWallL", wt, th, tl, trayWall, tx - tw / 2 + wt / 2, ty, zc));
-  drawer.add(box("TrayWallR", wt, th, tl, trayWall, tx + tw / 2 - wt / 2, ty, zc));
+  // the tray's side walls run on to the face's back, and a plate under the grip pocket closes the floor there, so an open
+  // drawer shows no slot between its face and its tray (from above or the side)
+  const toFace = 0.028 - 0.0095;                     // from the tray's front to 0.5 mm inside the face (its back is 10 mm behind its front)
+  drawer.add(box("TrayWallL", wt, th, tl + toFace, trayWall, tx - tw / 2 + wt / 2, ty, zc + toFace / 2));
+  drawer.add(box("TrayWallR", wt, th, tl + toFace, trayWall, tx + tw / 2 - wt / 2, ty, zc + toFace / 2));
+  drawer.add(box("TrayFloorFront", tw - 2 * wt - 0.0004, wt, toFace + 0.0005, trayWall, tx, gr.y0 - 0.0003 - wt / 2, zFF - 0.0095 - (toFace + 0.0005) / 2));
   drawer.add(box("TrayWallBack", tw, th, wt, trayWall, tx, ty, zc - tl / 2 + wt / 2));
   const xa = tx - tw / 2 + tw * 0.44, xb = tx - tw / 2 + tw * 0.66;
   drawer.add(box("TrayDividerA", wt, th * 0.9, tl * 0.96, trayWall, xa, ty - th * 0.05, zc));
@@ -423,5 +470,5 @@ const grain = { dir: `${TEX}/grain`, materials: {
   Front: { type: "peel_soft" }, Side: { type: "peel_soft" }, TopPlate: { type: "peel_soft" }, FlapFace: { type: "peel_soft" }, Fascia: { type: "peel_soft" },
 } };
 await exportGLB(root, clips, OUT, {
-  Front: `${T}/front.jpg`, FlapFace: `${T}/front.jpg`, Panel: `${T}/panel.jpg`, DrawerFace: `${T}/drawer.jpg`, KnobTop: `${T}/knob_top.jpg`, BtnPower: `${T}/btn_power.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`,
+  Front: `${T}/front.jpg`, FlapFace: `${T}/front.jpg`, Panel: `${T}/panel.jpg`, ...hiTex, DrawerFace: `${T}/drawer.jpg`, KnobTop: `${T}/knob_top.jpg`, BtnPower: `${T}/btn_power.jpg`, Drum: `${T}/drum.jpg`, Hose: `${T}/hose.jpg`,
 }, grain);
