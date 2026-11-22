@@ -138,7 +138,14 @@ def door(fin, f):
 def mark():
     # Samsung's own wordmark in the inks the fronts show: light grey on the printed doors (Camellia Purple's front, its ink
     # pixels at 82% or more of the box's brightest), dark grey on the Inox door (its darkest 18%)
-    lg = np.asarray(Image.open(os.path.join(LOGOS, "samsung.png")).convert("RGBA")).astype(float)
+    # the wordmark from Samsung's SVG, drawn at 12 px per mm of its 69 mm ink (21 Nov; samsung.png gave about 7)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tex_samsung_standmark as _smk
+    _w = round(69 * 12)
+    cov = _smk.wordmark(LOGOS, _w)
+    cov = _smk.wordmark(LOGOS, round(_w * _w / cov.shape[1]))     # the SVG has a margin: draw again so the ink is 69 mm
+    lg = np.zeros(cov.shape + (4,))
+    lg[..., 3] = cov
     out = {}
     for kind, fin in (("light", "camellia_purple"), ("dark", "elegant_inox")):
         a = load_rgba(FRONTS[fin]["file"])
@@ -227,14 +234,16 @@ def badge():
     colours["badge"] = {"w_mm": W_MM, "aspect": round(Wp / Hp, 4), "padded": [img.width, img.height]}
 
 
-def text_png(name, lines, fill, wmm, hmm, PX=8):
-    # words set again at PX px per mm on a clear ground, each line fitted to its measured height
+def text_png(name, lines, fill, wmm, hmm, PX=12):
+    # words set again at PX px per mm on a clear ground, each line fitted to its measured height (12 px per mm since
+    # 21 Nov, was 8; the margin stays 1.25 mm, so the builders' planes keep their size)
+    P = round(PAD * PX / 8)
     W, H = int(wmm * PX), int(hmm * PX)
-    img = Image.new("RGBA", (W + 2 * PAD, H + 2 * PAD), fill[:3] + (0,))
+    img = Image.new("RGBA", (W + 2 * P, H + 2 * P), fill[:3] + (0,))
     d = ImageDraw.Draw(img)
     for (s, cy_mm, h_mm, fc) in lines:
         f = font(int(h_mm * PX * 1.35), fc)
-        d.text((PAD + W / 2, PAD + cy_mm * PX), s, font=f, fill=fill, anchor="mm")
+        d.text((P + W / 2, P + cy_mm * PX), s, font=f, fill=fill, anchor="mm")
     save(img, name)
     return img
 
