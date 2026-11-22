@@ -50,7 +50,7 @@ const pnX0 = 0.171;                                    // the control panel, rig
 const ctBot = 1.009, ctTop = 1.078;                    // the chiller tray
 const s1 = 0.858, s2 = 0.732, s3 = 0.604;              // the three glass shelves' tops
 const coverY = 0.443;                                  // the vegetable case's cover
-const vbBot = 0.202, vbTop = 0.432;                    // the vegetable case
+const vbBot = 0.202, vbTop = 0.4245;                   // the vegetable case (its top just under the cover's 18 mm front band, so it slides out under it)
 // the door: its liner stands 25 mm into the cabinet; the pockets hang off it (open photo: floors and wall heights,
 // measured up from the door's foot; depths ESTIMATED)
 const pw = W - 0.002, rC = 0.02;                       // the door's top corners rounded 20 mm (front)
@@ -552,8 +552,11 @@ addPocket("TopPocket", bkW, BK.top, -pw / 2);
 addPocket("HalfPocketHinge", half, BK.half, -pw / 2 + hx);
 addPocket("HalfPocketFree", half, BK.half, -pw / 2 - hx);
 addPocket("HalfPocketLow", half, BK.halfL, -pw / 2 + hx);
-addPocket("BigPocket", bkW, BK.big, -pw / 2);
-addPocket("BottlePocket", bkW, BK.bottle, -pw / 2);
+// the big and bottle pockets stop 12 mm shorter at the hinge end (ESTIMATED), so with the door at its stop the trays slide
+// straight out past them
+const lowW = bkW - 0.012, lowX = -pw / 2 - 0.006;
+addPocket("BigPocket", lowW, BK.big, lowX);
+addPocket("BottlePocket", lowW, BK.bottle, lowX);
 // the moulded rib down the middle of the liner, from 600 to 1000 mm up the door, its foot cut on the slant (open photo)
 {
   const y0 = 0.6, y1 = 1.0, dep = 0.04, s = new THREE.Shape();
@@ -567,7 +570,7 @@ const eggX = [-0.055, 0, 0.055].map((d) => -pw / 2 + hx + d);
 fridgeDoor.add(box("EggCupsRib", half - 0.02, 0.006, 0.05, clearRib, -pw / 2 + hx, BK.half.y + 0.007, -linerFace - BK.half.d / 2));
 fridgeDoor.add(box("EggCupsRib", half - 0.02, 0.006, 0.05, clearRib, -pw / 2 - hx, BK.half.y + 0.007, -linerFace - BK.half.d / 2));
 {
-  const inside = (dep) => [-pw / 2 - bkW / 2 + 0.006, -pw / 2 + bkW / 2 - 0.006, -(linerFace + dep / 2)];
+  const inside = (dep) => [lowX - lowW / 2 + 0.006, lowX + lowW / 2 - 0.006, -(linerFace + dep / 2)];
   const deps = { egg: BK.half.d, jar: BK.big.d, bottle: BK.bottle.d };
   stock.doorFridge(fridgeDoor, { fit: true, eggY: BK.half.y, eggX, jarY: BK.big.y, botY: BK.bottle.y, canY: null, deps, inside });
   // what is taller than its pocket's space (to the pocket over it, less 1 cm) is left out
@@ -585,7 +588,7 @@ fridgeDoor.add(box("EggCupsRib", half - 0.02, 0.006, 0.05, clearRib, -pw / 2 - h
   if (out.length) console.log(`left out (taller than its pocket's space): ${out.join(", ")}`);
   // what stays in the bottle pocket is lined up again across it
   const low = fridgeDoor.children.filter((o) => (o.isGroup || o.isMesh) && !/Pocket|Gasket|Door|Handle|Lock|Haier|Rib/.test(o.name) && Math.abs(new THREE.Box3().setFromObject(o).applyMatrix4(inv).min.y - BK.bottle.y) < 0.02);
-  if (low.length) row(low, W / 2 - pw / 2 - bkW / 2 + 0.006, W / 2 - pw / 2 + bkW / 2 - 0.006, zDoor - linerFace - BK.bottle.d + 0.006);
+  if (low.length) row(low, W / 2 + lowX - lowW / 2 + 0.006, W / 2 + lowX + lowW / 2 - 0.006, zDoor - linerFace - BK.bottle.d + 0.006);
 }
 // the other half pocket holds eggs too, and the top pocket three jars (copies of the door's own eggs and jars)
 {

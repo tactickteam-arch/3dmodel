@@ -169,7 +169,7 @@ def rear():
 def flap():
     # pwg_g04 (0.65 px per mm on the flap, 0.97 of the opening's scale): the box x 409-427, rows 254-269 (27 x 23 mm); FREEZE
     # x 431-468 and ZONE x 468-497, caps rows 255-264 (14 mm tall); FREEZE darker than ZONE (two greys on the frosted flap)
-    PX = 8
+    PX = 12
     mmpx = 1 / (0.67 * 0.97)
     W_mm, H_mm = (497 - 409) * mmpx, (269 - 254) * mmpx
     img = Image.new("RGBA", (int(W_mm * PX) + 2 * PAD, int(H_mm * PX) + 2 * PAD), (150, 156, 164, 0))
