@@ -43,6 +43,7 @@ os.makedirs(D, exist_ok=True)
 ARIAL = "/System/Library/Fonts/Supplemental/Arial.ttf"
 NARROW = "/System/Library/Fonts/Supplemental/Arial Narrow.ttf"
 AVENIR = "/System/Library/Fonts/Avenir Next.ttc"
+MASK = 240                          # px a fixed-size word is set at before it is scaled into its box (always down)
 
 # ── IFB's size (product page, manual UF421PKMAN780 E p.77 "598 x 618 x 875 (8Kg/9Kg)", Sangeetha's listing 87.5 x 61.8 x 59.8 cm) ──
 W_MM, H_MM, D_MM = 598.0, 875.0, 618.0
@@ -332,7 +333,7 @@ BASE = int(round(float(np.median(grey[int(TOP) + 8:int(FACE_BOT) - 6][:, _cols])
 print("fascia base", BASE)
 
 
-def panel():
+def panel(name="panel.jpg"):
     x0, y0, x1, y1 = PANEL_BOX
     tw, th = round((x1 - x0) * K), round((y1 - y0) * K)
     # the fascia's tone row by row, from print-free columns (between the display and the dial, and right of the button)
@@ -393,17 +394,18 @@ def panel():
     word(can, NOTE[0], NOTE[1], org, (170, 170, 170), "r")
     red = (236, 70, 88)
     put(can, power_steam_icon(), POWER_STEAM["icon"], org, red, keep="fit")
-    m = text_mask("POWER STEAM", 80, ARIAL.replace("Arial.ttf", "Arial Bold.ttf"))
+    m = text_mask("POWER STEAM", MASK, ARIAL.replace("Arial.ttf", "Arial Bold.ttf"))
     put(can, m, POWER_STEAM["text"], org, red, keep="w", align="l")
-    put(can, text_mask("®", 80, ARIAL), POWER_STEAM["reg"], org, red, keep="fit")
+    put(can, text_mask("®", MASK, ARIAL), POWER_STEAM["reg"], org, red, keep="fit")
     for s, b in MODEL_LINE:
-        put(can, text_mask(s, 80, AVENIR, 7), b, org, (205, 205, 205), keep="w")
+        put(can, text_mask(s, MASK, AVENIR, 7), b, org, (205, 205, 205), keep="w")
     # the touch power button's face is the panel itself: its power mark printed a little darker than the panel (the photo's
     # ink reads 27-34 on 41), an open circle round a short upright bar; the chrome ring round it is 3D
     vec(can, org, (1344.5, 169.5, 1366.5, 193), (27, 27, 28), power_mark)
     can = np.clip(can, 0, 255).astype(np.uint8)
-    save(Image.fromarray(can), "panel.jpg", 90)
-    return tw, th
+    if name:
+        save(Image.fromarray(can), name, 90)
+    return can
 
 
 def power_steam_icon():
@@ -519,7 +521,7 @@ def drawer():
         # IFB's eco mark (the drop, the leaf and two bubbles), drawn again as vectors on IFB's lined-up drawer photo, then
         # ECO INVERTER in DIN Alternate; both in the print's light grey
         vec(can, org, ECO_ICON, PRINT_GREY, eco_mark(ECO_ICON, 1.0))
-        put(can, text_mask("ECO INVERTER", 80, DIN), ECO_TEXT, org, PRINT_GREY, keep="xy")
+        put(can, text_mask("ECO INVERTER", MASK, DIN), ECO_TEXT, org, PRINT_GREY, keep="xy")
     if DRAWER_ICONS == "ai_eco":
         # [Ai] in a blue rounded box, the eco mark in a light outlined box, then ECO INVERTER (IFB's drawer photo)
         ai = Image.new("L", (200, 200), 0)
@@ -527,7 +529,7 @@ def drawer():
         dd.rounded_rectangle([0, 0, 200, 200], 30, fill=255)
         aim = np.asarray(ai).astype(np.float32) / 255
         put(can, aim, (752.5, 236.5, 761, 246.5), org, (52, 150, 222), keep="fit")
-        put(can, text_mask("Ai", 80, ARIAL), (754.5, 238.8, 759.2, 244.4), org, (235, 245, 252), keep="fit")
+        put(can, text_mask("Ai", MASK, ARIAL), (754.5, 238.8, 759.2, 244.4), org, (235, 245, 252), keep="fit")
         eco = Image.new("L", (200, 200), 0)
         de = ImageDraw.Draw(eco)
         de.rounded_rectangle([6, 6, 194, 194], 30, outline=255, width=14)
@@ -536,7 +538,7 @@ def drawer():
         de.ellipse([110, 40, 170, 100], outline=255, width=12)
         de.ellipse([140, 120, 165, 145], outline=255, width=8)
         put(can, np.asarray(eco).astype(np.float32) / 255, (763.5, 236.5, 772, 246.5), org, (205, 205, 205), keep="fit")
-        put(can, text_mask("ECO INVERTER", 80, AVENIR, 5), (774.5, 239.5, 825, 247), org, (205, 205, 205), keep="w")
+        put(can, text_mask("ECO INVERTER", MASK, AVENIR, 5), (774.5, 239.5, 825, 247), org, (205, 205, 205), keep="w")
     save(Image.fromarray(np.clip(can, 0, 255).astype(np.uint8)), "drawer.jpg", 90)
 
 
@@ -637,8 +639,57 @@ def open_layout():
     return ppm
 
 
+
+# ── the prints a shopper reads close up, at 12 px per mm (19-21 Nov clarity pass) ──
+# panel.jpg above stays at T (7 px per mm) as the strip's own texture. The same drawing is made again at HI px per mm for
+# what is laid over it: the strip's flat face in two halves (each under the 4096 px a phone or headset loads), cut at the
+# emptiest column right of the display; the display glass's face as its own texture; and the drawer's
+# face (drawer.jpg, 200 mm across, fits in one texture at HI). decals.json gives each one's rectangle on panel.jpg (u, v).
+HI = 12.0
+TEX_MAX = 4096
+
+
+def save_hi(a, name, q=88):
+    Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(os.path.join(D, name), quality=q, subsampling=0, optimize=True)
+    print("wrote", os.path.join(D, name), a.shape[1], "x", a.shape[0])
+
+
+def panel_hi():
+    can = panel(None)
+    x0, y0 = PANEL_BOX[0], PANEL_BOX[1]
+    h, w = can.shape[:2]
+    # the join: the emptiest column between the display's right edge and the next print (no word, mark or rule there)
+    lo = max(w - TEX_MAX + 16, math.ceil((DISPLAY[2] + 3 - x0) * K))
+    hi = min(TEX_MAX - 16, round((DISPLAY[2] + 110 - x0) * K))
+    g = can.astype(np.float32).max(2)
+    ink = (np.abs(g - np.median(g, axis=1, keepdims=True)) > 14).sum(0).astype(np.float32)
+    ink = np.convolve(ink, np.ones(61), "same")
+    run = np.flatnonzero(ink[lo:hi] == ink[lo:hi].min())
+    run = run[:np.argmax(np.diff(np.r_[run, 10 ** 9]) > 1) + 1]      # the first stretch of the emptiest columns
+    cut = int(lo + run[len(run) // 2])                              # and its middle
+    print("join at photo column", round(x0 + cut / K, 1), "ink there", float(ink[cut]))
+    assert cut <= TEX_MAX and w - cut <= TEX_MAX, (w, cut)
+    a, b = math.floor((DISPLAY[0] - x0) * K) - 2, math.ceil((DISPLAY[2] - x0) * K) + 2
+    c, d = math.floor((DISPLAY[1] - y0) * K) - 2, math.ceil((DISPLAY[3] - y0) * K) + 2
+    save_hi(can[c:d, a:b], "display.jpg")
+    # the strip's halves never show the display (their faces have its opening): flat there, to keep the files small
+    face = can.copy()
+    face[c + 4:d - 4, a + 4:b - 4] = 10
+    save_hi(face[:, :cut], "panel_a.jpg")
+    save_hi(face[:, cut:], "panel_b.jpg")
+    rects = {"panelA": {"file": "panel_a.jpg", "rect": [0.0, 0.0, cut / w, 1.0]},
+             "panelB": {"file": "panel_b.jpg", "rect": [cut / w, 0.0, 1.0, 1.0]},
+             "display": {"file": "display.jpg", "rect": [a / w, c / h, b / w, d / h]}}
+    with open(os.path.join(D, "decals.json"), "w") as f:
+        json.dump(rects, f, indent=1)
+    print("wrote decals.json, cut at", cut, "of", w, "px")
+
+
 panel()
+T, K = HI, HI / PPM
+panel_hi()
 drawer()
+T, K = 7.0, 7.0 / PPM
 front_fall()
 drum()
 hose()
