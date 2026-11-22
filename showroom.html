@@ -110,6 +110,29 @@
   .chip .nm { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .chip b { display: block; font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--copper-dk); margin-bottom: 1px; }
   .chip[aria-pressed="true"] { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+  .chip .mop, .res .mop { display: block; font-style: normal; font-size: 11.5px; font-weight: 500; color: var(--slate); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* search: brand, name, model or item code, as you type */
+  .dock-top { display: flex; gap: 8px; align-items: flex-start; }
+  .dock-top .cats { flex: 1; min-width: 0; }
+  .search { flex: none; position: relative; display: flex; align-items: center; gap: 7px; width: 280px; height: 36px; padding: 0 8px 0 12px; border: 1px solid var(--hair); background: #fff; border-radius: 999px; }
+  .search:focus-within { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+  .search svg { width: 17px; height: 17px; color: var(--slate); flex: none; }
+  .search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 13.5px; color: var(--navy); padding: 0; }
+  .search input::placeholder { color: #8A8C92; }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .search kbd { font: inherit; font-size: 11.5px; font-weight: 600; color: var(--slate); border: 1px solid var(--hair); border-radius: 6px; padding: 0 6px; line-height: 18px; }
+  .search:focus-within kbd { display: none; }
+  .results { position: absolute; right: 10px; bottom: calc(100% + 8px); width: min(430px, calc(100% - 20px)); max-height: min(360px, 50vh); overflow-y: auto; border-radius: 16px; padding: 6px; z-index: 8; }
+  .results p { margin: 0; padding: 12px; font-size: 13.5px; color: var(--slate); }
+  .res { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; border-radius: 11px; padding: 6px 8px; text-align: left; font-size: 13.5px; font-weight: 500; line-height: 1.3; }
+  .res:hover, .res[aria-selected="true"] { background: #F1F1F3; }
+  .res img { width: 38px; height: 38px; border-radius: 8px; object-fit: contain; background: #fff; flex: none; }
+  .res > span { min-width: 0; }
+  .res b { color: var(--copper-dk); font-weight: 700; margin-right: 4px; }
+  .res small { display: block; font-size: 12px; color: var(--slate); }
+  .res mark { background: var(--copper-bg); color: inherit; border-radius: 3px; }
+  .pcard .mop { margin: 6px 0 0; font-size: 14px; font-weight: 600; color: var(--navy); }
 
   .loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 9; font-size: 15px; color: var(--slate); pointer-events: none; }
   .loading span { display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 999px; background: rgba(253,252,249,.94); box-shadow: var(--shadow); }
@@ -141,6 +164,12 @@
     .cat { padding: 6px 11px; font-size: 12.5px; }
     .chip { width: 210px; font-size: 12px; }
     .chip img { width: 38px; height: 38px; }
+    .chip .mop { display: none; }
+    .search { width: 132px; height: 32px; padding: 0 6px 0 10px; }
+    .search:focus-within { width: 200px; }
+    .search kbd { display: none; }
+    .search input { font-size: 16px; } /* (no zoom on iPhone when it takes focus) */
+    .results { left: 8px; right: 8px; width: auto; }
     .pcard { left: 8px; right: 8px; width: auto; bottom: calc(var(--dock-h) + 8px); padding: 12px 12px 10px 14px; }
     .pcard h2 { font-size: 16px; }
     .pcard .logo { height: 16px; }
@@ -179,11 +208,20 @@
       <button class="x" id="pcClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <p class="meta" id="pcMeta"></p>
+    <p class="mop" id="pcMop"></p>
     <div class="pparts" id="pcParts" role="group" aria-label="Open and close"></div>
     <a class="go" id="pcLink" href="/">See it in 3D and AR <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
   <nav class="dock glass" id="dock" aria-label="Products in the showroom">
-    <div class="cats" id="cats"></div>
+    <div class="dock-top">
+      <div class="cats" id="cats"></div>
+      <div class="search" id="search" role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Search brand, model or item code" autocomplete="off" spellcheck="false" aria-label="Search the showroom" aria-controls="results" aria-expanded="false" enterkeyhint="go">
+        <kbd>/</kbd>
+      </div>
+    </div>
+    <div class="results glass hide" id="results" role="listbox" aria-label="Products found"></div>
     <div class="chips" id="chips"></div>
   </nav>
 </main>

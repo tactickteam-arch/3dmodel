@@ -2,6 +2,9 @@
 // VR and in passthrough:
 // - the hall is laid out from products.json: an aisle per category, every product on show once, none overlapping,
 //   each facing its walkway, a chip for each and a count per category;
+// - it opens at eye height inside the entrance; a frame there is timed; the up arrow walks, the left arrow turns, and
+//   with the search box focused (by "/") they don't; a model code typed in and Enter walks you to that product; its
+//   card and chip show the MOP placeholder;
 // - the loader: never more than its cap loaded or loading at once, over a flight past every product and with
 //   ?cap=4; models left behind are unloaded; none fail;
 // - a chip flies to its product and opens its card (with its /p/ link); a tap on a door opens it (with a mouse,
@@ -141,7 +144,59 @@ await b.waitFor("window.__showroom.slots().every((s) => s.loaded || s.stand.phot
 let si = await standIns();
 check(si.n > 0 && !si.bad.length, `the ${si.n} not loaded stand as a box in their colour with their photo on the front; the loaded ones don't${si.bad.length ? `: ${si.bad.slice(0, 2).join(", ")}` : ""}`);
 check(ld.loaded <= ld.cap && ld.maxSeen <= ld.cap && !ld.failed.length, `from the entrance: ${ld.loaded} loaded (most at once ${ld.maxSeen}), none failed`);
-check((await sr("labels()")).length === 0, "from the entrance the aisle signs name things, not a tag on every product");
+// it opens at eye height just inside the entrance, after a slow step in, looking down the middle aisle
+await settle();
+const cam0 = await sr("camera()");
+const mid = lay.aisles[Math.floor((lay.aisles.length - 1) / 2)];
+check(Math.abs(cam0.pos[1] - 1.6) < 0.05 && cam0.pos[2] > 0 && cam0.pos[2] < 1.5 && Math.abs(cam0.pos[0] - mid.mid) < 0.3 && cam0.target[2] < cam0.pos[2] - 3, `it opens at eye height inside the entrance, down the middle aisle (camera ${cam0.pos})`);
+const ft = await sr("frameTime(20)");
+console.log(`       a frame there: ${ft.ms} ms in this headless browser's software renderer (polished floor ${ft.polished ? "on" : "off"}${ft.dropped ? ", dropped for speed" : ""}), ${await sr("draws()")} draw calls`);
+check(ft.ms < 400, `a frame at the entrance draws in ${ft.ms} ms here (software rendering; a laptop's GPU is many times faster)`);
+// the walk keys: up walks forward at eye height, in the walkway; left turns where you stand; with the search box
+// focused they do nothing. (Held 1.5 s; this headless browser draws only a few frames a second when nothing moves,
+// and the page's timer keeps the steps coming.)
+const hold = async (code, key, ms = 1500) => {
+  await b.send("Input.dispatchKeyEvent", { type: "rawKeyDown", code, key, windowsVirtualKeyCode: { ArrowUp: 38, ArrowLeft: 37, ArrowDown: 40, ArrowRight: 39 }[code] });
+  await sleep(ms);
+  await b.send("Input.dispatchKeyEvent", { type: "keyUp", code, key, windowsVirtualKeyCode: { ArrowUp: 38, ArrowLeft: 37, ArrowDown: 40, ArrowRight: 39 }[code] });
+  await sleep(700);
+};
+const yaw = (c) => Math.atan2(c.target[0] - c.pos[0], c.target[2] - c.pos[2]);
+await hold("ArrowUp", "ArrowUp");
+let cam2 = await sr("camera()");
+check(cam2.pos[2] < cam0.pos[2] - 0.15 && Math.abs(cam2.pos[1] - 1.6) < 0.05 && Math.abs(cam2.pos[0] - mid.mid) < 0.3, `the up arrow walks forward down the aisle (${cam0.pos[2]} -> ${cam2.pos[2]} m)`);
+await hold("ArrowLeft", "ArrowLeft", 800);
+const cam3 = await sr("camera()"), turned = Math.abs(Math.atan2(Math.sin(yaw(cam3) - yaw(cam2)), Math.cos(yaw(cam3) - yaw(cam2))));
+check(turned > 0.3 && hyp(cam3.pos, cam2.pos) < 0.05, `the left arrow turns you where you stand (${turned.toFixed(2)} rad)`);
+await b.send("Input.dispatchKeyEvent", { type: "rawKeyDown", key: "/", code: "Slash", windowsVirtualKeyCode: 191 });
+await b.send("Input.dispatchKeyEvent", { type: "keyUp", key: "/", code: "Slash", windowsVirtualKeyCode: 191 });
+await sleep(200);
+check(await b.evalJS("document.activeElement && document.activeElement.id === 'q'"), `"/" puts you in the search box`);
+await hold("ArrowUp", "ArrowUp", 800);
+const cam4 = await sr("camera()");
+check(hyp(cam4.pos, cam3.pos) < 0.01, "with the search box focused, the arrow keys don't walk");
+// search: a model code typed in, Enter: it walks you to that product and opens its card
+const Y = products.filter((p) => p.category === "Washing machine").at(-1) || products.at(-1);
+await b.evalJS("document.getElementById('q').value = ''");
+await b.send("Input.insertText", { text: Y.model });
+await sleep(300);
+const res = await b.evalJS(`[...document.querySelectorAll("#results .res")].length + " " + !document.getElementById("results").classList.contains("hide") + " " + (document.querySelector("#results .res b")?.textContent || "")`);
+check(res.split(" ")[1] === "true" && +res.split(" ")[0] >= 1 && res.split(" ").slice(2).join(" ") === Y.brand, `typing ${Y.model} lists it (${res})`);
+await b.send("Input.dispatchKeyEvent", { type: "rawKeyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+await b.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+await settle();
+{
+  const c = await sr("camera()"), sy = await slotOf(Y.id), d = Math.hypot(...c.pos.map((v, i) => v - sy.center[i]));
+  check(await sr("selected()") === Y.id && d > 1.2 && d < 3.2 && hyp(c.target, sy.center) < 0.05, `and Enter walks you to ${Y.id}: ${d.toFixed(2)} m from it, looking at it, its card open`);
+  check(await b.evalJS("document.getElementById('pcMop').textContent") === "MOP: price coming soon" && await b.evalJS(`document.querySelector('.chip[data-id="${Y.id}"] .mop').textContent`) === "MOP: price coming soon",
+    "its card and its chip show the MOP placeholder (no prices in the repo)");
+}
+// the whole showroom from above
+await b.evalJS("document.getElementById('btnOverview').click()");
+await settle();
+await b.waitFor("window.__showroom.loader().loading === 0", 120000);
+await sleep(500);
+check((await sr("labels()")).length === 0, "from above the aisle signs name things, not a tag on every product");
 const draws = await sr("draws()");
 check(draws < 1000, `the whole hall with ${ld.loaded} models loaded is ${draws} draw calls (the room itself merged into a few dozen)`);
 await b.shot(`${out}/showroom-overview.png`);
