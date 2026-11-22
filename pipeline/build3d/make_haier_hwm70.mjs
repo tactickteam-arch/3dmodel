@@ -10,6 +10,8 @@
 // usage: node make_haier_hwm70.mjs <entry.json> <tex dir> <out.glb>
 import { THREE, mat, mesh, box, group, inward, stateClips, exportGLB, productParts, saveZones } from "./lib.mjs";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import fs from "node:fs";
+import { uvDecal } from "./decal_curved.mjs";
 
 const [PRODUCTS, TEX, OUT] = process.argv.slice(2);
 const ID = "haier-hwm70-306s8";
@@ -236,6 +238,9 @@ const tubD = 0.245, tubZ = zAt(tubD);
 {
   const o = outline(0.0015);
   cab.add(ribbon("TopCoverSkirt", o, S, lipTop, coverM, { closed: true, centre: [0, 0.05] }));
+  // the 1.5 mm ledge where the cover's skirt sits on the cabinet's top edge, closed: open, it was a slit through which the
+  // background showed past the cabinet's inside at a low angle from behind
+  cab.add(plate("TopCoverSeat", outline(0), [outline(0.0015)], S, bodyM));
   // the rounded lip: three bands stepping 1.2 mm in each
   let prev = o;
   [[0.0025, lipTop + 0.0018], [0.004, lipTop + 0.0032], [0.0055, deckY]].forEach(([ins, y], i, arr) => {
@@ -305,9 +310,12 @@ const tubD = 0.245, tubZ = zAt(tubD);
   cab.add(box("RingNotch", 0.07, 0.006, 0.02, hingeM, 0, wy - 0.008, tubZ - 0.155));
 }
 
+let printTex = {};
 // ── the control panel strip: Haier's top photo, a crescent between the lip and the silver trim, sloping up 13 mm ──
 // photo px: x = 600 + 2.2 * x(mm), y = 584 - 2.2 * d(mm); the texture spans photo x 48-1146, y 406-566
-const PANEL = { y0: 0.849, y1: 0.862 };
+// (the strip's front edge stands 0.8 mm over the deck, so the whole strip is clear of it: at 0.849 its front 5 mm ran under
+// the deck and the words under the three round keys were hidden)
+const PANEL = { y0: deckY + 0.0008, y1: 0.862 };
 const dFront = (x) => 0.0095 + sag(x);                  // the strip's front edge, 9.5 mm behind the bowed front
 const dBack = (x) => 0.0827 + (x * x) / (2 * 5.0);      // the silver trim's front edge (a flatter arc)
 const panelY = (d, x) => PANEL.y0 + (PANEL.y1 - PANEL.y0) * (d - dFront(x)) / (dBack(x) - dFront(x));
@@ -316,13 +324,29 @@ const panelUV = (x, z) => { const d = zF - z; return [((600 + 2200 * x) - 48) / 
   const xe = 0.2495, n = 40, pts = [];
   for (let i = 0; i <= n; i++) { const x = -xe + (2 * xe * i) / n; pts.push([x, zF - dFront(x)]); }
   for (let i = n; i >= 0; i--) { const x = -xe + (2 * xe * i) / n; pts.push([x, zF - dBack(x)]); }
-  const s = new THREE.Shape(pts.map(([x, z]) => new THREE.Vector2(x, -z)));
-  const g = new THREE.ShapeGeometry(s, 4);
-  g.rotateX(-Math.PI / 2);
-  const p = g.attributes.position, u = g.attributes.uv;
-  for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i); p.setY(i, panelY(zF - z, x)); u.setXY(i, ...panelUV(x, z)); }
+  // the face as a grid between the two arcs (n across, m from front to back), so it slopes evenly from the front edge to the
+  // trim everywhere (a shape filled from its outline alone has long triangles along the front arc that stay at the front
+  // edge's height, flat for up to 20 mm in the middle)
+  const m = 8, P = [], UV = [], I = [];
+  for (let i = 0; i <= n; i++) {
+    const x = -xe + (2 * xe * i) / n;
+    for (let j = 0; j <= m; j++) {
+      const d = dFront(x) + (dBack(x) - dFront(x)) * (j / m), z = zF - d;
+      P.push(x, panelY(d, x), z); UV.push(...panelUV(x, z));
+    }
+  }
+  for (let i = 0; i < n; i++) for (let j = 0; j < m; j++) {
+    const a = i * (m + 1) + j, b = a + m + 1, c = a + 1, d = b + 1;
+    I.push(a, b, c, b, d, c);                              // facing up: x grows to the right, d grows to the back
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(P, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(UV, 2));
+  g.setIndex(I);
   g.computeVertexNormals();
-  cab.add(mesh("PanelFace", g, panelM));
+  if (g.attributes.normal.getY(0) < 0) throw new Error("PanelFace faces down");
+  const panelFace = mesh("PanelFace", g, panelM);
+  cab.add(panelFace);
   // the strip's two ends and its front edge closed down to the deck
   const edge = pts.slice(0, n + 1).map(([x, z]) => [x, z]);
   cab.add(ribbon("PanelEdge", edge, deckY - 0.002, PANEL.y0, black, { centre: [0, 0] }));
@@ -340,7 +364,19 @@ const panelUV = (x, z) => { const d = zF - z; return [((600 + 2200 * x) - 48) / 
   for (let i = 0; i <= n; i++) { const x = -xe + (2 * xe * i) / n; trim.push([x, zF - dBack(x)]); }
   for (let i = n; i >= 0; i--) { const x = -xe + (2 * xe * i) / n; trim.push([x, zF - dBack(x) - 0.003]); }
   cab.add(plate("SilverTrim", trim, [], PANEL.y1 + 0.0004, trimM));
-  // raised keys: the three round buttons and the two framed keys stand 1.2 mm proud; their tops carry the panel print
+  // the strip's print at 12 px per mm for a close look (tex_haier_hwm70.py: the same drawing again, in two halves), laid
+  // 0.9 mm over the strip and clipped to its crescent; the strip's own finish
+  // (the grid is given per half: a 10 mm x 2.7 mm cell, as fine down the strip as its arcing front edge needs; the decal
+  // tool's own count measures across the middle, which for a half reaching the strip's slanted end is off the strip)
+  for (const [k, d] of Object.entries(JSON.parse(fs.readFileSync(`${T}/decals.json`, "utf8")))) {
+    uvDecal(panelFace, d.rect, mat(`Print_${k}`, 0xffffff, { rough: 0.28 }), { name: `PrintDecal_${k}`, clip: true, nu: Math.ceil(0.499 * (d.rect[2] - d.rect[0]) / 0.01), nv: 24 });
+    printTex[`Print_${k}`] = `${T}/${d.file}`;
+  }
+  // raised keys: the three round buttons and the two framed keys stand 1.2 mm proud; their tops carry the panel print,
+  // from keys.jpg (the same drawing at 12 px per mm over the five keys; keys.json: its box as a fraction of the strip's u, v)
+  const KB = JSON.parse(fs.readFileSync(`${T}/keys.json`, "utf8")).rect;
+  const keyM = mat("KeyFace", 0xffffff, { rough: 0.28 });
+  const keyUV = (x, z) => { const [u, v] = panelUV(x, z); return [(u - KB[0]) / (KB[2] - KB[0]), (v - KB[1]) / (KB[3] - KB[1])]; };
   const key = (name, shape, cx, d) => {
     const z = zF - d;
     const g = new THREE.ExtrudeGeometry(shape, { depth: 0.0012, bevelEnabled: false, curveSegments: 24 });
@@ -348,10 +384,10 @@ const panelUV = (x, z) => { const d = zF - z; return [((600 + 2200 * x) - 48) / 
     g.translate(cx, 0, z);
     const p = g.attributes.position, u = g.attributes.uv;
     const base = panelY(d, cx);
-    for (let i = 0; i < p.count; i++) { const x = p.getX(i), zz = p.getZ(i); p.setY(i, panelY(zF - zz, x) + p.getY(i) + 0.0002); u.setXY(i, ...panelUV(x, zz)); }
+    for (let i = 0; i < p.count; i++) { const x = p.getX(i), zz = p.getZ(i); p.setY(i, panelY(zF - zz, x) + p.getY(i) + 0.0002); u.setXY(i, ...keyUV(x, zz)); }
     void base;
     g.computeVertexNormals();
-    cab.add(mesh(name, g, [panelM, black]));
+    cab.add(mesh(name, g, [keyM, black]));
   };
   const disc = (r) => { const s_ = new THREE.Shape(); s_.absarc(0, 0, r, 0, Math.PI * 2, false); return s_; };
   const rr = (w, h, r) => { const s_ = new THREE.Shape(); const x0 = -w / 2, y0 = -h / 2; s_.moveTo(x0 + r, y0); s_.lineTo(-x0 - r, y0); s_.absarc(-x0 - r, y0 + r, r, -Math.PI / 2, 0); s_.lineTo(-x0, -y0 - r); s_.absarc(-x0 - r, -y0 - r, r, 0, Math.PI / 2); s_.lineTo(x0 + r, -y0); s_.absarc(x0 + r, -y0 - r, r, Math.PI / 2, Math.PI); s_.lineTo(x0, y0 + r); s_.absarc(x0 + r, y0 + r, r, Math.PI, 1.5 * Math.PI); return s_; };
@@ -462,6 +498,7 @@ const clips = stateClips(root, parts);
 saveZones(PRODUCTS, ID, root, parts);
 await exportGLB(root, clips, OUT, {
   PanelFace: `${T}/panel.jpg`, PillowDrum: `${T}/drum.jpg`, Pulsator: `${T}/pulsator.jpg`, RidgePrint: `${T}/ridge_print.png`,
+  KeyFace: `${T}/keys.jpg`, ...printTex,
 }, { dir: `${TEX}/grain`, materials: {
   // Grain: the PCM cabinet and the grey top cover get the soft peel, the moulded plinth the strong peel; nothing on the
   // panel print, the glass or the black gloss lid

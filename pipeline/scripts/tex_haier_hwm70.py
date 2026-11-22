@@ -55,13 +55,7 @@ def load(name):
 # ───────────────────────── control panel ─────────────────────────
 top = load("W020231128540638969138_1200.jpg")
 X0, Y0, X1, Y1 = 48, 406, 1146, 566          # the black strip in the photo (its front edge arcs down to 563 at the middle)
-S = 7.2 / 2.2                                 # texture px per photo px: 7.2 px/mm
-CW, CH = int(round((X1 - X0) * S)), int(round((Y1 - Y0) * S))
-big = cv2.resize(top[Y0 - 4:Y1 + 4, X0 - 4:X1 + 4], None, fx=S, fy=S, interpolation=cv2.INTER_CUBIC)
-o = int(round(4 * S))
-big = big[o:o + CH, o:o + CW]
-blum = big.mean(2)
-canvas = np.zeros((CH, CW, 3), np.float32)
+PX_MM = 7.2                                   # the panel texture's px per mm (panel.jpg; the close-up decals are drawn at 12)
 
 
 def T(x, y):
@@ -76,20 +70,6 @@ def put(alpha, colour, x0, y0):
         return
     a = alpha[ys0 - y0:ys1 - y0, xs0 - x0:xs1 - x0][..., None]
     canvas[ys0:ys1, xs0:xs1] = canvas[ys0:ys1, xs0:xs1] * (1 - a) + np.array(colour, np.float32) * a
-
-
-# zones: gloss black ends (with the ribs), dark grey printed field, black display window. Photo colours:
-# black 0, field (54, 52, 53), display glass 0-7, its readout window (62, 58, 57)
-FIELD = (40, 39, 40)            # the photo's 54 under Haier's render light; the viewer adds about 25%
-BLACK = (9, 9, 10)
-canvas[...] = BLACK
-fx0, _ = T(253, 0)
-fx1, _ = T(953, 0)
-canvas[:, fx0:fx1] = FIELD
-wx0, _ = T(565, 0)
-wx1, _ = T(634, 0)
-canvas[:, wx0:wx1] = BLACK
-canvas += rng.normal(0, 0.5, (CH, CW, 1))
 
 
 def ink(win, thr, colour=None, soft=6.0, mode="light"):
@@ -154,8 +134,6 @@ def word(text, win, font=ARIAL_B, thr=110, colour=None):
     return (bx0, by0, bx1, by1)
 
 
-# slanted ribs in the two black ends: nine dark grey strokes each side (and the field's own edge), found on photo
-# rows 412 and 520 where the strip's grey frame is clear of them, and drawn straight from the strip's top to its bottom
 def rib_runs(y, lo, hi):
     row = cv2.resize(top[y:y + 1, 0:1200], None, fx=S, fy=1, interpolation=cv2.INTER_CUBIC).mean(2)[0]
     seg = row[int(lo * S):int(hi * S)] > 12
@@ -170,88 +148,119 @@ def rib_runs(y, lo, hi):
     return runs
 
 
-RIB = (34, 34, 36)
-for (lo, hi), (lo2, hi2) in (((95, 245), (95, 250)), ((955, 1092), (948, 1092))):
-    ra, rb = rib_runs(412, lo, hi), rib_runs(520, lo2, hi2)
-    assert len(ra) == len(rb), (ra, rb)
-    for (a0, a1), (b0, b1) in zip(ra, rb):
-        # centres from the runs, a constant 3.8 photo px (1.7 mm) stroke: the runs' own widths follow the photo's light
-        ca, cb = (a0 + a1) / 2, (b0 + b1) / 2
-        a0, a1, b0, b1 = ca - 1.9, ca + 1.9, cb - 1.9, cb + 1.9
-        def at(y, u0, u1, v0, v1):
-            t_ = (y - 412) / 108
-            return u0 + (v0 - u0) * t_, u1 + (v1 - u1) * t_
-        k = 4
-        img = Image.new("L", (CW * k // 8 + 8, CH * k), 0)        # draw at 4x in a strip wide enough
-        p0, p1 = at(Y0, a0, a1, b0, b1), at(Y1, a0, a1, b0, b1)
-        xs_min = min(p0[0], p1[0]) - 2
-        poly = [((p0[0] - xs_min) * S * k, 0), ((p0[1] - xs_min) * S * k, 0), ((p1[1] - xs_min) * S * k, CH * k), ((p1[0] - xs_min) * S * k, CH * k)]
-        ImageDraw.Draw(img).polygon(poly, fill=255)
-        a = cv2.resize(np.asarray(img).astype(np.float32) / 255, (img.width // k, CH), interpolation=cv2.INTER_AREA)
-        put(a, RIB, T(xs_min, 0)[0], 0)
-canvas[:, fx0:fx1] = FIELD
-canvas[:, wx0:wx1] = BLACK
+def draw_panel(px_mm):
+    """the control panel drawn at px_mm px per mm; returns the canvas"""
+    global S, CW, CH, big, o, blum, canvas, fx0, fx1, wx0, wx1
+    S = px_mm / 2.2                               # texture px per photo px (2.2 photo px per mm)
+    CW, CH = int(round((X1 - X0) * S)), int(round((Y1 - Y0) * S))
+    big = cv2.resize(top[Y0 - 4:Y1 + 4, X0 - 4:X1 + 4], None, fx=S, fy=S, interpolation=cv2.INTER_CUBIC)
+    o = int(round(4 * S))
+    big = big[o:o + CH, o:o + CW]
+    blum = big.mean(2)
+    canvas = np.zeros((CH, CW, 3), np.float32)
 
-# the Haier mark: the brand's own outline, silver as in the photo (198-214), fitted to the photo's box
-logo = np.asarray(Image.open(os.path.join(LOGOS, "haier.png")).convert("RGBA")).astype(np.float32)[..., 3] / 255
-ys, xs = np.where(logo > 0.05)
-logo = logo[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-lb = ink_box((140, 446, 252, 478), 120)
-put(cv2.resize(logo, (lb[2] - lb[0], lb[3] - lb[1]), interpolation=cv2.INTER_AREA), (206, 206, 210), lb[0], lb[1])
-word("7.0kg", (195, 479, 250, 497), font=ARIAL, thr=110, colour=(206, 206, 210))
 
-# water-level table
-word("Detergent", (366, 419, 410, 430))
-word("Flash", (434, 419, 462, 430))
-word("Normally on", (462, 419, 512, 430))
-rows = [(433, 444), (449, 460), (465, 476), (481, 492)]
-for (y0, y1), a, b, c in zip(rows, ["48L-54L", "39L-43L", "27L-33L", "15L-21L"], ["48L", "39L", "27L", "15L"], ["54L", "43L", "33L", "21L"]):
-    word(a, (380, y0, 412, y1), font=ARIAL, thr=105)
-    word(b, (437, y0, 460, y1), font=ARIAL, thr=105)
-    word(c, (472, y0, 496, y1), font=ARIAL, thr=105)
-    ink((365, y0, 381, y1), 70, colour="photo", soft=10)         # the tub icon (cyan water in the top two)
-ink((462, 428, 470, 505), 18, colour=(0, 0, 0), mode="dark", soft=4)   # the LED column
-ink((462, 428, 470, 505), 22, colour=(48, 46, 47), soft=6)              # its four slits
-disc(472.5, 517.5, 20.5, (6, 6, 7))
-ink((448, 495, 497, 537), 60, colour="photo", soft=10)           # its button ring and icon
-word("Water Level", (438, 537, 505, 551))
-word("Child Lock", (517, 528, 545, 535), thr=150)
-ink((520, 514, 541, 528), 80, soft=10)                           # the child-lock icon
-ink((496, 524, 516, 532), 60, soft=10)                           # the rule joining the two buttons, either side of its words
-ink((546, 524, 565, 532), 60, soft=10)
+    # zones: gloss black ends (with the ribs), dark grey printed field, black display window. Photo colours:
+    # black 0, field (54, 52, 53), display glass 0-7, its readout window (62, 58, 57)
+    FIELD = (40, 39, 40)            # the photo's 54 under Haier's render light; the viewer adds about 25%
+    BLACK = (9, 9, 10)
+    canvas[...] = BLACK
+    fx0, _ = T(253, 0)
+    fx1, _ = T(953, 0)
+    canvas[:, fx0:fx1] = FIELD
+    wx0, _ = T(565, 0)
+    wx1, _ = T(634, 0)
+    canvas[:, wx0:wx1] = BLACK
+    canvas += rng.normal(0, 0.5, (CH, CW, 1))
 
-# display window
-word("Remaining Minutes", (566, 436, 633, 446), thr=120)
-word("Delay Hours", (575, 476, 622, 487))
-x0, y0 = T(574, 447)
-x1, y1 = T(625, 473)
-canvas[y0:y1, x0:x1] = (44, 41, 40)
-disc(597.5, 517.5, 20.5, (6, 6, 7))
-ink((574, 495, 621, 538), 60, colour="photo", soft=10)
-word("Delay", (580, 539, 615, 553))
 
-# programme list
-for txt, win in [("Wash", (692, 432, 718, 443)), ("Rinse", (690, 448, 718, 459)), ("Spin", (692, 463, 718, 475)),
-                 ("Tub Dry", (680, 479, 718, 491)), ("Smart", (738, 432, 768, 443)), ("Soak", (738, 448, 766, 459)),
-                 ("Delicate", (737, 463, 776, 475)), ("Quick", (737, 479, 766, 491))]:
-    word(txt, win)
-for xx in ((718, 727), (736, 745)):
-    ink((xx[0], 428, xx[1], 506), 18, colour=(0, 0, 0), mode="dark", soft=4)
-    ink((xx[0], 428, xx[1], 506), 22, colour=(48, 46, 47), soft=6)
-disc(728, 517.5, 20.5, (6, 6, 7))
-ink((704, 495, 752, 537), 60, colour="photo", soft=10)
-word("Program", (704, 537, 752, 551))
+    # slanted ribs in the two black ends: nine dark grey strokes each side (and the field's own edge), found on photo
+    # rows 412 and 520 where the strip's grey frame is clear of them, and drawn straight from the strip's top to its bottom
+    RIB = (34, 34, 36)
+    for (lo, hi), (lo2, hi2) in (((95, 245), (95, 250)), ((955, 1092), (948, 1092))):
+        ra, rb = rib_runs(412, lo, hi), rib_runs(520, lo2, hi2)
+        assert len(ra) == len(rb), (ra, rb)
+        for (a0, a1), (b0, b1) in zip(ra, rb):
+            # centres from the runs, a constant 3.8 photo px (1.7 mm) stroke: the runs' own widths follow the photo's light
+            ca, cb = (a0 + a1) / 2, (b0 + b1) / 2
+            a0, a1, b0, b1 = ca - 1.9, ca + 1.9, cb - 1.9, cb + 1.9
+            def at(y, u0, u1, v0, v1):
+                t_ = (y - 412) / 108
+                return u0 + (v0 - u0) * t_, u1 + (v1 - u1) * t_
+            k = 4
+            img = Image.new("L", (CW * k // 8 + 8, CH * k), 0)        # draw at 4x in a strip wide enough
+            p0, p1 = at(Y0, a0, a1, b0, b1), at(Y1, a0, a1, b0, b1)
+            xs_min = min(p0[0], p1[0]) - 2
+            poly = [((p0[0] - xs_min) * S * k, 0), ((p0[1] - xs_min) * S * k, 0), ((p1[1] - xs_min) * S * k, CH * k), ((p1[0] - xs_min) * S * k, CH * k)]
+            ImageDraw.Draw(img).polygon(poly, fill=255)
+            a = cv2.resize(np.asarray(img).astype(np.float32) / 255, (img.width // k, CH), interpolation=cv2.INTER_AREA)
+            put(a, RIB, T(xs_min, 0)[0], 0)
+    canvas[:, fx0:fx1] = FIELD
+    canvas[:, wx0:wx1] = BLACK
 
-# keys: power (orange frame and symbol), start/pause (cyan)
-ink((820, 444, 870, 484), 60, colour=(238, 92, 24), soft=12)
-ink((772, 484, 822, 523), 60, colour=(40, 196, 236), soft=12)
+    # the Haier mark: the brand's own outline, silver as in the photo (198-214), fitted to the photo's box
+    logo = np.asarray(Image.open(os.path.join(LOGOS, "haier.png")).convert("RGBA")).astype(np.float32)[..., 3] / 255
+    ys, xs = np.where(logo > 0.05)
+    logo = logo[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    lb = ink_box((140, 446, 252, 478), 120)
+    put(cv2.resize(logo, (lb[2] - lb[0], lb[3] - lb[1]), interpolation=cv2.INTER_AREA), (206, 206, 210), lb[0], lb[1])
+    word("7.0kg", (195, 479, 250, 497), font=ARIAL, thr=110, colour=(206, 206, 210))
 
-# the four feature icons and their names, silver
-ink((925, 440, 1100, 471), 80, colour="photo", soft=12)
-for txt, win in [("FRESH AIR", (921, 472, 955, 478)), ("NZP", (967, 472, 984, 478)), ("AUTO RESTART", (1000, 470, 1050, 476)),
-                 ("OCEANUS WAVE", (1054, 470, 1104, 476))]:
-    word(txt, win, font=ARIAL_N, thr=70)
+    # water-level table
+    word("Detergent", (366, 419, 410, 430))
+    word("Flash", (434, 419, 462, 430))
+    word("Normally on", (462, 419, 512, 430))
+    rows = [(433, 444), (449, 460), (465, 476), (481, 492)]
+    for (y0, y1), a, b, c in zip(rows, ["48L-54L", "39L-43L", "27L-33L", "15L-21L"], ["48L", "39L", "27L", "15L"], ["54L", "43L", "33L", "21L"]):
+        word(a, (380, y0, 412, y1), font=ARIAL, thr=105)
+        word(b, (437, y0, 460, y1), font=ARIAL, thr=105)
+        word(c, (472, y0, 496, y1), font=ARIAL, thr=105)
+        ink((365, y0, 381, y1), 70, colour="photo", soft=10)         # the tub icon (cyan water in the top two)
+    ink((462, 428, 470, 505), 18, colour=(0, 0, 0), mode="dark", soft=4)   # the LED column
+    ink((462, 428, 470, 505), 22, colour=(48, 46, 47), soft=6)              # its four slits
+    disc(472.5, 517.5, 20.5, (6, 6, 7))
+    ink((448, 495, 497, 537), 60, colour="photo", soft=10)           # its button ring and icon
+    word("Water Level", (438, 537, 505, 551))
+    word("Child Lock", (517, 528, 545, 535), thr=150)
+    ink((520, 514, 541, 528), 80, soft=10)                           # the child-lock icon
+    ink((496, 524, 516, 532), 60, soft=10)                           # the rule joining the two buttons, either side of its words
+    ink((546, 524, 565, 532), 60, soft=10)
 
+    # display window
+    word("Remaining Minutes", (566, 436, 633, 446), thr=120)
+    word("Delay Hours", (575, 476, 622, 487))
+    x0, y0 = T(574, 447)
+    x1, y1 = T(625, 473)
+    canvas[y0:y1, x0:x1] = (44, 41, 40)
+    disc(597.5, 517.5, 20.5, (6, 6, 7))
+    ink((574, 495, 621, 538), 60, colour="photo", soft=10)
+    word("Delay", (580, 539, 615, 553))
+
+    # programme list
+    for txt, win in [("Wash", (692, 432, 718, 443)), ("Rinse", (690, 448, 718, 459)), ("Spin", (692, 463, 718, 475)),
+                     ("Tub Dry", (680, 479, 718, 491)), ("Smart", (738, 432, 768, 443)), ("Soak", (738, 448, 766, 459)),
+                     ("Delicate", (737, 463, 776, 475)), ("Quick", (737, 479, 766, 491))]:
+        word(txt, win)
+    for xx in ((718, 727), (736, 745)):
+        ink((xx[0], 428, xx[1], 506), 18, colour=(0, 0, 0), mode="dark", soft=4)
+        ink((xx[0], 428, xx[1], 506), 22, colour=(48, 46, 47), soft=6)
+    disc(728, 517.5, 20.5, (6, 6, 7))
+    ink((704, 495, 752, 537), 60, colour="photo", soft=10)
+    word("Program", (704, 537, 752, 551))
+
+    # keys: power (orange frame and symbol), start/pause (cyan)
+    ink((820, 444, 870, 484), 60, colour=(238, 92, 24), soft=12)
+    ink((772, 484, 822, 523), 60, colour=(40, 196, 236), soft=12)
+
+    # the four feature icons and their names, silver
+    ink((925, 440, 1100, 471), 80, colour="photo", soft=12)
+    for txt, win in [("FRESH AIR", (921, 472, 955, 478)), ("NZP", (967, 472, 984, 478)), ("AUTO RESTART", (1000, 470, 1050, 476)),
+                     ("OCEANUS WAVE", (1054, 470, 1104, 476))]:
+        word(txt, win, font=ARIAL_N, thr=70)
+    return canvas
+
+
+canvas = draw_panel(PX_MM)
 pan = Image.fromarray(np.clip(canvas, 0, 255).astype(np.uint8))
 save(pan, "panel.jpg", q=90)
 if DEBUG:
@@ -323,3 +332,37 @@ for i in range(N + 1):
 tile = cv2.GaussianBlur(tile, (0, 0), 0.8)
 drum = np.stack([tile * 178, tile * 182, tile * 188], -1)
 save(Image.fromarray(np.clip(drum, 0, 255).astype(np.uint8)).resize((256, 256), Image.LANCZOS), "drum.jpg")
+
+# ───────────────────────── the close-up print: the panel at 12 px per mm ─────────────────────────
+# panel.jpg (7.2 px per mm) covers the strip in one texture. For a shopper who steps up close the same panel is drawn again
+# by the same code at 12 px per mm (every word set again in its font, every icon cut from the enlarged photo with the same
+# hard threshold) and cut in two at the emptiest column of its middle, each half under the 4096 px a phone loads: panel_a.jpg
+# and panel_b.jpg, laid over the strip as decals 0.9 mm off it (decals.json: each half's u, v rectangle on the strip;
+# make_haier_hwm70.mjs lays them with decal_curved.mjs, clipped to the strip's crescent). The raised keys' tops take their
+# print from keys.jpg, the same drawing over the five keys (keys.json: its box as a fraction of the strip's u and v).
+import json
+HI, TEX_MAX = 12.0, 4096
+hi = draw_panel(HI)
+img = Image.fromarray(np.clip(hi, 0, 255).astype(np.uint8))
+Wd = hi.shape[1]
+lo_, hi_ = Wd - TEX_MAX + 16, TEX_MAX - 16
+inkc = (hi.max(2) > 60).sum(0).astype(np.float32)
+inkc = np.convolve(inkc, np.ones(25), "same")
+cut = int(lo_ + np.argmin(inkc[lo_:hi_]))
+rects = {}
+for key, (name, a0, a1) in {"panelA": ("panel_a.jpg", 0, cut), "panelB": ("panel_b.jpg", cut, Wd)}.items():
+    img.crop((a0, 0, a1, img.height)).save(os.path.join(D, name), quality=88, subsampling=0, optimize=True)
+    rects[key] = {"file": name, "rect": [a0 / Wd, 0, a1 / Wd, 1]}
+with open(os.path.join(D, "decals.json"), "w") as f:
+    json.dump(rects, f, indent=1)
+print("wrote panel_a.jpg, panel_b.jpg", img.size, "cut at", cut, "px; ink there", float(inkc[cut]))
+# the keys (make_haier_hwm70.mjs: round keys r 9.3 mm at x -58, -1.1, 58.2 mm, 30.2 mm behind the front; the framed keys
+# 20.5 x 15 and 20.5 x 15.5 mm at x 89.3 and 111.1 mm, 36.6 and 54.5 mm behind it), 1.5 mm round them
+kx0, kx1, kd0, kd1 = -0.058 - 0.0093 - 0.0015, 0.1111 + 0.01025 + 0.0015, 0.0302 - 0.0093 - 0.0015, 0.0545 + 0.00775 + 0.0015
+col = lambda x: (600 + 2200 * x - X0) * S
+row = lambda d: (584 - 2200 * d - Y0) * S
+kb = [int(np.floor(col(kx0))), int(np.floor(row(kd1))), int(np.ceil(col(kx1))), int(np.ceil(row(kd0)))]
+img.crop(tuple(kb)).save(os.path.join(D, "keys.jpg"), quality=90, subsampling=0, optimize=True)
+with open(os.path.join(D, "keys.json"), "w") as f:
+    json.dump({"rect": [kb[0] / Wd, kb[1] / hi.shape[0], kb[2] / Wd, kb[3] / hi.shape[0]]}, f, indent=1)
+print("wrote keys.jpg", kb[2] - kb[0], "x", kb[3] - kb[1])
