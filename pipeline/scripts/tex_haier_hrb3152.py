@@ -125,9 +125,161 @@ def badge():
 
 
 def display():
-    # the display window across the front of the fridge's ceiling (pmg_g06 x 432-548, rows 205-226), 4x LANCZOS
-    a = Image.open(os.path.join(SRC, "pmg_g06.jpg")).convert("RGB").crop((432, 205, 548, 226))
-    save(a.resize((a.width * 4, a.height * 4), Image.LANCZOS), "display.jpg", 92)
+    """The control display in the fridge's ceiling, drawn again at 12 px per mm.
+
+    The plane (226 x 40.9 mm) shows the housing's grey frame round a dark window, as on pmg_g06 (x 432-548, rows
+    205-226): the window's edges are measured there (top row 209.5, bottom 220; left x 439.2 -> 442.4, right 538.7 ->
+    536.2). What is in the window is read off Haier's own close-up of this display on the HRB-3152PKG-P page
+    (pkg_micom.jpg, "Internal MI-COM", lit): the keys R/F and Energy Saving (each "3 Sec" under it), a lit mode icon,
+    the temperature 02 with its unlit segments and minus, deg c, a two-step bar, the keys Ref. and Frz. Its layout matches
+    pmg_g06's (two framed keys left, digits and bar, two framed keys right, within 2 % of the width). The close-up's
+    window corners are mapped onto pmg_g06's by a homography; keys, words, digits and bar are drawn as shapes and type,
+    the icon and deg c are its own lit ink cut from a 16x enlargement. The unlit marks between the icon and the digits
+    can't be read: left dark.
+    """
+    PX = 12.0
+    Wmm, Hmm = 226.0, 226.0 * 84 / 464
+    CW, CH = round(Wmm * PX), round(Hmm * PX)
+    k = CW / 464                                         # canvas px per px of the old 464 x 84 crop (4x pmg_g06)
+    g6 = Image.open(os.path.join(SRC, "pmg_g06.jpg")).convert("RGB").crop((432, 205, 548, 226))
+    # the frame: the photo's grey, row by row as its two ends show it (columns clear of the window), smoothed; nothing
+    # is printed on it
+    g6a = np.asarray(g6).astype(np.float32)
+    rows = np.concatenate([g6a[:, :4], g6a[:, -4:]], 1).mean(1)           # 21 x 3
+    prof = cv2.resize(rows[:, None, :], (1, CH), interpolation=cv2.INTER_CUBIC)[:, 0, :]
+    prof = cv2.GaussianBlur(prof[:, None, :], (1, 0), sigmaX=0.1, sigmaY=1.5 * PX)[:, 0, :]
+    canvas = np.repeat(prof[:, None, :], CW, 1).astype(np.float32)
+
+    def to_c(x, y):                                     # pmg_g06 photo px -> canvas px
+        return (x - 432) * 4 * k, (y - 205) * 4 * k
+
+    win = [to_c(439.2, 209.5), to_c(538.7, 209.5), to_c(536.2, 220.0), to_c(442.4, 220.0)]
+    src = np.float32([[214.9, 309.4], [615.9, 308.5], [602.3, 348.3], [231.8, 352.1]])   # the same corners on pkg_micom
+    Hm = cv2.getPerspectiveTransform(src, np.float32(win))
+
+    def mp(pts):
+        p = cv2.perspectiveTransform(np.float32(pts).reshape(-1, 1, 2), Hm).reshape(-1, 2)
+        return [tuple(q) for q in p]
+
+    SS = 4
+
+    def layer():
+        return Image.new("L", (CW * SS, CH * SS), 0)
+
+    def put(lay, colour):
+        a = np.asarray(lay.resize((CW, CH), Image.BOX)).astype(np.float32)[..., None] / 255
+        canvas[...] = canvas * (1 - a) + np.array(colour, np.float32) * a
+
+    def poly(d, pts):
+        d.polygon([(x * SS, y * SS) for x, y in mp(pts)], fill=255)
+
+    WIN = (39, 39, 39)                                  # the window on pmg_g06
+    PRINT = (122, 124, 110)                             # the keys' frames and words: dim and warm, about 3x the window
+    LIT = (233, 236, 252)                               # the lit segments, icon and deg c (pkg_micom)
+    UNLIT = (64, 66, 74)                                # unlit segments, faint
+    BAR = (103, 109, 169)                               # the bar's upper step, lavender
+
+    lay = layer()
+    ImageDraw.Draw(lay).polygon([(x * SS, y * SS) for x, y in win], fill=255)
+    put(lay, WIN)
+
+    # the four framed keys: rounded frames about 1 px of the close-up wide (0.5 mm)
+    keys = {"R/F": (246.5, 320.0, 282.5, 342.8), "ES": (292.2, 320.0, 326.5, 342.8),
+            "Ref.": (518.5, 318.1, 550.6, 340.6), "Frz.": (558.5, 318.1, 590.9, 339.8)}
+    lay = layer()
+    d = ImageDraw.Draw(lay)
+    for x0, y0, x1, y1 in keys.values():
+        q = mp([(x0, y0), (x1, y1)])
+        (a0, b0), (a1, b1) = q
+        lw = 0.55 * PX * SS
+        d.rounded_rectangle((a0 * SS, b0 * SS, a1 * SS, b1 * SS), radius=1.4 * PX * SS, outline=255, width=round(lw))
+    put(lay, PRINT)
+
+    # their words, each fitted to the box its ink takes on the close-up
+    mic = np.asarray(Image.open(os.path.join(SRC, "pkg_micom.jpg")).convert("RGB")).astype(np.float32)
+    lum = mic.mean(2)
+
+    def ink_box(x0, y0, x1, y1):
+        c = lum[y0:y1, x0:x1]
+        t = (np.percentile(c, 97) + np.percentile(c, 30)) / 2
+        ys, xs = np.where(c > t)
+        return x0 + xs.min(), y0 + ys.min(), x0 + xs.max() + 1, y0 + ys.max() + 1
+
+    ARIAL = "/System/Library/Fonts/Supplemental/Arial.ttf"
+
+    def word(text, box):
+        f = ImageFont.truetype(ARIAL, 400)
+        im = Image.new("L", (int(f.getlength(text)) + 400, 800), 0)
+        ImageDraw.Draw(im).text((200, 600), text, font=f, fill=255, anchor="ls")
+        im = im.crop(im.getbbox())
+        (a0, b0), (a1, b1) = mp([(box[0], box[1]), (box[2], box[3])])
+        w, h = round((a1 - a0) * SS), round((b1 - b0) * SS)
+        lay = layer()
+        lay.paste(im.resize((w, h), Image.LANCZOS), (round(a0 * SS), round(b0 * SS)))
+        put(lay, PRINT)
+
+    word("R/F", (253.0, 327.0, 270.5, 336.5))                     # the reflection left of it upsets a threshold
+    word("Energy", ink_box(295, 322, 325, 331))
+    word("Saving", ink_box(295, 331, 325, 341))
+    word("Ref.", ink_box(521, 321, 548, 338))
+    word("Frz.", ink_box(561, 321, 588, 337))
+    # "3 Sec" under the first two keys: dim, just above the window's lower edge (read off an 8x enlargement; a threshold
+    # there catches the frame)
+    word("3 Sec", (255.6, 345.0, 274.4, 350.6))
+    word("3 Sec", (300.6, 345.0, 318.8, 350.4))
+
+    # the temperature: two seven-segment digits (outer boxes on the close-up), stroke 2.4 px, chamfered ends
+    def segs(x0, y0, x1, y1, t=2.4):
+        ym = (y0 + y1) / 2
+        c = t / 2
+        h = lambda xa, xb, y: [(xa + c, y), (xa + t, y - c), (xb - t, y - c), (xb - c, y), (xb - t, y + c), (xa + t, y + c)]
+        v = lambda x, ya, yb: [(x, ya + c), (x + c, ya + t), (x + c, yb - t), (x, yb - c), (x - c, yb - t), (x - c, ya + t)]
+        g = 0.35
+        return {"a": h(x0 + g, x1 - g, y0 + c), "g": h(x0 + g, x1 - g, ym), "d": h(x0 + g, x1 - g, y1 - c),
+                "f": v(x0 + c, y0 + g, ym - g), "e": v(x0 + c, ym + g, y1 - g),
+                "b": v(x1 - c, y0 + g, ym - g), "c": v(x1 - c, ym + g, y1 - g)}
+
+    lit, unlit = layer(), layer()
+    dl, du = ImageDraw.Draw(lit), ImageDraw.Draw(unlit)
+    for (box, on) in (((442.0, 317.8, 455.6, 342.8), "abcdef"), ((459.6, 317.6, 474.0, 342.8), "abged")):
+        for name, pts in segs(*box).items():
+            poly(dl if name in on else du, pts)
+    poly(du, [(433.3, 329.6), (438.0, 329.6), (438.0, 331.6), (433.3, 331.6)])      # the minus, unlit
+    put(unlit, UNLIT)
+    put(lit, LIT)
+
+    # the bar: two steps, the upper lavender, the lower lit
+    lay = layer()
+    poly(ImageDraw.Draw(lay), [(494.8, 317.4), (504.8, 317.4), (504.8, 328.8), (494.8, 328.8)])
+    put(lay, BAR)
+    lay = layer()
+    poly(ImageDraw.Draw(lay), [(494.8, 330.8), (504.8, 330.8), (504.8, 342.9), (494.8, 342.9)])
+    put(lay, LIT)
+
+    # the lit mode icon (a drop and a ring with two arcs round them) and deg c: the close-up's own lit ink (its blue
+    # channel), cut with a hard threshold from a 16x enlargement and warped onto the window
+    def lit_ink(x0, y0, x1, y1, thr):
+        E = 16
+        c = mic[y0:y1, x0:x1, 2]
+        b = cv2.resize(c, None, fx=E, fy=E, interpolation=cv2.INTER_CUBIC)
+        b = cv2.GaussianBlur(b, (0, 0), E * 0.3)
+        m = np.clip((b - thr) / 12 + 0.5, 0, 1).astype(np.float32)
+        S = np.float32([[1 / E, 0, x0], [0, 1 / E, y0], [0, 0, 1]])
+        Z = np.float32([[SS, 0, 0], [0, SS, 0], [0, 0, 1]])
+        w = cv2.warpPerspective(m, Z @ Hm @ S, (CW * SS, CH * SS), flags=cv2.INTER_LINEAR)
+        put(Image.fromarray(np.clip(w * 255, 0, 255).astype(np.uint8)), LIT)
+
+    lit_ink(343, 319, 371, 344, 130)
+    lit_ink(476, 332, 488, 344, 130)                    # the c
+    lay = layer()                                       # the degree ring: 3.4 px across, too small to cut, drawn
+    d = ImageDraw.Draw(lay)
+    for r, f in ((1.7, 255), (0.75, 0)):
+        q = mp([(479.8 - r, 329.6 - r), (479.8 + r, 329.6 + r)])
+        d.ellipse((q[0][0] * SS, q[0][1] * SS, q[1][0] * SS, q[1][1] * SS), fill=f)
+    put(lay, LIT)
+
+    canvas += np.random.default_rng(3152).normal(0, 0.6, canvas.shape)
+    save(Image.fromarray(np.clip(canvas, 0, 255).astype(np.uint8)), "display.jpg", 90)
 
 
 def duct():

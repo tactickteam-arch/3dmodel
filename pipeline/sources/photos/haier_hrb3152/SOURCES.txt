@@ -16,3 +16,6 @@ pkg_*: https://www.haier.com/in/refrigerators/265-litres-frost-free-bottom-mount
   g04 https://image.haier.com/in/refrigerators/W020250925473850192052_1200.jpg
   g05 https://image.haier.com/in/refrigerators/W020250925473850340369_1200.jpg
   g06 https://image.haier.com/in/refrigerators/W020250812766320148790_1200.jpg
+pkg_micom.jpg: Haier India's "Internal MI-COM" feature image on the HRB-3152PKG-P page (the Black Glass colour of this
+  fridge), the control display lit, close up; downloaded 23 Nov 2026:
+  https://image.haier.com/in/refrigerators/W020190925684399642850.jpg
