@@ -57,7 +57,7 @@
   .stage canvas { display: block; width: 100%; height: 100%; outline: none; }
   .glass { background: rgba(253,252,249,.94); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 
-  .hint { position: absolute; left: 20px; top: 20px; max-width: calc(100% - 300px); display: flex; align-items: center; gap: 9px; font-size: 13.5px; line-height: 1.35; color: var(--navy); padding: 10px 18px 10px 12px; border-radius: 999px; z-index: 5; transition: opacity .5s; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hint { position: absolute; left: 20px; top: 20px; max-width: calc(100% - 540px); display: flex; align-items: center; gap: 9px; font-size: 13.5px; line-height: 1.35; color: var(--navy); padding: 10px 18px 10px 12px; border-radius: 999px; z-index: 5; transition: opacity .5s; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hint span { overflow: hidden; text-overflow: ellipsis; }
   .hint b { font-weight: 600; }
   .hint svg { width: 18px; height: 18px; color: var(--copper-dk); flex: none; }
@@ -199,13 +199,44 @@
   /* in the headset the page sits behind; nothing on it is seen */
   body.in-xr .minimap, body.in-xr .tourbar, body.in-xr .hint, body.in-xr .tools, body.in-xr .labels, body.in-xr .pcard, body.in-xr .dock, body.in-xr .progress, body.in-xr .filters, body.in-xr .results { display: none !important; }
 
+
+  /* getting around: the move pad, the Go to menu, the first-visit coach and its "?" */
+  .tool.round { width: 40px; height: 40px; padding: 0; justify-content: center; font-size: 17px; font-weight: 700; }
+  .pad { position: absolute; right: 20px; bottom: calc(var(--dock-h) + 30px); z-index: 6; display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(2, 52px); gap: 6px; padding: 8px; border-radius: 18px; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .pad button { position: relative; border: 1px solid var(--hair); background: #fff; border-radius: 12px; display: grid; place-items: center; padding: 0; touch-action: none; -webkit-touch-callout: none; }
+  .pad button:hover { border-color: var(--navy); }
+  .pad button.on { background: var(--navy); color: var(--paper); border-color: var(--navy); }
+  .pad button svg { width: 22px; height: 22px; }
+  .pad kbd { position: absolute; right: 4px; bottom: 2px; font: inherit; font-size: 9.5px; font-weight: 600; color: var(--slate); letter-spacing: .3px; }
+  .pad button.on kbd { color: #C9C9CE; }
+  .pad [data-k="f"] { grid-column: 2; grid-row: 1; }
+  .pad [data-k="tl"] { grid-column: 1; grid-row: 2; }
+  .pad [data-k="b"] { grid-column: 2; grid-row: 2; }
+  .pad [data-k="tr"] { grid-column: 3; grid-row: 2; }
+  .gotomenu { position: absolute; right: 20px; top: 70px; z-index: 8; width: min(340px, calc(100% - 40px)); max-height: min(520px, calc(100% - var(--dock-h) - 110px)); overflow-y: auto; border-radius: 16px; padding: 8px; }
+  .gotomenu h3 { margin: 4px 8px 6px; font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate); }
+  .gotomenu button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; border-radius: 11px; padding: 8px; text-align: left; font-size: 14px; font-weight: 600; line-height: 1.25; }
+  .gotomenu button:hover, .gotomenu button:focus-visible { background: #F1F1F3; }
+  .gotomenu i { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--copper); color: var(--navy); font-style: normal; font-size: 13px; font-weight: 700; }
+  .gotomenu i.alt { background: #2A2A2D; color: var(--copper); }
+  .gotomenu small { display: block; font-size: 12px; font-weight: 500; color: var(--slate); }
+  .coach { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); z-index: 9; width: min(380px, calc(100% - 24px)); border-radius: 18px; padding: 18px 18px 14px; }
+  .coach .step { font-size: 11.5px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--copper-dk); }
+  .coach h2 { margin: 4px 0 6px; font-size: 19px; font-weight: 600; }
+  .coach p { margin: 0; font-size: 14.5px; line-height: 1.5; color: #2A2A2D; }
+  .coach .row { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+  .coach .dots { display: flex; gap: 5px; margin-right: auto; }
+  .coach .dots b { width: 7px; height: 7px; border-radius: 50%; background: #D6D6DA; }
+  .coach .dots b.on { background: var(--copper); }
+  .coach button { border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 8px 14px; font-size: 13.5px; font-weight: 600; }
+  .coach button.primary { background: var(--navy); color: var(--paper); border-color: var(--navy); }
+  body.in-xr .pad, body.in-xr .gotomenu, body.in-xr .coach { display: none !important; }
   @media (max-width: 900px) {
     header { height: 56px; padding: 0 16px; }
     .brand img { height: 28px; }
     .pill { display: none; }
     .stage { height: calc(100vh - 56px); height: calc(100dvh - 56px); }
     .hint { left: 12px; top: 12px; max-width: calc(100% - 170px); font-size: 12px; border-radius: 16px; white-space: normal; } /* (beside the folded floor plan) */
-    .progress { top: auto; bottom: calc(var(--dock-h) + 108px); } /* (above the two buttons) */
     .tools { right: 12px; top: auto; bottom: calc(var(--dock-h) + 12px); flex-direction: column; align-items: flex-end; }
     .tool { padding: 9px 14px 9px 11px; font-size: 13px; }
     .dock { left: 0; right: 0; bottom: 0; transform: none; width: 100%; border-radius: 18px 18px 0 0; padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
@@ -239,6 +270,13 @@
     .pparts button { padding: 7px 11px; font-size: 12.5px; }
     .pcard .go { margin-top: 8px; font-size: 13.5px; }
     .tools.carded { display: none; }
+    .tools .tool.round { width: 36px; height: 36px; font-size: 15px; }
+    .progress { top: auto; bottom: calc(var(--dock-h) + 214px); } /* (above the buttons and the move pad) */
+    .pad { right: auto; left: 12px; bottom: calc(var(--dock-h) + 12px); grid-template-columns: repeat(3, 54px); grid-template-rows: repeat(2, 54px); padding: 6px; gap: 6px; }
+    .pad kbd { display: none; }
+    .pad.carded, .stage.touring .pad { display: none; }
+    .gotomenu { left: 8px; right: 8px; top: auto; bottom: calc(var(--dock-h) + 8px); width: auto; max-height: 60%; }
+    .coach { top: 76px; }
   }
 </style>
 </head>
@@ -268,8 +306,20 @@
   <div class="tools" id="tools">
     <button class="tool glass" id="btnOverview" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M3 21h18M9 21v-6h6v6"/></svg>Whole showroom</button>
     <button class="tool glass" id="btnTour" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/></svg>Guided tour</button>
+    <button class="tool glass" id="btnGoto" type="button" aria-expanded="false" aria-controls="gotoMenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Go to</button>
+    <button class="tool glass round" id="btnHelp" type="button" aria-label="How to get around" title="How to get around">?</button>
     <button class="tool dark hide" id="btnVR" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="11" rx="4"/><circle cx="8" cy="12.5" r="2"/><circle cx="16" cy="12.5" r="2"/></svg>Step inside (VR)</button>
     <button class="tool dark hide" id="btnAR" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>In your room</button>
+  </div>
+  <div class="gotomenu glass hide" id="gotoMenu" role="menu" aria-label="Go to"></div>
+  <div class="pad glass" id="pad" role="group" aria-label="Walk and turn (hold to keep going)">
+    <button type="button" data-k="f" aria-label="Walk forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg><kbd>↑ W</kbd></button>
+    <button type="button" data-k="tl" aria-label="Turn left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-2"/></svg><kbd>←</kbd></button>
+    <button type="button" data-k="b" aria-label="Walk back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg><kbd>↓ S</kbd></button>
+    <button type="button" data-k="tr" aria-label="Turn right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h2"/></svg><kbd>→</kbd></button>
+  </div>
+  <div class="coach glass hide" id="coach" role="dialog" aria-labelledby="coachTitle"><div class="step" id="coachStep"></div><h2 id="coachTitle"></h2><p id="coachText"></p>
+    <div class="row"><div class="dots" id="coachDots"></div><button type="button" id="coachSkip">Skip</button><button type="button" class="primary" id="coachNext">Next</button></div>
   </div>
   <div class="pcard glass gone" id="pcard" role="dialog" aria-labelledby="pcName" aria-hidden="true" inert>
     <div class="top">

@@ -708,7 +708,7 @@ b.close();
   await br.viewport(1366, 768, false, MAC);
   // (the floor plan steps aside on the resize; a busy machine can take a few seconds to get there)
   const lapCheck = () => br.evalJS(`(() => {
-    const els = ["hint", "minimap", "tools", "pcard"].map((id) => document.getElementById(id))
+    const els = ["hint", "minimap", "tools", "pcard", "pad"].map((id) => document.getElementById(id))
       .filter((e) => e && e.offsetParent && !e.classList.contains("gone") && getComputedStyle(e).visibility !== "hidden").map((e) => [e.id, e.getBoundingClientRect()]);
     const out = [];
     for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const [a, r] = els[i], [c, u] = els[j];
@@ -752,7 +752,7 @@ b.close();
   // Tab reaches every control, in order
   const seen = [];
   await br.evalJS("document.activeElement?.blur()");
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 50; i++) {
     await br.send("Input.dispatchKeyEvent", { type: "rawKeyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
     await br.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
     seen.push(await br.evalJS("(document.activeElement.id || document.activeElement.className || document.activeElement.tagName) + ''"));
@@ -803,6 +803,78 @@ b.close();
   check(!e2.length, e2.length ? `console errors: ${e2.slice(0, 3).join(" | ")}` : "no console errors (a failed model is a warning, not an error)");
   br.close();
 
+  console.log("\n[getting around: the coach, Go to, the move pad, the floor arrows]");
+  br = await r4open(`${base}/showroom?coach`);
+  await r4ready(br); await r4settle(br);
+  let co = await r4sr(br, "coach()");
+  check(co.shown && co.step === 0, "on the first visit a short coach shows how to look around, walk and open a product");
+  await br.evalJS("document.getElementById('coachNext').click()");
+  co = await r4sr(br, "coach()");
+  const coText = await br.evalJS("document.getElementById('coachTitle').textContent");
+  check(co.shown && co.step === 1 && /walk/i.test(coText), `Next goes to its second step ("${coText}")`);
+  await br.evalJS("document.getElementById('coachSkip').click()");
+  check(!(await r4sr(br, "coach()")).shown, "Skip closes it");
+  await br.go(`${base}/showroom?coach`);
+  await r4ready(br); await r4settle(br);
+  check(!(await r4sr(br, "coach()")).shown, "and it isn't shown again in the same browser");
+  await br.evalJS("document.getElementById('btnHelp').click()");
+  co = await r4sr(br, "coach()");
+  check(co.shown && co.step === 0, "the ? button shows it again");
+  await br.evalJS("document.getElementById('coachSkip').click()");
+  // Go to: every place in the menu, and each one lands you there, on open floor at eye height
+  const gl6 = await r4sr(br, "layout()"), gos = await r4sr(br, "gotos()");
+  await br.evalJS("document.getElementById('btnGoto').click()");
+  await sleep(300);
+  const menuIds = await br.evalJS("[...document.querySelectorAll('#gotoMenu [data-go]')].map((b) => b.dataset.go)");
+  const wantIds = ["entrance", ...gl6.aisles.map((a, i) => `aisle-${i + 1}`), "living-room", "kitchen", "laundry", "logo-wall"];
+  check(wantIds.every((id) => menuIds.includes(id)) && menuIds.length === gos.length, `Go to lists the entrance, all ${gl6.aisles.length} aisles, the living-room wall, the kitchen, the laundry and the logo wall (${menuIds.length})`);
+  await br.evalJS("document.getElementById('btnGoto').click()");
+  const missed = [];
+  for (const g of gos) {
+    await br.evalJS("document.getElementById('btnGoto').click()");
+    await sleep(200);
+    await br.evalJS(`document.querySelector('#gotoMenu [data-go="${g.id}"]').click()`);
+    await r4settle(br);
+    const c = await r4sr(br, "camera()");
+    if (hyp(c.pos, g.pos) > 0.15 || Math.abs(c.pos[1] - 1.6) > 0.05 || !g.open || !(await r4sr(br, `walkableAt(${c.pos[0]}, ${c.pos[2]})`))) missed.push(`${g.id} (${c.pos})`);
+  }
+  check(!missed.length, `each of the ${gos.length} lands at its spot, at eye height on open floor${missed.length ? `; not: ${missed.slice(0, 3).join(", ")}` : ""}`);
+  check(await br.evalJS("document.getElementById('gotoMenu').classList.contains('hide')"), "and the menu closes once you go");
+  // the move pad: holding forward walks you forward, stays on open floor; holding a turn turns you
+  await br.evalJS("document.getElementById('btnGoto').click()"); await sleep(200);
+  await br.evalJS(`document.querySelector('#gotoMenu [data-go="aisle-2"]').click()`); await r4settle(br);
+  const padAt = (k) => br.evalJS(`(() => { const r = document.querySelector('#pad [data-k="${k}"]').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2, r.width, r.height]; })()`);
+  const holdPad = async (k, ms) => { const [x, y] = await padAt(k); await br.send("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", clickCount: 1 }); await sleep(ms); await br.send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", clickCount: 1 }); await sleep(700); };
+  const pf = await padAt("f");
+  check(pf[2] >= 44 && pf[3] >= 44 && (await br.evalJS("document.querySelector('#pad [data-k=\"f\"] kbd').textContent")).includes("W"), `the move pad sits above the dock at the bottom right, its buttons ${Math.round(pf[2])} px, marked with their keys`);
+  const p0 = await r4sr(br, "camera()");
+  await holdPad("f", 1500);
+  const p1 = await r4sr(br, "camera()");
+  check(p1.pos[2] < p0.pos[2] - 0.5 && Math.abs(p1.pos[0] - p0.pos[0]) < 0.3 && Math.abs(p1.pos[1] - 1.6) < 0.05, `holding its forward arrow walks you forward down the aisle (${p0.pos[2]} -> ${p1.pos[2]} m)`);
+  await holdPad("f", 9000);
+  const p2 = await r4sr(br, "camera()");
+  check(await r4sr(br, `walkableAt(${p2.pos[0]}, ${p2.pos[2]})`) && Math.abs(p2.pos[0]) < gl6.W / 2 && p2.pos[2] > -gl6.D && p2.pos[2] < p1.pos[2], `held on, it keeps walking and stays on open floor inside the hall, clear of every fixture and product (now at ${p2.pos})`);
+  const y0 = Math.atan2(p2.target[0] - p2.pos[0], p2.target[2] - p2.pos[2]);
+  await holdPad("tr", 900);
+  const p3 = await r4sr(br, "camera()"), y1 = Math.atan2(p3.target[0] - p3.pos[0], p3.target[2] - p3.pos[2]);
+  check(Math.abs(Math.atan2(Math.sin(y1 - y0), Math.cos(y1 - y0))) > 0.3 && hyp(p3.pos, p2.pos) < 0.05, "holding a turn arrow turns you where you stand");
+  // the floor plan: each aisle's number takes you to that aisle; "You are here" with the way you face
+  const ap = await r4sr(br, "mmAisle(3)");
+  for (const type of ["mousePressed", "mouseReleased"]) await br.send("Input.dispatchMouseEvent", { type, x: ap[0], y: ap[1], button: "left", clickCount: 1 });
+  await r4settle(br);
+  const p4 = await r4sr(br, "camera()"), g3 = gos.find((g) => g.id === "aisle-3");
+  check(hyp(p4.pos, g3.pos) < 0.15, `a tap on aisle 3's number on the floor plan takes you to aisle 3 (${p4.pos})`);
+  // the floor arrows: one at each aisle's door, a row along the front out to the side aisles, all on open floor
+  const arr = await r4sr(br, "arrows()"), fx6 = await r4sr(br, "fixtures()"), plan6 = await r4sr(br, "plan()");
+  const hit6 = (a, c, tol) => a.min[0] < c.max[0] - tol && c.min[0] < a.max[0] - tol && a.min[1] < c.max[1] - tol && c.min[1] < a.max[1] - tol && a.min[2] < c.max[2] - tol && c.min[2] < a.max[2] - tol;
+  const fa = fx6.filter((f) => f.tag === "floor arrow"), faBad = fa.filter((f) => fx6.some((g) => g.tag !== "floor arrow" && hit6(f, g, 0.001)) || plan6.some((p) => p.boxes.some((x) => hit6(f, x, 0.001))));
+  check(gl6.aisles.every((a) => arr.some((r) => Math.abs(r.x - a.mid) < 0.01 && r.ry === 0)) && arr.some((r) => r.ry !== 0) && arr.every((r) => r.open), `arrows on the floor: one into each aisle under its sign and ${arr.filter((r) => r.ry !== 0).length} along the front, all on open floor`);
+  check(fa.length === arr.length && !faBad.length, `none of them under a fixture or a product${faBad.length ? `: ${faBad.length}` : ""}`);
+  await br.shot(`${R}/getting-around.png`);
+  const e6 = errorsIn(br.logs);
+  check(!e6.length, e6.length ? `console errors: ${e6.slice(0, 3).join(" | ")}` : "no console errors");
+  br.close();
+
   console.log("\n[no WebGL]");
   br = await r4open(`${base}/showroom`, { flags: ["--disable-webgl", "--disable-3d-apis"] });
   await br.waitFor("!!document.getElementById('nogl')", 30000);
@@ -816,7 +888,7 @@ b.close();
   await r4ready(br);
   // the corner pieces (hint, floor plan, the buttons, the loading pill) never sit on each other
   const overlaps = () => br.evalJS(`(() => {
-    const els = ["hint", "minimap", "tools", "progress"].map((id) => document.getElementById(id))
+    const els = ["hint", "minimap", "tools", "progress", "pad"].map((id) => document.getElementById(id))
       .filter((e) => e && e.offsetParent && !e.classList.contains("gone") && !e.classList.contains("hide") && getComputedStyle(e).visibility !== "hidden").map((e) => [e.id, e.getBoundingClientRect()]);
     const out = [];
     for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const [a, r] = els[i], [c, u] = els[j];
@@ -888,6 +960,9 @@ b.close();
   check(!ff.length, `and of each other${ff.length ? `: ${[...new Set(ff)].slice(0, 4).join(", ")}` : ""}`);
   const gsw = await gsr(g, "swatches()"), gunw = await gsr(g, "unwashed()");
   const gbad = gsw.filter((s) => !s.clear || Math.max(...s.clear.got.map((v, i) => Math.abs(v - s.want[i]))) > 4);
+  const ggo = await gsr(g, "gotos()"), garr = await gsr(g, "arrows()");
+  check(ggo.length === gl.aisles.length + 5 && ggo.every((x) => x.open) && ggo.some((x) => /Microwave/.test(x.label)) && garr.length && garr.every((x) => x.open) && gl.aisles.every((a) => garr.some((r) => Math.abs(r.x - a.mid) < 0.01)),
+    `Go to grows with it (${ggo.length} places, the new aisle among them), each on open floor; a floor arrow at every aisle's door (${garr.length} arrows)`);
   check(!gbad.length && !gunw.length, `the new aisles and walls take the same colours (${gsw.map((s) => s.name.split(" ")[0]).join(", ")} as painted) and a scallop over every product${gbad.length ? `; off: ${gbad.map((s) => s.name).join(", ")}` : ""}${gunw.length ? `; no scallop over ${gunw.slice(0, 3).join(", ")}` : ""}`);
   const hb = await gsr(g, "hallBox()");
   const W0 = typeof lay !== "undefined" ? lay.W : 0;

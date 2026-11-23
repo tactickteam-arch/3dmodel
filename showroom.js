@@ -1047,6 +1047,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
   L.paint.backdrop = backdrop; L.backdrops = [];
   const backdropAt = (x0, x1) => { L.backdrops.push([x0, x1]); put(backdrop, new THREE.PlaneGeometry(x1 - x0, 2.77), [(x0 + x1) / 2, 2.77 / 2, -D + 0.002]); };
   if (kw > 2) {
+    L.kitchenX = kx;
     backdropAt(k0 - 0.25, k1 + 0.25);
     const zb = -D + 0.3, front = -D + 0.59;
     box(mats.trim, kw - 0.04, 0.1, 0.52, kx, 0.05, zb);
@@ -1098,6 +1099,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
   // folded towels in colour and a rail of hanging ones
   const l1 = W / 2 - 0.4, l0 = Math.max(LW / 2 + 0.5, l1 - 3.4), lx = (l0 + l1) / 2;
   if (l1 - l0 > 2) {
+    L.laundryX = lx;
     backdropAt(l0 - 0.25, l1 + 0.25);
     box(m.gloss, 0.6, 2.2, 0.6, l1 - 0.3, 1.1, -D + 0.31);
     box(m.steel, 0.012, 0.3, 0.016, l1 - 0.56, 1.1, -D + 0.62);
@@ -1207,6 +1209,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
         }
       };
       if (side === sofaSide) {
+        L.living = { px, face, zc, zA };
         // the sofa: light linen, low arms, two seat cushions and four soft ones against the back
         const SL = clamp(run - 1.5, 1.2, 2.4), sz = zc;
         for (const t of SL >= 1.9 ? [-0.25, 0.25] : [-0.2]) framed(sz + t * SL, 0.92);
@@ -1329,6 +1332,30 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
   const c = L.counter;
   plant(c.x[0] - 0.7, -D + 0.75); plant(c.x[1] + 0.7, -D + 0.75); // (far enough off the logo wall for the leaves)
   plant(-W / 2 + 0.45, 0.9, 1.2); plant(W / 2 - 0.45, 0.9, 1.2);
+
+  fixtureTag = "floor arrow";
+  // wayfinding on the floor in front of the hall: from where you come in, a row of arrows along the front out to
+  // the side aisles, and one at each aisle's door pointing in under its sign (any that would land on something
+  // else are left out)
+  const arrowMat = onTop(new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, toneMapped: false, opacity: 0.9, map: canvasTexture(128, 128, (g) => {
+    g.strokeStyle = COPPER; g.lineWidth = 20; g.lineCap = "round"; g.lineJoin = "round";
+    g.beginPath(); g.moveTo(24, 92); g.lineTo(64, 44); g.lineTo(104, 92); g.stroke();
+  }) }), 3);
+  arrowMat.userData.order = 1;
+  L.arrows = [];
+  const arrow = (x, z, ry) => {
+    const S = 0.42, box = [x - S / 2, x + S / 2, z - S / 2, z + S / 2];
+    if (fixtures.some((f) => f.tag !== "floor arrow" && f.box.min.x < box[1] && box[0] < f.box.max.x && f.box.min.z < box[3] && box[2] < f.box.max.z && f.box.min.y < 0.05)) return;
+    if (decor.some(([x0, x1, z0, z1]) => x0 < box[1] && box[0] < x1 && z0 < box[3] && box[2] < z1)) return;
+    put(arrowMat, flat(S, S), [x, 0.0025, z], [0, ry, 0]);
+    L.arrows.push([x, z, ry]);
+  };
+  const start = L.aisles[Math.floor((L.aisles.length - 1) / 2)].mid;
+  for (const a of L.aisles) arrow(a.mid, 0.45, 0);
+  for (const dir of [-1, 1]) {
+    const far = dir < 0 ? L.aisles[0].mid : L.aisles.at(-1).mid;
+    for (let x = start + dir * 0.9; dir * (far - x) > 0.3; x += dir * 1.2) arrow(x, 1.3, dir < 0 ? Math.PI / 2 : -Math.PI / 2);
+  }
 }
 
 fixtureTag = null;
@@ -1753,7 +1780,7 @@ const inModel = (s, o) => { for (; o && o !== s.group; o = o.parent) if (o === s
 const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const touch = matchMedia("(pointer: coarse)").matches || isPhone;
 $("hint").innerHTML = `${svg('<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"/><path d="M12 9.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.6 16a1.6 1.6 0 0 1 2.4-2.1L9 15.5"/>')}<span>${touch
-  ? "<b>Drag</b> to look around · <b>pinch</b> to zoom · <b>tap</b> a product, then a door to open it"
+  ? "<b>Drag</b> to look around · <b>hold the arrows</b> to walk · <b>tap</b> a product, then a door to open it"
   : "<b>Drag</b> to look around · <b>arrow keys</b> to walk · <b>/</b> to search · <b>click</b> a product to walk up to it, then a door to open it"}</span>`;
 let hintTimer = 0;
 const hintGone = () => { clearTimeout(hintTimer); hintTimer = setTimeout(() => $("hint").classList.add("gone"), 400); };
@@ -1805,7 +1832,7 @@ function measureTags() {
 }
 measureTags();
 document.fonts?.ready.then(() => { measureTags(); redraw(); });
-const FIXED = ["hint", "tools", "pcard", "dock", "minimap", "tourbar", "filters", "results", "progress"];
+const FIXED = ["hint", "tools", "pcard", "dock", "minimap", "tourbar", "filters", "results", "progress", "pad", "gotoMenu", "coach"];
 function fixedRects() {
   const st = stage.getBoundingClientRect();
   return FIXED.map((id) => $(id)).filter((e) => e && e.offsetParent && !e.classList.contains("gone") && getComputedStyle(e).opacity !== "0")
@@ -1879,6 +1906,7 @@ function renderCard() {
   card.setAttribute("aria-hidden", String(!s));
   card.inert = !s;
   $("tools").classList.toggle("carded", !!s);
+  $("pad").classList.toggle("carded", !!s);
   fitCamera();
   if (!s) return;
   const p = s.p;
@@ -2112,11 +2140,15 @@ const mm = { el: $("minimap"), cv: $("mmCanvas"), x0: -L.W / 2 - 0.3, x1: L.W / 
     const r = mm.cv.getBoundingClientRect(), x = mm.x0 + (e.clientX - r.left) / mm.k, z = mm.z0 + (e.clientY - r.top) / mm.k;
     stopTour(true);
     select(null);
+    // an aisle's number, under the plan: go to that aisle
+    const a = L.aisles.find((a) => Math.hypot(e.clientX - r.left - mmX(a.mid), e.clientY - r.top - mmLabelY()) < 9);
+    if (a) { goTo(gotoSpots().find((g) => g.aisle === a)); hintGone(); return; }
     walkTo(new THREE.Vector3(x, 0, z));
     hintGone();
   });
 }
 const mmX = (x) => (x - mm.x0) * mm.k, mmZ = (z) => (z - mm.z0) * mm.k;
+const mmLabelY = () => Math.min(mm.h - 7, mmZ(0) + 8); // the aisles' numbers, just outside the entrance
 function drawMinimap() {
   if (mm.el.classList.contains("closed") || xr) return;
   const g = mm.g;
@@ -2142,6 +2174,16 @@ function drawMinimap() {
   g.beginPath(); g.moveTo(px, pz); g.arc(px, pz, 22, -ang + Math.PI / 2 - 0.55, -ang + Math.PI / 2 + 0.55); g.closePath(); g.fill();
   g.fillStyle = "#F58A29"; g.strokeStyle = "#fff"; g.lineWidth = 2;
   g.beginPath(); g.arc(px, pz, 4.5, 0, Math.PI * 2); g.fill(); g.stroke();
+  // the aisles' numbers (tap one to go there), then "You are here" by the dot
+  g.font = `700 9px ${FONT}`; g.textAlign = "center"; g.textBaseline = "middle";
+  for (const a of L.aisles) {
+    const ax = mmX(a.mid), ay = mmLabelY();
+    g.fillStyle = "#2A2A2D"; g.beginPath(); g.arc(ax, ay, 6.5, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "#fff"; g.fillText(String(a.n), ax, ay + 0.5);
+  }
+  g.font = `600 10px ${FONT}`; g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,0.95)"; g.fillStyle = "#B85A12";
+  const ty = pz > 22 ? pz - 13 : pz + 15, tx = clamp(px, 32, mm.w - 32);
+  g.strokeText("You are here", tx, ty); g.fillText("You are here", tx, ty);
   mmDirty = false;
 }
 
@@ -2152,6 +2194,7 @@ const tourStops = [...new Set(L.aisles.map((a) => a.cat))].map((cat) => order.fi
 const tour = { on: false, playing: false, i: -1, timer: 0, kiosk: false };
 function tourShow() {
   $("tourbar").classList.toggle("hide", !tour.on);
+  stage.classList.toggle("touring", tour.on);
   if (!tour.on) return;
   const s = tourStops[tour.i];
   $("tourText").textContent = `Tour · ${tour.i + 1} of ${tourStops.length} · ${L.aisles.find((a) => a.cat === s.p.category).title}: ${s.p.brand} ${s.p.shortName}`;
@@ -2869,7 +2912,109 @@ function makeMenu() {
 
 // ── read-only views for automated checks ──
 const v3 = (v) => v.toArray().map((n) => +n.toFixed(3));
+
+// ── getting around, plainly: a move pad (hold to keep going), a Go to menu built from the layout, and a short coach
+// on the first visit (again from the "?") ──
+// the places to go: the entrance, every aisle with its brands, and the room sets and logo wall where there are any
+// (each spot nudged to the nearest bit of open floor)
+function gotoSpots() {
+  const V = (x, y, z) => new THREE.Vector3(x, y, z), out = [];
+  const add = (o) => {
+    let { pos } = o;
+    if (!walkable(pos.x, pos.z)) {
+      search: for (let r = 0.2; r < 4; r += 0.2) for (let i = 0; i < 16; i++) {
+        const x = pos.x + Math.cos(i * Math.PI / 8) * r, z = pos.z + Math.sin(i * Math.PI / 8) * r;
+        if (walkable(x, z)) { pos = V(x, EYE, z); break search; }
+      }
+    }
+    out.push({ ...o, pos });
+  };
+  const e = entranceView();
+  add({ id: "entrance", icon: "⌂", label: "Entrance", sub: "Where you came in", pos: e.pos, target: e.target });
+  for (const a of L.aisles) add({ id: `aisle-${a.n}`, aisle: a, icon: String(a.n), label: a.of > 1 ? `${a.title} ${a.part}` : a.title,
+    sub: [...new Set(a.items.map((p) => p.brand))].join(", "), pos: V(a.mid, EYE, 0.6), target: V(a.mid, 1.3, -Math.min(8, a.len * 0.6)) });
+  const lv = L.living;
+  if (lv) add({ id: "living-room", icon: "AC", label: "Air conditioners: living-room wall", sub: "The units over a sofa, as at home", pos: V(lv.px + lv.face * 2.4, EYE, Math.min(-0.6, lv.zA + 0.8)), target: V(lv.px, 1.4, lv.zc - 0.8) });
+  if (L.kitchenX != null) add({ id: "kitchen", icon: "K", label: "Kitchen", sub: "A fitted kitchen set", pos: V(L.kitchenX + 1.2, EYE, -L.D + 4.2), target: V(L.kitchenX, 1.1, -L.D) });
+  if (L.laundryX != null) add({ id: "laundry", icon: "L", label: "Laundry", sub: "A laundry corner", pos: V(L.laundryX - 1.2, EYE, -L.D + 4.2), target: V(L.laundryX, 1.1, -L.D) });
+  add({ id: "logo-wall", icon: "S", label: "Logo wall and counter", sub: "The back of the store", pos: V(0, EYE, L.counter.z[1] + 2.8), target: V(0, 1.5, -L.D) }); // (no higher than eye: the view never looks up)
+  return out;
+}
+let gotoLast = null;
+function goTo(g) {
+  if (!g) return;
+  stopTour(true); select(null); closeGoto(); hintGone();
+  const d = camera.position.distanceTo(g.pos);
+  gotoLast = g.id;
+  flyTo(g.pos.clone(), g.target.clone(), clamp(900 + d * 110, 1000, 2600));
+}
+function closeGoto() { $("gotoMenu").classList.add("hide"); $("btnGoto").setAttribute("aria-expanded", "false"); }
+$("btnGoto").addEventListener("click", (e) => {
+  e.stopPropagation();
+  const m = $("gotoMenu");
+  if (!m.classList.contains("hide")) { closeGoto(); return; }
+  const spots = gotoSpots();
+  m.innerHTML = `<h3>Go to</h3>${spots.map((g) => `<button type="button" role="menuitem" data-go="${esc(g.id)}"><i class="${g.aisle ? "" : "alt"}">${esc(g.icon)}</i><span>${esc(g.label)}<small>${esc(g.sub)}</small></span></button>`).join("")}`;
+  m.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => goTo(spots.find((g) => g.id === b.dataset.go))));
+  m.classList.remove("hide"); $("btnGoto").setAttribute("aria-expanded", "true");
+  $("filters").classList.add("hide"); $("results").classList.add("hide");
+  if (!e.detail) m.querySelector("button")?.focus({ preventScroll: true }); // (opened from the keyboard)
+});
+addEventListener("pointerdown", (e) => { if (!e.target.closest?.("#gotoMenu, #btnGoto")) closeGoto(); }, { capture: true });
+addEventListener("keydown", (e) => { if (e.key === "Escape") closeGoto(); });
+
+// the move pad: press and hold, as the arrow keys
+for (const b of $("pad").querySelectorAll("button")) {
+  const k = b.dataset.k;
+  const down = (e) => { e.preventDefault(); b.setPointerCapture?.(e.pointerId); stopTour(true); closeGoto(); keys.add(k); b.classList.add("on"); flight = null; hintGone(); walkTick(); };
+  const up = () => { keys.delete(k); b.classList.remove("on"); };
+  b.addEventListener("pointerdown", down);
+  for (const ev of ["pointerup", "pointercancel", "lostpointercapture"]) b.addEventListener(ev, up);
+  b.addEventListener("contextmenu", (e) => e.preventDefault());
+  // (from the keyboard: Enter or Space takes a short step or turn)
+  b.addEventListener("keydown", (e) => { if (e.key !== "Enter" && e.key !== " ") return; e.preventDefault(); e.stopPropagation(); keys.add(k); walkTick(); setTimeout(() => keys.delete(k), 350); });
+}
+
+// the coach: three short steps, once per browser; "?" shows it again
+const COACH_KEY = "sr-coach-1";
+const COACH = [
+  ["Look around", touch ? "Drag with one finger to look round. Pinch to zoom in and out." : "Drag with the mouse to look round. Scroll to zoom in and out."],
+  ["Walk", touch ? "Hold the arrows at the bottom to walk and turn. Go to takes you straight to any aisle, and the floor plan shows where you are." : "Hold the arrow keys (or W, A, S, D) or the arrows at the bottom right. Go to takes you straight to any aisle, and the floor plan shows where you are."],
+  ["Open a product", touch ? "Tap a product to walk up to it, then tap a door to open it. Or search for any model at the bottom." : "Click a product to walk up to it, then click a door to open it. Or press / to search for any model."],
+];
+const coach = { step: -1 };
+function coachShow(i) {
+  coach.step = i;
+  const on = i >= 0 && i < COACH.length;
+  $("coach").classList.toggle("hide", !on);
+  if (!on) return;
+  $("hint").classList.add("gone");
+  $("coachStep").textContent = `Step ${i + 1} of ${COACH.length}`;
+  $("coachTitle").textContent = COACH[i][0];
+  $("coachText").textContent = COACH[i][1];
+  $("coachDots").innerHTML = COACH.map((_, j) => `<b class="${j === i ? "on" : ""}"></b>`).join("");
+  $("coachNext").textContent = i === COACH.length - 1 ? "Start" : "Next";
+}
+function coachDone() { coachShow(-1); try { localStorage.setItem(COACH_KEY, "1"); } catch {} }
+$("coachNext").addEventListener("click", () => (coach.step + 1 < COACH.length ? coachShow(coach.step + 1) : coachDone()));
+$("coachSkip").addEventListener("click", coachDone);
+$("btnHelp").addEventListener("click", () => { closeGoto(); coachShow(0); });
+{
+  let seen = false;
+  try { seen = localStorage.getItem(COACH_KEY) === "1"; } catch {}
+  // (not over a link to a product or an aisle, a kiosk, or for a test browser unless it asks with ?coach)
+  const auto = !navigator.webdriver || params.has("coach");
+  if (!seen && auto && !KIOSK && !focusId && !params.has("q") && !params.has("aisle") && !xr) coachShow(0);
+}
+
 window.__showroom = {
+  // getting around: the Go to menu's places (where each lands, and whether that is open floor), the coach, the floor arrows
+  gotos: () => gotoSpots().map((g) => ({ id: g.id, label: g.label, pos: v3(g.pos), target: v3(g.target), open: walkable(g.pos.x, g.pos.z) })),
+  coach: () => ({ shown: !$("coach").classList.contains("hide"), step: coach.step }),
+  arrows: () => (L.arrows || []).map(([x, z, ry]) => ({ x: +x.toFixed(3), z: +z.toFixed(3), ry: +ry.toFixed(3), open: walkable(x, z) })),
+  walkableAt: (x, z) => walkable(x, z),
+  // where aisle n's number is on the floor plan, in page pixels (null when the plan is folded away)
+  mmAisle: (n) => { if (mm.el.classList.contains("closed")) return null; const a = L.aisles[n - 1], r = mm.cv.getBoundingClientRect(); return [r.left + mmX(a.mid), r.top + mmLabelY()]; },
   dimmed: () => slots.filter((s) => s.dim).map((s) => s.p.id),
   veils: () => veil.count,
   tour: () => ({ on: tour.on, playing: tour.playing, kiosk: tour.kiosk, at: tour.on ? tourStops[tour.i].p.id : null, stops: tourStops.map((s) => s.p.id) }),
