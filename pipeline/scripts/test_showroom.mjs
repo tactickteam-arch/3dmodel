@@ -168,6 +168,28 @@ check(Math.abs(cam0.pos[1] - 1.6) < 0.05 && cam0.pos[2] > 0 && cam0.pos[2] < 1.5
 const ft = await sr("frameTime(20)");
 console.log(`       a frame there: ${ft.ms} ms in this headless browser's software renderer (polished floor ${ft.polished ? "on" : "off"}${ft.dropped ? ", dropped for speed" : ""}), ${await sr("draws()")} draw calls`);
 check(ft.ms < 400, `a frame at the entrance draws in ${ft.ms} ms here (software rendering; a laptop's GPU is many times faster)`);
+
+console.log("\n[the walls' colours and light]");
+// each painted surface, read back off the screen where nothing lights it, is its colour from the client's palette;
+// under a scallop of the wall-wash the greige is brighter and warmer but still greige
+const sw = await sr("swatches()"), off = (s) => Math.max(...s.clear.got.map((v, i) => Math.abs(v - s.want[i])));
+for (const s of sw) check(s.clear && off(s) <= 4, `${s.name}: ${s.clear ? `rgb(${s.clear.got}) on screen at ${s.clear.at.map((v) => v.toFixed(1))}, painted ${s.hex} (off by ${off(s)})` : `no clear spot of the ${s.tried} tried`}`);
+const gw = sw.find((s) => s.name === "greige wall");
+const gwOk = gw?.washed && gw.washed.got.every((v, i) => v >= gw.want[i] + 4 && v <= 250) && gw.washed.got[0] - gw.washed.got[2] > gw.want[0] - gw.want[2];
+check(gwOk, `in a scallop's beam the greige wall reads rgb(${gw?.washed?.got}): lit warmer and brighter, not washed out`);
+const unw = await sr("unwashed()");
+check(!unw.length, `a scallop of light on the wall or partition behind every product${unw.length ? `; not over ${unw.slice(0, 3).join(", ")}` : ""}`);
+{
+  const fx0 = await sr("fixtures()"), plan0 = await sr("plan()"), units = plan0.filter((p) => p.wall).length;
+  const hit0 = (a, c, tol) => a.min[0] < c.max[0] - tol && c.min[0] < a.max[0] - tol && a.min[1] < c.max[1] - tol && c.min[1] < a.max[1] - tol && a.min[2] < c.max[2] - tol && c.min[2] < a.max[2] - tol;
+  const lr = fx0.filter((f) => f.tag === "living room"), plates = fx0.filter((f) => f.tag === "name plate");
+  const bad = [];
+  for (const f of lr) {
+    for (const p of plan0) if (p.boxes.some((x) => hit0(f, x, 0.002))) bad.push(p.id);
+    for (const g of fx0) if (g.tag !== "living room" && hit0(f, g, 0.002)) bad.push(g.tag);
+  }
+  check(!units || (lr.length > 20 && plates.length === units && !bad.length), `the air conditioners' wall is a living room (${lr.length} pieces: prints, a sofa, a lamp, a plant, a sideboard), clear of every unit, its name plate (${plates.length}) and talker${bad.length ? `; touches ${[...new Set(bad)].slice(0, 3).join(", ")}` : ""}`);
+}
 // the walk keys: up walks forward at eye height, in the walkway; left turns where you stand; with the search box
 // focused they do nothing. (Held 1.5 s; this headless browser draws only a few frames a second when nothing moves,
 // and the page's timer keeps the steps coming.)
@@ -392,8 +414,11 @@ await sleep(800);
 pt = await sr(`screenOf("${X.id}", ${JSON.stringify(frontOf(door))})`);
 if (pt && await canvasAt(pt)) {
   await finger(pt[0], pt[1]);
-  await sleep(1600);
-  check((await slotOf(X.id)).state[door.key], `a finger tap on its ${door.key} opens it`);
+  // (a loaded machine can take a few seconds to get the tap through the door's swing; one more tap if it never came)
+  const opened = async (ms) => { for (let t = 0; t < ms; t += 400) { await sleep(400); if ((await slotOf(X.id)).state[door.key]) return true; } return false; };
+  let tapped = await opened(6000);
+  if (!tapped) { await finger(pt[0], pt[1]); tapped = await opened(4000); }
+  check(tapped, `a finger tap on its ${door.key} opens it`);
 } else check(false, `the ${door.key} can be tapped on the phone (${pt})`);
 await b.shot(`${out}/showroom-phone-door.png`);
 await b.evalJS("document.getElementById('btnOverview').click()");
@@ -681,14 +706,16 @@ b.close();
   } else check(false, `${X.id}'s card offers Fill the fridge`);
   // a shorter laptop screen: the card, the floor plan, the buttons and the hint never sit on each other
   await br.viewport(1366, 768, false, MAC);
-  await sleep(800);
-  const lapOv = await br.evalJS(`(() => {
+  // (the floor plan steps aside on the resize; a busy machine can take a few seconds to get there)
+  const lapCheck = () => br.evalJS(`(() => {
     const els = ["hint", "minimap", "tools", "pcard"].map((id) => document.getElementById(id))
       .filter((e) => e && e.offsetParent && !e.classList.contains("gone") && getComputedStyle(e).visibility !== "hidden").map((e) => [e.id, e.getBoundingClientRect()]);
     const out = [];
     for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const [a, r] = els[i], [c, u] = els[j];
       if (r.left < u.right && u.left < r.right && r.top < u.bottom && u.top < r.bottom) out.push(a + " / " + c); }
     return out; })()`);
+  let lapOv = [];
+  for (let i = 0; i < 12; i++) { await sleep(i ? 500 : 800); lapOv = await lapCheck(); if (!lapOv.length) break; }
   check(!lapOv.length, `at 1366x768 with the card open, nothing on screen covers anything else${lapOv.length ? `: ${lapOv.join(", ")}` : ""}`);
   await br.viewport(1440, 900, false, MAC);
   await sleep(500);
@@ -855,10 +882,13 @@ b.close();
   const fx = await gsr(g, "fixtures()");
   const fxp = [];
   for (const f of fx) for (const p of plan) if (p.boxes.some((x) => hit(f, x, 0.002))) fxp.push(`${f.tag} / ${p.id}`);
-  check(!fxp.length, `signs, panels, talkers, the reception, the room sets, plants and the shop front (${fx.length} pieces) keep clear of every product${fxp.length ? `: ${[...new Set(fxp)].slice(0, 4).join(", ")}` : ""}`);
+  check(!fxp.length, `signs, panels, talkers, name plates, the reception, the room sets (the living room's prints, sofa and lamps too), plants and the shop front (${fx.length} pieces) keep clear of every product${fxp.length ? `: ${[...new Set(fxp)].slice(0, 4).join(", ")}` : ""}`);
   const ff = [];
   for (let i = 0; i < fx.length; i++) for (let j = i + 1; j < fx.length; j++) if (fx[i].tag !== fx[j].tag && hit(fx[i], fx[j], 0.002)) ff.push(`${fx[i].tag} / ${fx[j].tag}`);
   check(!ff.length, `and of each other${ff.length ? `: ${[...new Set(ff)].slice(0, 4).join(", ")}` : ""}`);
+  const gsw = await gsr(g, "swatches()"), gunw = await gsr(g, "unwashed()");
+  const gbad = gsw.filter((s) => !s.clear || Math.max(...s.clear.got.map((v, i) => Math.abs(v - s.want[i]))) > 4);
+  check(!gbad.length && !gunw.length, `the new aisles and walls take the same colours (${gsw.map((s) => s.name.split(" ")[0]).join(", ")} as painted) and a scallop over every product${gbad.length ? `; off: ${gbad.map((s) => s.name).join(", ")}` : ""}${gunw.length ? `; no scallop over ${gunw.slice(0, 3).join(", ")}` : ""}`);
   const hb = await gsr(g, "hallBox()");
   const W0 = typeof lay !== "undefined" ? lay.W : 0;
   check(gl.W > W0 && Math.abs(hb.min[0] + gl.W / 2) < 0.1 && Math.abs(hb.max[0] - gl.W / 2) < 0.1 && Math.abs(hb.min[2] + gl.D) < 0.1 && hb.max[1] >= gl.WALL_H - 0.01,

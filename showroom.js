@@ -90,6 +90,7 @@ const END = 0.8, CROSS = 2.2;       // after an aisle's last product; the cross 
 const MAX_RUN = 12;    // the longest row of products along one side of an aisle
 // partitions are low enough to see over from the overview; the one by a wall of air conditioners stands taller
 const PART_H = 2.05, PART_TALL = 2.6, WALL_H = 3.2;
+const FASCIA = 2.8;    // the charcoal band along the top of the hall's walls starts here
 const AC_Y = 2.05;     // an air conditioner's centre height, as in xr.js
 const RING_R = 2.4;    // passthrough: the ring round you
 const sizeOf = (p) => ({ w: cm(p.size.w) / 100, h: cm(p.size.h) / 100, d: cm(p.size.d) / 100 });
@@ -198,9 +199,10 @@ if (!renderer) {
 }
 renderer.setPixelRatio(Math.min(devicePixelRatio, light ? 1.5 : 2));
 renderer.setSize(stage.clientWidth, stage.clientHeight, false);
-// filmic tone mapping and a warm key light over a neutral studio environment, as a lit shop floor
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.92;
+// Khronos PBR Neutral tone mapping, as the product pages (model-viewer) and xr.js: the products keep their true
+// colours; a warm key light over a neutral studio environment, as a lit shop floor
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 0.85;
 renderer.setClearColor(0x000000, 0); // see-through where nothing is drawn: passthrough shows the room
 renderer.xr.enabled = true;
 renderer.domElement.style.touchAction = "none";
@@ -291,12 +293,22 @@ function bakeAll() {
 const flat = (w, d) => new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2); // on the floor, facing up
 let seed = 11;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-const CHARCOAL = "#28282B";
+// The client's palette for the walls (sRGB, as given): greige on the walls and partitions, champagne behind the room
+// sets, ice blue as the air conditioners' accent, charcoal on the feature surfaces and bands, ivory on the ceiling and
+// trim. The surfaces painted in it are drawn unlit and outside tone mapping, so on screen they are these very colours
+// wherever the wall-wash light doesn't add to them; the products keep the shop's lights.
+const PAL = { greige: "#D9D2C5", champagne: "#EEE8DC", ice: "#C8DCE7", charcoal: "#343A40", ivory: "#F7F6F2" };
+const CHARCOAL = PAL.charcoal;
+// an unlit surface in the palette (with the screen-space dither that keeps its gradients from banding)
+const paint = (map, color = 0xffffff) => new THREE.MeshBasicMaterial({ map, color, toneMapped: false, dithering: true });
 const mats = {
   floor: null,
   wall: null,
   part: null,
-  trim: new THREE.MeshStandardMaterial({ color: 0x29292c, roughness: 0.45, metalness: 0.2 }),
+  trim: new THREE.MeshStandardMaterial({ color: 0x343a40, roughness: 0.45, metalness: 0.2 }),
+  skirt: paint(null, new THREE.Color(PAL.ivory)),       // skirting along the walls and partitions
+  charcoal: paint(null, new THREE.Color(PAL.charcoal)), // the logo wall's face
+  warm: onTop(new THREE.MeshBasicMaterial({ color: 0xffd7a6, toneMapped: false }), 2), // warm LED lines (about 2800 K)
   plinth: new THREE.MeshStandardMaterial({ color: 0xf6f4f0, roughness: 0.38, metalness: 0 }),
   copper: new THREE.MeshStandardMaterial({ color: 0xf58a29, roughness: 0.4, metalness: 0.1 }),
   counterTop: new THREE.MeshStandardMaterial({ color: 0xfbfaf8, roughness: 0.25, metalness: 0 }),
@@ -372,15 +384,14 @@ mats.trim.userData.block = false;
   put(mats.trim, new THREE.BoxGeometry(W + 0.02, 0.03, 0.02), [0, -0.015, APRON]);
   for (const sx of [-1, 1]) put(mats.trim, new THREE.BoxGeometry(0.02, 0.03, APRON + SINK), [sx * (W / 2 + 0.01), -0.015, (APRON - SINK) / 2]);
 
-  // walls: warm white, darker just above the floor, a charcoal fascia along the top over a thin orange line
-  const FASCIA = 2.8;
-  mats.wall = new THREE.MeshStandardMaterial({ roughness: 0.92, map: stripTexture(WALL_H + SINK, -SINK, (g, w) => {
-    g.fillStyle = "#F2EFEA"; g.fillRect(0, -SINK, w, WALL_H + SINK);
-    const ao = g.createLinearGradient(0, 0, 0, 0.8); ao.addColorStop(0, "rgba(70,58,44,0.14)"); ao.addColorStop(1, "rgba(70,58,44,0)");
-    g.fillStyle = ao; g.fillRect(0, 0, w, 0.8);
+  // walls: greige, a little darker just above the floor, a charcoal fascia along the top over a thin orange line
+  mats.wall = paint(stripTexture(WALL_H + SINK, -SINK, (g, w) => {
+    g.fillStyle = PAL.greige; g.fillRect(0, -SINK, w, WALL_H + SINK);
+    const ao = g.createLinearGradient(0, 0, 0, 0.6); ao.addColorStop(0, "rgba(70,58,44,0.12)"); ao.addColorStop(1, "rgba(70,58,44,0)");
+    g.fillStyle = ao; g.fillRect(0, 0, w, 0.6);
     g.fillStyle = "#F58A29"; g.fillRect(0, FASCIA - 0.03, w, 0.03);
     g.fillStyle = CHARCOAL; g.fillRect(0, FASCIA, w, WALL_H - FASCIA + 0.01);
-  }) });
+  }));
   mats.wall.userData.block = true;
   // single-sided: the back, and the two sides from the entrance to the back
   const wall = (w, x, z, ry) => put(mats.wall, new THREE.PlaneGeometry(w, WALL_H + SINK), [x, (WALL_H - SINK) / 2, z], [0, ry, 0]);
@@ -389,8 +400,8 @@ mats.trim.userData.block = false;
   wall(D + SINK, W / 2, -(D + SINK) / 2, -Math.PI / 2);
   // skirting along the walls
   const SK = 0.1;
-  put(mats.trim, new THREE.BoxGeometry(W, SK + 0.02, 0.016), [0, (SK - 0.02) / 2, -D + 0.006]);
-  for (const sx of [-1, 1]) put(mats.trim, new THREE.BoxGeometry(0.016, SK + 0.02, D), [sx * (W / 2 - 0.006), (SK - 0.02) / 2, -D / 2]);
+  put(mats.skirt, new THREE.BoxGeometry(W, SK + 0.02, 0.016), [0, (SK - 0.02) / 2, -D + 0.006]);
+  for (const sx of [-1, 1]) put(mats.skirt, new THREE.BoxGeometry(0.016, SK + 0.02, D), [sx * (W / 2 - 0.006), (SK - 0.02) / 2, -D / 2]);
 
   // display partitions between the aisles: a pale panel, darker near the floor, a charcoal cap, skirting both sides,
   // and a charcoal trim on each end
@@ -398,13 +409,14 @@ mats.trim.userData.block = false;
   const partMats = new Map();
   const partMat = (H) => {
     if (!partMats.has(H)) {
-      const m = new THREE.MeshStandardMaterial({ roughness: 0.85, map: stripTexture(H + 0.02, -0.02, (g, w) => {
-        g.fillStyle = "#E7E2DA"; g.fillRect(0, -0.02, w, H + 0.02);
-        const ao = g.createLinearGradient(0, 0, 0, 0.7); ao.addColorStop(0, "rgba(70,58,44,0.13)"); ao.addColorStop(1, "rgba(70,58,44,0)");
-        g.fillStyle = ao; g.fillRect(0, 0, w, 0.7);
+      // (greige, as the walls)
+      const m = paint(stripTexture(H + 0.02, -0.02, (g, w) => {
+        g.fillStyle = PAL.greige; g.fillRect(0, -0.02, w, H + 0.02);
+        const ao = g.createLinearGradient(0, 0, 0, 0.6); ao.addColorStop(0, "rgba(70,58,44,0.12)"); ao.addColorStop(1, "rgba(70,58,44,0)");
+        g.fillStyle = ao; g.fillRect(0, 0, w, 0.6);
         g.fillStyle = "#F58A29"; g.fillRect(0, H - 0.18, w, 0.018);
         g.fillStyle = CHARCOAL; g.fillRect(0, H - 0.162, w, 0.2);
-      }) });
+      }));
       m.userData.block = true;
       partMats.set(H, m);
     }
@@ -416,7 +428,9 @@ mats.trim.userData.block = false;
     put(partMat(H), new THREE.BoxGeometry(PT, H + 0.02, LEN), [a.x1, (H - 0.02) / 2, -LEN / 2]);
     put(mats.trim, new THREE.BoxGeometry(PT + 0.02, 0.045, LEN - 0.01), [a.x1, H + 0.0125, -LEN / 2]); // the cap
     for (const zc of [-0.021, -LEN + 0.021]) put(mats.trim, new THREE.BoxGeometry(PT + 0.032, H + 0.08, 0.05), [a.x1, (H + 0.06) / 2, zc]);
-    for (const sx of [-1, 1]) put(mats.trim, new THREE.BoxGeometry(0.016, SK + 0.02, LEN - 0.02), [a.x1 + sx * (PT / 2 + 0.006), (SK - 0.02) / 2, -LEN / 2]);
+    for (const sx of [-1, 1]) put(mats.skirt, new THREE.BoxGeometry(0.016, SK + 0.02, LEN - 0.02), [a.x1 + sx * (PT / 2 + 0.006), (SK - 0.02) / 2, -LEN / 2]);
+    // a warm LED line up the middle of the partition's end, towards the entrance
+    put(mats.warm, new THREE.PlaneGeometry(0.012, H - 0.1), [a.x1, (H - 0.1) / 2 + 0.06, 0.005]);
   });
   // a soft shadow on the floor along every wall and partition
   const aoTex = canvasTexture(4, 128, (g) => { const gr = g.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, "rgba(30,24,18,0.22)"); gr.addColorStop(1, "rgba(30,24,18,0)"); g.fillStyle = gr; g.fillRect(0, 0, 4, 128); });
@@ -434,12 +448,13 @@ mats.trim.userData.block = false;
 
   // the ceiling (faces down only) with a light strip down each walkway and two across the back
   const ceilTex = canvasTexture(256, 256, (g) => {
-    g.fillStyle = "#F4F2EE"; g.fillRect(0, 0, 256, 256);
-    g.fillStyle = "rgba(150,140,125,0.35)"; g.fillRect(0, 0, 256, 2); g.fillRect(0, 0, 2, 256); g.fillRect(0, 127, 256, 2); g.fillRect(127, 0, 2, 256);
+    g.fillStyle = PAL.ivory; g.fillRect(0, 0, 256, 256);
+    g.fillStyle = "rgba(150,140,125,0.3)"; g.fillRect(0, 0, 256, 2); g.fillRect(0, 0, 2, 256); g.fillRect(0, 127, 256, 2); g.fillRect(127, 0, 2, 256);
   });
   ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping;
   ceilTex.repeat.set((W + 2 * SINK) / 1.2, (D + SINK) / 1.2);
-  const ceilMat = new THREE.MeshBasicMaterial({ map: ceilTex, color: 0xe6e2dc });
+  const ceilMat = paint(ceilTex);
+  L.paint = { wall: mats.wall, partitions: [...partMats.values()], ceiling: ceilMat }; // (for the palette check)
   put(ceilMat, new THREE.PlaneGeometry(W + 2 * SINK, D + SINK), [0, WALL_H, -(D + SINK) / 2], [Math.PI / 2, 0, 0]);
   // (each in a charcoal frame; all of them face down, so from above they vanish with the ceiling)
   const frameMat = new THREE.MeshBasicMaterial({ color: 0x3a3a3d });
@@ -477,18 +492,86 @@ mats.trim.userData.block = false;
       }
     }
   }
-  // the light washing down the hall's walls from the ceiling, in soft scallops
-  const washTex = canvasTexture(256, 256, (g) => {
-    const gr = g.createRadialGradient(128, -40, 10, 128, -40, 250);
-    gr.addColorStop(0, "rgba(255,238,210,0.5)"); gr.addColorStop(0.55, "rgba(255,238,210,0.16)"); gr.addColorStop(1, "rgba(255,238,210,0)");
-    g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  // Wall-wash: warm light (about 2800 K) from small recessed washers in the ceiling by the walls, spreading down each
+  // wall in a soft scallop, as in a lit shop: over every product's bay (on the hall's walls and the partitions),
+  // over the air conditioners, along the room sets and across the logo wall. One scallop texture (its falloff
+  // smooth, the dither on the material keeping it from banding), added to what is there; the lit walls take the
+  // warmth, the products keep their true colour.
+  // (eps, gp, fp: how tight the hot spot under the washer is and how fast the light falls off down the wall)
+  const scallopOf = (eps, gp, fp) => {
+    const w = 128, h = 256, c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d"), img = g.createImageData(w, h);
+    let peak = 0;
+    const v = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      // the washer sits a little above the top edge and out from the wall; the light grazes down the wall
+      const dx = (x + 0.5) / w - 0.5, dy = (y + 0.5) / h + 0.05, r = Math.hypot(dx * 1.9, dy), cone = Math.atan2(Math.abs(dx) * 1.9, dy);
+      const edge = Math.min(1, Math.max(0, (0.95 - cone) / 0.5)), beam = edge * edge * (3 - 2 * edge);
+      const graze = dy / Math.pow(r * r + eps, gp), foot = Math.pow(1 - (y + 0.5) / h, fp);
+      v[y * w + x] = beam * graze * foot; peak = Math.max(peak, v[y * w + x]);
+    }
+    for (let k = 0; k < w * h; k++) {
+      const a = Math.min(1, v[k] / peak * 1.1);
+      img.data.set([255, 180, 107, Math.round(a * 255)], k * 4); // (3000 K)
+    }
+    g.putImageData(img, 0, 0);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  };
+  const scallopTex = scallopOf(0.04, 1.1, 1.4), fanTex = scallopOf(0.14, 0.7, 0.8); // (a fuller fan for the air conditioners' wall)
+  const washMat = (k, map = scallopTex) => onTop(new THREE.MeshBasicMaterial({ map, color: new THREE.Color(k, k, k), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, dithering: true }), 1);
+  // (additive blending happens after the shader turns the colour to sRGB, so these small factors already add a lot)
+  const wash = washMat(0.2), washDark = washMat(0.5); // (on charcoal, more light to show the same glow)
+  // (over the air conditioners: the units hide the middle of a scallop, so theirs go between and beside them, stronger)
+  const washAC = washMat(0.42, fanTex); // (about as strong as the logo wall's)
+  const unitGaps = (units) => {
+    const u = [...units].sort((p, q) => q.pos[2] - p.pos[2]), hw = (pl) => sizeOf(pl.p).w / 2, out = [u[0].pos[2] + hw(u[0]) + 0.3];
+    for (let i = 0; i + 1 < u.length; i++) out.push((u[i].pos[2] - hw(u[i]) + u[i + 1].pos[2] + hw(u[i + 1])) / 2);
+    out.push(u.at(-1).pos[2] - hw(u.at(-1)) - 0.3);
+    return out;
+  };
+  L.paint.wash = wash;
+  // a scallop on a face: centred at u along it, its top at y; nx, nz: the face's direction
+  const scallop = (mat, x, z, ry, top, w = 1.3, h = 2.1) => put(mat, new THREE.PlaneGeometry(w, h), [x, top - h / 2, z], [0, ry, 0]);
+  L.wash = [];
+  const scallopAt = (mat, x, z, ry, top, w, h) => { scallop(mat, x, z, ry, top, w, h); L.wash.push([x, top - h * 0.55, z]); };
+  // the hall's own walls: one every 1.6 m or so, and one over each product standing against that wall instead
+  const LWALL = Math.min(7, W * 0.4);
+  const along = (from, to, at) => {
+    const n = Math.max(1, Math.round(Math.abs(to - from) / 1.6)), out = [];
+    for (let i = 0; i < n; i++) out.push(from + (to - from) * (i + 0.5) / n);
+    return out.filter((u) => !at.some((c) => Math.abs(c - u) < 0.9)).concat(at);
+  };
+  const onWall = (side) => L.places.filter((pl) => (side === "L" ? pl.aisle === L.aisles[0] : pl.aisle === L.aisles.at(-1)) && pl.side === side);
+  for (const [side, x, ry] of [["L", -W / 2 + 0.004, Math.PI / 2], ["R", W / 2 - 0.004, -Math.PI / 2]]) {
+    const units = onWall(side).filter((pl) => pl.p.placement === "wall");
+    for (const z of along(-0.6, -D + 0.6, onWall(side).filter((pl) => pl.p.placement !== "wall").map((pl) => pl.pos[2]).concat(units.length ? unitGaps(units) : []))) {
+      const ac = units.some((pl) => Math.abs(pl.pos[2] - z) < sizeOf(pl.p).w / 2 + 0.75);
+      scallopAt(ac ? washAC : wash, x, z, ry, FASCIA, ac ? 1.1 : 1.3, 2.1);
+    }
+  }
+  for (const x of along(-W / 2 + 0.6, W / 2 - 0.6, []).filter((u) => Math.abs(u) > LWALL / 2 + 0.5)) scallopAt(wash, x, -D + 0.004, 0, FASCIA, 1.3, 2.1);
+  // the logo wall: four across its face, the logo between the middle two
+  for (const f of [-0.375, -0.125, 0.125, 0.375]) scallopAt(washDark, f * LWALL, -D + 0.0805, 0, WALL_H - 0.05, 1.5, 2.6);
+  // the partitions: over each product's bay, on its own side, from just under the charcoal band
+  L.aisles.slice(0, -1).forEach((a, i) => {
+    const H = L.partH[i], top = H - 0.2;
+    for (const [isLeft, units] of [[true, L.places.filter((pl) => pl.aisle === a && pl.side === "R" && pl.p.placement === "wall")], [false, L.places.filter((pl) => pl.aisle === L.aisles[i + 1] && pl.side === "L" && pl.p.placement === "wall")]]) {
+      if (units.length) for (const z of unitGaps(units)) scallopAt(washAC, a.x1 + (isLeft ? -1 : 1) * (PT / 2 + 0.004), z, isLeft ? -Math.PI / 2 : Math.PI / 2, H - 0.2, 1.1, Math.min(1.9, H - 0.25));
+    }
+    for (const pl of L.places) {
+      const left = pl.aisle === a && pl.side === "R", right = pl.aisle === L.aisles[i + 1] && pl.side === "L";
+      if ((!left && !right) || pl.p.placement === "wall") continue;
+      const sw = Math.min(1.4, sizeOf(pl.p).w + 0.55);
+      scallopAt(wash, a.x1 + (left ? -1 : 1) * (PT / 2 + 0.004), pl.pos[2], left ? -Math.PI / 2 : Math.PI / 2, top, sw, Math.min(1.9, top - 0.05));
+    }
   });
-  washTex.wrapS = THREE.RepeatWrapping;
-  const washMat = (len) => { const m = onTop(new THREE.MeshBasicMaterial({ map: washTex.clone(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }), 1); m.map.repeat.set(Math.round(len / 1.8), 1); m.map.needsUpdate = true; return m; };
-  const WH = 2.1;
-  put(washMat(D), new THREE.PlaneGeometry(D, WH), [-W / 2 + 0.004, FASCIA - WH / 2, -D / 2], [0, Math.PI / 2, 0]);
-  put(washMat(D), new THREE.PlaneGeometry(D, WH), [W / 2 - 0.004, FASCIA - WH / 2, -D / 2], [0, -Math.PI / 2, 0]);
-  put(washMat(W), new THREE.PlaneGeometry(W, WH), [0, FASCIA - WH / 2, -D + 0.004], [0, 0, 0]);
+  // the washers themselves: a small round light in the ceiling over each scallop on the hall's walls
+  const washer = new THREE.CircleGeometry(0.045, 16).rotateX(Math.PI / 2);
+  for (const [x, , z] of L.wash) {
+    const ix = Math.abs(x) > W / 2 - 0.1 ? x - Math.sign(x) * 0.35 : x, iz = z < -D + 0.1 ? z + 0.35 : z;
+    if (Math.abs(x) > W / 2 - 0.1 || z < -D + 0.1) put(mats.warm, washer.clone(), [ix, WALL_H - 0.004, iz]);
+  }
 
   fixtureTag = "aisle sign";
   // a hanging sign at each aisle's entrance, both faces: its number, the category, how many and which brands
@@ -568,7 +651,9 @@ mats.trim.userData.block = false;
   fixtureTag = "reception";
   // the logo wall at the far end, with a counter in front of it
   const LW = Math.min(7, W * 0.4), LH = WALL_H;
-  put(mats.trim, new THREE.BoxGeometry(LW, LH + 0.02, 0.08), [0, (LH - 0.02) / 2, -D + 0.04]);
+  put(mats.charcoal, new THREE.BoxGeometry(LW, LH + 0.02, 0.08), [0, (LH - 0.02) / 2, -D + 0.04]);
+  // warm LED lines down both its sides, in the reveal against the greige wall
+  for (const sx of [-1, 1]) put(mats.warm, new THREE.PlaneGeometry(0.014, LH - 0.3), [sx * (LW / 2 + 0.001), (LH - 0.3) / 2 + 0.15, -D + 0.05], [0, sx * Math.PI / 2, 0]);
   const logo = new Image();
   const logoTex = canvasTexture(HQ ? 2048 : 1024, HQ ? 1024 : 512, () => {});
   const drawLogo = () => {
@@ -665,8 +750,10 @@ const logoTex = canvasTexture(1024, Math.max(512, 2 ** Math.ceil(Math.log2(Math.
     const s = sizeOf(pl.p), wall = pl.p.placement === "wall";
     frame.compose(new THREE.Vector3(pl.pos[0], 0, pl.pos[2]), Q.setFromEuler(E.set(0, pl.rot, 0)), ONE);
     if (wall) {
-      // its plate on the wall under it
+      // its plate on the wall under it (a fixture, so the layout checks keep the room sets' frames and lamps off it)
+      fixtureTag = "name plate";
       put(plateMat, plate(pl.p.id, 0.48), [0, pl.pos[1] - 0.16, 0.009], [0, 0, 0], frame);
+      fixtureTag = null;
       continue;
     }
     const maxD = deepest.get(`${L.aisles.indexOf(pl.aisle)}${pl.side}`), pw = s.w + 0.1, pd = maxD + 0.1;
@@ -755,7 +842,7 @@ const logoTex = canvasTexture(1024, Math.max(512, 2 ** Math.ceil(Math.log2(Math.
       const runBrands = [...new Set(list.map((pl) => pl.p.brand))];
       const draw = () => {
         lpg.setTransform(lk, 0, 0, lk, 0, 0);
-        const bg = lpg.createLinearGradient(0, cy, 0, cy + LP.h); bg.addColorStop(0, "#FFFFFF"); bg.addColorStop(1, "#F4F1EC");
+        const bg = lpg.createLinearGradient(0, cy, 0, cy + LP.h); bg.addColorStop(0, PAL.champagne); bg.addColorStop(1, PAL.greige);
         lpg.fillStyle = bg; lpg.fillRect(cx, cy, LP.w, LP.h);
         lpg.textAlign = "center"; lpg.textBaseline = "alphabetic";
         lpg.fillStyle = COPPER_DK; lpg.font = `600 20px ${FONT}`;
@@ -951,7 +1038,16 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
   // the kitchen: oak base cabinets with steel handles under a veined stone top, a sink and tap, a black glass hob,
   // a tiled splashback lit from under gloss-white wall cabinets, and a few things on the counter
   const k0 = -W / 2 + 0.4, k1 = Math.min(-LW / 2 - 0.5, k0 + 4.2), kw = k1 - k0, kx = (k0 + k1) / 2;
+  // (the room sets stand against champagne: a panel on the greige wall, floor to the orange line)
+  const backdrop = onTop(paint(stripTexture(2.77, 0, (g, w) => {
+    g.fillStyle = PAL.champagne; g.fillRect(0, 0, w, 2.77);
+    const ao = g.createLinearGradient(0, 0, 0, 0.6); ao.addColorStop(0, "rgba(70,58,44,0.12)"); ao.addColorStop(1, "rgba(70,58,44,0)");
+    g.fillStyle = ao; g.fillRect(0, 0, w, 0.6);
+  })), 1);
+  L.paint.backdrop = backdrop; L.backdrops = [];
+  const backdropAt = (x0, x1) => { L.backdrops.push([x0, x1]); put(backdrop, new THREE.PlaneGeometry(x1 - x0, 2.77), [(x0 + x1) / 2, 2.77 / 2, -D + 0.002]); };
   if (kw > 2) {
+    backdropAt(k0 - 0.25, k1 + 0.25);
     const zb = -D + 0.3, front = -D + 0.59;
     box(mats.trim, kw - 0.04, 0.1, 0.52, kx, 0.05, zb);
     box(m.white, kw, 0.78, 0.58, kx, 0.49, zb);
@@ -968,7 +1064,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
     box(m.gloss, kw, 0.7, 0.34, kx, 1.92, -D + 0.18);
     for (let i = 1; i < nd; i++) box(mats.trim, 0.006, 0.66, 0.005, k0 + dw * i, 1.92, -D + 0.352);
     for (let i = 0; i < nd; i++) box(m.steel, 0.012, 0.16, 0.016, k0 + dw * (i + 0.5) + (i % 2 ? -1 : 1) * (dw / 2 - 0.06), 1.66, -D + 0.36);
-    box(mats.light, kw - 0.1, 0.008, 0.02, kx, 1.565, -D + 0.3); // the light under the wall cabinets
+    box(mats.warm, kw - 0.1, 0.008, 0.02, kx, 1.565, -D + 0.3); // the warm LED line under the wall cabinets
     // the sink, its tap, the hob
     const sx = kx - kw * 0.22, hx = kx + kw * 0.24, zc = -D + 0.32;
     box(m.steel, 0.64, 0.006, 0.46, sx, TOP + 0.001, zc);
@@ -1002,6 +1098,7 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
   // folded towels in colour and a rail of hanging ones
   const l1 = W / 2 - 0.4, l0 = Math.max(LW / 2 + 0.5, l1 - 3.4), lx = (l0 + l1) / 2;
   if (l1 - l0 > 2) {
+    backdropAt(l0 - 0.25, l1 + 0.25);
     box(m.gloss, 0.6, 2.2, 0.6, l1 - 0.3, 1.1, -D + 0.31);
     box(m.steel, 0.012, 0.3, 0.016, l1 - 0.56, 1.1, -D + 0.62);
     box(m.vein, l1 - l0 - 0.6, 0.04, 0.62, lx - 0.3, TOP, -D + 0.31);
@@ -1021,6 +1118,8 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
     // shelves of folded towels, two to a stack
     for (const [s, y] of [[0, 1.5], [1, 1.88]]) {
       box(m.oak, l1 - l0 - 0.7, 0.03, 0.28, lx - 0.3, y, -D + 0.14);
+      box(mats.warm, l1 - l0 - 0.8, 0.006, 0.012, lx - 0.3, y - 0.018, -D + 0.25); // a warm LED line under the shelf
+      put(m.glow, new THREE.PlaneGeometry(l1 - l0 - 0.8, 0.4), [lx - 0.3, y - 0.2, -D + 0.006]);
       let x = l0 + 0.15;
       for (let n = 0; x < l1 - 0.95; n++) {
         const tw = 0.3;
@@ -1036,36 +1135,134 @@ const decor = [];  // footprints [x0, x1, z0, z1] you can't walk through
     decor.push([l0, l1, -D, -D + 0.65]);
   }
   fixtureTag = "living room";
-  // under the air conditioners, a living room: wooden slats on the wall, a sofa with cushions, a rug, a side
-  // table with a lamp, and a framed abstract print
-  const acs = L.places.filter((pl) => pl.p.placement === "wall");
-  if (acs.length) {
-    const a = acs[0].aisle, side = acs[0].side, face = side === "L" ? 1 : -1;
-    const outer = side === "L" ? a === L.aisles[0] : a === L.aisles.at(-1);
-    const px = side === "L" ? a.x0 + (outer ? 0 : PT / 2) : a.x1 - (outer ? 0 : PT / 2);
-    const zs = acs.filter((pl) => pl.side === side).map((pl) => pl.pos[2]), z0 = Math.min(...zs) - 0.5, z1 = Math.max(...zs) + 0.5;
-    for (let z = z1; z > z0; z -= 0.09) box(m.wood, 0.02, 1.45, 0.05, px + face * 0.012, 0.85, z - 0.025);
-    const zc = (z0 + z1) / 2, SL = Math.min(2.2, z1 - z0 - 1.2), X = (d) => px + face * d; // d: out from the wall
-    box(m.sofa, 0.86, 0.3, SL, X(0.49), 0.25, zc);                  // the base
-    box(mats.trim, 0.8, 0.1, SL - 0.1, X(0.49), 0.05, zc);           // its plinth
-    box(m.sofa, 0.2, 0.5, SL, X(0.16), 0.6, zc);                     // the back
-    for (const s of [-1, 1]) box(m.sofa, 0.86, 0.26, 0.16, X(0.49), 0.53, zc + s * (SL / 2 - 0.08)); // the arms
-    for (const s of [-1, 1]) box(m.sofa2, 0.62, 0.12, SL / 2 - 0.17, X(0.57), 0.46, zc + s * (SL / 4 - 0.04)); // seat cushions
-    [[-0.62, 0, 0.12], [-0.38, 1, -0.08], [0.42, 2, 0.1], [0.66, 0, -0.12]].forEach(([t, c, r]) =>
-      boxR(m.cushion[c], 0.12, 0.3, 0.3, [X(0.34), 0.64, zc + t * (SL / 2 - 0.22)], [r, 0, -face * 0.25]));
-    put(m.rug, flat(1.6, SL + 0.6), [X(1.05), 0.003, zc]);
-    // the side table and its lamp, past the sofa's arm
-    const tz = zc - SL / 2 - 0.35;
-    cyl(m.oak, 0.22, 0.22, 0.03, X(0.4), 0.52, tz, 28);
-    cyl(mats.trim, 0.02, 0.02, 0.5, X(0.4), 0.25, tz, 8);
-    cyl(mats.trim, 0.16, 0.16, 0.012, X(0.4), 0.006, tz, 20);
-    cyl(m.ceramic, 0.06, 0.08, 0.16, X(0.4), 0.615, tz, 20);
-    cyl(mats.trim, 0.008, 0.008, 0.14, X(0.4), 0.76, tz, 6);
-    cyl(m.shade, 0.12, 0.16, 0.2, X(0.4), 0.92, tz, 24);
-    // the print above the sofa
-    box(mats.trim, 0.03, 0.56, 0.84, X(0.04), 1.2, zc);
-    put(m.print, new THREE.PlaneGeometry(0.76, 0.48), [X(0.056), 1.2, zc], [0, face * Math.PI / 2, 0]);
-    decor.push([Math.min(px, X(1.0)), Math.max(px, X(1.0)), tz - 0.3, zc + SL / 2]);
+  // Under the air conditioners, a living room on every wall that carries them, as in the client's reference: each
+  // unit at its mounting height on the greige wall, an ice-blue band above the run, framed botanical line prints
+  // between the units, and below them a light linen sofa with cushions, a rug, a side table with a cream-shaded lamp
+  // and a plant (on the right-hand wall), or a low oak sideboard with a lamp and a vase (facing it). All of it stays
+  // under the units' name plates.
+  Object.assign(m, {
+    linen: new THREE.MeshStandardMaterial({ color: 0xcfc4b3, roughness: 0.96 }),
+    lightOak: new THREE.MeshStandardMaterial({ color: 0xd8bf99, roughness: 0.6 }),
+    linen2: new THREE.MeshStandardMaterial({ color: 0xdcd3c5, roughness: 0.96 }),
+    cushion: [0xf3efe7, 0xb6aa98, new THREE.Color(PAL.ice).getHex(), 0xefe9df].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.97 })),
+    shade: new THREE.MeshBasicMaterial({ color: 0xfbefd9, toneMapped: false }),
+    urn: new THREE.MeshStandardMaterial({ color: 0xf6f4ef, roughness: 0.25 }),
+    ice: onTop(paint(null, new THREE.Color(PAL.ice)), 1),
+    lampGlow: onTop(new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, dithering: true, map: canvasTexture(128, 128, (g) => {
+      const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, "rgba(255,214,160,0.55)"); gr.addColorStop(0.5, "rgba(255,214,160,0.16)"); gr.addColorStop(1, "rgba(255,214,160,0)");
+      g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+    }) }), 2),
+    rug: onTop(new THREE.MeshStandardMaterial({ roughness: 1, map: canvasTexture(512, 512, (g) => {
+      g.fillStyle = "#E4DCCD"; g.fillRect(0, 0, 512, 512);
+      g.strokeStyle = "#C9BBA5"; g.lineWidth = 10; g.strokeRect(22, 22, 468, 468);
+      for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(${rnd() < 0.5 ? "255,255,255" : "120,100,80"},0.07)`; g.fillRect(rnd() * 512, rnd() * 512, 2, 2); }
+    }) }), 2),
+  });
+  // three botanical line prints on cream, a cell each in one texture
+  m.prints = new THREE.MeshStandardMaterial({ roughness: 0.8, map: canvasTexture(768, 512, (g) => {
+    for (let c = 0; c < 3; c++) {
+      const x0 = c * 256;
+      g.fillStyle = "#EFE9DE"; g.fillRect(x0, 0, 256, 512);
+      g.fillStyle = "#F7F3EC"; g.fillRect(x0 + 34, 40, 188, 432);
+      g.strokeStyle = "#6F6A60"; g.lineWidth = 2.2; g.lineCap = "round";
+      const cx = x0 + 128, bend = (c - 1) * 18;
+      g.beginPath(); g.moveTo(cx, 430); g.quadraticCurveTo(cx + bend, 260, cx - bend * 0.5, 110); g.stroke();
+      for (let k = 0; k < 7; k++) {
+        const t = 0.15 + k * 0.11, y = 430 - t * 320, x = cx + bend * Math.sin(t * 3) * 0.6, sd = k % 2 ? 1 : -1, len = 46 - k * 3;
+        g.beginPath(); g.moveTo(x, y);
+        g.quadraticCurveTo(x + sd * len * 0.7, y - 16, x + sd * len, y - 34);
+        g.quadraticCurveTo(x + sd * len * 0.35, y - 26, x, y); g.stroke();
+      }
+    }
+  }) });
+  const prints = (cell, w, h) => { const g = new THREE.PlaneGeometry(w, h), uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setX(i, (cell + uv.getX(i)) / 3); return g; };
+  let printN = 0;
+  L.paint.ice = m.ice; L.iceBands = [];
+  for (const a of L.aisles) {
+    const sides = ["L", "R"].map((side) => ({ side, units: L.places.filter((pl) => pl.aisle === a && pl.side === side && pl.p.placement === "wall").sort((p, q) => q.pos[2] - p.pos[2]) })).filter((x) => x.units.length);
+    const sofaSide = sides.some((x) => x.side === "R") ? "R" : sides[0]?.side;
+    for (const { side, units } of sides) {
+      const ai = L.aisles.indexOf(a), face = side === "L" ? 1 : -1;
+      const outer = side === "L" ? ai === 0 : ai === L.aisles.length - 1;
+      const px = side === "L" ? a.x0 + (outer ? 0 : PT / 2) : a.x1 - (outer ? 0 : PT / 2), X = (d) => px + face * d, ry = face * Math.PI / 2;
+      const half = (pl) => sizeOf(pl.p).w / 2;
+      const zA = units[0].pos[2] + half(units[0]), zB = units.at(-1).pos[2] - half(units.at(-1)), zc = (zA + zB) / 2, run = zA - zB;
+      const plates = Math.min(...units.map((pl) => pl.pos[1])) - 0.2; // the bottom of the lowest name plate
+      // the ice-blue band over the run, between the units' tops and the wall's top line
+      const unitTop = Math.max(...units.map((pl) => pl.pos[1] + sizeOf(pl.p).h)), lineY = outer ? FASCIA - 0.03 : L.partH[side === "L" ? ai - 1 : ai] - 0.18;
+      const b0 = unitTop + 0.05, b1 = Math.min(lineY - 0.02, b0 + 0.3);
+      if (b1 - b0 > 0.08) { put(m.ice, new THREE.PlaneGeometry(run + 0.8, b1 - b0), [X(0.002), (b0 + b1) / 2, zc], [0, ry, 0]); L.iceBands.push({ x: X(0.002), y: (b0 + b1) / 2, z0: zc - run / 2 - 0.4, z1: zc + run / 2 + 0.4, face }); }
+      // a large botanical print (about 60 x 75 cm, light oak frame, cream mat) over the furniture, under the units'
+      // name plates; moved along the wall, or left out, where a plate or talker is in the way
+      const framed = (zc0, y0) => {
+        const FH = Math.min(0.75, plates - 0.12 - y0), FW = FH * 0.8;
+        if (FH < 0.4) return;
+        for (const dz of [0, 0.1, -0.1, 0.2, -0.2, 0.3, -0.3, 0.4, -0.4]) {
+          const z = zc0 + dz, b = { min: [Math.min(px, X(0.04)), y0, z - FW / 2 - 0.04], max: [Math.max(px, X(0.04)), y0 + FH + 0.08, z + FW / 2 + 0.04] };
+          if (fixtures.some((f) => f.tag !== "living room" && f.box.min.x < b.max[0] && b.min[0] < f.box.max.x && f.box.min.y < b.max[1] && b.min[1] < f.box.max.y && f.box.min.z < b.max[2] && b.min[2] < f.box.max.z)) continue;
+          const y = y0 + 0.04 + FH / 2;
+          box(m.lightOak, 0.03, FH + 0.07, FW + 0.07, X(0.015), y, z);
+          put(m.prints, prints(printN++ % 3, FW, FH), [X(0.031), y, z], [0, ry, 0]);
+          return;
+        }
+      };
+      if (side === sofaSide) {
+        // the sofa: light linen, low arms, two seat cushions and four soft ones against the back
+        const SL = clamp(run - 1.5, 1.2, 2.4), sz = zc;
+        for (const t of SL >= 1.9 ? [-0.25, 0.25] : [-0.2]) framed(sz + t * SL, 0.92);
+        box(m.linen, 0.88, 0.3, SL, X(0.5), 0.25, sz);
+        box(mats.trim, 0.8, 0.08, SL - 0.1, X(0.5), 0.04, sz);
+        box(m.linen, 0.2, 0.46, SL, X(0.16), 0.62, sz);
+        for (const k of [-1, 1]) box(m.linen, 0.88, 0.22, 0.15, X(0.5), 0.51, sz + k * (SL / 2 - 0.075));
+        for (const k of [-1, 1]) box(m.linen2, 0.64, 0.12, SL / 2 - 0.16, X(0.58), 0.46, sz + k * (SL / 4 - 0.04));
+        [[-0.66, 0, 0.1], [-0.36, 1, -0.06], [0.34, 2, 0.08], [0.64, 3, -0.1]].forEach(([t, c, r]) =>
+          boxR(m.cushion[c], 0.13, 0.34, 0.34, [X(0.34), 0.66, sz + t * (SL / 2 - 0.2)], [r, 0, -face * 0.22]));
+        put(m.rug, flat(1.5, SL + 0.5), [X(1.15), 0.003, sz]);
+        decor.push([Math.min(px, X(0.95)), Math.max(px, X(0.95)), sz - SL / 2 - 0.02, sz + SL / 2 + 0.02]);
+        // the side table and lamp past the far arm, a plant past the near one, where the run has room
+        const tz = sz - SL / 2 - 0.32;
+        if (tz - 0.26 > zB - 0.35) {
+          cyl(m.oak, 0.24, 0.24, 0.03, X(0.34), 0.56, tz, 28);
+          cyl(mats.trim, 0.018, 0.018, 0.54, X(0.34), 0.27, tz, 8);
+          cyl(mats.trim, 0.16, 0.16, 0.012, X(0.34), 0.006, tz, 20);
+          put(m.urn, new THREE.SphereGeometry(0.09, 20, 14).scale(1, 1.35, 1), [X(0.34), 0.575 + 0.12, tz]);
+          cyl(m.urn, 0.03, 0.05, 0.05, X(0.34), 0.6, tz, 16);
+          cyl(mats.trim, 0.007, 0.007, 0.12, X(0.34), 0.86, tz, 6);
+          cyl(m.shade, 0.13, 0.17, 0.24, X(0.34), 1.0, tz, 28);
+          put(m.lampGlow, new THREE.PlaneGeometry(1.1, 1.1), [X(0.006), 1.02, tz], [0, ry, 0]);
+          decor.push([Math.min(px, X(0.6)), Math.max(px, X(0.6)), tz - 0.26, tz + 0.26]);
+        }
+        const pz = sz + SL / 2 + 0.34;
+        if (pz + 0.26 < zA + 0.35) {
+          cyl(m.urn, 0.17, 0.13, 0.36, X(0.3), 0.18, pz, 20);
+          for (let n = 0; n < 9; n++) {
+            const ang = (n / 9) * Math.PI * 2 + rnd(), lh = 0.55 + rnd() * 0.3, tilt = 0.15 + rnd() * 0.3;
+            const leaf = new THREE.ConeGeometry(0.045, lh, 3).scale(1, 1, 0.25);
+            leaf.translate(0, lh / 2, 0);
+            leaf.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(tilt, ang, 0, "YXZ")));
+            put(n % 2 ? m.leaf : m.leaf2, leaf, [X(0.3) + Math.sin(ang) * 0.04, 0.34, pz + Math.cos(ang) * 0.04]);
+          }
+          decor.push([Math.min(px, X(0.56)), Math.max(px, X(0.56)), pz - 0.26, pz + 0.26]);
+        }
+      } else {
+        // a low oak sideboard on a charcoal plinth, a lamp at one end, a vase and books at the other
+        const SB = clamp(run - 1.2, 1.0, 1.8), sz = zc;
+        framed(sz + SB / 4, 0.95);
+        box(mats.trim, 0.38, 0.08, SB - 0.06, X(0.22), 0.04, sz);
+        box(m.oak, 0.42, 0.56, SB, X(0.23), 0.36, sz);
+        for (let k = 1; k < 3; k++) box(mats.trim, 0.004, 0.5, 0.004, X(0.442), 0.36, sz - SB / 2 + (SB * k) / 3);
+        const lz = sz - SB / 2 + 0.22;
+        put(m.urn, new THREE.SphereGeometry(0.08, 20, 14).scale(1, 1.3, 1), [X(0.23), 0.64 + 0.1, lz]);
+        cyl(mats.trim, 0.007, 0.007, 0.1, X(0.23), 0.88, lz, 6);
+        cyl(m.shade, 0.12, 0.155, 0.22, X(0.23), 1.0, lz, 28);
+        put(m.lampGlow, new THREE.PlaneGeometry(1.0, 1.0), [X(0.006), 1.02, lz], [0, ry, 0]);
+        const vz = sz + SB / 2 - 0.25;
+        cyl(m.ceramic, 0.06, 0.08, 0.26, X(0.25), 0.64 + 0.13, vz, 20);
+        box(m.cushion[1], 0.2, 0.05, 0.26, X(0.24), 0.665, vz - 0.22);
+        box(m.cushion[2], 0.18, 0.04, 0.24, X(0.24), 0.71, vz - 0.22);
+        decor.push([Math.min(px, X(0.5)), Math.max(px, X(0.5)), sz - SB / 2 - 0.02, sz + SB / 2 + 0.02]);
+      }
+    }
   }
   fixtureTag = "shop front";
   // the shop front, seen from inside: glass between slim charcoal mullions, an open door across each walkway
@@ -2708,6 +2905,57 @@ window.__showroom = {
   card: () => ({ shown: !$("pcard").classList.contains("gone"), name: $("pcName").textContent, link: $("pcLink").getAttribute("href") }),
   // a point in a product's own model space, on the screen
   screenOf: (id, p) => { const s = byId.get(id); const v = s.group.localToWorld(new THREE.Vector3(...p)).project(camera); const r = renderer.domElement.getBoundingClientRect(); return v.z > 1 ? null : [r.left + (v.x + 1) / 2 * r.width, r.top + (1 - v.y) / 2 * r.height]; },
+  // The palette as it shows on screen. For each painted surface, spots on it are tried until one has nothing in front
+  // of it from 2 m away; the view from there is drawn to the screen and the colour at the middle read back (the median
+  // of a 5x5 patch, sRGB). `clear`: a spot no wall-wash or lamp glow adds to; `washed`: one under a scallop's beam
+  // (the greige walls only), to see the light warms the wall and doesn't hide it.
+  swatches: () => {
+    const { W, D } = L, S = [];
+    const zs = (z0, z1, st = 0.2) => { const o = []; for (let z = z0; z >= z1; z -= st) o.push(z); return o; };
+    const xs = (x0, x1, st = 0.2) => { const o = []; for (let x = x0; x <= x1; x += st) o.push(x); return o; };
+    const walls = (y) => [...zs(-0.8, -D + 0.8).flatMap((z) => [[[-W / 2, y, z], [1, 0, 0]], [[W / 2, y, z], [-1, 0, 0]]]), ...xs(-W / 2 + 0.8, W / 2 - 0.8).map((x) => [[x, y, -D], [0, 0, 1]])];
+    S.push({ name: "greige wall", hex: PAL.greige, mats: [L.paint.wall], spots: [1.2, 1.5, 1.8].flatMap(walls) });
+    S.push({ name: "greige partition", hex: PAL.greige, mats: L.paint.partitions, spots: L.aisles.slice(0, -1).flatMap((a) => zs(-0.6, -L.LEN + 0.6).flatMap((z) => [1.2, 1.6].flatMap((y) => [[[a.x1 - PT / 2, y, z], [-1, 0, 0]], [[a.x1 + PT / 2, y, z], [1, 0, 0]]]))) });
+    S.push({ name: "charcoal fascia", hex: PAL.charcoal, mats: [L.paint.wall], spots: walls((FASCIA + WALL_H) / 2) });
+    S.push({ name: "ivory ceiling", hex: PAL.ivory, mats: [L.paint.ceiling], spots: xs(-W / 2 + 1, W / 2 - 1, 0.37).flatMap((x) => zs(-1, -D + 1, 0.53).map((z) => [[x, WALL_H, z], [0, -1, 0]])) });
+    S.push({ name: "champagne backdrop", hex: PAL.champagne, mats: [L.paint.backdrop], spots: L.backdrops.flatMap(([x0, x1]) => xs(x0 + 0.1, x1 - 0.1, 0.15).flatMap((x) => [1.0, 1.3, 2.2, 2.5].map((y) => [[x, y, -D], [0, 0, 1]]))) });
+    S.push({ name: "ice band", hex: PAL.ice, mats: [L.paint.ice], spots: L.iceBands.flatMap((b) => zs(b.z1 - 0.05, b.z0 + 0.05, 0.1).map((z) => [[b.x, b.y, z], [b.face, 0, 0]])) });
+    const gl = renderer.getContext(), cam = new THREE.PerspectiveCamera(40, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.05, 60);
+    const extra = (m) => m.blending === THREE.AdditiveBlending, px = new Uint8Array(5 * 5 * 4);
+    const read = (pos, n) => {
+      cam.position.set(pos[0] + 2 * n[0], pos[1] + 2 * n[1], pos[2] + 2 * n[2]);
+      if (n[1]) cam.up.set(0, 0, -1); else cam.up.set(0, 1, 0);
+      cam.lookAt(...pos); cam.updateMatrixWorld(true);
+      renderer.setRenderTarget(null); renderer.render(scene, cam);
+      gl.readPixels((gl.drawingBufferWidth >> 1) - 2, (gl.drawingBufferHeight >> 1) - 2, 5, 5, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      return [0, 1, 2].map((c) => { const v = []; for (let i = 0; i < 25; i++) v.push(px[i * 4 + c]); v.sort((a, b) => a - b); return v[12]; });
+    };
+    const hits = (pos, n) => {
+      const o = new THREE.Vector3(pos[0] + 2 * n[0], pos[1] + 2 * n[1], pos[2] + 2 * n[2]);
+      raycaster.set(o, new THREE.Vector3(-n[0], -n[1], -n[2])); raycaster.camera = camera;
+      return raycaster.intersectObjects(scene.children, true).filter((h) => (h.object.isMesh || h.object.isSprite) && shown(h.object) && h.object.material);
+    };
+    const out = S.map((s) => {
+      const r = { name: s.name, hex: s.hex, want: [1, 3, 5].map((i) => parseInt(s.hex.slice(i, i + 2), 16)), tried: s.spots.length };
+      for (const [pos, n] of s.spots) {
+        const hs = hits(pos, n), first = hs.find((h) => !extra(h.object.material));
+        if (!first || !s.mats.includes(first.object.material) || Math.abs(first.distance - 2) > 0.03) continue;
+        const lit = hs.filter((h) => h.distance < first.distance && extra(h.object.material));
+        if (!lit.length) { r.clear = { at: pos, got: read(pos, n) }; break; }
+      }
+      // in a scallop's beam on the hall's side walls, a little over halfway down it
+      for (const [x, y, z] of s.name === "greige wall" ? L.wash.filter(([x]) => Math.abs(x) > W / 2 - 0.1) : []) {
+        const pos = [Math.sign(x) * W / 2, y, z], n = [-Math.sign(x), 0, 0], hs = hits(pos, n), first = hs.find((h) => !extra(h.object.material));
+        if (first?.object.material !== L.paint.wall || Math.abs(first.distance - 2) > 0.03) continue;
+        if (hs.some((h) => h.distance < first.distance && h.object.material === L.paint.wash)) { r.washed = { at: pos, got: read(pos, n) }; break; }
+      }
+      return r;
+    });
+    redraw();
+    return out;
+  },
+  // products with no wall-wash scallop over their bay, on the wall or partition behind them (beside it, for a unit on the wall)
+  unwashed: () => L.places.filter((pl) => !L.wash.some(([x, , z]) => Math.abs(z - pl.pos[2]) < (pl.p.placement === "wall" ? sizeOf(pl.p).w / 2 + 0.35 : 0.05) && Math.abs(x - pl.pos[0]) < 1 && Math.sign(x - pl.pos[0]) === (pl.side === "L" ? -1 : 1))).map((pl) => pl.p.id),
   draws: () => lastCalls, // in the last frame, the polished floor's mirror image included
   // the time to draw a frame here and wait for it, in ms (the average of n), and whether the effects were dropped
   frameTime: (n = 20) => { pickFloor(camera); const gl = renderer.getContext(); renderer.render(scene, camera); gl.finish(); const t0 = performance.now(); for (let i = 0; i < n; i++) { renderer.render(scene, camera); gl.finish(); } return { ms: +((performance.now() - t0) / n).toFixed(1), polished: !!polished?.visible, dropped: perf.dropped }; },
