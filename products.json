@@ -24931,6 +24931,236 @@
           "show": "always"
         }
       ]
+    },
+    {
+      "id": "lg-tx310nwo",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Washing machine",
+      "model": "TX310NWO",
+      "name": "LG 10 kg AI Direct Drive top-load washing machine with TurboDrum",
+      "shortName": "10 kg AI Direct Drive top-load washer",
+      "summary": "Lift the tempered glass lid, pull out the detergent drawer and look into the TurboDrum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/lg-tx310nwo.glb",
+      "thumb": "/photos/lg-tx310nwo/0.jpg",
+      "photos": [
+        "/photos/lg-tx310nwo/0.jpg",
+        "/photos/lg-tx310nwo/1.jpg",
+        "/photos/lg-tx310nwo/2.jpg",
+        "/photos/lg-tx310nwo/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Onyx Black",
+          "swatchColor": "#0c0c0e",
+          "usdz": "/models/usdz/lg-tx310nwo-onyx-black.usdz",
+          "itemCode": "TX310NWO.ANBQEIL",
+          "code": "TX310NWO"
+        }
+      ],
+      "size": {
+        "w": "56.5 cm",
+        "h": "100.3 cm",
+        "d": "62 cm"
+      },
+      "sizeNote": "100.3 cm tall with the lid shut; with the lid open it is 127.5 cm",
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -100,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.281,
+                0.875,
+                -0.088
+              ],
+              [
+                0.281,
+                0.925,
+                0.307
+              ]
+            ],
+            "open": [
+              [
+                -0.281,
+                0.932,
+                -0.156
+              ],
+              [
+                0.281,
+                1.329,
+                -0.038
+              ]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent drawer",
+          "node": "DetergentDrawer",
+          "slide": [
+            0,
+            0,
+            0.14
+          ],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [
+                -0.143,
+                0.854,
+                -0.228
+              ],
+              [
+                0.073,
+                0.894,
+                -0.072
+              ]
+            ],
+            "open": [
+              [
+                -0.143,
+                0.854,
+                -0.088
+              ],
+              [
+                0.073,
+                0.894,
+                0.068
+              ]
+            ]
+          }
+        }
+      ],
+      "specs": [
+        [
+          "Capacity",
+          "10 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Energy rating",
+          "5 star, 0.0064 kWh/kg/cycle"
+        ],
+        [
+          "Motor",
+          "Inverter Direct Drive, AI DD and 6 Motion DD"
+        ],
+        [
+          "Wash",
+          "TurboDrum, TurboWash, JetSpray, Side Water Fall"
+        ],
+        [
+          "Drum",
+          "Semi stainless steel, embossed inner drum"
+        ],
+        [
+          "Programmes",
+          "Normal, Quick Wash, Hard Water, Soak + Normal, Tub Clean, AI Wash, Gentle, Duvet, Spin Only, Downloaded"
+        ],
+        [
+          "Lid",
+          "Tempered glass, soft closing"
+        ],
+        [
+          "Display",
+          "LED with 18:88 figures, delay end 3-19 hours"
+        ],
+        [
+          "Smart",
+          "LG ThinQ (Wi-Fi): remote start, Smart Diagnosis, energy monitoring"
+        ],
+        [
+          "Water",
+          "Cold only inlet; 10 water levels, 5 spin levels, rinse up to 5 times"
+        ],
+        [
+          "Weight",
+          "35 kg"
+        ]
+      ],
+      "source": "https://www.lg.com/in/laundry/top-loading-washing-machines/tx310nwo/",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/lg-10kg-top-load-washing-machine-ai-direct-drive-6-motion-dd-5-star-or-onyx-black-tx310nwoanbqeil/21239",
+      "hotspots": [
+        {
+          "title": "AI Direct Drive",
+          "text": "Auto detects the fabric type & weight and optimises every wash. Detects not only the weight, but also senses the softness of fabric, and it chooses the optimal motions for the fabric by itself.",
+          "pos": [
+            0.2194,
+            0.9904,
+            -0.2015
+          ],
+          "normal": [
+            0,
+            0.858,
+            0.514
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Water Resistant Control Panel",
+          "text": "Designed for damp environments with an IPX4 rating. The high waterproof rating and rear-mounted controls ensure lasting durability.",
+          "pos": [
+            -0.2209,
+            0.9498,
+            -0.1337
+          ],
+          "normal": [
+            0,
+            0.858,
+            0.514
+          ],
+          "show": "always"
+        },
+        {
+          "title": "TurboDrum",
+          "text": "TurboDrum™ for powerful wash: the drum and the pulsator turn in opposite directions for a strong water stream.",
+          "pos": [
+            0,
+            0.392,
+            0.09
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "Bigger Detergent Box & eZMix",
+          "text": "Bigger detergent box & eZMix ensure even detergent-softener mix for effortless washing and lasting fabric softness.",
+          "pos": [
+            -0.035,
+            0.874,
+            -0.0705
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "lid"
+        }
+      ],
+      "fit": {
+        "sides": 2,
+        "back": 10,
+        "top": 27.2,
+        "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 127.5 cm, so keep 27.2 cm free above it."
+      }
     }
   ]
 }
