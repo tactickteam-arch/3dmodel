@@ -1,0 +1,5 @@
+{
+  "sticksOut": {
+    "Door[A-Z]\\w*|Knob[A-Z]\\w*|DialLamp|Keys|Button[A-Z]\\w*|PrintDecal_(key|power|start)\\w*": "Samsung gives 59.5 cm for the cabinet and 63.5 cm to the front of the door (product page; manual DC68-04382A: C 595 mm to the cabinet's front, D 635 mm to the door's front). The door, the dial, the keys and buttons and the print on their faces stand in front of the cabinet."
+  }
+}

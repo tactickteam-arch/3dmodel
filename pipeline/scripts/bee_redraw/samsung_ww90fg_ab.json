@@ -1,0 +1,8 @@
+{
+  "_about": "Samsung WW90FG4U04ABTL (Black): Samsung's own 2024-26 label image for this model (Samsung India gallery, energy label), cut out by tex_bee_label.py (bee_cut_label_ab.png).",
+  "template": "sw2024",
+  "src": "pipeline/sources/photos/samsung_ww90fg/bee_cut_label_ab.png",
+  "out": "pipeline/tex/samsung_ww90fg/bee_label_ab.png",
+  "width_mm": 64,
+  "words": { "series": "2024 - 26", "value": "0.05", "type": "Front Load", "cap": "9.0", "model": "WW90FG4U04ABTL", "country": "India" }
+}
