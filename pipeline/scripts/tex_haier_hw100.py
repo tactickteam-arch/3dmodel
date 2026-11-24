@@ -19,8 +19,9 @@ strip's height comes from the front photo (rows 179-211: 771 to 737 mm).
 Text. Every word, number and icon is set again sharp: the words in Arial Narrow fitted to the ink boxes measured on 8x
 enlargements of the panel photo (Haier's print is a narrow grotesque), the badges' capitals in Arial Bold, the Haier wordmark
 from logos/haier.png, the time as outlined seven-segment digits, the keys' outlines and icons as drawn shapes. The small line
-icons beside the time (5 mm, 8 px in the photo) are the photo's own ink, enlarged with a hard edge: no sharper picture of this
-panel exists. The thirteen programme pictures are coloured art; they stay the photo's, enlarged and sharpened, with their
+icons beside the time (5 mm, 8 px in the photo): 9 are drawn as shapes, traced from Haier's own drawing of this display in its
+HW120-DM14F9 series manual (Fig. 3-4) where this model's photo confirms the same icon (bottle, shirt, iron, Wi-Fi, padlock,
+moon, the ringed tick, baby face, clock); the other 2 aren't in that drawing and stay the photo's own ink, enlarged. The thirteen programme pictures are coloured art; they stay the photo's, enlarged and sharpened, with their
 names set again.
 """
 import json
@@ -248,6 +249,45 @@ def icon(name):
     elif name == "diamonds":         # the dial's centre mark: four small diamonds in a diamond
         for cx, cy in ((200, 90), (90, 200), (310, 200), (200, 310)):
             d.polygon([(cx, cy - 80), (cx + 80, cy), (cx, cy + 80), (cx - 80, cy)], outline=255, width=26)
+    # the display's small status icons, traced from Haier's own drawing of this display (HW120-DM14F9 series manual,
+    # Fig. 3-4); only the ones this model's panel photo confirms in shape (see NOTES)
+    elif name == "wifi":             # three arcs over a dot
+        for r in (85, 165, 245):
+            arc(200, 330, r, 228, 312, 30)
+        d.ellipse([178, 318, 222, 362], fill=255)
+    elif name == "circ":             # a ring open at the lower right round a tick, a thin inner ring, a play mark in the gap
+        arc(200, 200, 168, 75, 375, 30); arc(200, 200, 118, 0, 360, 18)
+        ln([(140, 200), (188, 245), (265, 152)], 28)
+        d.polygon([(300, 272), (300, 372), (382, 322)], outline=255, width=22)
+    elif name == "padlock":          # a padlock: the shackle over a rounded body with a keyhole
+        arc(200, 165, 82, 180, 360, 30); ln([(118, 165), (118, 205)], 30); ln([(282, 165), (282, 205)], 30)
+        rr([78, 200, 322, 372], 30, 30); ln([(200, 262), (200, 306)], 30)
+    elif name == "face":             # a baby's face: the head with an ear each side, a curl of hair, two eyes, a smile
+        d.ellipse([60, 80, 340, 360], outline=255, width=30)
+        arc(48, 225, 34, 90, 270, 26); arc(352, 225, 34, 270, 450, 26)
+        arc(200, 108, 38, 180, 470, 22)
+        for x in (148, 252):
+            d.ellipse([x - 17, 205, x + 17, 239], fill=255)
+        arc(200, 255, 48, 25, 155, 24)
+    elif name == "moon":             # a crescent moon outline, two small stars at its lower right
+        yy, xx = np.mgrid[0:N, 0:N]
+        cres = ((xx - 175) ** 2 + (yy - 200) ** 2 < 165 ** 2) & ~((xx - 275) ** 2 + (yy - 130) ** 2 < 140 ** 2)
+        er = cv2.erode(cres.astype(np.uint8), np.ones((31, 31), np.uint8)).astype(bool)
+        a_ = np.asarray(im).copy(); a_[cres & ~er] = 255; im.paste(Image.fromarray(a_)); d = ImageDraw.Draw(im)
+        d.ellipse([262, 250, 326, 314], outline=255, width=24); d.ellipse([318, 318, 378, 378], fill=255)
+    elif name == "clock":            # a ring with its two hands at three o'clock
+        d.ellipse([35, 35, 365, 365], outline=255, width=30); ln([(200, 85), (200, 205), (292, 205)], 28)
+    elif name == "bottle":           # a milk bottle: cap, neck, shoulders, a level line across
+        ln([(165, 35), (235, 35)], 30)
+        ln([(168, 40), (168, 100), (112, 165), (112, 340), (140, 372), (260, 372), (288, 340), (288, 165), (232, 100), (232, 40)], 30)
+        ln([(112, 235), (288, 235)], 22)
+    elif name == "shirt":            # a T-shirt with short sleeves and a round neck
+        ln([(145, 55), (55, 100), (20, 190), (95, 215), (100, 368), (300, 368), (305, 215), (380, 190), (345, 100), (255, 55),
+            (230, 95), (170, 95), (145, 55)], 30)
+    elif name == "iron":             # a clothes iron's sole, its curved nose at the left, the handle rising to a knob
+        pts = [(30 + 200 * t_, 340 - 175 * math.sin(t_ * math.pi / 2)) for t_ in np.linspace(0, 1, 9)]
+        ln(pts + [(355, 165), (370, 340), (30, 340)], 36)
+        ln([(250, 165), (325, 62)], 32); d.ellipse([312, 22, 372, 82], outline=255, width=24)
     return crop_ink(np.asarray(im.resize((N // (2 if HI else 4), N // (2 if HI else 4)), Image.LANCZOS)).astype(np.float32) / 255, 0.15)
 
 
@@ -313,6 +353,16 @@ def photo_art(c, box, k_sharp=0.8, thr=14):
     ya, xa = round(Y0), round(X0)
     a = c.a[ya:ya + h, xa:xa + w]
     a[:] = a * (1 - m[..., None]) + big * m[..., None]
+
+
+def ink_box(box, thr=0.45):
+    """The extent of the photo's light ink inside box (photo px), to the half pixel."""
+    x0, y0, x1, y1 = (math.floor(box[0]), math.floor(box[1]), math.ceil(box[2]), math.ceil(box[3]))
+    L = photo()[y0:y1, x0:x1].max(2)
+    bg = np.percentile(L, 30)
+    n = np.clip((L - bg) / max(L.max() - bg, 1), 0, 1)
+    ys, xs = np.where(n > thr)
+    return (x0 + xs.min() - 0.25, y0 + ys.min() - 0.25, x0 + xs.max() + 1.25, y0 + ys.max() + 1.25)
 
 
 def photo_ink(c, box, colour, thr=0.38):
@@ -392,10 +442,16 @@ def panel():
     for x0, x1 in ((382, 398), (405, 420.5)):
         c.rule(x0, x1, 640.2, 0.9, GREY)
     c.cap("AI", 427.2, 435, 621.5, 628.6, WHITE, ARIAL)
-    for box in ((426.5, 631, 436, 643), (426, 644, 436, 654), (437.5, 619, 448, 631), (437.5, 631.5, 448, 643),
-                (437.5, 644, 448, 654), (532, 620, 542.5, 630), (532, 632, 542, 642.5), (532, 644, 542.5, 654),
-                (543.5, 620, 554, 630.5), (542.5, 632, 554.5, 643), (543.5, 644, 554, 654)):
-        photo_ink(c, box, WHITE)
+    # the 11 small icons beside the time: 9 drawn as shapes (each fitted to the ink box this model's photo shows for it), the
+    # 2 the manual's drawing doesn't confirm kept as the photo's own ink
+    for name, box in (("bottle", (426.5, 631, 436, 643)), ("shirt", (426, 644, 436, 654)), (None, (437.5, 619, 448, 631)),
+                      ("iron", (437.5, 631.5, 448, 643)), (None, (437.5, 644, 448, 654)), ("wifi", (532, 620, 542.5, 630)),
+                      ("padlock", (532, 632, 542, 642.5)), ("moon", (532, 644, 542.5, 654)), ("circ", (543.5, 620, 554, 630.5)),
+                      ("face", (542.5, 632, 554.5, 643)), ("clock", (543.5, 644, 554, 654))):
+        if name:
+            c.place(icon(name), ink_box(box), WHITE)
+        else:
+            photo_ink(c, box, WHITE)
     for x0 in (449, 468, 492.5, 511):
         seven(c, (x0, 621, x0 + 15.5, 652.5), WHITE)
     for y in (628.5, 639.5):
