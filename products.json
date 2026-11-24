@@ -26048,6 +26048,245 @@
       ]
     },
     {
+      "id": "ifb-tl751ms2sid",
+      "brand": "IFB",
+      "brandLogo": "/logos/ifb.png",
+      "category": "Washing machine",
+      "model": "TL751MS2SID",
+      "name": "IFB 7.5 kg top-load washing machine with Ai, Power Steam and Eco Inverter Motor",
+      "shortName": "7.5 kg Power Steam top-load washer",
+      "summary": "Lift the tinted glass lid, pull out the ActivMix tray and look into the drum with its triadic pulsator, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/ifb-tl751ms2sid.glb",
+      "thumb": "/photos/ifb-tl751ms2sid/0.jpg",
+      "photos": [
+        "/photos/ifb-tl751ms2sid/0.jpg",
+        "/photos/ifb-tl751ms2sid/1.jpg",
+        "/photos/ifb-tl751ms2sid/2.jpg",
+        "/photos/ifb-tl751ms2sid/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Mystic Silver",
+          "swatchColor": "#8e8e90",
+          "usdz": "/models/usdz/ifb-tl751ms2sid-mystic-silver.usdz",
+          "itemCode": "TL751MS2SID",
+          "code": "TL751MS2SID"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -95,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.271,
+                0.861,
+                -0.152
+              ],
+              [
+                0.271,
+                0.914,
+                0.283
+              ]
+            ],
+            "open": [
+              [
+                -0.271,
+                0.914,
+                -0.19
+              ],
+              [
+                0.271,
+                1.352,
+                -0.1
+              ]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "ActivMix tray",
+          "node": "DetergentDrawer",
+          "slide": [
+            0,
+            0,
+            0.1
+          ],
+          "needs": "lid",
+          "zone": {
+            "closed": [
+              [
+                -0.1,
+                0.837,
+                -0.248
+              ],
+              [
+                0.1,
+                0.877,
+                -0.141
+              ]
+            ],
+            "open": [
+              [
+                -0.1,
+                0.837,
+                -0.148
+              ],
+              [
+                0.1,
+                0.877,
+                -0.041
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.3 cm",
+        "h": "94.6 cm",
+        "d": "57.5 cm"
+      },
+      "sizeNote": "94.6 cm tall with the lid shut; IFB gives no height with the lid open",
+      "specs": [
+        [
+          "Capacity",
+          "7.5 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Max spin",
+          "720 rpm"
+        ],
+        [
+          "Motor",
+          "Eco Inverter Motor, 10 years motor warranty"
+        ],
+        [
+          "Energy",
+          "5 star (BEE), 0.0065 kWh/kg/cycle on its energy label"
+        ],
+        [
+          "Water",
+          "20 L/kg/cycle on its energy label"
+        ],
+        [
+          "Programmes",
+          "9: Mix/Daily, Cotton, Express 30', Delicates, Baby Wear, StainFighter, Bulky, Anti-Allergen and Tub Clean"
+        ],
+        [
+          "Features",
+          "Ai, Power Steam with in-built heater, Aqua Energie, ActivMix, Pre Clean, Shower Rinse, Air Dry, Delay Start, Auto Tub Clean"
+        ],
+        [
+          "Wash",
+          "Triadic pulsator, lint tower filter; hot wash at 40 and 60 °C and Steam; 10 water levels"
+        ],
+        [
+          "Controls",
+          "Membrane keys with tactile switches, amber LED display, panel at the back"
+        ],
+        [
+          "Lid",
+          "Tinted glass, soft close"
+        ],
+        [
+          "Safety",
+          "Child lock, auto imbalance correction, programme memory backup, high and low voltage protection"
+        ],
+        [
+          "Colour",
+          "Mystic Silver"
+        ],
+        [
+          "Supply",
+          "220-240 V, single phase, 50 Hz, 16 A"
+        ],
+        [
+          "Weight",
+          "31 kg"
+        ],
+        [
+          "Warranty",
+          "4 years on the machine, 10 years on the motor, 10 years spare parts support"
+        ]
+      ],
+      "source": "https://www.ifbappliances.com/tl751ms2sid",
+      "hotspots": [
+        {
+          "title": "Powered by Ai",
+          "text": "Ai detects the weight and type of the fabric, then tailors the wash cycle to suit the load.",
+          "pos": [
+            -0.245,
+            0.921,
+            -0.1779
+          ],
+          "normal": [
+            0,
+            0.938,
+            0.346
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Power Steam",
+          "text": "Steam twice in the wash: at the start to dislodge dirt and kill 99.99% germs, and at the end to reduce wrinkles and keep clothes soft.",
+          "pos": [
+            -0.207,
+            0.9205,
+            -0.1765
+          ],
+          "normal": [
+            0,
+            0.938,
+            0.346
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Triadic pulsator",
+          "text": "A 3-step wash action: scrub, swirl and punch.",
+          "pos": [
+            0,
+            0.45,
+            0.045
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "Eco Inverter Motor",
+          "text": "Energy-efficient performance with low power consumption, backed by a 10-year motor warranty.",
+          "pos": [
+            0.226,
+            0.9211,
+            -0.178
+          ],
+          "normal": [
+            0,
+            0.938,
+            0.346
+          ],
+          "show": "always"
+        }
+      ]
+    },
+    {
       "id": "lg-dfb532fp",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",
