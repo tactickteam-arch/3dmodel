@@ -1,0 +1,144 @@
+{
+  "products": [
+    {
+      "id": "bosch-wga244zpin",
+      "brand": "Bosch",
+      "brandLogo": "/logos/bosch.png",
+      "category": "Washing machine",
+      "model": "WGA244ZPIN",
+      "name": "Bosch Series 6 front-load 9 kg washing machine with Iron Steam Assist",
+      "shortName": "9 kg Series 6 front-load washer",
+      "summary": "Open the door to see the Vario Drum, pull out the detergent drawer and open the pump filter, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the round flap to open it",
+      "glb": "/models/bosch-wga244zpin.glb",
+      "thumb": "/photos/bosch-wga244zpin/0.jpg",
+      "photos": ["/photos/bosch-wga244zpin/0.jpg", "/photos/bosch-wga244zpin/1.jpg", "/photos/bosch-wga244zpin/2.jpg", "/photos/bosch-wga244zpin/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Dark Lake",
+          "swatchColor": "#4a5060",
+          "usdz": "/models/usdz/bosch-wga244zpin-dark-lake.usdz",
+          "itemCode": "WGA244ZPIN",
+          "code": "WGA244ZPIN"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.19],
+          "zone": {
+            "closed": [
+              [-0.262, 0.744, 0.085],
+              [-0.091, 0.822, 0.301]
+            ],
+            "open": [
+              [-0.262, 0.744, 0.275],
+              [-0.091, 0.822, 0.491]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -118,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.247, 0.215, 0.205],
+              [0.247, 0.709, 0.341]
+            ],
+            "open": [
+              [-0.543, 0.215, 0.228],
+              [-0.24, 0.709, 0.681]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 90,
+          "zone": {
+            "closed": [
+              [0.116, 0.025, 0.295],
+              [0.271, 0.181, 0.303]
+            ],
+            "open": [
+              [0.116, 0.018, 0.295],
+              [0.271, 0.026, 0.45]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.8 cm",
+        "h": "84.8 cm",
+        "d": "59 cm"
+      },
+      "sizeNote": "63.6 cm deep with the door, 104.9 cm with the door open at 90 degrees",
+      "specs": [
+        ["Capacity", "9 kg, 60 L drum"],
+        ["Type", "Front load, freestanding"],
+        ["Max spin", "1400 rpm"],
+        ["Motor", "EcoSilence Drive (SilentPowerDrive)"],
+        ["Anti Stain", "Removes 4 stubborn stains without pre-treatment"],
+        ["Steam", "Iron Steam Assist, up to 50% fewer wrinkles"],
+        ["Speed", "SpeedPerfect, up to 65% less time"],
+        ["Programmes", "Cottons, Cottons 60° Label, Synthetics, Daily Mix Load, Wool, Delicates/Silk, Rinse, Spin/Drain, Drum Descale, Duvet, Quick 15/30 min, Shirts, Allergy Plus, Steam"],
+        ["Display", "LED display with countdown, Ready In up to 24 h"],
+        ["Smart", "Loading sensor, reload function, balance control, multiple water protection"],
+        ["Side panels", "Anti Vibration design"],
+        ["Door", "Hinged on the left, silver-black grey frame"],
+        ["Noise", "54 dB(A) washing"],
+        ["Energy", "5 star (BEE's register)"],
+        ["Supply", "220-240 V, 2300 W, 160 cm cord"],
+        ["Hoses", "Inlet 100 cm, drain 150 cm"],
+        ["Weight", "73.8 kg"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/bosch-eon-regalis-9-kg-front-load-washing-machine-with-ai-turbidity-sensing-or-steam-wash-or-inbuilt-heater-or-wga244zpin-wga244zpin/21203",
+      "source": "https://www.bosch-home.in/en/product/washer-dryer/washing-machines/front-loading-washing-machines/WGA244ZPIN",
+      "hotspots": [
+        {
+          "title": "Anti Stain",
+          "text": "Reliably removes 4 different stubborn stains without any additional pre-treatment.",
+          "pos": [0.1009, 0.7554, 0.298],
+          "normal": [0, 0, 1],
+          "show": "!door"
+        },
+        {
+          "title": "SpeedPerfect",
+          "text": "Perfectly clean in up to 65% less time.",
+          "pos": [0.2503, 0.7554, 0.298],
+          "normal": [0, 0, 1],
+          "show": "!door"
+        },
+        {
+          "title": "Vario Drum",
+          "text": "Gently and efficiently washes with even water distribution and without creasing garments.",
+          "pos": [0.08, 0.4, -0.095],
+          "normal": [0, 0, 1],
+          "show": "door"
+        },
+        {
+          "title": "Anti Vibration Design",
+          "text": "Extremely stable and especially quiet thanks to special vibration protection.",
+          "pos": [0.299, 0.43, -0.02],
+          "normal": [1, 0, 0],
+          "show": "always"
+        }
+      ],
+      "fit": {
+        "front": 46,
+        "note": "From Bosch: 63.6 cm deep with the door closed and 104.9 cm with the door open at 90 degrees. Bosch's page and manual publish no side or back gaps; leave room for the hoses and the plug."
+      }
+    }
+  ]
+}
