@@ -1,0 +1,117 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-33048",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Washing machine",
+      "model": "XS9014BWME",
+      "name": "Whirlpool 9 kg Steam front-load washer with in-built heater",
+      "shortName": "9 kg Steam front-load washer",
+      "summary": "Open the door to see the 330 mm wide drum opening and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/whirlpool-33048.glb",
+      "thumb": "/photos/whirlpool-33048/0.jpg",
+      "photos": ["/photos/whirlpool-33048/0.jpg", "/photos/whirlpool-33048/1.jpg", "/photos/whirlpool-33048/2.jpg", "/photos/whirlpool-33048/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Midnight Grey",
+          "swatchColor": "#45464a",
+          "usdz": "/models/usdz/whirlpool-33048-midnight-grey.usdz",
+          "itemCode": "33048",
+          "code": "XS9014BWME"
+        }
+      ],
+      "parts": [
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -110,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.27, 0.164, 0.201],
+              [0.27, 0.704, 0.32]
+            ],
+            "open": [
+              [-0.463, 0.164, 0.268],
+              [-0.205, 0.704, 0.79]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.2],
+          "zone": {
+            "closed": [
+              [-0.29, 0.719, -0.015],
+              [-0.108, 0.841, 0.275]
+            ],
+            "open": [
+              [-0.29, 0.719, 0.185],
+              [-0.108, 0.841, 0.475]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "64 cm"
+      },
+      "sizeNote": "Whirlpool lists 64 x 85 x 60 cm; its front photo shows the front is the 60 cm side, so 64 cm is the depth to the door's front",
+      "specs": [
+        ["Capacity", "9 kg"],
+        ["Type", "Front-load washer, fully automatic, freestanding"],
+        ["Max spin", "1400 rpm"],
+        ["Motor", "Inverter (Intellisense Inverter Technology), 10 years warranty on the motor"],
+        ["Programmes", "15: Sanitize, Delicates, Cotton, Eco-Cotton, Daily Wash, Woollens, Active Wear, Drum Clean, Spin & Drain, Rinse & Spin, Bedding/Curtains, Baby Care, Bed & Bath, Rapid 30', StainWash"],
+        ["Features", "Removes up to 100 tough stains, 6th Sense SoftMove, SteamWash, in-built heater, Fresh Care+, Add Garment, Zero Pressure Fill, Smart Wave Drum Movement"],
+        ["Drum access", "330 mm wide"],
+        ["Display", "LED + touch"],
+        ["Energy", "5 star"],
+        ["Supply", "220-240 V, 50 Hz, 480 W"],
+        ["Weight", "71.2 kg"],
+        ["Warranty", "2 years comprehensive, 10 years on the motor"]
+      ],
+      "source": "https://india.whirlpool.in/xpert-care-9kg-5-star-front-load-washing-machine-with-in-built-heater/p",
+      "hotspots": [
+        {
+          "title": "Removes up to 100 tough stains",
+          "text": "Restores clothes to their former glory by removing 100 tough dried stains like curry, henna, ink, grease and many more.",
+          "pos": [-0.062, 0.8195, 0.2765],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "6th Sense SoftMove",
+          "text": "6th Sense SoftMove Technology delivers 18% better fabric care by using a combination of sensors and algorithms to choose from 6 customized drum movements for different types of fabrics.",
+          "pos": [0.265, 0.816, 0.2765],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Steam Wash",
+          "text": "The Advanced Steam Wash Technology provides a sanitized laundry with the power of steam. It removes up to 99.9% bacteria and allergens, dust mites and virus.",
+          "pos": [0.2306, 0.777, 0.2785],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Wide Drum Access",
+          "text": "The 330 mm wide internal drum access makes loading and unloading laundry effortless.",
+          "pos": [0.06, 0.4, 0.12],
+          "normal": [0, 0, 1],
+          "show": "door"
+        }
+      ]
+    }
+  ]
+}
