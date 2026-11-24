@@ -1,4 +1,7 @@
 {
+  "whirlpool-30350": {
+    "footprint": "one-round-end"
+  },
   "*": {
     "sticksOut": {
       "Plug|PlugPin|PowerCord|Cord[A-Z]\\w*|DrainHose|Hose[A-Z]\\w*|Inlet[A-Z]\\w*|Bolt[A-Z]\\w*|Grommet|TubPlate": "The cord and plug, the hoses and inlet, the transit bolts and the tub's rear plate stand out at the back as on the real unit. Makers' sizes are the cabinet without them."

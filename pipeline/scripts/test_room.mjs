@@ -7,6 +7,8 @@ import fs from "node:fs";
 import { launch, sleep } from "./cdp.mjs";
 
 const [base, out] = process.argv.slice(2);
+// products whose footprint isn't a W x D box, from pipeline/entries/gate.json (a person writes it)
+const FOOTPRINT = Object.fromEntries(Object.entries(JSON.parse(fs.readFileSync(new URL("../entries/gate.json", import.meta.url), "utf8"))).filter(([, v]) => v?.footprint).map(([k, v]) => [k, v.footprint]));
 fs.mkdirSync(out, { recursive: true });
 let failed = 0;
 const ok = (c, msg) => { console.log(`  ${c ? "ok  " : "FAIL"} ${msg}`); if (!c) failed++; };
@@ -64,9 +66,18 @@ for (const p of catalogue.products.filter((p) => !p.hidden)) {
     let expected = Wm * f / dist;                                        // photo pixels
     if (!wall) {
       const o = JSON.parse(await b.evalJS(`(()=>{const o=document.querySelector('.room-model').getCameraOrbit();return JSON.stringify({t:o.theta,r:o.radius})})()`));
-      const Dm = parseFloat(p.size.d) / 100, us = [];
-      for (const x of [-Wm / 2, Wm / 2]) for (const z of [-Dm / 2, Dm / 2]) us.push(f * (x * Math.cos(o.t) - z * Math.sin(o.t)) / (o.r - (x * Math.sin(o.t) + z * Math.cos(o.t))));
-      expected = Math.max(...us) - Math.min(...us);
+      const Dm = parseFloat(p.size.d) / 100;
+      const span = (pts) => { const us = pts.map(([x, z]) => f * (x * Math.cos(o.t) - z * Math.sin(o.t)) / (o.r - (x * Math.sin(o.t) + z * Math.cos(o.t)))); return Math.max(...us) - Math.min(...us); };
+      const box = [[-Wm / 2, -Dm / 2], [-Wm / 2, Dm / 2], [Wm / 2, -Dm / 2], [Wm / 2, Dm / 2]];
+      expected = span(box);
+      // a footprint that isn't a box (gate.json, written by a person: "footprint": "one-round-end", as a twin tub's wash
+      // end): one end is a half circle of the depth's diameter; which end isn't recorded, so the nearer of the two counts
+      if (FOOTPRINT[p.id] === "one-round-end") {
+        const r = Dm / 2, arc = (cx, a0) => Array.from({ length: 25 }, (_, i) => { const a = a0 + (Math.PI * i) / 24; return [cx + r * Math.cos(a), r * Math.sin(a)]; });
+        const left = [[Wm / 2, -r], [Wm / 2, r], ...arc(-Wm / 2 + r, Math.PI / 2)], right = [[-Wm / 2, -r], [-Wm / 2, r], ...arc(Wm / 2 - r, -Math.PI / 2)];
+        const drawnNow = (await drawnSize()).w / k;
+        expected = [span(left), span(right)].sort((u, v) => Math.abs(u - drawnNow) - Math.abs(v - drawnNow))[0];
+      }
     }
     const drawn = (await drawnSize()).w / k;
     ok(Math.abs(drawn - expected) / expected < 0.06, `drawn width ${drawn.toFixed(0)} px is within 6% of the ${expected.toFixed(0)} px real width at ${dist.toFixed(1)} m`);
