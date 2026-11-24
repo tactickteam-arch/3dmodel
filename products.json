@@ -27285,6 +27285,197 @@
       }
     },
     {
+      "id": "bosch-woe90dv0in",
+      "brand": "Bosch",
+      "brandLogo": "/logos/bosch.png",
+      "category": "Washing machine",
+      "model": "WOE90DV0IN",
+      "name": "Bosch Series 2 9 kg fully automatic top-load washing machine",
+      "shortName": "9 kg Series 2 top-load washer",
+      "summary": "Lift the soft-closing glass lid and look down into the drum, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/bosch-woe90dv0in.glb",
+      "thumb": "/photos/bosch-woe90dv0in/0.jpg",
+      "photos": [
+        "/photos/bosch-woe90dv0in/0.jpg",
+        "/photos/bosch-woe90dv0in/1.jpg",
+        "/photos/bosch-woe90dv0in/2.jpg",
+        "/photos/bosch-woe90dv0in/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Dark Grey",
+          "swatchColor": "#4b4d51",
+          "usdz": "/models/usdz/bosch-woe90dv0in-dark-grey.usdz",
+          "itemCode": "WOE90DV0IN",
+          "code": "WOE90DV0IN"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.272,
+                0.919,
+                -0.166
+              ],
+              [
+                0.272,
+                0.955,
+                0.178
+              ]
+            ],
+            "open": [
+              [
+                -0.272,
+                0.954,
+                -0.167
+              ],
+              [
+                0.272,
+                1.298,
+                -0.131
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55 cm",
+        "h": "96 cm",
+        "d": "56 cm"
+      },
+      "sizeNote": "Body only, 96 cm tall; with the lid open it is about 129 cm",
+      "specs": [
+        [
+          "Capacity",
+          "9 kg, 50 L drum"
+        ],
+        [
+          "Type",
+          "Fully automatic top load, freestanding"
+        ],
+        [
+          "Max spin",
+          "680 rpm"
+        ],
+        [
+          "Motor",
+          "Inverter motor (VarioInverter)"
+        ],
+        [
+          "Energy rating",
+          "5 star (BEE)"
+        ],
+        [
+          "Programmes",
+          "Smart, Water Save, Quick, Wool, Synthetics, Prewash, Delicates, Intense, Tub Clean, Spin"
+        ],
+        [
+          "Options",
+          "Water level (L01 to L10), Delay up to 24 h, Favorite, Soak, Wash Time, Rinse Cycle, Spin Time, Child Lock"
+        ],
+        [
+          "Display",
+          "LED display with digital countdown"
+        ],
+        [
+          "Lid",
+          "Soft closing, hinged at the back, glass top"
+        ],
+        [
+          "Safety",
+          "Balance control, multiple water protection"
+        ],
+        [
+          "Noise",
+          "59.8 dB(A) re 1 pW, washing"
+        ],
+        [
+          "Power",
+          "220-240 V, 50 Hz, 10 A fuse, India plug (6 A), 150 cm cord"
+        ],
+        [
+          "Net weight",
+          "33.6 kg"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/bosch-series-2-fully-automatic-top-load-washing-machine-woe90dv0in/21193",
+      "source": "https://www.bosch-home.in/en/product/washer-dryer/washing-machines/top-loading-washing-machines/WOE90DV0IN",
+      "hotspots": [
+        {
+          "title": "Soft Closing Lid",
+          "text": "It provides a gradual lid closure to ensure an injury-free and silent closing of the washer lid.",
+          "pos": [
+            0.15,
+            0.955,
+            0.13
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "!lid"
+        },
+        {
+          "title": "Smart Program",
+          "text": "With the Smart program, the washing machine will automatically choose the optimum pattern and water level by sensing the load for your laundry cycle.",
+          "pos": [
+            0.0259,
+            0.9113,
+            0.2194
+          ],
+          "normal": [
+            0,
+            0.9885,
+            0.151
+          ],
+          "show": "always"
+        },
+        {
+          "title": "24h delay start",
+          "text": "Greater flexibility thanks to freely selectable program start delay (24 h).",
+          "pos": [
+            -0.0967,
+            0.9048,
+            0.2623
+          ],
+          "normal": [
+            0,
+            0.9885,
+            0.151
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Inverter Motor",
+          "text": "The VarioInverter motor is a powerful, durable and highly efficient motor that provides optimum washing performance that is backed with warranty.",
+          "pos": [
+            0.219,
+            0.9103,
+            0.2264
+          ],
+          "normal": [
+            0,
+            0.9885,
+            0.151
+          ],
+          "show": "always"
+        }
+      ]
+    },
+    {
       "id": "lg-dfb532fp",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",
