@@ -1,0 +1,102 @@
+{
+  "products": [
+    {
+      "id": "haier-hwm110-h688bk",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HWM110-H688BK",
+      "name": "Haier 11 kg top-load washing machine with in-built heater",
+      "shortName": "11 kg top-load washer with heater",
+      "summary": "Lift the toughened-glass lid to see the pillow drum, the Magic filter and the detergent box, read the console's controls, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/haier-hwm110-h688bk.glb",
+      "thumb": "/photos/haier-hwm110-h688bk/0.jpg",
+      "photos": ["/photos/haier-hwm110-h688bk/0.jpg", "/photos/haier-hwm110-h688bk/1.jpg", "/photos/haier-hwm110-h688bk/2.jpg", "/photos/haier-hwm110-h688bk/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#3a3b3f",
+          "usdz": "/models/usdz/haier-hwm110-h688bk-black.usdz",
+          "itemCode": "HWM110-H688BK:NOIDA",
+          "code": "HWM110-H688BK"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -85,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.27, 0.936, -0.179],
+              [0.27, 0.985, 0.273]
+            ],
+            "open": [
+              [-0.27, 0.981, -0.179],
+              [0.27, 1.435, -0.091]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "55 cm",
+        "h": "104 cm",
+        "d": "57 cm"
+      },
+      "sizeNote": "Body only, 104 cm tall at the console; with the lid open it is about 143 cm",
+      "specs": [
+        ["Capacity", "11 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star"],
+        ["Heater", "Advanced in-built butterfly-shaped heater"],
+        ["Programmes", "15 + wash programmes"],
+        ["Features", "In-built heater, Ultra Fresh Air, Quick Wash, Mix Load, memory back-up"],
+        ["Drum", "Oceanus Wave drum, stainless steel tub"],
+        ["Filter", "2X Magic filter"],
+        ["Lid", "Toughened glass, Softfall"],
+        ["Display", "Digital"],
+        ["Colour", "Black"],
+        ["Size (W x D x H)", "550 x 570 x 1040 mm"],
+        ["Warranty", "4 years comprehensive, 10 years on the motor"]
+      ],
+      "source": "https://shop.haierindia.com/products/Top-Load-Washing-Machines/Haier-11KG-Top-Load-Washing-Washing-Machine-(HWM110-H688BK)/2371",
+      "hotspots": [
+        {
+          "title": "Advanced in-built heater",
+          "text": "Haier's advanced butterfly-shaped in-built heater delivers powerful cleaning performance and effective germ elimination.",
+          "pos": [0.037, 1.007, -0.217],
+          "normal": [0, 0.902, 0.432],
+          "show": "always"
+        },
+        {
+          "title": "Softfall Technology",
+          "text": "Softfall Technology ensures gentle and safe lid closure, preventing accidental slamming and minimizing noise.",
+          "pos": [0.2, 0.985, -0.165],
+          "normal": [0, 0.998, 0.06],
+          "show": "!lid"
+        },
+        {
+          "title": "Oceanus Wave Drum",
+          "text": "The Oceanus Wave Drum offers gentle yet thorough washing, mimicking the natural motion of ocean waves to protect your clothes.",
+          "pos": [0.152, 0.66, -0.108],
+          "normal": [-0.707, 0, 0.707],
+          "show": "lid"
+        },
+        {
+          "title": "2X Magic Filter",
+          "text": "It efficiently captures lint and debris twice as effectively, ensuring cleaner laundry and improved washing machine performance.",
+          "pos": [0, 0.71, -0.15],
+          "normal": [0, 0, 1],
+          "show": "lid"
+        }
+      ]
+    }
+  ]
+}
