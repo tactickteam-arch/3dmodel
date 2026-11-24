@@ -423,4 +423,5 @@ def main():
         draw_label(name, LABELS[name], cmp_dir)
 
 
-main()
+if __name__ == "__main__":   # other texture scripts import LABELS and draw_label without running it
+    main()
