@@ -85,7 +85,7 @@ const parts = entry.parts || [];
   // STANDARD 2: a colour in Sangeetha's item master links as /p/<its item code>, one that isn't as /p/<product's item code>/<colour>
   // (finishPath in site.js; make_pages.mjs writes the page)
   const codes = (entry.finishes || []).map((_, i) => String(finishPath(entry, i) || "").slice(3));
-  const badCode = codes.filter((c) => c && (!/^[\w .\-\u00a0]+(\/[\w .\-\u00a0]+)*$/.test(c) || /(^|\/)\.\.?(\/|$)/.test(c)));
+  const badCode = codes.filter((c) => c && (!/^[\w .:\-\u00a0]+(\/[\w .:\-\u00a0]+)*$/.test(c) || /(^|\/)\.\.?(\/|$)/.test(c)));
   record("item-links", codes.length > 0 && codes.every(Boolean) && !badCode.length && new Set(codes).size === codes.length,
     codes.every(Boolean) ? `${codes.length} colours: ${codes.map((c) => `/p/${c}`).join(", ")}${badCode.length ? `; can't be a link: ${badCode.join(", ")}` : ""}${new Set(codes).size < codes.length ? "; a code is repeated" : ""}`
       : `${codes.filter((c) => !c).length} of ${codes.length} colours have no maker code (each colour needs its exact item code)`);

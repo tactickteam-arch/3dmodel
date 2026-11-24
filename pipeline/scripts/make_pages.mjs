@@ -133,7 +133,7 @@ export function build({ site, products, productHtml, indexHtml, compareHtml, sho
   // (Sangeetha's own item code, `itemCode`, from its listing; the maker's `code`; and `altCodes`, other codes Sangeetha's
   // sheets give for that row)
   for (const p of shown) for (const fin of p.finishes || []) for (const code of new Set([fin.itemCode, fin.code, ...(fin.altCodes || [])].map((c) => String(c || "").trim()).filter(Boolean))) {
-    if (!/^[\w .\-\u00a0]+(\/[\w .\-\u00a0]+)*$/.test(code) || /(^|\/)\.\.?(\/|$)/.test(code)) { notes.push(`item code "${code}" can't be a link; left out`); continue; }
+    if (!/^[\w .:\-\u00a0]+(\/[\w .:\-\u00a0]+)*$/.test(code) || /(^|\/)\.\.?(\/|$)/.test(code)) { notes.push(`item code "${code}" can't be a link; left out`); continue; }
     page(p, code, code);
   }
   // and one per colour that isn't in Sangeetha's item master, at its product's item code and its name
