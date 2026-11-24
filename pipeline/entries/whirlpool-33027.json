@@ -1,0 +1,119 @@
+{
+  "products": [
+    {
+      "id": "whirlpool-33027",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Washing machine",
+      "model": "33027",
+      "name": "Whirlpool Xpert Care 9 kg front-load washer with Ozone Air Refresh and in-built heater",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-xpert-care-9kg-5-star-front-load-washing-machine-with-ozone-air-refresh-technology-and-in-built-heater-volcano-grey-33027/21107",
+      "shortName": "9 kg Xpert Care front-load washer",
+      "summary": "Open the door to see the 330 mm wide drum opening and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/whirlpool-33027.glb",
+      "thumb": "/photos/whirlpool-33027/0.jpg",
+      "photos": ["/photos/whirlpool-33027/0.jpg", "/photos/whirlpool-33027/1.jpg", "/photos/whirlpool-33027/2.jpg", "/photos/whirlpool-33027/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Volcano Grey",
+          "swatchColor": "#4e5056",
+          "usdz": "/models/usdz/whirlpool-33027-volcano-grey.usdz",
+          "itemCode": "33027",
+          "code": "33027"
+        }
+      ],
+      "parts": [
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -110,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.27, 0.164, 0.201],
+              [0.27, 0.704, 0.32]
+            ],
+            "open": [
+              [-0.463, 0.164, 0.268],
+              [-0.205, 0.704, 0.79]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.2],
+          "zone": {
+            "closed": [
+              [-0.29, 0.718, -0.015],
+              [-0.107, 0.838, 0.275]
+            ],
+            "open": [
+              [-0.29, 0.718, 0.185],
+              [-0.107, 0.838, 0.475]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "64 cm"
+      },
+      "sizeNote": "Whirlpool lists 64 x 85 x 60 cm; its front photo shows the front is the 60 cm side, so 64 cm is the depth to the door's front",
+      "specs": [
+        ["Capacity", "9 kg"],
+        ["Type", "Front-load washer, fully automatic, freestanding"],
+        ["Max spin", "1400 rpm (Whirlpool's page and Sangeetha; the panel in Whirlpool's photo of this model reads 1200 RPM)"],
+        ["Motor", "Direct Drive"],
+        ["Programmes", "15: Ozone Refresh, StainWash, Rapid 30', Sanitize, Baby Care, Bedding & Curtains, Rinse and Spin, Spin and Drain, Delicates, Cotton, Eco-Cotton, Daily Wash, Woolens, Athletic Wear, Smart Wave Drum Movement"],
+        ["Features", "Ozone Air Refresh (zero shrinkage and colour fading, odour removal), 6th Sense SoftMove, SteamWash, in-built heater, FreshCare+, Zero Pressure Fill, Add Garment, Smart Wave Drum Movement"],
+        ["Drum access", "330 mm wide"],
+        ["Display", "LCD display with touch keys"],
+        ["Energy", "5 star, 0.0342 kWh per kg per cycle (BEE label HA XC 90 BD 5S/2025)"],
+        ["Water", "9 litres per kg per cycle (BEE label)"],
+        ["Supply", "220-240 V, 50 Hz, 480 W"],
+        ["Weight", "71.2 kg"],
+        ["Warranty", "5 years comprehensive, 5 more years on the motor"]
+      ],
+      "source": "https://india.whirlpool.in/xpert-care-9kg-5-star-front-load-washing-machine-with-ozone-air-refresh-technology-and-in-built-heater-t/p",
+      "hotspots": [
+        {
+          "title": "Ozone Air Refresh",
+          "text": "Ozone Refresh: zero shrinkage and colour fading, and odour removal, with Ozone Air Refresh Technology.",
+          "pos": [-0.0015, 0.8285, 0.276],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "6th Sense SoftMove",
+          "text": "6th Sense SoftMove Technology delivers 18% better fabric care by using a combination of sensors and algorithms to choose from 6 customized drum movements for different types of fabrics.",
+          "pos": [0.268, 0.821, 0.276],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "100 tough stains",
+          "text": "Restores clothes to their former glory by removing 100 tough dried stains like curry, henna, ink, grease and many more.",
+          "pos": [-0.065, 0.816, 0.2775],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Wide Drum Access",
+          "text": "The 330 mm wide internal drum access makes loading and unloading laundry effortless.",
+          "pos": [0.06, 0.4, 0.12],
+          "normal": [0, 0, 1],
+          "show": "door"
+        }
+      ]
+    }
+  ]
+}
