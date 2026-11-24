@@ -1,0 +1,104 @@
+{
+  "products": [
+    {
+      "id": "godrej-wteon-rhn-10-5-0-fefh-c-glgr",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Washing machine",
+      "model": "WTEON RHN 10 5.0 FEFH C GLGR",
+      "name": "Godrej Eon Rhine 10 kg top-load washer with in-built heater",
+      "shortName": "Eon Rhine 10 kg top-load washer",
+      "summary": "Lift the soft-shut glass lid to see the Quadra steel pulsator and the lint filters, read the rear control panel, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/godrej-wteon-rhn-10-5-0-fefh-c-glgr.glb",
+      "thumb": "/photos/godrej-wteon-rhn-10-5-0-fefh-c-glgr/0.jpg",
+      "photos": ["/photos/godrej-wteon-rhn-10-5-0-fefh-c-glgr/0.jpg", "/photos/godrej-wteon-rhn-10-5-0-fefh-c-glgr/1.jpg", "/photos/godrej-wteon-rhn-10-5-0-fefh-c-glgr/2.jpg", "/photos/godrej-wteon-rhn-10-5-0-fefh-c-glgr/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Glacial Grey",
+          "swatchColor": "#5d5c5c",
+          "usdz": "/models/usdz/godrej-wteon-rhn-10-5-0-fefh-c-glgr-glacial-grey.usdz",
+          "itemCode": "WTEON RHN 10 5.0",
+          "code": "WTEON RHN 10 5.0 FEFH C GLGR"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.3, 0.958, -0.14],
+              [0.3, 0.999, 0.258]
+            ],
+            "open": [
+              [-0.3, 1.002, -0.142],
+              [0.3, 1.4, -0.101]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "62 cm",
+        "h": "102 cm",
+        "d": "60.5 cm"
+      },
+      "sizeNote": "102 cm tall to the top of the rear control panel; with the lid open it is about 140 cm",
+      "specs": [
+        ["Capacity", "10 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star"],
+        ["Heater", "In-built, washes with water up to 60°C"],
+        ["Spin speed", "650 rpm (approx.)"],
+        ["Programmes", "Auto / Mix Fabric, Tub Clean, Hot Wash, Saree, Cotton, Woollens, Bulky / Denim, Anti Wrinkle, Quick Wash, Delicate / Baby Care"],
+        ["Pulsator and drum", "Quadra steel pulsator, Acu-Wash drum"],
+        ["Lint filter", "Dual Magic Lint Filter"],
+        ["Low water pressure", "Zero Pressure Technology, washes at 0.02 MPa at the inlet"],
+        ["Lid", "Tinted toughened glass, soft shut"],
+        ["Control panel", "Touch keys and digital display on the rear panel"],
+        ["Extras", "Delay Start, Child Lock, Auto Resume, Extra Rinse, Cycle End Buzzer, Unbalanced Load Detection"],
+        ["Weight", "40.5 kg"],
+        ["Warranty", "5 years comprehensive*, 10 years on the wash motor"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/godrej-10-kg-5-star-fully-automatic-top-load-washing-machine-wteon-rhn-10-5-0/21646",
+      "source": "https://www.godrejenterprises.com/home-appliances/washing-machines/top-load/p/wteon-rhn-10-5-0-fefh-c-glgr",
+      "hotspots": [
+        {
+          "title": "Water-protected rear control panel",
+          "text": "Controls at the back enable easy removal of wet clothes without the panel getting wet.",
+          "pos": [0.15, 1.01, -0.2175],
+          "normal": [0, 0.992, 0.128],
+          "show": "always"
+        },
+        {
+          "title": "Soft-shut glass lid",
+          "text": "The durable tinted toughened-glass lid closes gently for safer, quieter everyday use.",
+          "pos": [-0.15, 1, 0.12],
+          "normal": [0, 1, 0],
+          "show": "!lid"
+        },
+        {
+          "title": "Quadra Steel Pulsator",
+          "text": "The strong stainless-steel pulsator creates powerful water movement for effective cleaning while helping maintain wash hygiene.",
+          "pos": [0.07, 0.473, 0.06],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "Dual Magic Lint Filter",
+          "text": "Dual lint filters trap lint, fluff and debris during the wash to help keep clothes cleaner.",
+          "pos": [-0.174, 0.75, 0.0325],
+          "normal": [1, 0, 0],
+          "show": "lid"
+        }
+      ]
+    }
+  ]
+}
