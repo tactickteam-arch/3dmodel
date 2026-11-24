@@ -1,0 +1,70 @@
+{
+  "_about": "Whirlpool SA A3P A4 85 5S (item 30350, Ace Turbo Dry Xtra 8.5 kg): Whirlpool India's own 2024-26 label image for this model (its gallery), cut out (bee_cut_label.png); the Samsung washer layout's places, the brand Whirlpool, 'India' as printed. On BEE's register (Whirlpool semi automatic, SA A3P A4 85 5S, 5 star).",
+  "template": "sw2024",
+  "src": "pipeline/sources/photos/whirlpool_30350/bee_cut_label.png",
+  "out": "pipeline/tex/whirlpool_30350/bee_label.png",
+  "width_mm": 64,
+  "words": {
+    "series": "2024 - 26",
+    "value": "0.0092",
+    "type": "Semi Automatic",
+    "cap": "8.5",
+    "model": "SA A3P A4 85 5S",
+    "country": "India"
+  },
+  "items": [
+    {
+      "key": "brand",
+      "t": "Whirlpool"
+    },
+    {
+      "key": "foot1",
+      "t": "*Under test conditions, when tested in accordance with relevant standards."
+    },
+    {
+      "key": "series",
+      "win": [
+        0.06,
+        0.296,
+        0.94,
+        0.383
+      ]
+    },
+    {
+      "key": "value",
+      "win": [
+        0.06,
+        0.555,
+        0.513,
+        0.632
+      ]
+    },
+    {
+      "key": "ast",
+      "win": [
+        0.508,
+        0.55,
+        0.547,
+        0.592
+      ]
+    },
+    {
+      "key": "unit",
+      "win": [
+        0.535,
+        0.595,
+        0.94,
+        0.632
+      ]
+    }
+  ],
+  "pictures": [
+    {
+      "circle": [
+        0.108,
+        0.949,
+        0.058
+      ]
+    }
+  ]
+}

@@ -25807,6 +25807,250 @@
       ]
     },
     {
+      "id": "whirlpool-30350",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Washing machine",
+      "model": "30350",
+      "name": "Whirlpool Ace Turbo Dry Xtra 8.5 kg semi-automatic washing machine",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-8-5-kg-5-star-semi-automatic-top-load-washing-machine-purple-dazzle-30350/21167",
+      "shortName": "8.5 kg Ace Turbo Dry Xtra semi-automatic washer",
+      "summary": "Lift the wash lid to see the 3D Turbo impeller and the detergent dispenser, lift the spin lid to see the dryer, then place it in your home at its real size.",
+      "arTip": "Tap the wash lid or the spin lid to open it",
+      "glb": "/models/whirlpool-30350.glb",
+      "thumb": "/photos/whirlpool-30350/0.jpg",
+      "photos": [
+        "/photos/whirlpool-30350/0.jpg",
+        "/photos/whirlpool-30350/1.jpg",
+        "/photos/whirlpool-30350/2.jpg",
+        "/photos/whirlpool-30350/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-24deg 66deg 118%",
+      "finishes": [
+        {
+          "name": "Purple Dazzle",
+          "swatchColor": "#40276a",
+          "variant": "Purple Dazzle",
+          "usdz": "/models/usdz/whirlpool-30350-purple-dazzle.usdz",
+          "itemCode": "30350",
+          "code": "30350"
+        },
+        {
+          "name": "Wine",
+          "swatchColor": "#4f1c2f",
+          "variant": "Wine",
+          "usdz": "/models/usdz/whirlpool-30350-wine.usdz",
+          "code": "30351"
+        },
+        {
+          "name": "Grey",
+          "swatchColor": "#535354",
+          "variant": "Grey",
+          "usdz": "/models/usdz/whirlpool-30350-grey.usdz",
+          "code": "30352"
+        }
+      ],
+      "parts": [
+        {
+          "key": "wash",
+          "label": "wash lid",
+          "node": "WashLid",
+          "axis": "z",
+          "angle": 100,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.423,
+                0.864,
+                -0.228
+              ],
+              [
+                0.033,
+                0.89,
+                0.228
+              ]
+            ],
+            "open": [
+              [
+                -0.529,
+                0.862,
+                -0.228
+              ],
+              [
+                -0.425,
+                1.316,
+                0.228
+              ]
+            ]
+          }
+        },
+        {
+          "key": "spin",
+          "label": "spin lid",
+          "node": "SpinLid",
+          "axis": "x",
+          "angle": -90,
+          "hint": false,
+          "zone": {
+            "closed": [
+              [
+                0.048,
+                0.843,
+                -0.132
+              ],
+              [
+                0.398,
+                0.86,
+                0.244
+              ]
+            ],
+            "open": [
+              [
+                0.048,
+                0.859,
+                -0.133
+              ],
+              [
+                0.398,
+                1.235,
+                -0.116
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "87 cm",
+        "h": "96.6 cm",
+        "d": "51.2 cm"
+      },
+      "sizeNote": "87 cm wide with the handle, 96.6 cm to the top of the controls; with the spin lid up it is about 125 cm",
+      "specs": [
+        [
+          "Capacity",
+          "8.5 kg"
+        ],
+        [
+          "Type",
+          "Semi-automatic top load, twin tub"
+        ],
+        [
+          "Energy rating",
+          "5 star, 0.0092 kWh/kg/cycle (energy label)"
+        ],
+        [
+          "Spin speed",
+          "Up to 1400 rpm (+/-)"
+        ],
+        [
+          "Programmes",
+          "3: Delicate, Normal, Heavy"
+        ],
+        [
+          "Water levels",
+          "3"
+        ],
+        [
+          "Dry timer",
+          "Up to 10 minutes"
+        ],
+        [
+          "Technology",
+          "Ace Turbo Dry, 3D Turbo impeller, Super Soak, Dynamix detergent dispenser, Turbo Lint Filter"
+        ],
+        [
+          "Extras",
+          "Auto Restart, end of cycle buzzer, rat protection, big wheels and integrated smart handle, detachable lids"
+        ],
+        [
+          "Noise",
+          "69.5 dB (Sangeetha)"
+        ],
+        [
+          "Power",
+          "420 W, 220-240 V, 50 Hz"
+        ],
+        [
+          "Weight",
+          "23 kg"
+        ],
+        [
+          "Colours",
+          "Purple Dazzle, Wine, Grey"
+        ],
+        [
+          "Warranty",
+          "4 years comprehensive, 10 years on the wash motor and prime mover, 4 years on the spin motor"
+        ]
+      ],
+      "source": "https://india.whirlpool.in/8-5-kg-semi-automatic-with-faster-drying-ace-turbo-dry-xtraa-1-2/p",
+      "hotspots": [
+        {
+          "title": "1400 RPM faster drying",
+          "text": "With 1400RPM, the machine can dry heavy loads with ease.",
+          "pos": [
+            0.223,
+            0.86,
+            0.12
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "!spin"
+        },
+        {
+          "title": "10 min Dry Time",
+          "text": "The machine is equipped with a dry timer that gives superior drying results in just 10 minutes.",
+          "pos": [
+            0.35,
+            0.94,
+            -0.17
+          ],
+          "normal": [
+            0,
+            0.884,
+            0.467
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Zero Detergent Patches",
+          "text": "Hydrodynamic fins vigorously mix the detergent with water, ensuring no detergent coagulation and, hence, offering a supreme wash experience resulting in zero detergent patches.",
+          "pos": [
+            -0.165,
+            0.38,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "wash"
+        },
+        {
+          "title": "Ease of mobility",
+          "text": "Big wheels and integrated smart handle for ease of mobility",
+          "pos": [
+            0.4345,
+            0.79,
+            0.1
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "show": "always"
+        }
+      ]
+    },
+    {
       "id": "lg-dfb532fp",
       "brand": "LG",
       "brandLogo": "/logos/lg.png",
