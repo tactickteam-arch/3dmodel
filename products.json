@@ -23338,6 +23338,205 @@
           }
         }
       ]
+    },
+    {
+      "id": "haier-hw100-dm14f9bku1",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HW100-DM14F9BKU1",
+      "name": "Haier F9 10 kg front-load washer with AI Colour Panel",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-10-kg-fully-automatic-front-load-washing-machine-or-hw100-dm14f9bku1-hw100-dm14f9bku1/20246",
+      "shortName": "10 kg F9 front-load washer",
+      "summary": "Open the door to see the 525 mm Super Drum, then place it in your home at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/haier-hw100-dm14f9bku1.glb",
+      "thumb": "/photos/haier-hw100-dm14f9bku1/0.jpg",
+      "photos": [
+        "/photos/haier-hw100-dm14f9bku1/0.jpg",
+        "/photos/haier-hw100-dm14f9bku1/1.jpg",
+        "/photos/haier-hw100-dm14f9bku1/2.jpg",
+        "/photos/haier-hw100-dm14f9bku1/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#3c3f46",
+          "usdz": "/models/usdz/haier-hw100-dm14f9bku1-black.usdz",
+          "itemCode": "HW100-DM14F9BKU1",
+          "code": "HW100-DM14F9BKU1"
+        }
+      ],
+      "parts": [
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -126,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.27,
+                0.181,
+                0.183
+              ],
+              [
+                0.268,
+                0.719,
+                0.3
+              ]
+            ],
+            "open": [
+              [
+                -0.567,
+                0.181,
+                0.271
+              ],
+              [
+                -0.206,
+                0.719,
+                0.716
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "60 cm"
+      },
+      "sizeNote": "60 cm deep with the door (Haier gives 60 cm)",
+      "specs": [
+        [
+          "Capacity",
+          "10 kg"
+        ],
+        [
+          "Type",
+          "Front-load washer, fully automatic"
+        ],
+        [
+          "Max spin",
+          "1400 rpm"
+        ],
+        [
+          "Motor",
+          "Direct Motion motor"
+        ],
+        [
+          "Drum",
+          "525 mm Super Drum, pillow-shape drum, high-strength electric welding"
+        ],
+        [
+          "Panel",
+          "AI Colour Panel with dial, AI Onetouch, LED display"
+        ],
+        [
+          "Programmes on the panel",
+          "Mix, Quick, Heavy, Cotton, Sport, Jeans, Delicate, Shirt, Babycare, Towel, Spin, Self Clean, Remote"
+        ],
+        [
+          "Options on the panel",
+          "Night, Stain, Steam, Delay, Time, Temp., Speed, Rinse+, Eco, Add item"
+        ],
+        [
+          "Smart",
+          "Wi-Fi"
+        ],
+        [
+          "Wash temperature",
+          "Up to 90°C"
+        ],
+        [
+          "Energy",
+          "5 star"
+        ],
+        [
+          "Noise",
+          "Washing 50 dB(A), spinning 70 dB(A)"
+        ],
+        [
+          "Supply",
+          "220-240 V, 50 Hz"
+        ],
+        [
+          "Door",
+          "Hinged on the left, half-transparent tinted glass, silver rim"
+        ],
+        [
+          "Warranty",
+          "4 years comprehensive, 12 years on the motor"
+        ]
+      ],
+      "source": "https://shop.haierindia.com/products/Front-Load-Washing-Machines/Haier-10-Kg-Fully-Automatic-Front-Load-Washing-Machine/1966",
+      "hotspots": [
+        {
+          "title": "AI Colour Panel",
+          "text": "India's first AI-powered colourful display panel offers an intuitive and vibrant interface, making laundry smarter and more interactive.",
+          "pos": [
+            0.039,
+            0.808,
+            0.2747
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "One-Touch AI Wash",
+          "text": "Just one touch is all it takes: it automatically senses fabric type, load, and dirt level to choose the perfect wash settings.",
+          "pos": [
+            0.265,
+            0.798,
+            0.2747
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Direct Motion Motor",
+          "text": "Built for durability and silence, this advanced motor ensures energy efficiency with smooth, vibration-free operation.",
+          "pos": [
+            0,
+            0.755,
+            0.2707
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Night Wash",
+          "text": "Designed for silent operation, Night Wash lets you run cycles anytime, even during the night, without disturbing your peace.",
+          "pos": [
+            -0.0705,
+            0.825,
+            0.2747
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        }
+      ]
     }
   ]
 }
