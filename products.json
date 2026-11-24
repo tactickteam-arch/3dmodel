@@ -24429,6 +24429,233 @@
           "show": "lid"
         }
       ]
+    },
+    {
+      "id": "whirlpool-33015",
+      "brand": "Whirlpool",
+      "brandLogo": "/logos/whirlpool.png",
+      "category": "Washing machine",
+      "model": "33015",
+      "name": "Whirlpool Xpert Care 8 kg front-load washer with Ozone Air Refresh and in-built heater",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/whirlpool-xpert-care-8kg-5-star-front-load-washing-machine-with-ozone-air-refresh-technology-heater-inverter-33015/21181",
+      "shortName": "8 kg Xpert Care front-load washer",
+      "summary": "Open the door to see the 330 mm wide drum opening and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/whirlpool-33015.glb",
+      "thumb": "/photos/whirlpool-33015/0.jpg",
+      "photos": [
+        "/photos/whirlpool-33015/0.jpg",
+        "/photos/whirlpool-33015/1.jpg",
+        "/photos/whirlpool-33015/2.jpg",
+        "/photos/whirlpool-33015/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Majestic Silver",
+          "swatchColor": "#b8bbc0",
+          "usdz": "/models/usdz/whirlpool-33015-majestic-silver.usdz",
+          "itemCode": "33015",
+          "code": "33015"
+        }
+      ],
+      "parts": [
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -110,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.27,
+                0.164,
+                0.201
+              ],
+              [
+                0.27,
+                0.704,
+                0.32
+              ]
+            ],
+            "open": [
+              [
+                -0.463,
+                0.164,
+                0.268
+              ],
+              [
+                -0.205,
+                0.704,
+                0.79
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.2
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.29,
+                0.718,
+                -0.015
+              ],
+              [
+                -0.107,
+                0.838,
+                0.275
+              ]
+            ],
+            "open": [
+              [
+                -0.29,
+                0.718,
+                0.185
+              ],
+              [
+                -0.107,
+                0.838,
+                0.475
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "64 cm"
+      },
+      "sizeNote": "Whirlpool lists 64 x 85 x 60 cm; its front photo shows the front is the 60 cm side, so 64 cm is the depth to the door's front",
+      "specs": [
+        [
+          "Capacity",
+          "8 kg"
+        ],
+        [
+          "Type",
+          "Front-load washer, fully automatic, freestanding"
+        ],
+        [
+          "Max spin",
+          "1400 rpm"
+        ],
+        [
+          "Motor",
+          "Intellisense Inverter"
+        ],
+        [
+          "Programmes",
+          "15: Ozone Refresh, StainWash, Rapid 30', Sanitize, Baby Care, Bedding/Curtains, Rinse & Spin, Spin & Drain, Delicates, Cotton, Eco Cotton, Daily Wash, Woollens, Active Wear, Drum Clean"
+        ],
+        [
+          "Features",
+          "Ozone Air Refresh, 6th Sense SoftMove, SteamWash, in-built heater, Fresh Care+, Add Garment, Water Spray, Zero Pressure Fill"
+        ],
+        [
+          "Drum access",
+          "330 mm wide"
+        ],
+        [
+          "Display",
+          "Digital display, LED and touch keys"
+        ],
+        [
+          "Energy",
+          "5 star, 0.0376 kWh per kg per cycle (BEE label HA XC 80 BD 5S/2025)"
+        ],
+        [
+          "Water",
+          "9 litres per kg per cycle (BEE label)"
+        ],
+        [
+          "Supply",
+          "220-240 V, 50 Hz, 480 W"
+        ],
+        [
+          "Weight",
+          "71.2 kg"
+        ],
+        [
+          "Warranty",
+          "5 years comprehensive, 5 more years on the motor"
+        ]
+      ],
+      "source": "https://india.whirlpool.in/xpert-care-8-kg-5-star-front-load-washing-machine-with-ozone-air-refresh-technology-and-heater-intellisense-inverter/p",
+      "hotspots": [
+        {
+          "title": "Ozone Air Refresh",
+          "text": "Ozone Refresh: zero shrinkage and colour fading, and odour removal, with Ozone Air Refresh Technology.",
+          "pos": [
+            -0.0015,
+            0.8285,
+            0.276
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "6th Sense SoftMove",
+          "text": "6th Sense SoftMove Technology delivers 18% better fabric care by using a combination of sensors and algorithms to choose from 6 customized drum movements for different types of fabrics.",
+          "pos": [
+            0.268,
+            0.821,
+            0.276
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "SteamWash",
+          "text": "The Advanced Steam Wash Technology provides a sanitized laundry with the power of steam. It removes up to 99.9% bacteria and allergens, up to 99.9% dust mites and up to 99.9% virus.",
+          "pos": [
+            0.234,
+            0.774,
+            0.2775
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Wide Drum Access",
+          "text": "The 330 mm wide internal drum access makes loading and unloading laundry effortless.",
+          "pos": [
+            0.06,
+            0.4,
+            0.12
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        }
+      ]
     }
   ]
 }
