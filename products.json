@@ -25161,6 +25161,205 @@
         "top": 27.2,
         "note": "From LG's owner's manual: leave 10 cm behind the machine and 2 cm on the left and right. The lid swings up and back: LG gives the height with the lid open as 127.5 cm, so keep 27.2 cm free above it."
       }
+    },
+    {
+      "id": "godrej-wteon-val-80-5-0-fdan-mtbk",
+      "brand": "Godrej",
+      "brandLogo": "/logos/godrej.png",
+      "category": "Washing machine",
+      "model": "WTEON VAL 80 5.0 FDAN MTBK",
+      "name": "Godrej Eon Valor 8 kg top-load washer with AI-powered wash",
+      "shortName": "Eon Valor 8 kg top-load washer",
+      "summary": "Lift the toughened glass lid to see the stainless steel drum and the Magic Lint Filter, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/godrej-wteon-val-80-5-0-fdan-mtbk.glb",
+      "thumb": "/photos/godrej-wteon-val-80-5-0-fdan-mtbk/0.jpg",
+      "photos": [
+        "/photos/godrej-wteon-val-80-5-0-fdan-mtbk/0.jpg",
+        "/photos/godrej-wteon-val-80-5-0-fdan-mtbk/1.jpg",
+        "/photos/godrej-wteon-val-80-5-0-fdan-mtbk/2.jpg",
+        "/photos/godrej-wteon-val-80-5-0-fdan-mtbk/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Metallic Black",
+          "swatchColor": "#3e3f42",
+          "usdz": "/models/usdz/godrej-wteon-val-80-5-0-fdan-mtbk-metallic-black.usdz",
+          "itemCode": "WTEON VAL 80 5.0",
+          "code": "WTEON VAL 80 5.0 FDAN MTBK"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -95,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.264,
+                0.894,
+                -0.116
+              ],
+              [
+                0.264,
+                0.909,
+                0.278
+              ]
+            ],
+            "open": [
+              [
+                -0.264,
+                0.893,
+                -0.155
+              ],
+              [
+                0.264,
+                1.287,
+                -0.105
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.2 cm",
+        "h": "97.6 cm",
+        "d": "56.5 cm"
+      },
+      "sizeNote": "Body 97.6 cm tall; with the lid open it is about 129 cm",
+      "specs": [
+        [
+          "Capacity",
+          "8 kg"
+        ],
+        [
+          "Type",
+          "Fully automatic top load"
+        ],
+        [
+          "Energy rating",
+          "5 star"
+        ],
+        [
+          "Technology",
+          "AI Powered Wash Technology, Roller Coaster Wash Technology"
+        ],
+        [
+          "Drum",
+          "Stainless Steel Gravity Drum"
+        ],
+        [
+          "Pulsator",
+          "Quadra Steel Pulsator"
+        ],
+        [
+          "Water pressure",
+          "Washes at low water pressure of 0.02 MPa at the inlet valve (~Zero Pressure Technology)"
+        ],
+        [
+          "Programmes",
+          "Auto, Regular, Strong, Quick Wash, Sports Wear, Gentle, Rinse, Spin"
+        ],
+        [
+          "Water levels",
+          "High, Medium, Low, Minimum"
+        ],
+        [
+          "Lid",
+          "Toughened glass"
+        ],
+        [
+          "Filter",
+          "Magic Lint Filter"
+        ],
+        [
+          "Extras",
+          "Delay, Child Lock, Extra Rinse, Cycle End Buzzer, Anti-Rodent Mesh"
+        ],
+        [
+          "Colour",
+          "Metallic Black"
+        ],
+        [
+          "Weight",
+          "29 kg"
+        ],
+        [
+          "Warranty",
+          "5 years free comprehensive warranty (conditions apply)"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/godrej-8-kg-5-star-fully-automatic-top-load-washing-machine-wteon-val-80-5-0/21610",
+      "source": "https://www.godrejenterprises.com/home-appliances/washing-machines/top-load/p/wteon-val-80-5-0-fdan-mtbk",
+      "hotspots": [
+        {
+          "title": "Toughened Glass Lid",
+          "text": "Adds to aesthetics while its scratch, heat and impact resistance makes it durable.",
+          "pos": [
+            -0.17,
+            0.902,
+            0.12
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "show": "!lid"
+        },
+        {
+          "title": "Stainless Steel Gravity Drum",
+          "text": "Stainless steel resists bacterial growth on the drum and ensures a hygienic wash.",
+          "pos": [
+            0.192,
+            0.7,
+            0.07
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "Magic Lint Filter",
+          "text": "Traps lint, fluff, and debris with anti reverse flow casing.",
+          "pos": [
+            0,
+            0.74,
+            -0.108
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "lid"
+        },
+        {
+          "title": "~Zero Pressure Technology",
+          "text": "Washes clothes even at low water pressure of 0.02 MPa (at inlet valve).",
+          "pos": [
+            0.17,
+            0.927,
+            -0.152
+          ],
+          "normal": [
+            0,
+            0.882,
+            0.471
+          ],
+          "show": "always"
+        }
+      ]
     }
   ]
 }

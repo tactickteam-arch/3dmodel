@@ -1,0 +1,1 @@
+pipeline/sources/photos/godrej_val80: Godrej's own gallery for WTEON VAL 80 5.0 FDAN MTBK (static.godrejenterprises.com 1_7e17cedcdc, 2_d455ea91e0, 3_96fd75c7f2, 5_aaba7b4865, 7_338719504c, magic_lint_filter_443f015560; 2754 x 3084 webp, flattened on white and cropped, crop boxes in tex_godrej_val80.py)
