@@ -48,6 +48,13 @@ export const flipV = (geo) => { const uv = geo.attributes.uv; for (let i = 0; i 
 export function inward(geo) {
   const idx = geo.index;
   if (idx) for (let i = 0; i < idx.count; i += 3) { const b = idx.getX(i + 1); idx.setX(i + 1, idx.getX(i + 2)); idx.setX(i + 2, b); }
+  // no index (ExtrudeGeometry, toNonIndexed): turn each triangle round by swapping its 2nd and 3rd vertex in every
+  // attribute (24 Nov: before this, only the normals flipped, so the face still faced the old way, lit as if it didn't)
+  else for (const a of Object.values(geo.attributes)) {
+    for (let i = 0; i + 2 < a.count; i += 3) for (let c = 0; c < a.itemSize; c++) {
+      const t = a.getComponent(i + 1, c); a.setComponent(i + 1, c, a.getComponent(i + 2, c)); a.setComponent(i + 2, c, t);
+    }
+  }
   const n = geo.attributes.normal;
   for (let i = 0; i < n.count; i++) n.setXYZ(i, -n.getX(i), -n.getY(i), -n.getZ(i));
   return geo;
