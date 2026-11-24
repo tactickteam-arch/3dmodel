@@ -1,0 +1,160 @@
+{
+  "products": [
+    {
+      "id": "ifb-executive-zbn-cms",
+      "brand": "IFB",
+      "brandLogo": "/logos/ifb.png",
+      "category": "Washing machine",
+      "model": "EXECUTIVE ZBN CMS",
+      "name": "IFB Executive ZBN Laundrimagic 9/6/3 kg washer dryer refresher with Ai Dry",
+      "shortName": "9/6/3 kg Executive ZBN washer dryer",
+      "summary": "Open the door to see the drum, pull out the detergent drawer and open the pump-filter door, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the round flap to open it",
+      "glb": "/models/ifb-executive-zbn-cms.glb",
+      "thumb": "/photos/ifb-executive-zbn-cms/0.jpg",
+      "photos": ["/photos/ifb-executive-zbn-cms/0.jpg", "/photos/ifb-executive-zbn-cms/1.jpg", "/photos/ifb-executive-zbn-cms/2.jpg", "/photos/ifb-executive-zbn-cms/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black Hairline",
+          "swatchColor": "#2b2b2c",
+          "usdz": "/models/usdz/ifb-executive-zbn-cms-black-hairline.usdz",
+          "variant": "Black Hairline",
+          "itemCode": "EXECUTIVE ZBN 1400",
+          "code": "EXECUTIVE ZBN CMS",
+          "altCodes": ["EXECUTIVE ZBN 9-6-3"]
+        },
+        {
+          "name": "White",
+          "swatchColor": "#e6e6e8",
+          "usdz": "/models/usdz/ifb-executive-zbn-cms-white.usdz",
+          "variant": "White",
+          "code": "EXECUTIVE ZVN"
+        },
+        {
+          "name": "Mocha",
+          "swatchColor": "#5b4a42",
+          "usdz": "/models/usdz/ifb-executive-zbn-cms-mocha.usdz",
+          "variant": "Mocha",
+          "code": "EXECUTIVE ZMN CMS"
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.19],
+          "zone": {
+            "closed": [
+              [-0.299, 0.753, 0.04],
+              [-0.1, 0.875, 0.288]
+            ],
+            "open": [
+              [-0.299, 0.753, 0.23],
+              [-0.1, 0.875, 0.478]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -130,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.258, 0.225, 0.191],
+              [0.255, 0.738, 0.333]
+            ],
+            "open": [
+              [-0.567, 0.225, 0.278],
+              [-0.208, 0.738, 0.694]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "pump filter",
+          "node": "FilterFlap",
+          "axis": "y",
+          "angle": 100,
+          "zone": {
+            "closed": [
+              [0.087, 0.04, 0.274],
+              [0.228, 0.181, 0.279]
+            ],
+            "open": [
+              [0.226, 0.04, 0.279],
+              [0.256, 0.181, 0.418]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.8 cm",
+        "h": "87.5 cm",
+        "d": "66.7 cm"
+      },
+      "sizeNote": "IFB gives 66.7 cm deep on its product page and 62.1 cm for the cabinet in its manual; here the door stands in front of the cabinet to the 66.7 cm",
+      "specs": [
+        ["Capacity", "9 kg wash, 6 kg dry, 3 kg steam refresh"],
+        ["Type", "Front-load washer dryer refresher"],
+        ["Max spin", "1400 rpm (No Spin, 400, 600, 800, 1000, 1200, 1400)"],
+        ["Motor", "Eco Inverter Motor, 10 years motor warranty"],
+        ["Drying", "Ai Dry, Cupboard Dry, Iron Dry, Time Dry; Wash + Dry in 2 or 4 hours; Spin & Dry"],
+        ["Refresh", "Steam Refresh in 30 minutes, with just steam, no water or detergent"],
+        ["Energy", "About 0.05 kWh/kg/cycle washing, about 0.8 drying (IFB)"],
+        ["Water", "5-9 L/kg/cycle (IFB)"],
+        ["Programmes", "10 on the machine plus 12 in the My IFB app"],
+        ["Features", "Ai, Power Steam, 9 Swirl Wash, Turbo Spray, 3D Wash System, Time Saver, Aqua Energie, Laundry Add"],
+        ["Smart", "Wi-Fi and voice through the My IFB app"],
+        ["Temperatures", "Cold, 30, 40, 60 and 95 °C"],
+        ["Controls", "Touch keys and a chrome dial, large 7-segment LED display"],
+        ["Door", "Hinged on the left, 320 mm opening"],
+        ["Colours", "Black Hairline (ZBN), White (ZVN), Mocha (ZMN)"],
+        ["Supply", "220-240 V, single phase, 50 Hz; 2000 W heater"],
+        ["Weight", "76 kg"],
+        ["Warranty", "4 years on the machine, 10 years on the motor, 10 years spare parts support"]
+      ],
+      "source": "https://www.ifbappliances.com/executive-zbn",
+      "hotspots": [
+        {
+          "title": "Ai Dry",
+          "text": "Automatically stops the drying cycle the moment your clothes are completely dry, which helps prevent over-drying, protects fabrics and saves energy.",
+          "pos": [0, 0.84, 0.2875],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "Steam Refresh with Dry Mode",
+          "text": "Clothes that are fresh, free of odour and wrinkles in just 30 minutes, with just steam: no water or detergent.",
+          "pos": [-0.052, 0.766, 0.2875],
+          "normal": [0, 0, 1],
+          "show": "always"
+        },
+        {
+          "title": "9 Swirl Wash",
+          "text": "Mimics hand wash motions to give your clothes the care they deserve.",
+          "pos": [0.08, 0.45, -0.15],
+          "normal": [0, 0, 1],
+          "show": "door"
+        },
+        {
+          "title": "Eco Inverter Motor",
+          "text": "Consumes up to 40% less energy, and the washer operates quietly with minimal vibration.",
+          "pos": [0.299, 0.45, -0.05],
+          "normal": [1, 0, 0],
+          "show": "always"
+        }
+      ],
+      "fit": {
+        "back": 10,
+        "note": "IFB's manual asks for at least 10 cm between the back and the wall. IFB publishes no gap for the sides, and no depth with the door open: leave room in front to open the door and to pull out the drawer."
+      }
+    }
+  ]
+}
