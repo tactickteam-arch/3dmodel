@@ -1,0 +1,112 @@
+{
+  "products": [
+    {
+      "id": "bosch-woe80ag0in",
+      "brand": "Bosch",
+      "brandLogo": "/logos/bosch.png",
+      "category": "Washing machine",
+      "model": "WOE80AG0IN",
+      "name": "Bosch Series 2 8 kg fully automatic top-load washing machine",
+      "shortName": "8 kg Series 2 top-load washer",
+      "summary": "Lift the soft-closing black glass lid and look down at the PowerWave pulsator, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/bosch-woe80ag0in.glb",
+      "thumb": "/photos/bosch-woe80ag0in/0.jpg",
+      "photos": ["/photos/bosch-woe80ag0in/0.jpg", "/photos/bosch-woe80ag0in/1.jpg", "/photos/bosch-woe80ag0in/2.jpg", "/photos/bosch-woe80ag0in/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Dark Grey",
+          "swatchColor": "#4b4c49",
+          "usdz": "/models/usdz/bosch-woe80ag0in-dark-grey.usdz",
+          "variant": "Dark Grey",
+          "itemCode": "WOE80AG0IN",
+          "code": "WOE80AG0IN"
+        },
+        {
+          "name": "Silver",
+          "swatchColor": "#8a8b88",
+          "usdz": "/models/usdz/bosch-woe80ag0in-silver.usdz",
+          "variant": "Silver",
+          "code": "WOE80AH0IN"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.267, 0.917, -0.248],
+              [0.267, 0.947, 0.199]
+            ],
+            "open": [
+              [-0.267, 0.946, -0.248],
+              [0.267, 1.392, -0.218]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54 cm",
+        "h": "95 cm",
+        "d": "56.5 cm"
+      },
+      "sizeNote": "Body only, 95 cm tall; with the lid open it is about 140 cm",
+      "specs": [
+        ["Capacity", "8 kg, 45 L drum"],
+        ["Type", "Fully automatic top load, freestanding"],
+        ["Max spin", "700 rpm"],
+        ["Motor", "Inverter motor (VarioInverter)"],
+        ["Wash system", "PowerWave: the pulsator, a dynamic water flow and drum movement"],
+        ["Energy rating", "5 star (BEE)"],
+        ["Programmes", "Normal, Eco wash, Delicates, Quick, Mix, Cottons, Water Save, Spin, Heavy, Tub clean"],
+        ["Options", "Water level (01 to 10), Delay up to 24 h, Easy Start, Child Lock"],
+        ["Display", "LED display with digital countdown"],
+        ["Lid", "Soft closing, hinged at the back, black glass top"],
+        ["Safety", "Multiple water protection"],
+        ["Noise", "52 dB(A) re 1 pW, washing (Bosch gives 65 dB(A) for the Silver model)"],
+        ["Power", "220-240 V, 50 Hz, 5 A fuse, India plug (6 A), 135 cm cord"],
+        ["Net weight", "33.6 kg (Silver: 31.0 kg)"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/bosch-series-2-top-loader-washing-machine-woe80ag0in/21192",
+      "source": "https://www.bosch-home.in/en/product/washer-dryer/washing-machines/top-loading-washing-machines/WOE80AG0IN",
+      "hotspots": [
+        {
+          "title": "Soft Closing Lid",
+          "text": "It provides a gradual lid closure to ensure an injury-free and silent closing of the washer lid.",
+          "pos": [0.15, 0.947, 0.1325],
+          "normal": [0, 1, 0],
+          "show": "!lid"
+        },
+        {
+          "title": "PowerWave Wash System",
+          "text": "PowerWave Wash System is a combination of the innovatively designed pulsator, dynamic waterflow system and intelligent drum movement which gives perfect wash results.",
+          "pos": [0, 0.42, 0.0325],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "24h delay start",
+          "text": "Greater flexibility thanks to freely selectable program start delay (24 h).",
+          "pos": [-0.0278, 0.8765, 0.2619],
+          "normal": [0, 0.84, 0.543],
+          "show": "always"
+        },
+        {
+          "title": "Inverter Motor",
+          "text": "The VarioInverter motor is a powerful, durable and highly efficient motor that provides optimum washing performance that is backed with warranty.",
+          "pos": [0.195, 0.8899, 0.241],
+          "normal": [0, 0.84, 0.543],
+          "show": "always"
+        }
+      ]
+    }
+  ]
+}
