@@ -113,7 +113,7 @@ export const ORDERS = [
       {"brand": "Samsung", "code": "WW90FG4U04ASTL", "name": "9 kg front load washing machine", "id": "samsung-ww90fg4u04astl"},
       {"brand": "Whirlpool", "code": "30350", "name": "8.5 kg semi-automatic washing machine, Purple Dazzle", "id": "whirlpool-30350"},
       {"brand": "Whirlpool", "code": "33027", "name": "9 kg front load washing machine", "id": "whirlpool-33027"},
-      {"brand": "Whirlpool", "code": "33048", "name": "Xpert Care 9 kg front load washing machine, Midnight Grey"},
+      {"brand": "Whirlpool", "code": "33048", "name": "Xpert Care 9 kg front load washing machine, Midnight Grey", "waiting": "Size needed"},
       {"brand": "Whirlpool", "code": "33015", "name": "8 kg front load washing machine", "id": "whirlpool-33015"}
     ],
   },
