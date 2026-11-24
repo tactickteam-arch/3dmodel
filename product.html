@@ -19,7 +19,7 @@
 } }
 </script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js" defer></script>
 <script src="/track.js" defer></script>
 <script type="module" src="/store-bridge.js"></script>
 <style>
@@ -797,19 +797,22 @@ function openPhoto(src) {
   document.body.appendChild(box);
 }
 
-// the delivered files, with their real sizes
+// the delivered files, with their real sizes (asked for once the list comes near the screen, not with the page)
 const files = [[product.glb, "GLB", "Android, web and headsets"], ...product.finishes.map((f) => [f.usdz, "USDZ", `iPhone, iPad and Vision Pro${(product.finishes || []).length > 1 ? ` · ${f.name}` : ""}`])];
-for (const [url, kind, use] of files) {
+const fileLinks = files.map(([url, kind, use]) => {
   const a = document.createElement("a");
   a.href = url;
   a.download = "";
   a.innerHTML = `<div><b>${kind}</b> <span>${esc(use)}</span></div><span class="sz">…</span>`;
   $("files").appendChild(a);
-  fetch(url, { method: "HEAD" }).then((r) => {
-    const n = +r.headers.get("content-length");
-    a.querySelector(".sz").textContent = n ? `${(n / 1048576).toFixed(n > 1048576 ? 1 : 2)} MB` : "";
-  }).catch(() => {});
-}
+  return a;
+});
+const fileSizes = () => fileLinks.forEach((a) => fetch(a.getAttribute("href"), { method: "HEAD" }).then((r) => {
+  const n = +r.headers.get("content-length");
+  a.querySelector(".sz").textContent = n ? `${(n / 1048576).toFixed(n > 1048576 ? 1 : 2)} MB` : "";
+}).catch(() => {}));
+if (!window.IntersectionObserver) fileSizes();
+else { const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); fileSizes(); } }, { rootMargin: "300px" }); io.observe($("files")); }
 if (product.sizeNote) { $("sizeNote").textContent = `${product.sizeNote}. Placed at real size.`; $("sizeNote").classList.remove("hide"); }
 { // the gaps the maker publishes, shown before the shopper types anything
   const f = product.fit || {};
@@ -971,7 +974,7 @@ async function togglePart(key, { instant = false } = {}) {
   mv.currentTime = instant ? mv.duration : 0;
   mv.play({ repetitions: 1 });
   if (swingsWide && anyBefore !== anyAfter && !instant && !arActive) {
-    const o = mv.getCameraOrbit();
+    const o = cameraGoal();
     mv.cameraOrbit = `${o.theta}rad ${o.phi}rad ${anyAfter ? o.radius * 1.3 : o.radius / 1.3}m`;
   }
   renderParts();
@@ -1245,38 +1248,74 @@ mv.addEventListener("camera-change", (e) => {
   if (e.detail.source === "user-interaction") $("hint").classList.add("gone");
 });
 
-// ── the slow turn: once the model is in, the view goes slowly round the product (the studio light with it, as a
-// drag does), like a turntable in a shop. Any touch, click, wheel or key anywhere on the page stops it at once; after
-// SPIN_IDLE_MS with nobody touching anything it picks up again from wherever the view is, but only with every part
-// shut, nothing zoomed, no feature card, AR or room photo open. Off for "reduce motion" and in the page tests
+// ── the opening turn: once the model is in and on screen, the view goes once round the product (the studio light with
+// it, as a drag does), easing in and out over TURN_MS, and settles where it began, the usual front three-quarter view;
+// then it stays still. A unit on the wall can't be seen from behind (maxCameraOrbit), so its view swings once to
+// each side and back instead. The first touch, drag, wheel or key anywhere on the page stops it for good: on the 3D
+// view itself the view stays where the finger took it; anywhere else (a part, a colour, AR, a view button) it glides
+// back to the opening view. None with "reduce motion", in ?embed (the kiosk's frames and a retailer's box), ?kiosk,
+// on a back or forward return, inside AR, with a feature card, close-up or room photo open, or in the page tests
 // (cdp.mjs sets window.__noSpin); ?spin=1 turns it on anyway, ?spin=0 off.
-const SPIN_DEG_S = 12, SPIN_IDLE_MS = 8000;
+const TURN_MS = 7000, SWAY = rad(60);
 const spinParam = new URLSearchParams(location.search).get("spin");
-const spinAllowed = spinParam === "1" || (spinParam !== "0" && !window.__noSpin && !matchMedia("(prefers-reduced-motion: reduce)").matches);
-let spinning = false, spinStarted = false, spinLast = 0, spinTheta = 0, lastTouch = 0;
+const returning = performance.getEntriesByType?.("navigation")?.[0]?.type === "back_forward";
+const spinAllowed = spinParam === "1" || (spinParam !== "0" && !window.__noSpin && !returning
+  && !document.documentElement.classList.contains("embed") && !new URLSearchParams(location.search).has("kiosk")
+  && !matchMedia("(prefers-reduced-motion: reduce)").matches);
+const turn = { on: false, done: false, ms: 0, last: 0, theta0: 0, phi: 0, radius: 0, home: null, homeUntil: 0 };
 const spinFree = () => mv.loaded && !arActive && !closedUp && !featuresOn && !touring && !busy && !Object.values(state).some(Boolean)
   && !document.hidden && !document.querySelector(".room:not(.hide)");
-function spinFrame(t) {
-  if (!spinning) return;
-  if (!spinFree()) { spinning = false; return; }
-  const dt = Math.min(0.1, (t - (spinLast || t)) / 1000);
-  spinLast = t;
-  spinTheta += rad(SPIN_DEG_S) * dt;
-  const o = mv.getCameraOrbit();
-  mv.cameraOrbit = `${spinTheta}rad ${o.phi}rad ${o.radius}m`;
+const easeSine = (k) => 0.5 - 0.5 * Math.cos(Math.PI * k);
+function turnFrame(t) {
+  if (!turn.on) return;
+  if (!spinFree()) { stopTurn(); return; }
+  turn.ms += Math.min(100, t - (turn.last || t)); // (a slow or hidden frame slows the turn instead of jumping it)
+  turn.last = t;
+  const k = Math.min(1, turn.ms / TURN_MS), e = easeSine(k);
+  const theta = onWall ? turn.theta0 + turn.sway * Math.sin(2 * Math.PI * e) : turn.theta0 + 2 * Math.PI * e;
+  mv.cameraOrbit = `${theta}rad ${turn.phi}rad ${turn.radius}m`;
   mv.jumpCameraToGoal();
-  requestAnimationFrame(spinFrame);
+  if (k < 1) { requestAnimationFrame(turnFrame); return; }
+  turn.on = false; turn.done = true;
+  mv.cameraOrbit = `${turn.theta0}rad ${turn.phi}rad ${turn.radius}m`; // exactly where it began
+  mv.jumpCameraToGoal();
 }
-function startSpin() {
-  if (!spinAllowed || spinning || !spinFree()) return;
-  spinning = spinStarted = true; spinLast = 0; spinTheta = mv.getCameraOrbit().theta;
-  requestAnimationFrame(spinFrame);
+function startTurn() {
+  if (!spinAllowed || turn.on || turn.done) return;
+  if (!spinFree()) { if (mv.loaded && !document.hidden) turn.done = true; return; } // (a hidden tab starts it once shown)
+  const o = mv.getCameraOrbit();
+  // (a wall unit's swing stays inside the 100 degrees it may turn to either side)
+  Object.assign(turn, { on: true, ms: 0, last: 0, theta0: o.theta, phi: o.phi, radius: o.radius, sway: Math.max(0, Math.min(SWAY, rad(95) - Math.abs(o.theta))) });
+  requestAnimationFrame(turnFrame);
 }
-const stopSpin = () => { spinning = false; lastTouch = performance.now(); };
-for (const ev of ["pointerdown", "wheel", "keydown", "touchstart"]) addEventListener(ev, stopSpin, { capture: true, passive: true });
-onLoad(() => setTimeout(startSpin, 600));
-setInterval(() => { if (spinStarted && !spinning && performance.now() - lastTouch > SPIN_IDLE_MS) startSpin(); }, 1000);
-window.__spin = { spinning: () => spinning, allowed: spinAllowed };
+// stopped for good; e is the event that stopped it (none: AR, a card or the like took over)
+function stopTurn(e) {
+  if (turn.done && !turn.on) return;
+  const was = turn.on;
+  turn.on = false; turn.done = true;
+  if (!was) return;
+  // the same view, its angle brought back within half a turn of where it began
+  const o = mv.getCameraOrbit(), theta = o.theta - 2 * Math.PI * Math.round((o.theta - turn.theta0) / (2 * Math.PI));
+  mv.cameraOrbit = `${theta}rad ${o.phi}rad ${o.radius}m`;
+  mv.jumpCameraToGoal();
+  if (!e || e.target === mv || arActive) return;
+  // a press outside the 3D view: back to the opening view, model-viewer's own glide
+  turn.home = { theta: turn.theta0, phi: turn.phi, radius: turn.radius };
+  turn.homeUntil = performance.now() + 1500;
+  mv.cameraOrbit = `${turn.theta0}rad ${turn.phi}rad ${turn.radius}m`;
+}
+// where the camera is headed: the opening view while it glides back there, else where it is
+const cameraGoal = () => (turn.home && performance.now() < turn.homeUntil ? { ...turn.home } : mv.getCameraOrbit());
+for (const ev of ["pointerdown", "wheel", "keydown", "touchstart"]) addEventListener(ev, stopTurn, { capture: true, passive: true });
+// it starts once the model is in, its poster gone, and the 3D view on screen in a tab that is showing
+let stageSeen = false;
+const tryTurn = () => { if (stageSeen && mv.loaded && mv.modelIsVisible) startTurn(); };
+if (spinAllowed) {
+  new IntersectionObserver((es) => { stageSeen = es.some((x) => x.isIntersecting); if (stageSeen) setTimeout(tryTurn, 500); }, { threshold: 0.5 }).observe(mv);
+  onLoad(() => setTimeout(tryTurn, 500));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(tryTurn, 300); });
+}
+window.__spin = { spinning: () => turn.on, done: () => turn.done, allowed: spinAllowed, start: () => turn.theta0 };
 
 // ── feature callouts: "Show features" puts a numbered label in the margin for each feature, with a line to its
 // spot on the product. A label (or its dot) opens a short card; Next walks through them, opening or closing

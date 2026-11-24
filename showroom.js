@@ -34,6 +34,7 @@ const pricesReady = loadPrices(); // (MOP: from the server's prices file when it
 let prices = new Map();
 pricesReady.then((m) => { prices = m; });
 const params = new URLSearchParams(location.search);
+const KIOSK_PARAM = params.has("kiosk");
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const Y = new THREE.Vector3(0, 1, 0);
@@ -227,7 +228,8 @@ scene.add(world);
 const FOV = 55; // degrees, up and down, in the part of the view the dock and card leave clear
 const camera = new THREE.PerspectiveCamera(FOV, stage.clientWidth / Math.max(1, stage.clientHeight), 0.05, 200);
 let dirty = 2;
-const redraw = () => { dirty = 2; };
+let looping = false, loopReady = false, stillFrames = 0; // (the frame loop: see frameLoop)
+const redraw = () => { dirty = 2; wake(); };
 let xr = null; // the headset session's state, while there is one
 
 await Promise.race([document.fonts?.load(`600 40px Outfit`), new Promise((r) => setTimeout(r, 2000))]).catch(() => {});
@@ -1777,6 +1779,100 @@ const slotOf = (o) => { for (; o; o = o.parent) if (o.userData.slot) return o.us
 const shown = (o) => { for (; o; o = o.parent) if (!o.visible) return false; return true; }; // a ray ignores what is hidden
 const inModel = (s, o) => { for (; o && o !== s.group; o = o.parent) if (o === s.model) return true; return false; };
 
+// ── the opening turn (as on the product page): a product you go to (its chip, a tap, a search, ?focus=) turns once on
+// its spot when you arrive and its model is in, easing in and out over TURN_MS, and stops facing the aisle again as
+// it stood. It steps out from the partition only as far as each moment of the turn needs, so no corner, cord or
+// hose goes into it, and it turns only where nothing else (a product beside it as it stands, doors and all, a room
+// set or the counter) is within its reach. Not on the wall, with a door open, in the guided tour or ?kiosk, in a
+// headset, with "reduce motion", or in the page tests (cdp.mjs sets window.__noSpin; ?spin=1 turns it on anyway,
+// ?spin=0 off). The first touch, drag, wheel or key stops it for good, and the product turns back the short way.
+const TURN_MS = 7000, BACK_MS = 450;
+const turnAllowed = params.get("spin") === "1" || (params.get("spin") !== "0" && !window.__noSpin && !reduceMotion && !KIOSK_PARAM);
+const spin = { pending: null, s: null, root: null, ms: 0, last: 0, z0: 0, back: 0, corners: [], backAt: 0, a0: 0 };
+const easeSine = (k) => 0.5 - 0.5 * Math.cos(Math.PI * k);
+const turnBox = new THREE.Box3();
+// the footprint's corners round the point the model turns on (its own origin), in its slot's frame
+function footprint(s, root) {
+  turnBox.setFromObject(root);
+  const pts = [];
+  for (const x of [turnBox.min.x, turnBox.max.x]) for (const z of [turnBox.min.z, turnBox.max.z]) {
+    const v = s.group.worldToLocal(new THREE.Vector3(x, 0, z));
+    pts.push([v.x - root.position.x, v.z - root.position.z]);
+  }
+  return pts;
+}
+// how far out from the partition the model must stand, turned by a (radians), for its back to stay 3 cm off it
+function stepOut(a) {
+  const c = Math.cos(a), sn = Math.sin(a);
+  let back = 0;
+  for (const [x, z] of spin.corners) back = Math.max(back, -(-x * sn + z * c));
+  return Math.max(0, back + 0.03 - spin.room);
+}
+const circleHits = (cx, cz, r, x0, x1, z0, z1) => Math.hypot(cx - clamp(cx, x0, x1), cz - clamp(cz, z0, z1)) < r;
+function turnFits(s) {
+  if (s.wall || !s.model || Object.values(s.state).some(Boolean) || s.dim) return false;
+  const root = s.model, corners = footprint(s, root), r = Math.max(...corners.map(([x, z]) => Math.hypot(x, z))) + 0.02;
+  spin.corners = corners; spin.room = s.size.d / 2 + BACK + root.position.z; // (its axis to the partition)
+  let out = 0;
+  for (let a = 0; a < Math.PI; a += Math.PI / 36) out = Math.max(out, stepOut(a));
+  if (out > 0.3) return false;
+  const axis = s.group.localToWorld(root.position.clone().setY(0)), y0 = s.group.position.y, y1 = y0 + s.size.h;
+  const at = [0, 0.5, 1].map((k) => axis.clone().addScaledVector(s.front, out * k));
+  const hits = (x0, x1, z0, z1) => at.some((p) => circleHits(p.x, p.z, r, x0, x1, z0, z1));
+  for (const t of slots) {
+    if (t === s || !t.group.visible || t.center.distanceTo(s.center) > r + 4) continue;
+    turnBox.setFromObject(t.model || t.stand);
+    if (turnBox.min.y < y1 && turnBox.max.y > y0 && hits(turnBox.min.x, turnBox.max.x, turnBox.min.z, turnBox.max.z)) return false;
+  }
+  const c = L.counter;
+  return !decor.some(([x0, x1, z0, z1]) => hits(x0, x1, z0, z1)) && !(c && hits(c.x[0], c.x[1], c.z[0], c.z[1]));
+}
+function stepTurn(now) {
+  if (spin.pending) {
+    const s = spin.pending;
+    if (selected !== s || xr || tour.on) spin.pending = null;
+    else if (!flight && s.model && !s.loading && !s.fade) {
+      spin.pending = null;
+      if (turnFits(s)) Object.assign(spin, { s, root: s.model, ms: 0, last: now, z0: s.model.position.z, back: 0 });
+    }
+  }
+  const s = spin.s, root = spin.root;
+  if (!s) return false;
+  if (s.model !== root || xr) { endTurn(); return false; } // (a new colour's model comes in facing front)
+  let a;
+  if (spin.back) { // turning back the short way, once stopped
+    const k = Math.min(1, (now - spin.backAt) / BACK_MS);
+    a = spin.a0 * (1 - (1 - Math.pow(1 - k, 3)));
+    if (k >= 1) { endTurn(); return true; }
+  } else {
+    spin.ms += Math.min(100, now - spin.last); // (a slow frame slows the turn instead of jumping it)
+    const k = Math.min(1, spin.ms / TURN_MS);
+    a = 2 * Math.PI * easeSine(k);
+    if (k >= 1) { endTurn(); return true; }
+  }
+  spin.last = now;
+  root.rotation.y = a;
+  root.position.z = spin.z0 + stepOut(a);
+  return true;
+}
+// back exactly as it stood
+function endTurn() {
+  if (spin.s && spin.root) { spin.root.rotation.y = 0; spin.root.position.z = spin.z0; }
+  spin.s = spin.root = null; spin.back = 0;
+  redraw();
+}
+// stopped for good by a touch, drag, wheel or key: it turns back the short way
+function stopTurn() {
+  spin.pending = null;
+  if (!spin.s || spin.back) return;
+  const a = spin.root.rotation.y % (2 * Math.PI);
+  spin.a0 = a > Math.PI ? a - 2 * Math.PI : a;
+  spin.back = 1; spin.backAt = performance.now();
+  wake();
+}
+for (const ev of ["pointerdown", "wheel", "keydown", "touchstart"]) addEventListener(ev, stopTurn, { capture: true, passive: true });
+const turnSoon = (s) => { if (turnAllowed && s && !s.wall && !xr && !tour.on) { if (spin.s && spin.s !== s) endTurn(); spin.pending = s; wake(); } };
+
 // ── the page: hint, aisle tabs, product chips, names over the products, the product card ──
 const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const touch = matchMedia("(pointer: coarse)").matches || isPhone;
@@ -1887,7 +1983,9 @@ function updateLabels() {
 }
 
 let selected = null;
-function select(s, { fly = false } = {}) {
+function select(s, { fly = false, turn = fly } = {}) {
+  const fresh = s !== selected; // (a product turns as you go to it, not again while it stays picked)
+  if (fresh) { spin.pending = null; if (spin.s && spin.s !== s) endTurn(); }
   selected = s;
   for (const t of slots) t.tag.setAttribute("aria-pressed", String(t === s));
   $("chips").querySelectorAll(".chip").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.id === s?.p.id)));
@@ -1899,6 +1997,7 @@ function select(s, { fly = false } = {}) {
   const chip = $("chips").querySelector(`.chip[data-id="${CSS.escape(s.p.id)}"]`);
   if (chip) $("chips").scrollTo({ left: chip.offsetLeft - ($("chips").clientWidth - chip.offsetWidth) / 2, behavior: reduceMotion ? "auto" : "smooth" });
   if (fly) { const v = viewFor(s); flyTo(v.pos, v.target); }
+  if (turn && fresh) turnSoon(s);
   hintGone();
 }
 function renderCard() {
@@ -2344,6 +2443,7 @@ function flyTo(pos, target, ms = 1000, lift = null) {
   if (reduceMotion) { flight = null; jumpTo({ pos: pos.clone(), target: target.clone() }); planSoon(); return; }
   const d = camera.position.distanceTo(pos);
   flight = { p0: camera.position.clone(), t0: controls.target.clone(), p1: pos, t1: target, start: performance.now(), ms, lift: lift ?? Math.min(3, d * 0.25) };
+  wake();
 }
 // just inside the entrance at eye height, looking down the middle aisle
 function entranceView() {
@@ -2495,9 +2595,23 @@ function watchPerf(dt) {
   }
   perf.n = perf.slow = 0;
 }
-renderer.setAnimationLoop((time, frame) => {
+// The frame loop runs only while something moves: the camera (a drag, its damping, a flight, a walk), a door, a fade,
+// the card sliding in, a turn. After a few still frames it stops altogether (no frame callbacks at all while you
+// only look), and wakes on the next touch, key, wheel or change (redraw); a quarter-second check catches anything
+// else that starts moving. A headset always keeps it (its frames come from the session). The browser itself holds
+// it while the tab is hidden.
+const moving = () => !!flight || keys.size > 0 || walkV !== 0 || turnV !== 0 || side !== sideTo || !!spin.s || !!spin.pending?.model
+  || slots.some((s) => s.fade || [...s.moving.values()].some((m) => m.t !== m.to));
+function wake() {
+  stillFrames = 0;
+  if (looping || !loopReady) return;
+  looping = true;
+  walkAt = sideAt = performance.now(); // (a step or slide starts from now, not from when the loop stopped)
+  renderer.setAnimationLoop(frameLoop);
+}
+function frameLoop(time, frame) {
   veil.visible = !xr && veil.count > 0; // (the filters' veils are for the screen only)
-  if (xr) return xrFrame(time, frame);
+  if (xr) { stillFrames = 0; spin.pending = null; if (spin.s) endTurn(); return xrFrame(time, frame); }
   const now = performance.now();
   let moved = stepFlight(now);
   if (!flight && controls.update()) moved = true;
@@ -2506,6 +2620,7 @@ renderer.setAnimationLoop((time, frame) => {
   if (stepFades(now)) moved = true;
   if (stepSide(now)) moved = true;
   if (stepWalk(now)) moved = true;
+  if (stepTurn(now)) moved = true;
   loopAt = now;
   // not on the way: what a flight passes would load only to be dropped (it plans again when it lands)
   if (!flight && now - lastPlan > 300) { lastPlan = now; planLoads(); }
@@ -2520,7 +2635,15 @@ renderer.setAnimationLoop((time, frame) => {
     updateLabels();
     dirty = Math.max(0, dirty - 1);
   }
-});
+  stillFrames = moved || dirty > 0 || mmDirty || moving() ? 0 : stillFrames + 1;
+  // (stopped just after this frame: three.js asks for the next frame once this callback returns, and a stop from
+  // inside it would leave that request running)
+  if (stillFrames > 30 && !renderer.xr.isPresenting) { looping = false; queueMicrotask(() => { if (!looping) renderer.setAnimationLoop(null); }); planLoads(); }
+}
+loopReady = true;
+wake();
+for (const ev of ["pointerdown", "wheel", "keydown", "touchstart", "resize"]) addEventListener(ev, wake, { capture: true, passive: true });
+setInterval(() => { if (!looping && !document.hidden && (dirty > 0 || mmDirty || moving())) wake(); }, 250);
 new ResizeObserver(() => { if (!xr) fitCamera(); }).observe(stage);
 // the card, the buttons and the progress bar sit just above the dock, however tall it is
 const dockFit = () => stage.style.setProperty("--dock-h", `${Math.round(stage.getBoundingClientRect().bottom - $("dock").getBoundingClientRect().top)}px`);
@@ -2532,7 +2655,7 @@ fitCamera();
 const focus = focusId ? byId.get(focusId) : null;
 // ?aisle=<n>: at that aisle's entrance (its number on the signs); ?q=<words>: the search, with what it finds
 const aisleN = Math.round(+params.get("aisle")), openAisle = !focus && L.aisles[aisleN - 1];
-if (focus) { select(focus); jumpTo(viewFor(focus)); }
+if (focus) { select(focus, { turn: true }); jumpTo(viewFor(focus)); }
 else if (openAisle) { const v = aisleView(openAisle); jumpTo(v); }
 else {
   // just inside the door at eye height, after a slow step in from outside
@@ -2571,6 +2694,7 @@ async function enterXR(mode) {
 }
 
 async function startXR(session, mode) {
+  wake(); // (a headset's frames come through the frame loop)
   const ar = mode === "ar";
   let type = "local-floor";
   try { await session.requestReferenceSpace("local-floor"); } catch { type = "local"; }
@@ -3009,6 +3133,14 @@ $("btnHelp").addEventListener("click", () => { closeGoto(); coachShow(0); });
 }
 
 window.__showroom = {
+  // the opening turn (its angle in degrees, how far it has stepped out from the partition) and whether the frame loop runs
+  turn: () => ({ allowed: turnAllowed, on: !!spin.s, back: !!spin.back, id: spin.s?.p.id || null, pending: spin.pending?.p.id || null,
+    deg: spin.root ? +THREE.MathUtils.radToDeg(spin.root.rotation.y).toFixed(1) : 0, out: spin.root ? +(spin.root.position.z - spin.z0).toFixed(3) : 0,
+    // how far the turning model's back is from the partition behind it, from its geometry as it stands now (metres)
+    gap: spin.s ? (() => { const bx = new THREE.Box3().setFromObject(spin.root, true), lo = [bx.min, bx.max].flatMap((a) => [bx.min, bx.max].map((c) => spin.s.group.worldToLocal(new THREE.Vector3(a.x, 0, c.z)).z)); return +(Math.min(...lo) + spin.s.size.d / 2 + BACK).toFixed(4); })() : null }),
+  // a product's model in its slot: its turn (degrees), where it stands, and how far it was stood forward when it loaded
+  pose: (id) => { const s = byId.get(id), m = s?.model; return JSON.stringify(m ? { ry: +THREE.MathUtils.radToDeg(m.rotation.y).toFixed(4), x: +m.position.x.toFixed(5), z: +m.position.z.toFixed(5), shift: +(s.shift || 0).toFixed(5) } : null); },
+  loop: () => ({ running: looping, still: stillFrames, dirty, moving: moving(), mm: mmDirty, side: side !== sideTo }),
   // getting around: the Go to menu's places (where each lands, and whether that is open floor), the coach, the floor arrows
   gotos: () => gotoSpots().map((g) => ({ id: g.id, label: g.label, pos: v3(g.pos), target: v3(g.target), open: walkable(g.pos.x, g.pos.z) })),
   coach: () => ({ shown: !$("coach").classList.contains("hide"), step: coach.step }),

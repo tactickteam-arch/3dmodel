@@ -306,7 +306,7 @@ function render() {
     return `<div class="cell"><a class="card" href="/p/${p.id}">
       <div class="pic"><img src="${p.thumb}" alt="${esc(p.name)}" loading="lazy" width="900" height="900"><span class="badge">${AR}3D and AR</span></div>
       <div class="body">
-        <img class="brandlogo" src="${p.brandLogo}" alt="${esc(p.brand)}">
+        <img class="brandlogo" src="${p.brandLogo}" alt="${esc(p.brand)}" loading="lazy" decoding="async">
         <h2>${esc(p.shortName)}</h2>
         <div class="model">Model ${highlight(p.model, query)}</div>
         ${mopLine(p)}

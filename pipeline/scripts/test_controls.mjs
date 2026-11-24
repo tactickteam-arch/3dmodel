@@ -27,6 +27,8 @@ const key = async (k, code, vk) => {
   await sleep(100);
 };
 
+// the opening turn is checked on the first product and the first unit on the wall
+const turnWall = (await (await fetch(`${base}/products.json`)).json()).products.find((p) => ids.includes(p.id) && p.placement === "wall")?.id;
 for (const id of ids) {
   console.log(`\n[${id}]`);
   b.logs.length = 0;
@@ -151,25 +153,45 @@ for (const id of ids) {
   }
   // a single click on a part still opens it: test_features.mjs taps every part with real clicks
 
-  // the slow turn (off in tests unless ?spin=1): it turns on its own once loaded, a key or a click stops it at once,
-  // and it picks up again after 8 s with nobody touching anything
-  await b.go(`${base}/p/${id}?spin=1`);
-  await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 90000);
-  const spinning = () => b.evalJS("window.__spin.spinning()");
-  check(await b.waitFor("window.__spin?.spinning()", 8000), "the view starts turning on its own once the model is in");
-  // (headless Chrome draws in software, a frame can take seconds, and each frame turns at most 0.1 s worth: so this waits
-  // for the turn instead of timing it)
-  const s0 = JSON.parse(await b.evalJS(CAM)), t0 = Date.now();
-  const s1 = await camUntil((c) => Math.abs(c.theta - s0.theta) > 1, 30000);
-  const turned = s1.theta - s0.theta, rate = turned / ((Date.now() - t0) / 1000);
-  check(turned > 1 && rate <= 12.5 && near(s1.phi, s0.phi, 0.5) && near(s1.r, s0.r, 0.01), `it turns slowly round the product (${turned.toFixed(1)} degrees, ${rate.toFixed(1)} degrees a second at most 12; tilt and distance kept)`);
-  await key("Shift", "ShiftLeft", 16);
-  const k0 = JSON.parse(await b.evalJS(CAM)); await sleep(3000); const k1 = JSON.parse(await b.evalJS(CAM));
-  check(!(await spinning()) && near(k1.theta, k0.theta, 0.5), `a key stops it, and it stays still (${(k1.theta - k0.theta).toFixed(1)} degrees in 3 s)`);
-  check(await b.waitFor("window.__spin.spinning()", 9000), "with nobody touching anything it turns again after 8 s");
-  for (const type of ["mousePressed", "mouseReleased"]) await b.send("Input.dispatchMouseEvent", { type, x: r.x + 8, y: r.y + 8, button: "left", clickCount: 1 });
-  await sleep(300);
-  check(!(await spinning()), "a click stops it again");
+  // the opening turn (off in tests unless ?spin=1): once the model is in, the view goes once round the product (a wall
+  // unit swings to each side and back) and settles exactly where it began; then it stays still. A key (outside the 3D
+  // view) stops it for good and the view glides back to the opening view; a press on the 3D view stops it where it is.
+  // (Headless Chrome draws in software and each frame turns at most 0.1 s worth, so this waits for the turn instead
+  // of timing it.) It takes a minute or two in software, so it runs on the first product and the first wall unit only.
+  if (id === ids[0] || id === turnWall) {
+    await b.go(`${base}/p/${id}?spin=1`);
+    await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 90000);
+    const spinning = () => b.evalJS("window.__spin.spinning()");
+    check(await b.waitFor("window.__spin?.spinning()", 15000), "the view starts turning on its own once the model is in");
+    const t0 = JSON.parse(await b.evalJS(CAM)), thetas = [t0.theta];
+    let tilt = true;
+    for (let i = 0; i < 900 && !(await b.evalJS("window.__spin.done()")); i++) { await sleep(200); const c = JSON.parse(await b.evalJS(CAM)); thetas.push(c.theta); tilt &&= near(c.phi, t0.phi, 0.5) && near(c.r, t0.r, 0.01); }
+    const start = (await b.evalJS("window.__spin.start()")) * 180 / Math.PI, span = Math.max(...thetas) - Math.min(...thetas);
+    const end = JSON.parse(await b.evalJS(CAM));
+    check(wall ? span > 90 && Math.max(...thetas) < 101 && Math.min(...thetas) > -101 : span > 300, `it goes ${wall ? "to each side and back" : "once round"} (${span.toFixed(0)} degrees), tilt and distance kept: ${tilt}`);
+    check(tilt && near(end.theta, start, 0.5) && near(end.phi, t0.phi, 0.5) && near(end.r, t0.r, 0.01) && !(await spinning()), `and settles where it began (${start.toFixed(1)} -> ${end.theta.toFixed(1)} degrees)`);
+    await sleep(4000);
+    const still = JSON.parse(await b.evalJS(CAM));
+    check(!(await spinning()) && near(still.theta, end.theta, 0.1), `then it stays still (${(still.theta - end.theta).toFixed(2)} degrees in 4 s)`);
+    await b.go(`${base}/p/${id}?spin=1`);
+    await b.waitFor("window.__spin?.spinning()", 90000);
+    await camUntil((c) => Math.abs(c.theta - t0.theta) > 20, 30000);
+    await key("Shift", "ShiftLeft", 16);
+    check(!(await spinning()) && await b.evalJS("window.__spin.done()"), "a key stops it at once");
+    const back = await camUntil((c) => near(c.theta, start, 1), 8000);
+    check(near(back.theta, start, 1), `and the view glides back to the opening view (${back.theta.toFixed(1)}, began at ${start.toFixed(1)} degrees)`);
+    await sleep(9000);
+    check(!(await spinning()) && near(JSON.parse(await b.evalJS(CAM)).theta, back.theta, 0.5), "it doesn't start again with nobody touching anything");
+    await b.go(`${base}/p/${id}?spin=1`);
+    await b.waitFor("window.__spin?.spinning()", 90000);
+    await camUntil((c) => Math.abs(c.theta - t0.theta) > 20, 30000);
+    await b.send("Input.dispatchMouseEvent", { type: "mousePressed", x: r.x + 8, y: r.y + 8, button: "left", clickCount: 1 });
+    const p0 = JSON.parse(await b.evalJS(CAM));
+    await b.send("Input.dispatchMouseEvent", { type: "mouseReleased", x: r.x + 8, y: r.y + 8, button: "left", clickCount: 1 });
+    await sleep(3000);
+    const p1 = JSON.parse(await b.evalJS(CAM));
+    check(!(await spinning()) && Math.abs(((p1.theta - p0.theta) % 360 + 540) % 360 - 180) < 2, `a press on the 3D view stops it where it is (${p0.theta.toFixed(1)} -> ${p1.theta.toFixed(1)} degrees)`);
+  }
 
   const errors = b.logs.filter((l) => /EXC|error/i.test(l));
   check(errors.length === 0, `no console errors${errors.length ? ": " + errors.join(" | ") : ""}`);
