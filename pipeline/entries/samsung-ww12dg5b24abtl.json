@@ -1,0 +1,165 @@
+{
+  "products": [
+    {
+      "id": "samsung-ww12dg5b24abtl",
+      "brand": "Samsung",
+      "brandLogo": "/logos/samsung.png",
+      "category": "Washing machine",
+      "model": "WW12DG5B24ABTL",
+      "name": "Samsung 12 kg front-load washing machine with AI EcoBubble, SmartThings AI Energy Mode and Hygiene Steam",
+      "shortName": "12 kg AI EcoBubble front-load washer",
+      "summary": "Open the door to see the drum, pull out the detergent drawer and open the filter cover, then place it in your home at its real size.",
+      "arTip": "Tap the door, the drawer or the filter cover to open it",
+      "glb": "/models/samsung-ww12dg5b24abtl.glb",
+      "thumb": "/photos/samsung-ww12dg5b24abtl/0.jpg",
+      "photos": ["/photos/samsung-ww12dg5b24abtl/0.jpg", "/photos/samsung-ww12dg5b24abtl/1.jpg", "/photos/samsung-ww12dg5b24abtl/2.jpg", "/photos/samsung-ww12dg5b24abtl/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 114%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#292c34",
+          "usdz": "/models/usdz/samsung-ww12dg5b24abtl-black.usdz",
+          "variant": "Black",
+          "itemCode": "WW12DG5B24ABTL",
+          "code": "WW12DG5B24ABTL"
+        },
+        {
+          "name": "Navy",
+          "swatchColor": "#2e3c52",
+          "usdz": "/models/usdz/samsung-ww12dg5b24abtl-navy.usdz",
+          "variant": "Navy",
+          "itemCode": "WW12DG5B24ASTL",
+          "code": "WW12DG5B24ASTL"
+        },
+        {
+          "name": "Refined Inox",
+          "swatchColor": "#4c4b4b",
+          "usdz": "/models/usdz/samsung-ww12dg5b24abtl-refined-inox.usdz",
+          "variant": "Refined Inox",
+          "itemCode": "WW12DG5B24AXTL",
+          "code": "WW12DG5B24AXTL",
+          "altCodes": ["WW12DG5B24AX"]
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "60 cm"
+      },
+      "sizeNote": "About 64.6 cm deep to the front of the door, measured off Samsung's side photo of this model; Samsung gives 60 cm for the cabinet",
+      "specs": [
+        ["Capacity", "12 kg"],
+        ["Type", "Front load, fully automatic"],
+        ["Max spin", "1400 rpm"],
+        ["Energy", "5 star (2024-26 label), 0.05 kWh/kg/cycle"],
+        ["Smart", "Wi-Fi, SmartThings, AI Energy Mode"],
+        ["Wash", "AI EcoBubble, Super Speed, Hygiene Steam, Bubble Soak"],
+        ["Motor", "Digital Inverter Technology, 10-year warranty on the motor"],
+        ["Drum", "Swirl drum"],
+        ["Programmes", "Cotton, eCotton, Synthetics, Hygiene Steam, Rinse+Spin, Drum Clean+, Downloaded, Quick Wash 15', Super Speed, Less Microfiber, Intense Cold, Colors, Wool/Delicates, Bedding"],
+        ["Options", "Delay End, Pre Wash, Intensive, Extra Rinse, Easy Iron, Bubble Soak, Child Lock"],
+        ["Drawer", "StayClean Drawer"],
+        ["Display", "LED"],
+        ["Door", "Carved Door, black, hinged on the left"],
+        ["Water inlet", "Cold"],
+        ["Supply", "220-240 V, 50 Hz, 1900-2300 W"],
+        ["Weight", "71 kg"],
+        ["Warranty", "2 years on the product, 10 years on the motor"],
+        ["Made in", "India"]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/ww12dg5b24abtl/21222",
+      "source": "https://www.samsung.com/in/washers-and-dryers/washing-machines/ww5000d-front-loading-smartthings-ai-energy-mode-a-10-percent-extra-energy-efficiency-ai-ecobubble-12kg-black-ww12dg5b24abtl/",
+      "hotspots": [
+        {
+          "title": "AI Ecobubble",
+          "text": "Enjoy effective washing with AI Ecobubble. Ecobubble creates bubbles that remove 24% more soil even in cool water, saves up to 70% energy and offers 45.5% better fabric care. It also detects the fabric type and adjusts the amount of bubbles, washing time, temperature and spin speed.",
+          "pos": [0.13, 0.8, 0.296],
+          "normal": [0, 0.1, 1]
+        },
+        {
+          "title": "Super Speed",
+          "text": "Cut your daily laundry time and get clothes thoroughly clean. Use Super Speed to wash a load in just 39 minutes (at the default settings with a 5 kg load).",
+          "pos": [-0.056, 0.817, 0.292],
+          "normal": [0, 0.1, 1],
+          "show": "!drawer"
+        },
+        {
+          "title": "Hygiene Steam",
+          "text": "Give clothes a deep and hygienic clean. Hygiene Steam releases steam from the bottom of the drum. It removes grime and up to 99.9% of certain bacteria and inactivates allergens derived from house dust mites.",
+          "pos": [0.004, 0.31, 0.1],
+          "normal": [0, 0.4, 1],
+          "show": "door"
+        },
+        {
+          "title": "StayClean Drawer",
+          "text": "The StayClean Drawer ensures that more of the detergent is washed away with a specially designed water flushing system. So there is less unsightly soap residue and the tray stays clean and hygienic.",
+          "pos": [-0.19, 0.79, 0.35],
+          "normal": [0, 1, 0],
+          "show": "drawer"
+        }
+      ],
+      "fit": {
+        "front": 55,
+        "sides": 2.5,
+        "top": 2.5,
+        "back": 5,
+        "note": "From Samsung's manual (DC68-04531A): at least 25 mm at the sides and top, 50 mm behind and 550 mm in front when it stands in an alcove or closet. Samsung gives 60 cm deep for the cabinet; the door and the dial stand in front of it."
+      },
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [0, 0, 0.2],
+          "zone": {
+            "closed": [
+              [-0.298, 0.721, 0.016],
+              [-0.078, 0.849, 0.3]
+            ],
+            "open": [
+              [-0.298, 0.721, 0.216],
+              [-0.078, 0.849, 0.5]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -125,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.246, 0.218, 0.22],
+              [0.254, 0.718, 0.346]
+            ],
+            "open": [
+              [-0.557, 0.218, 0.291],
+              [-0.219, 0.718, 0.726]
+            ]
+          }
+        },
+        {
+          "key": "filter",
+          "label": "filter cover",
+          "node": "FilterFlap",
+          "axis": "x",
+          "angle": 90,
+          "zone": {
+            "closed": [
+              [0.093, 0.036, 0.281],
+              [0.243, 0.15, 0.297]
+            ],
+            "open": [
+              [0.093, 0.021, 0.282],
+              [0.243, 0.037, 0.396]
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

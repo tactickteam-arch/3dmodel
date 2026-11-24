@@ -1,0 +1,8 @@
+{
+  "_about": "Samsung WW12DG5B24ASTL (Navy): Samsung's own 2024-26 label image for this model (Samsung India gallery, energy label), cut out by tex_bee_label.py (bee_cut_label_as.png).",
+  "template": "sw2024",
+  "src": "pipeline/sources/photos/samsung_ww12dg/bee_cut_label_as.png",
+  "out": "pipeline/tex/samsung_ww12dg/bee_label_as.png",
+  "width_mm": 64,
+  "words": { "series": "2024 - 26", "value": "0.05", "type": "Front Load", "cap": "12.0", "model": "WW12DG5B24ASTL", "country": "India" }
+}
