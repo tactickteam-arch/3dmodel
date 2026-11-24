@@ -53,7 +53,7 @@ DRAWER_W = 214.6
 PANEL_W = W - DRAWER_W
 
 # Colours. The photo's strip reads 77-80 (grey), the front plate 67-68, the drawer face 80. Textures render about 25%
-# brighter under the viewer light than the photo (PLAYBOOK 5.1), so they are written lower and checked on the render.
+# brighter under the viewer light than the photo, so they are written lower and checked on the render.
 SHADE = 0.78
 STRIP_RGB = (61, 61, 63)
 DRAWER_RGB = (62, 62, 64)
@@ -273,7 +273,7 @@ def panel_strip():
     red = np.asarray(PHOTO)[157:178, 431:484].reshape(-1, 3).astype(float)
     red = red[(red[:, 0] - red[:, 1]) > 30]
     print("red print in the photo (blurred into the grey)", np.percentile(red, 90, axis=0).round() if len(red) else None)
-    RED = (214, 62, 104)                                  # LG's red-pink print (PLAYBOOK 5.3: 232/52/108), toned like PROG
+    RED = (214, 62, 104)                                  # LG's red-pink print (target 232/52/108), toned like PROG
     ft = ImageFont.truetype(COND, 200, index=7)
     k = cap * S / PSY / (ft.getbbox("H")[3] - ft.getbbox("H")[1])
     rows = {}

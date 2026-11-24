@@ -2,7 +2,7 @@
 // shopper turns the model, the long highlights slide across the doors, the side that faces the key light
 // brightens, and a soft key-light shadow swings round on the floor (on the wall behind a wall unit).
 // At the opening view nothing changes from before: the light there is the one every product was matched to
-// (env/studio.hdr, PLAYBOOK section 8), and the key light adds no light of its own, only its shadow.
+// (env/studio.hdr), and the key light adds no light of its own, only its shadow.
 // Phone AR and the room photo tool keep their own light (the room's), so all of this is off while AR runs.
 // It reaches into model-viewer 4.0.0's scene through its symbols; if a later version moves them, the page
 // keeps the fixed light it had before instead of breaking.

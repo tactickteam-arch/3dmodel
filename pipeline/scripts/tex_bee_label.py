@@ -64,6 +64,6 @@ ys, xs = np.nonzero(~outside)
 y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
 alpha = np.where(outside, 0, 255).astype(np.uint8)
 img = np.dstack([rgb.astype(np.uint8), alpha])[y0:y1, x0:x1]
-# 64 colours with their alpha (PLAYBOOK: labels are 64-colour PNGs), so a label adds tens of KB, not hundreds
+# 64 colours with their alpha, so a label adds tens of KB, not hundreds
 Image.fromarray(img).quantize(colors=64, method=Image.Quantize.FASTOCTREE).save(out, optimize=True)
 print(f"{out}: {x1 - x0} x {y1 - y0} px, aspect {(x1 - x0) / (y1 - y0):.4f}")
