@@ -9,7 +9,8 @@
 // dark grey gasket ("Gasket: Dark grey"), the 525 mm drum ("525 Super Drum", "Pillow shape drum"), and the round pump-filter
 // cover bottom right (shut: no photo shows it open, BENCHMARK 7). The sides carry the pressed relief of Haier's 3/4 photos.
 // The back: the manual's rear view (Fig. 2-2) places the four transit bolts, the back cover's seven screws and the water inlet
-// valve; the cord and the drain hose are not modelled (the drawing does not show their runs clearly enough to place them).
+// valve, and its leads place the power cord (out under the top cover, to a hanging Indian 3-pin plug) and the ribbed drain
+// hose (up the back's left edge to a hook at the top).
 // The drawer's tray follows the manual's section 3.4 and Fig. 3-5 (detergent at the left with the liquid/powder flap
 // selector, softener and sanitizer at the right, the lock tab at the back); its sizes and colour ESTIMATED (no photo shows it
 // open).
@@ -81,6 +82,10 @@ const boltMat = mat("Bolt", 0xaeb2b7, { metal: 0.9, rough: 0.3 });
 const capMat = mat("BoltCapPlastic", 0x2c2e32, { rough: 0.6 });
 const screwM = mat("Screw", 0x8d9196, { metal: 0.8, rough: 0.35 });
 const valveM = mat("Valve", 0x3a3c40, { rough: 0.55 });
+const hoseM = mat("Hose", 0xffffff, { rough: 0.7 });             // the drain hose, ribbed (hose.jpg); grey UNVERIFIED
+const cordM = mat("Cord", 0x2b2c2f, { rough: 0.6 });             // UNVERIFIED colour
+const plugM = mat("PlugBody", 0x303134, { rough: 0.5 });
+const pinM = mat("PlugPin", 0xb9b4a4, { metal: 0.9, rough: 0.3 });
 
 const root = group("HaierHW90");
 const cab = group("Cabinet");
@@ -167,6 +172,47 @@ for (const [k, [bx, by]] of Object.entries(L.bolts)) {
 }
 L.screws.forEach(([sx, sy]) => cab.add(mesh("BackScrew", new THREE.CylinderGeometry(0.0045, 0.0045, 0.0006, 16).rotateX(Math.PI / 2), screwM, mm(sx), mm(sy), zB - 0.0001)));
 cab.add(mesh("InletValve", new THREE.CylinderGeometry(0.011, 0.011, 0.016, 24), valveM, mm(L.inlet[0]), mm(L.inlet[1]), zB - 0.008).rotateX(Math.PI / 2));
+// ── the drain hose and the power cord, as the manual's rear view (Fig. 2-2: "4 Power cord", "6 Drain hose") draws them;
+// both stay behind the back, so neither shows from the front, the 3/4 views or the side at eye level. Read off the drawing
+// at 200 dpi (+-10 mm); their colours UNVERIFIED (no photo shows the back).
+{
+  const rx = (X) => W / 2 - (X - 637) / 298 * W, ry = (Y) => H - (Y - 524) / 401 * (H - feet);   // drawing px -> metres
+  const tube = (name, pts, r, m, radial, perM = 110) => {
+    const c = new THREE.CatmullRomCurve3(pts, false, "centripetal");
+    const g = new THREE.TubeGeometry(c, Math.max(8, Math.round(c.getLength() * perM)), r, radial, false);
+    cab.add(mesh(name, g, m));
+    return { c, g };
+  };
+  const cap = (name, c, t, r, m) => {                         // closes a tube's end, so the hose isn't seen through
+    const p = c.getPointAt(t), d = c.getTangentAt(t);
+    const e = mesh(name, new THREE.CylinderGeometry(r, r, 0.003, 12), m, p.x, p.y, p.z);
+    e.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d);
+    cab.add(e);
+  };
+  // the drain hose (20 mm, ribbed): from its outlet low on the back (drawing 897, 905), up the back's left edge (seen from the
+  // front; the drawing's right edge, x 925) through a clip (y 630), to a hook at the top whose end hangs down (ESTIMATED shape)
+  const rd = 0.010, zD = zB - 0.0005 - rd, xe = rx(925);   // hugging the back, so as little as can be shows past its edge from the side
+  const drainPts = [[rx(897.5), ry(905)], [xe + 0.022, 0.062], [xe + 0.004, 0.09], [xe, 0.15], [xe, ry(630)], [xe, 0.77],
+    [xe + 0.0035, 0.797], [xe + 0.0175, 0.808], [xe + 0.0315, 0.797], [xe + 0.0335, 0.77], [xe + 0.0335, 0.752]]
+    .map(([x, y]) => new THREE.Vector3(x, y, zD));
+  const dr = tube("DrainHose", drainPts, rd, hoseM, 12);
+  { const uv = dr.g.attributes.uv, n = dr.c.getLength() / 0.0043; for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * n); }
+  cap("HoseCapLow", dr.c, 0, rd, hoseM);
+  cap("HoseCapEnd", dr.c, 1, rd, hoseM);
+  cab.add(box("HoseClip", 0.03, 0.012, 2 * rd + 0.003, plugM, xe, ry(630), zB - (2 * rd + 0.003) / 2 - 0.0002));
+  // the power cord (8 mm): out of the back just under the top cover (the drawing's lead 4 at x 822), down the back to its
+  // Indian 3-pin plug, hung pins-down as delivered (route below the exit ESTIMATED: the drawing shows only where it leaves)
+  const rc = 0.004, zC = zB - 0.0025 - rc, cx0 = rx(822), zPlug = zB - 0.0165;
+  cab.add(mesh("CordGrommet", new THREE.CylinderGeometry(0.009, 0.010, 0.006, 16).rotateX(Math.PI / 2), plugM, cx0, 0.803, zB - 0.003));
+  tube("PowerCord", [[cx0, 0.803, zB - 0.004], [cx0, 0.795, zC], [cx0 + 0.003, 0.70, zC], [cx0 + 0.005, 0.52, zC], [cx0 + 0.005, 0.445, zC], [cx0 + 0.005, 0.425, zPlug]]
+    .map(([x, y, z]) => new THREE.Vector3(x, y, z)), rc, cordM, 8);
+  const px = cx0 + 0.005;
+  cab.add(mesh("CordRelief", new THREE.CylinderGeometry(0.0055, 0.0075, 0.022, 14), plugM, px, 0.425 - 0.011, zPlug));
+  cab.add(mesh("Plug", new RoundedBoxGeometry(0.045, 0.042, 0.025, 2, 0.004), plugM, px, 0.403 - 0.021, zPlug));
+  // Indian 3-pin (Type D): the earth pin thicker and longer, the two others side by side (layout ESTIMATED)
+  for (const [dx, dz, r, len] of [[0, -0.006, 0.0026, 0.021], [-0.0095, 0.0045, 0.002, 0.016], [0.0095, 0.0045, 0.002, 0.016]])
+    cab.add(mesh("PlugPin", new THREE.CylinderGeometry(r, r, len, 10), pinM, px + dx, 0.361 - len / 2, zPlug + dz));
+}
 
 // ── the front below the band: the body's paint with the door seat cut out, and the raised ring round the seat (its top rises
 // over the band's lip, as in every photo) ──
@@ -329,5 +375,5 @@ const grain = { dir: `${TEX}/grain`, materials: {
 } };
 await exportGLB(root, clips, OUT, {
   SideL: `${T}/side_l.jpg`, SideR: `${T}/side_r.jpg`, Panel: `${T}/panel.jpg`, KnobTop: `${T}/knob_top.jpg`, Drum: `${T}/drum.jpg`,
-  KeyFace: `${T}/keys.jpg`, ...printTex,
+  KeyFace: `${T}/keys.jpg`, Hose: `${T}/hose.jpg`, ...printTex,
 }, grain);

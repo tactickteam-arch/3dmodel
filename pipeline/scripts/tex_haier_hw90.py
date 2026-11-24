@@ -534,3 +534,10 @@ for name, obj in (("decals_panel.json", decals_panel), ("decals_drawer.json", de
 # a full-resolution look at the print for checking (not used by the builder)
 if os.environ.get("HW90_PREVIEW"):
     Image.fromarray(np.clip(P, 0, 255).astype(np.uint8)).save(os.environ["HW90_PREVIEW"])
+
+# ════════ the drain hose's corrugation: one rib, repeated by the builder every 4.3 mm along the hose (ESTIMATED: no photo
+# shows this model's hose; the manual draws it ribbed) ════════
+rib = np.ones((16, 64, 3), np.float32) * np.array([150, 152, 155], np.float32)
+rib *= (0.68 + 0.32 * (0.5 + 0.5 * np.cos(np.linspace(0, 2 * np.pi, 64, endpoint=False))) ** 1.4)[None, :, None]
+Image.fromarray(rib.clip(0, 255).astype(np.uint8)).save(os.path.join(D, "hose.jpg"), quality=92)
+print("wrote hose.jpg")
