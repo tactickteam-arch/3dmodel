@@ -6,6 +6,7 @@ import * as pages from "./pages.js";
 import { reviewPage } from "./review.js";
 import * as tools from "./tools.js";   // requests, playlists, profile, and what each device shows
 import { trackerPage } from "./tracker.js";
+import { ordersPage } from "./orders.js";   // #/orders: read-only, also open without signing in
 import { startBell, stopBell, notificationsPage } from "./notify.js";   // the bell in the top bar, and #/notifications
 
 const params = new URLSearchParams(location.search);
@@ -16,6 +17,7 @@ const ROLES = { admin: "Admin", manager: "Manager", viewer: "Viewer" };
 const PAGES = [
   { id: "review", group: "Testing", label: "Review queue", ic: "checkCircle", run: reviewPage },   // #/review and #/review/<product id>
   { id: "dashboard", group: "Overview", label: "Dashboard", ic: "gauge", run: pages.dashboard },
+  { id: "orders", group: "Overview", label: "Orders", ic: "box", run: ordersPage },
   { id: "analytics", group: "Overview", label: "Analytics", ic: "chart", run: pages.analytics },
   { id: "stores", group: "Business operations", label: "Stores", ic: "store", run: pages.storesPage },
   { id: "devices", group: "Business operations", label: "Devices", ic: "devices", run: pages.devicesPage },
@@ -235,7 +237,24 @@ async function route() {
   catch (e) { if (my === token) el.innerHTML = errorBox(e); }
   if (my === token) el.dataset.ready = ctx.sub ? `${page.id}/${ctx.sub}` : page.id;   // for the tests
 }
-addEventListener("hashchange", route);
+// #/orders needs nothing from the database, so someone not signed in (or with the database not set up) sees it on
+// its own page, with a way to the sign-in
+const wantsOrders = () => /^#\/orders(\/|$)/.test(location.hash);
+async function showPublicOrders() {
+  destroyCharts();
+  document.title = "Orders · 3D Catalogue Admin";
+  root.innerHTML = `<div class="main" style="min-height:100vh">
+    <header class="top"><div class="brand" style="display:flex;align-items:center;gap:10px;font-weight:600"><span class="logo">${icon("cube")}</span>3D Catalogue Admin</div>
+      <span class="spacer"></span>${api ? `<a class="btn sm" href="#/dashboard">${icon("login")}Sign in</a>` : ""}</header>
+    <div class="content" style="margin:0 auto"><div id="page" style="display:grid;gap:24px;min-width:0"><div class="loading">Loading…</div></div></div></div>`;
+  const el = root.querySelector("#page");
+  try { await ordersPage({ el }); el.dataset.ready = "orders"; } catch (e) { el.innerHTML = errorBox(e); }
+}
+addEventListener("hashchange", () => {
+  if (profile) return route();
+  if (wantsOrders()) return showPublicOrders();
+  if (api) showLogin();
+});
 
 // ── start ────────────────────────────────────────────────────────────────────────────────────────────
 try {
@@ -243,9 +262,9 @@ try {
   const start = await api.start();
   profile = start.profile;
   recoveryMode = !!start.recovery;
-  if (!profile) showLogin(start.notice);
+  if (!profile) wantsOrders() ? showPublicOrders() : showLogin(start.notice);
   else { decide(); if (start.notice) toast(start.notice.text, start.notice.tone === "bad"); }
 } catch (e) {
-  fatal(e);
+  wantsOrders() ? showPublicOrders() : fatal(e);
 }
 window.__admin = { demo: DEMO, get profile() { return profile; }, get page() { return document.getElementById("page")?.dataset.ready || null; } };
