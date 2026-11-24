@@ -50,9 +50,8 @@ const BUDGET = {
   Refrigerator: { glb: 3.8, usdz: 8.0, meshes: 450, entities: 520 },
   "Washing machine": { glb: 2.5, usdz: 3.5, meshes: 80, entities: 130 },
   "Air conditioner": { glb: 1.2, usdz: 1.5, meshes: 40, entities: 70 },
-  // set before the first dishwasher (two wire racks, a cutlery basket and the door): the builder's estimate plus headroom;
-  // tighten it to the first one's real numbers once it is built
-  Dishwasher: { glb: 3.2, usdz: 4.5, meshes: 110, entities: 180 },
+  // the first dishwasher (LG DFB532FP: GLB 1.1 MB, USDZ 1.8 MB, 55 meshes, 80 entities) plus headroom for a fuller one
+  Dishwasher: { glb: 2.0, usdz: 3.0, meshes: 90, entities: 140 },
 }[cat];
 if (!BUDGET) { console.error(`gate: no budget for the category "${cat}"; add it to BUDGET in gate.mjs`); process.exit(2); }
 

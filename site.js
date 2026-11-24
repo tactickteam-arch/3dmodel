@@ -8,6 +8,7 @@ export const CATEGORIES = [
   ["Refrigerator", "Refrigerators"],
   ["Washing machine", "Washing machines"],
   ["Air conditioner", "Air conditioners"],
+  ["Dishwasher", "Dishwashers"],
 ];
 
 // A finish's address name, for ?finish=<slug>: "White and gold" -> "white-and-gold". make_pages.mjs and

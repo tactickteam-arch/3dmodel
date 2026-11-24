@@ -878,6 +878,7 @@ const TALK = { w: 192, h: 256, cols: L.places.length > 150 ? 20 : 10 }, TALK_SPE
   Refrigerator: ["Energy rating", "Compressor", "Type", "Convertible"],
   "Washing machine": ["Max spin", "Energy rating", "Motor", "Programmes"],
   "Air conditioner": ["Energy rating", "Inverter", "Capacity"],
+  Dishwasher: ["Place settings", "Wash system", "Noise level"],
 };
 {
   const tk = HQ ? 1 : 0.5, rows = Math.ceil(L.places.length / TALK.cols);

@@ -1,0 +1,139 @@
+{
+  "products": [
+    {
+      "id": "lg-dfb532fp",
+      "brand": "LG",
+      "brandLogo": "/logos/lg.png",
+      "category": "Dishwasher",
+      "model": "DFB532FP",
+      "name": "LG 14 place setting dishwasher with TrueSteam and QuadWash",
+      "shortName": "14 place setting TrueSteam dishwasher",
+      "summary": "Drop the door, pull out the lower and upper racks and see the QuadWash spray arms and the TrueSteam nozzles, then place it in your kitchen at its real size.",
+      "arTip": "Tap the door to open it",
+      "glb": "/models/lg-dfb532fp.glb",
+      "thumb": "/photos/lg-dfb532fp/0.jpg",
+      "photos": ["/photos/lg-dfb532fp/0.jpg", "/photos/lg-dfb532fp/1.jpg", "/photos/lg-dfb532fp/2.jpg", "/photos/lg-dfb532fp/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your kitchen",
+      "orbit": "-30deg 70deg 125%",
+      "finishes": [
+        {
+          "name": "Silver",
+          "swatchColor": "#a9aaac",
+          "usdz": "/models/usdz/lg-dfb532fp-silver.usdz",
+          "itemCode": "DFB532FP.APZPEIL",
+          "code": "DFB532FP"
+        }
+      ],
+      "parts": [
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "x",
+          "angle": 90,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.299, 0.08, 0.229],
+              [0.299, 0.813, 0.302]
+            ],
+            "open": [
+              [-0.299, 0.128, 0.249],
+              [0.299, 0.2, 0.983]
+            ]
+          }
+        },
+        {
+          "key": "lower",
+          "label": "lower rack",
+          "node": "LowerRack",
+          "slide": [0, 0, 0.43],
+          "needs": "door",
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.259, 0.2, -0.239],
+              [0.259, 0.432, 0.233]
+            ],
+            "open": [
+              [-0.259, 0.2, 0.191],
+              [0.259, 0.432, 0.663]
+            ]
+          }
+        },
+        {
+          "key": "upper",
+          "label": "upper rack",
+          "node": "UpperRack",
+          "slide": [0, 0, 0.33],
+          "needs": "door",
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.26, 0.51, -0.235],
+              [0.26, 0.665, 0.231]
+            ],
+            "open": [
+              [-0.26, 0.51, 0.095],
+              [0.26, 0.665, 0.561]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "60 cm",
+        "h": "85 cm",
+        "d": "60 cm"
+      },
+      "sizeNote": "85 cm tall and 60 cm deep with the door shut; the door drops down in front of it to open",
+      "specs": [
+        ["Place settings", "14"],
+        ["Type", "Free standing"],
+        ["Wash system", "QuadWash (four spray arms), TrueSteam"],
+        ["Programmes", "Auto, Intensive, Delicate, Refresh, Eco, Turbo, Machine Clean, Rinse, Express, Download Cycle"],
+        ["Options", "Dual Zone, Half Load, Energy Saver, Steam, High Temp., Extra Dry, Delay Start"],
+        ["Racks", "EasyRack Plus: upper rack adjusts to 3 heights, foldable tines, cutlery basket"],
+        ["Motor", "Inverter Direct Drive, 10 year warranty on the motor (2 years parts and labour + 8 years motor parts)"],
+        ["Smart", "LG ThinQ (Wi-Fi): download cycles, Smart Diagnosis"],
+        ["Noise level", "46 dBA"],
+        ["Power", "1600-1800 W, 220-240 V, 50 Hz"],
+        ["Weight", "48 kg"]
+      ],
+      "source": "https://www.lg.com/in/dishwasher/dfb532fp/",
+      "hotspots": [
+        {
+          "title": "Download Cycles",
+          "text": "With the LG ThinQ smartphone app, download new wash cycles to meet your needs—such as Pots & Pans, Casseroles, Glassware and Night Care.",
+          "pos": [-0.0611, 0.7806, 0.3019],
+          "normal": [0, 0, 1],
+          "show": "!door"
+        },
+        {
+          "title": "TrueSteam®",
+          "text": "TrueSteam® made by boiling water reaches the entire surface of every dish inside the tub resulting in sparkling clean dishes. Pure water particles of steam also help reduce water spots.",
+          "pos": [0, 0.196, 0.2457],
+          "normal": [0, 0, 1],
+          "show": "door"
+        },
+        {
+          "title": "QuadWash™",
+          "text": "With four spray arms instead of two, QuadWash™ provides stronger cleaning performance to clean every dish on every rack.",
+          "pos": [0, 0.19, -0.02],
+          "normal": [0, 1, 0],
+          "show": "door"
+        },
+        {
+          "title": "EasyRack™ Plus",
+          "text": "Adjust the height of the upper rack to three different levels to load taller items on any rack.",
+          "pos": [0.2565, 0.561, 0.2],
+          "normal": [-1, 0, 0],
+          "show": "door"
+        }
+      ],
+      "fit": {
+        "note": "From LG's owner's manual: in a corner, leave at least 5 cm between the dishwasher and the cabinet or wall beside it, and place it within 1 metre of the sink for the drain hose."
+      }
+    }
+  ]
+}
