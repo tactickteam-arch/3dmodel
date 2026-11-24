@@ -1,0 +1,237 @@
+{
+  "products": [
+    {
+      "id": "bosch-woe700d0in",
+      "brand": "Bosch",
+      "brandLogo": "/logos/bosch.png",
+      "category": "Washing machine",
+      "model": "WOE700D0IN",
+      "name": "Bosch Series 2 7 kg fully automatic top-load washing machine",
+      "shortName": "7 kg Series 2 top-load washer",
+      "summary": "Lift the soft-closing glass lid, pull out the detergent drawer and look into the drum, then place it in your home at its real size.",
+      "arTip": "Tap the lid or the detergent drawer to open it",
+      "glb": "/models/bosch-woe700d0in.glb",
+      "thumb": "/photos/bosch-woe700d0in/0.jpg",
+      "photos": [
+        "/photos/bosch-woe700d0in/0.jpg",
+        "/photos/bosch-woe700d0in/1.jpg",
+        "/photos/bosch-woe700d0in/2.jpg",
+        "/photos/bosch-woe700d0in/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Grey",
+          "swatchColor": "#86888c",
+          "usdz": "/models/usdz/bosch-woe700d0in-grey.usdz",
+          "itemCode": "WOE700D0IN",
+          "code": "WOE700D0IN"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -100,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.26,
+                0.902,
+                -0.14
+              ],
+              [
+                0.26,
+                0.952,
+                0.253
+              ]
+            ],
+            "open": [
+              [
+                -0.26,
+                0.937,
+                -0.193
+              ],
+              [
+                0.26,
+                1.331,
+                -0.108
+              ]
+            ]
+          }
+        },
+        {
+          "key": "drawer",
+          "label": "detergent drawer",
+          "node": "DetergentDrawer",
+          "slide": [
+            0,
+            0,
+            0.09
+          ],
+          "needs": "lid",
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.093,
+                0.916,
+                -0.213
+              ],
+              [
+                0.093,
+                0.936,
+                -0.109
+              ]
+            ],
+            "open": [
+              [
+                -0.093,
+                0.916,
+                -0.123
+              ],
+              [
+                0.093,
+                0.936,
+                -0.019
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "54.2 cm",
+        "h": "101.5 cm",
+        "d": "55.2 cm"
+      },
+      "sizeNote": "Body only, 101.5 cm tall; with the lid open it is about 133 cm",
+      "specs": [
+        [
+          "Capacity",
+          "7 kg, 47 L drum"
+        ],
+        [
+          "Type",
+          "Fully automatic top load, freestanding"
+        ],
+        [
+          "Max spin",
+          "680 rpm"
+        ],
+        [
+          "Motor",
+          "Eco Silence drive: quiet and long lasting"
+        ],
+        [
+          "Energy rating",
+          "5 star (BEE)"
+        ],
+        [
+          "Programmes",
+          "Smart, Quick, Mix, Delicates, Heavy, Whites, Cottons, Tub clean"
+        ],
+        [
+          "Options",
+          "Soak, 4 water levels, Wash, Rinse, Spin, Delay, Add Rinse, Anti-Tangle, Child Lock"
+        ],
+        [
+          "Display",
+          "LED display with digital countdown"
+        ],
+        [
+          "Lid",
+          "Soft closing, hinged at the back, glass top"
+        ],
+        [
+          "Safety",
+          "Balance control, multiple water protection"
+        ],
+        [
+          "Noise",
+          "65 dB(A) re 1 pW, washing"
+        ],
+        [
+          "Power",
+          "220-240 V, 50 Hz, 10 A fuse, India plug (6 A), 150 cm cord"
+        ],
+        [
+          "Net weight",
+          "33.6 kg"
+        ],
+        [
+          "Warranty",
+          "2 years; 10 years on the Eco Silence drive motor"
+        ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/bosch-series-2-fully-automatic-top-load-washing-machine-woe700d0in/21190",
+      "source": "https://www.bosch-home.in/en/product/washer-dryer/washing-machines/top-loading-washing-machines/WOE700D0IN",
+      "hotspots": [
+        {
+          "title": "Soft Closing Lid",
+          "text": "It provides a gradual lid closure to ensure an injury-free and silent closing of the washer lid.",
+          "pos": [
+            0.15,
+            0.9278,
+            0.208
+          ],
+          "normal": [
+            0,
+            0.997,
+            0.075
+          ],
+          "show": "!lid"
+        },
+        {
+          "title": "Smart Program",
+          "text": "With the Smart program, the washing machine will automatically choose the optimum pattern and water level by sensing the load for your laundry cycle.",
+          "pos": [
+            -0.0388,
+            1.0018,
+            -0.2359
+          ],
+          "normal": [
+            0,
+            0.912,
+            0.411
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Anti-Tangle",
+          "text": "It minimizes tangles in laundry by up to 50% making it gentler on fabric and easier to iron.",
+          "pos": [
+            0.0702,
+            1.0028,
+            -0.2382
+          ],
+          "normal": [
+            0,
+            0.912,
+            0.411
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Eco Silence drive",
+          "text": "Quiet and long lasting motor.",
+          "pos": [
+            0.217,
+            0.9892,
+            -0.208
+          ],
+          "normal": [
+            0,
+            0.912,
+            0.411
+          ],
+          "show": "always"
+        }
+      ]
+    }
+  ]
+}
