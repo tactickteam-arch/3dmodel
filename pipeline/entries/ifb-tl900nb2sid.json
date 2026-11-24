@@ -1,0 +1,128 @@
+{
+  "products": [
+    {
+      "id": "ifb-tl900nb2sid",
+      "brand": "IFB",
+      "brandLogo": "/logos/ifb.png",
+      "category": "Washing machine",
+      "model": "TL900NB2SID",
+      "name": "IFB DeepClean 9 kg top-load washing machine with Power Steam",
+      "shortName": "9 kg DeepClean top-load washer",
+      "summary": "Lift the tinted glass lid, pull out the detergent tray and look into the drum at the Triadic Pulsator and the lint tower filter, then place it in your home at its real size.",
+      "arTip": "Tap the lid to open it",
+      "glb": "/models/ifb-tl900nb2sid.glb",
+      "thumb": "/photos/ifb-tl900nb2sid/0.jpg",
+      "photos": ["/photos/ifb-tl900nb2sid/0.jpg", "/photos/ifb-tl900nb2sid/1.jpg", "/photos/ifb-tl900nb2sid/2.jpg", "/photos/ifb-tl900nb2sid/3.jpg"],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-30deg 66deg 125%",
+      "finishes": [
+        {
+          "name": "Noir Black",
+          "swatchColor": "#38383a",
+          "usdz": "/models/usdz/ifb-tl900nb2sid-noir-black.usdz",
+          "itemCode": "TL900NB2SID",
+          "code": "TL900NB2SID"
+        }
+      ],
+      "parts": [
+        {
+          "key": "lid",
+          "label": "lid",
+          "node": "Lid",
+          "axis": "x",
+          "angle": -85,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.283, 0.924, -0.181],
+              [0.283, 0.949, 0.2]
+            ],
+            "open": [
+              [-0.283, 0.943, -0.179],
+              [0.283, 1.324, -0.122]
+            ]
+          }
+        },
+        {
+          "key": "detergent",
+          "label": "detergent tray",
+          "node": "DetergentDrawer",
+          "slide": [0, 0, 0.08],
+          "needs": "lid",
+          "hint": true,
+          "zone": {
+            "closed": [
+              [-0.078, 0.879, -0.211],
+              [0.078, 0.904, -0.091]
+            ],
+            "open": [
+              [-0.078, 0.879, -0.131],
+              [0.078, 0.904, -0.011]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "57 cm",
+        "h": "95 cm",
+        "d": "59 cm"
+      },
+      "sizeNote": "95 cm tall with the lid shut; with the lid open it is about 133 cm",
+      "specs": [
+        ["Capacity", "9 kg"],
+        ["Type", "Fully automatic top load"],
+        ["Energy rating", "5 star, 0.0065 kWh/kg/cycle"],
+        ["Water use", "20 L/kg/cycle"],
+        ["Motor", "Eco Inverter Motor, 10 years on the motor"],
+        ["Steam", "Power Steam with in-built heater, hot wash at 60 °C"],
+        ["Wash", "Ai, Triadic Pulsator, 360° Bi-Axial Rotation, ActivMix, Aqua Energie"],
+        ["Programmes", "Mixed/Daily, Cotton, Express 30 min, Synthetic, Delicates, Jeans, StainFighter, Bulky, Hygiene/Anti-allergen, Rinse + Spin, Tub Clean"],
+        ["Options", "30, 40, 60 °C and Steam; 10 water levels; Pre Clean, Soak, Air Dry 5 to 120 min, Delay"],
+        ["Controls", "Programme knob and membrane tactile keys, amber LED"],
+        ["Lid", "Tinted tempered glass, soft close"],
+        ["Filter", "Lint tower filter"],
+        ["Safety", "Child lock, auto imbalance control, programme memory backup, high/low voltage protection"],
+        ["Power and water", "220-240 V, 50 Hz, 16 A; water pressure 0.3 to 10 bar"],
+        ["Colour", "Noir Black"],
+        ["Weight", "38 kg"],
+        ["Warranty", "4 years, 10 years on the motor, spare parts for 10 years"]
+      ],
+      "source": "https://www.ifbappliances.com/tl900nb2sid",
+      "hotspots": [
+        {
+          "title": "Power Steam with in-built heater",
+          "text": "Dual Steam cycle generates steam twice during the wash programme: at the start to dislodge dirt and kill 99.99% germs, and at the end to reduce wrinkles and keep clothes soft. Hot wash at 60 °C.",
+          "pos": [-0.2022, 0.8869, 0.2537],
+          "normal": [0, 0.9336, 0.3584],
+          "show": "always"
+        },
+        {
+          "title": "Eco Inverter Motor",
+          "text": "Delivers energy-efficient performance with low power consumption, and is designed for quiet operation with minimal vibration. Consumes up to 40% less energy, with a 10-year warranty.",
+          "pos": [-0.1542, 0.8865, 0.2546],
+          "normal": [0, 0.9336, 0.3584],
+          "show": "always"
+        },
+        {
+          "title": "Triadic Pulsator",
+          "text": "Delivers a 3 step wash action: scrub, swirl, punch. Soft scrub loosens stubborn dirt, Swirl Jet dislodges it and Centre Punch pushes it away.",
+          "pos": [0.07, 0.422, 0.065],
+          "normal": [0, 1, 0],
+          "show": "lid"
+        },
+        {
+          "title": "Soft Close Door",
+          "text": "The soft close feature ensures the washer door closes quietly, gently and does not slam shut.",
+          "pos": [-0.15, 0.9453, -0.005],
+          "normal": [0, 1, 0],
+          "show": "!lid"
+        }
+      ],
+      "fit": {
+        "back": 10,
+        "note": "From IFB's user manual: keep at least 100 mm between the back of the machine and the wall. The lid swings up and back: with it open the machine is about 133 cm tall (the opening angle is estimated from IFB's photos)."
+      }
+    }
+  ]
+}
