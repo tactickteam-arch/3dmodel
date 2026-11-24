@@ -61,6 +61,45 @@
   .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
   .chip .n { display: inline-grid; place-items: center; min-width: 22px; height: 22px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: #F1F1F3; color: var(--ink); font-size: 12.5px; font-weight: 600; }
   .chip[aria-pressed="true"] .n { background: var(--orange); }
+  .chip[hidden], .fbtn[hidden], .fchip[hidden] { display: none; }
+
+  /* brand and spec filters (filterGroups below): a panel under the bar; on a phone, one "Filters" button and a sheet */
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .filters { display: grid; gap: 12px; margin: -6px 0 18px; padding: 14px 18px; background: var(--card); border: 1px solid var(--hair); border-radius: 16px; }
+  .filters:empty { display: none; }
+  .fgroup { display: flex; gap: 8px 14px; align-items: baseline; min-width: 0; }
+  .flabel { flex: none; width: 118px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--slate); }
+  .fopts { display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; }
+  .fchip { border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .fchip .n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-left: 6px; padding: 0 5px; border-radius: 999px; background: #F1F1F3; font-size: 12px; font-weight: 600; }
+  .fchip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .fchip[aria-pressed="true"] .n { background: var(--orange); color: var(--ink); }
+  .fclear { justify-self: start; border: 0; background: none; padding: 4px 0; font-size: 14px; font-weight: 600; color: var(--orange-dk); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .fbtn { display: none; align-items: center; gap: 8px; border: 1px solid var(--ink); background: #fff; border-radius: 999px; padding: 11px 18px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .fbtn svg { width: 18px; height: 18px; }
+  .fbtn .n { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--orange); font-size: 12.5px; }
+  .fbtn .n:empty { display: none; }
+  .applied { display: none; }
+  .count { margin: 0 0 14px; font-size: 14px; color: var(--slate); }
+  .sheet { padding: 0; border: 0; background: var(--card); color: var(--ink); }
+  .sheet[open] { position: fixed; inset: auto 0 0 0; margin: 0; width: 100%; max-width: none; max-height: 86dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; box-shadow: 0 -12px 40px rgba(0,0,0,.2); }
+  .sheet::backdrop { background: rgba(14,14,15,.5); }
+  html:has(.sheet[open]) { overflow: hidden; }
+  .sheet .top { display: flex; align-items: center; justify-content: space-between; padding: 14px 12px 10px 20px; border-bottom: 1px solid var(--hair); }
+  .sheet h2 { margin: 0; font-size: 20px; font-weight: 600; }
+  .sheet .x { width: 44px; height: 44px; border: 0; border-radius: 50%; background: #F1F1F3; display: grid; place-items: center; cursor: pointer; }
+  .sheet .x svg { width: 20px; height: 20px; }
+  .sheet .filters { overflow-y: auto; margin: 0; border: 0; border-radius: 0; padding: 16px 20px; gap: 20px; }
+  .sheet .filters:empty::after { content: "No more filters for this choice."; color: var(--slate); }
+  .sheet .filters:empty { display: block; }
+  .sheet .fgroup { display: block; }
+  .sheet .flabel { display: block; width: auto; margin-bottom: 10px; }
+  .sheet .fchip { padding: 10px 15px; font-size: 15px; }
+  .sheet .bot { display: flex; gap: 10px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hair); }
+  .sheet .bot button { flex: 1; border-radius: 14px; padding: 14px 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .sheet .reset { border: 1px solid var(--hair); background: #fff; }
+  .sheet .reset:disabled { color: #A9AAB0; cursor: default; }
+  .sheet .done { flex: 2; border: 0; background: var(--orange); color: var(--ink); }
 
   .room { display: flex; align-items: center; gap: 20px; margin: 8px 0 4px; padding: 18px 20px; border-radius: 20px; background: var(--ink); color: #fff; text-decoration: none; overflow: hidden; position: relative; }
   .room .ic { width: 52px; height: 52px; flex: none; border-radius: 14px; background: var(--orange); display: grid; place-items: center; }
@@ -138,6 +177,15 @@
     .cbar .pick span { display: none; }
     .cbar .pick { padding: 4px; }
   }
+  @media (max-width: 700px) {
+    .wrap > .filters { display: none; }
+    .fbtn { display: inline-flex; }
+    .applied { display: flex; gap: 8px; flex-wrap: wrap; margin: -6px 0 14px; }
+    .applied:empty { display: none; }
+    .applied button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: 999px; padding: 8px 10px 8px 14px; font-size: 14px; font-weight: 500; cursor: pointer; }
+    .applied button svg { width: 14px; height: 14px; }
+    .applied .fclear { background: none; border: 0; color: var(--orange-dk); padding: 8px 4px; }
+  }
 </style>
 </head>
 <body>
@@ -173,8 +221,18 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Search model number or name" aria-label="Search by model number or name" autocomplete="off">
     </label>
-    <div class="chips" id="chips"></div>
+    <div class="chips" id="chips" role="group" aria-label="Category"></div>
+    <button class="fbtn" id="fbtn" type="button" aria-haspopup="dialog" aria-controls="fsheet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters<span class="n" id="fbtnN"></span></button>
   </div>
+  <div class="filters" id="filters" role="region" aria-label="Filters"></div>
+  <div class="applied" id="applied"></div>
+  <p class="count" id="count" role="status"></p>
+
+  <dialog class="sheet" id="fsheet" aria-labelledby="fsheetTitle">
+    <div class="top"><h2 id="fsheetTitle">Filters</h2><button class="x" id="fsheetX" type="button" aria-label="Close the filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="filters" id="sheetFilters"></div>
+    <div class="bot"><button class="reset" id="fsheetClear" type="button">Clear all</button><button class="done" id="fsheetDone" type="button">Show models</button></div>
+  </dialog>
 
   <div class="grid" id="grid"></div>
 
@@ -188,7 +246,7 @@
 </div>
 
 <script type="module">
-import { esc, CATEGORIES, fitCheck } from "/site.js";
+import { esc, CATEGORIES, fitCheck, finishSlug } from "/site.js";
 import { shownProducts } from "/live.js";
 import { loadPrices, mopOf, mopText } from "/prices.js";
 // products marked "hidden": true stay in products.json and /models, but are not shown; remove the flag to show one again.
@@ -205,8 +263,8 @@ const q = $("q");
 // after products.json loads, too late for the browser's own scroll restore, which put the list back at the top.
 history.scrollRestoration = "manual";
 const saved = history.state?.catalogue;
-if (saved) { q.value = saved.q || ""; cat = saved.cat ?? null; }
-const remember = () => history.replaceState({ ...history.state, catalogue: { y: scrollY, q: q.value, cat } }, "");
+let sel = {}; // the filters chosen: group key -> Set of option slugs (filter groups below)
+const remember = () => { writeURL(); history.replaceState({ ...history.state, catalogue: { y: scrollY, q: q.value, cat, f: selParams() } }, ""); };
 addEventListener("pagehide", remember);
 document.addEventListener("click", (e) => { if (e.target.closest?.("a.card")) remember(); }, true);
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -218,20 +276,167 @@ const READY = { compare: true, showroom: true };
 $("roomText").textContent = `All ${products.length} products in one room. Open any door on your phone, or step inside on Meta Quest or Vision Pro.`;
 if (!READY.showroom) $("roomLink").remove();
 
-// category chips, each with how many models it has
+// ── brand and spec filters ──
+// Each group puts a product under one option, read from what products.json already says: its brand, or the text of
+// one of its specs. A product a rule can't place stays in the list while nothing in that group is chosen; it never
+// vanishes from "All". Options in a group add up (LG or Samsung); groups narrow each other, the category and the
+// search. Each count is what pressing that option would show, and an option that would show nothing is left out.
+const slug = finishSlug;
+const specOf = (p, re) => (p.specs || []).find(([k]) => re.test(k))?.[1] || "";
+const num = (text, re) => { const m = re.exec(text); return m ? parseFloat(m[1]) : null; };
+const firstMatch = (texts, rules) => { for (const t of texts) for (const [re, label] of rules) if (t && re.test(t)) return label; return null; };
+const banded = (bands, v) => (v == null ? null : bands.find(([max]) => v <= max)[1]);
+const KG = [[7.5, "Up to 7.5 kg"], [8.5, "8 to 8.5 kg"], [9.5, "9 to 9.5 kg"], [11.5, "10 to 11.5 kg"], [Infinity, "12 kg and more"]];
+const LITRES = [[250, "Up to 250 L"], [350, "251 to 350 L"], [500, "351 to 500 L"], [Infinity, "Over 500 L"]];
+const WASHER_TYPES = [[/semi[- ]?automatic|twin tub/i, "Semi-automatic (twin tub)"], [/front[- ]?load/i, "Front load"], [/top[- ]?load/i, "Top load"]];
+const FRIDGE_TYPES = [[/french door|multi door/i, "French door"], [/side[- ]by[- ]side/i, "Side by side"], [/single door/i, "Single door"], [/double door/i, "Double door"]];
+const GROUPS = [
+  { key: "brand", label: "Brand", of: (p) => p.brand || null },
+  // the Type spec first; the name only when the Type spec says nothing the rule knows
+  { key: "type", label: "Type", cat: "Washing machine", order: ["Front load", "Top load", "Semi-automatic (twin tub)"], of: (p) => firstMatch([specOf(p, /^type$/i), p.name], WASHER_TYPES) },
+  { key: "type", label: "Type", cat: "Refrigerator", order: ["Single door", "Double door", "Side by side", "French door"], of: (p) => firstMatch([specOf(p, /^type$/i), p.name], FRIDGE_TYPES) },
+  // the wash capacity: the first "<n> kg" ("9 kg wash, 6 kg dry" is 9 kg)
+  { key: "capacity", label: "Capacity", cat: "Washing machine", order: KG.map(([, b]) => b), of: (p) => banded(KG, num(specOf(p, /^capacity$/i), /(\d+(?:\.\d+)?)\s*kg/i)) },
+  { key: "capacity", label: "Capacity", cat: "Refrigerator", order: LITRES.map(([, b]) => b), of: (p) => banded(LITRES, num(specOf(p, /^total capacity$/i), /(\d+(?:\.\d+)?)\s*L\b/)) },
+  // tons as Sangeetha lists them when the spec gives both the maker's and Sangeetha's figure
+  { key: "capacity", label: "Capacity", cat: "Air conditioner", of: (p) => { const s = specOf(p, /^capacity$/i), t = num(s, /Sangeetha lists it as (\d+(?:\.\d+)?)\s*ton/i) ?? num(s, /(\d+(?:\.\d+)?)\s*ton/i); return t == null ? null : `${t} ton`; } },
+  // the first "<n> star" of the Energy or Energy rating spec
+  { key: "stars", label: "Energy rating", of: (p) => { const n = num(specOf(p, /^energy( rating)?$/i), /(\d)\s*star/i); return n ? `${n} star` : null; } },
+];
+// each product's option in each group, worked out once
+const placed = new Map(products.map((p) => [p, GROUPS.map((g) => (!g.cat || g.cat === p.category ? g.of(p) : null))]));
+GROUPS.forEach((g, i) => {
+  const mine = products.filter((p) => !g.cat || g.cat === p.category);
+  const labels = [...new Set(mine.map((p) => placed.get(p)[i]).filter(Boolean))];
+  const rank = (l) => (g.order ? g.order.indexOf(l) : -1);
+  g.options = labels.sort((a, b) => rank(a) - rank(b) || parseFloat(a) - parseFloat(b) || a.localeCompare(b)).map((label) => ({ label, value: slug(label) }));
+  g.index = i;
+  g.unplaced = mine.filter((p) => !placed.get(p)[i]).map((p) => p.id);
+});
+const KEYS = [...new Set(GROUPS.map((g) => g.key))];
+const valueOf = (p, g) => { const l = placed.get(p)[g.index]; return l ? slug(l) : null; };
+const groupsNow = () => GROUPS.filter((g) => !g.cat || g.cat === cat);
+// drop what the current category has no option for (a fridge Type after switching to washers, a bad address)
+function prune() {
+  const ok = {};
+  for (const g of groupsNow()) for (const o of g.options) (ok[g.key] ||= new Set()).add(o.value);
+  for (const k of Object.keys(sel)) { sel[k] = new Set([...sel[k]].filter((v) => ok[k]?.has(v))); if (!sel[k].size) delete sel[k]; }
+}
+const chosen = () => Object.values(sel).reduce((n, s) => n + s.size, 0);
+const passes = (p, groups, skip) => groups.every((g) => g === skip || !sel[g.key]?.size || sel[g.key].has(valueOf(p, g)));
+const selParams = () => Object.fromEntries(Object.entries(sel).map(([k, s]) => [k, [...s].join(",")]));
+const setSel = (obj) => { sel = {}; for (const k of KEYS) { const v = obj?.[k]; if (v) sel[k] = new Set(String(v).split(",").map(slug).filter(Boolean)); } };
+
+// the search, category and filters live in the address (?q=&cat=&brand=lg,samsung&type=&capacity=&stars=), so a
+// shared link opens the same list; history.state keeps the scroll for "back"
+const PARAMS = ["q", "cat", ...KEYS];
+function readURL() {
+  const u = new URLSearchParams(location.search);
+  if (!PARAMS.some((k) => u.has(k))) return false;
+  q.value = u.get("q") || "";
+  const c = slug(u.get("cat") || "");
+  cat = CATEGORIES.find(([v, l]) => c && (slug(v) === c || slug(l) === c))?.[0] ?? null;
+  setSel(Object.fromEntries(KEYS.map((k) => [k, u.get(k)])));
+  return true;
+}
+function writeURL() {
+  clearTimeout(writeURL.t);
+  const u = new URL(location.href);
+  for (const k of PARAMS) u.searchParams.delete(k);
+  if (q.value.trim()) u.searchParams.set("q", q.value.trim());
+  if (cat) u.searchParams.set("cat", slug(cat));
+  for (const [k, v] of Object.entries(selParams())) u.searchParams.set(k, v);
+  const next = u.pathname + u.search.replace(/%2C/gi, ",") + u.hash;
+  // Safari refuses more than 100 address changes in 10 s: the search writes it after a pause (see q's input)
+  if (next !== location.pathname + location.search + location.hash) try { history.replaceState(history.state, "", next); } catch {}
+}
+if (!readURL() && saved) { q.value = saved.q || ""; cat = saved.cat ?? null; setSel(saved.f); }
+prune();
+
+// category chips, each with how many models it has for the search and the brand and energy filters
 const chips = $("chips");
-for (const [label, value] of CATS) {
+const catChips = CATS.map(([label, value]) => {
   const b = document.createElement("button");
   b.className = "chip";
-  b.innerHTML = `${esc(label)}<span class="n">${products.filter((p) => !value || p.category === value).length}</span>`;
-  b.setAttribute("aria-pressed", String(value === cat));
-  b.addEventListener("click", () => {
-    cat = value;
-    chips.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
-    render();
-  });
+  b.type = "button";
+  b.innerHTML = `${esc(label)}<span class="n"></span>`;
+  b.addEventListener("click", () => { cat = value; prune(); writeURL(); render(); });
   chips.appendChild(b);
+  return { b, value };
+});
+
+const XS = svg('<path d="M6 6l12 12M18 6 6 18"/>');
+const optionHtml = (g, o, n) => `<button class="fchip" type="button" data-key="${g.key}" data-value="${esc(o.value)}" aria-pressed="${!!sel[g.key]?.has(o.value)}">${esc(o.label)}<span class="n">${n}<span class="sr"> models</span></span></button>`;
+// the groups for this category: the options that would show something (and any already chosen), in groups with a choice
+function groupsHtml(inList, where) {
+  const groups = groupsNow();
+  const html = groups.map((g) => {
+    const base = inList.filter((p) => passes(p, groups, g));
+    const opts = g.options.map((o) => ({ o, n: base.filter((p) => valueOf(p, g) === o.value).length })).filter(({ o, n }) => n || sel[g.key]?.has(o.value));
+    if (opts.length < 2 && !sel[g.key]?.size) return "";
+    const id = `${where}-${g.key}`;
+    return `<div class="fgroup" role="group" aria-labelledby="${id}"><span class="flabel" id="${id}">${esc(g.label)}</span><div class="fopts">${opts.map(({ o, n }) => optionHtml(g, o, n)).join("")}</div></div>`;
+  }).join("");
+  return html + (html && chosen() && where === "fl" ? `<button class="fclear" type="button" data-clear>Clear filters</button>` : "");
 }
+function toggle(key, value) {
+  const s = (sel[key] ||= new Set());
+  s.has(value) ? s.delete(value) : s.add(value);
+  if (!s.size) delete sel[key];
+  writeURL();
+  render();
+}
+function clearFilters() { sel = {}; writeURL(); render(); }
+// a press re-draws the options: keep the keyboard on the one pressed
+function keepFocus(fn) {
+  const a = document.activeElement, was = a?.classList?.contains("fchip") && { box: a.closest(".filters")?.id, key: a.dataset.key, value: a.dataset.value };
+  fn();
+  if (was) $(was.box)?.querySelector(`.fchip[data-key="${was.key}"][data-value="${CSS.escape(was.value)}"]`)?.focus();
+}
+for (const box of [$("filters"), $("sheetFilters"), $("applied"), $("grid")]) box.addEventListener("click", (e) => {
+  const b = e.target.closest?.("[data-key], [data-clear]");
+  if (!b) return;
+  if (b.hasAttribute("data-clear")) clearFilters(); else toggle(b.dataset.key, b.dataset.value);
+});
+// on a phone: one "Filters" button, and the groups in a sheet from the bottom
+const sheet = $("fsheet");
+$("fbtn").addEventListener("click", () => { render(); sheet.showModal(); });
+$("fsheetX").addEventListener("click", () => sheet.close());
+$("fsheetDone").addEventListener("click", () => sheet.close());
+$("fsheetClear").addEventListener("click", clearFilters);
+sheet.addEventListener("click", (e) => { if (e.target === sheet) sheet.close(); }); // a tap on the dimmed page
+matchMedia("(min-width: 701px)").addEventListener("change", (e) => { if (e.matches && sheet.open) sheet.close(); });
+
+// draws the chips, the filters and their counts for the current list; render() calls it
+function renderFilters(inSearch, list) {
+  const global = GROUPS.filter((g) => !g.cat);
+  for (const { b, value } of catChips) {
+    const n = inSearch.filter((p) => (!value || p.category === value) && passes(p, global)).length;
+    b.querySelector(".n").textContent = n;
+    b.setAttribute("aria-pressed", String(value === cat));
+    b.hidden = !n && value !== null && value !== cat;
+  }
+  const inCat = inSearch.filter((p) => !cat || p.category === cat);
+  keepFocus(() => {
+    $("filters").innerHTML = groupsHtml(inCat, "fl");
+    $("sheetFilters").innerHTML = groupsHtml(inCat, "fs");
+  });
+  const k = chosen();
+  const fbtn = $("fbtn");
+  fbtn.hidden = !$("sheetFilters").innerHTML;
+  $("fbtnN").textContent = k || "";
+  fbtn.setAttribute("aria-label", k ? `Filters, ${k} chosen` : "Filters");
+  $("fsheetDone").textContent = `Show ${list.length} model${list.length === 1 ? "" : "s"}`;
+  $("fsheetClear").disabled = !k;
+  // on a phone, what is chosen stays in sight under the bar, each one a tap to take off
+  $("applied").innerHTML = !k ? "" : groupsNow().flatMap((g) => g.options.filter((o) => sel[g.key]?.has(o.value))
+    .map((o) => `<button type="button" data-key="${g.key}" data-value="${esc(o.value)}" aria-label="Remove ${esc(g.label)}: ${esc(o.label)}">${esc(o.label)}${XS}</button>`))
+    .join("") + `<button class="fclear" type="button" data-clear>Clear all</button>`;
+  const filtered = list.length !== products.length;
+  $("count").textContent = filtered ? `${list.length} of ${products.length} models` : `${products.length} models`;
+}
+// for the tests: each group and the products its rule could not place
+window.__filters = { groups: GROUPS.map((g) => ({ key: g.key, label: g.label, cat: g.cat || null, options: g.options.map((o) => o.label), unplaced: g.unplaced })) };
 
 // highlight the typed text inside a model number, ignoring spaces and dashes
 function highlight(text, query) {
@@ -295,10 +500,14 @@ $("cclear").addEventListener("click", () => { picks = []; try { localStorage.rem
 function render() {
   const query = q.value.trim();
   const n = norm(query);
-  const list = products.filter((p) => (!cat || p.category === cat) && (!n || norm(`${p.model} ${p.name} ${p.brand} ${p.category}`).includes(n)));
+  const inSearch = products.filter((p) => !n || norm(`${p.model} ${p.name} ${p.brand} ${p.category}`).includes(n));
+  const list = inSearch.filter((p) => (!cat || p.category === cat) && passes(p, groupsNow()));
+  renderFilters(inSearch, list);
   const grid = $("grid");
   if (!list.length) {
-    grid.innerHTML = `<div class="empty">No model matches <b>${esc(query)}</b> yet.<br>New models are added from their model number.</div>`;
+    grid.innerHTML = chosen()
+      ? `<div class="empty">No model matches ${query ? `<b>${esc(query)}</b> with ` : ""}these filters.<br><button class="fclear" type="button" data-clear>Clear the filters</button></div>`
+      : `<div class="empty">No model matches <b>${esc(query)}</b> yet.<br>New models are added from their model number.</div>`;
     return;
   }
   grid.innerHTML = list.map((p) => {
@@ -318,7 +527,7 @@ function render() {
   grid.querySelectorAll(".cmp").forEach((b) => b.addEventListener("click", () => togglePick(b.dataset.id)));
   renderPicks();
 }
-q.addEventListener("input", render);
+q.addEventListener("input", () => { render(); clearTimeout(writeURL.t); writeURL.t = setTimeout(writeURL, 400); });
 q.addEventListener("keydown", (e) => {
   if (e.key !== "Enter") return;
   const first = document.querySelector("#grid .card");
