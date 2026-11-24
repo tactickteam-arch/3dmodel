@@ -156,6 +156,44 @@ LABELS = {
     ),
 }
 
+# Haier HW90-DM14929EBKF: Haier's own label graphic on a marketplace listing of this model under its online code
+# EFL90-DM14IBIEBK (BEE's register files both codes under one application, 175301), 255 x 472 px for 64 mm. Shown on a
+# black backdrop, so the dark outline round the sticker can't be told from it: the cream edge is the outline's inner edge,
+# and no white margin is drawn.
+LABELS["haier_hw90"] = dict(
+    src="pipeline/sources/photos/haier_hw90/bee_cut_bee_label.png", out="pipeline/tex/haier_hw90/bee_label.png",
+    width_mm=64,
+    colours=dict(red=(218, 2, 21), yellow=(255, 249, 177), cream=(255, 252, 215), green=(2, 158, 77),
+                 margin=(255, 252, 215), ink=(35, 26, 9)),
+    cx=127.5, base=124.5,
+    outline=dict(r=126.7, ry=124.9, w=1.4, bottom=471.2, margin=0),
+    red=dict(rx=118.2, ry=119.5, stroke=2.0),
+    disc=dict(rx=59.0, ry=59.6, stroke=1.6),
+    band=dict(side=152.2, apex=227.6),
+    emblem=dict(cx=126.8, cy=216.5, r=27.6, ring=2.3, fill="cream"),
+    box=dict(x0=42.0, x1=212.6, y0=254.6, y1=305.3, w=1.35, green=(265.7, 282.0), rules=[293.2]),
+    rules=dict(ys=[315.5, 327.5, 339.5, 351.5, 363.5, 375.5, 386.5], x0=40.9, x1=213.8, w=1.3),
+    foot_rule=dict(y=453.0, x0=41.6, x1=213.7, w=1.3),
+    stars=[(42.86, 94.54, 21.8, 10.6, 0.397), (80.91, 46.75, 21.3, 19.0, 0.400), (129.46, 31.79, 20.9, 18.4, 0.420),
+           (181.07, 49.6, 21.8, 18.2, 0.390), (212.5, 93.9, 21.3, 18.5, 0.400)],
+    star_sectors=None,
+    num=dict(h=0.44, font="reg", dy=0.07),
+    words=[("MORE STARS", "black", (84.2, 96.8, 173.2, 107.9), "dark"),
+           ("MORE SAVINGS", "black", (78.1, 107.9, 178.5, 119.8), "dark"),
+           ("POWER SAVINGS", "black", (18.1, 133, 237.4, 154), "light"),
+           ("GUIDE", "black", (80.1, 156, 178.5, 180), "light"),
+           ("ENERGY CONSUMPTION", "bold", (49.4, 256, 211.7, 265.3), "dark"),
+           ("0.0501*", "bold", (51.4, 266.5, 206.5, 281.2), "green"),
+           ("kWh/kg/cycle", "bold", (49.4, 282.4, 211.7, 292.6), "dark"),
+           ("Label Period : 1st Jan 2024 - 31st Dec 2026", "bold", (46.4, 295.4, 211.0, 304.4), "dark")]
+          + [(t, "narrow", (38.9, y0, 219, y1), "faint") for t, (y0, y1) in zip(WASHER_FOOT, [(454, 462.5), (462.5, 470.5)])],
+    table=dict(split=122.0, x0=41.8, x1=224.0, rows=[("Appliance", ": Washing Machine"), ("Brand", ": Haier"),
+                                                    ("Model/Year", ": EFL90-DM14IBIEBK/2024"), ("Type", ": Front Load"),
+                                                    ("Load Capacity", ": 9.0 kg"), ("Water Consumption", ": 6.63 L/kg/cycle")]),
+    pictures=[dict(circle=(126.8, 216.5, 24.6)), dict(circle=(129.0, 422.5, 22.0)),
+              dict(box=(104.0, 446.0, 154.0, 452.3))],
+)
+
 
 def text_mask(text, font):
     """The word's ink at a large size, cropped to its ink, as an L image."""

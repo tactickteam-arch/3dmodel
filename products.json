@@ -22509,6 +22509,244 @@
           "show": "always"
         }
       ]
+    },
+    {
+      "id": "haier-hw90-dm14929ebkf",
+      "brand": "Haier",
+      "brandLogo": "/logos/haier.png",
+      "category": "Washing machine",
+      "model": "HW90-DM14929EBKF",
+      "name": "Haier 929 series 9 kg front-load washer with Puri Steam",
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-9-kg-front-load-washing-machine-hw90-dm14929ebkf/19369",
+      "shortName": "9 kg 929 front-load washer",
+      "summary": "Open the door to see the 525 mm Super Drum and pull out the detergent drawer, then place it in your home at its real size.",
+      "arTip": "Tap the door or the drawer to open it",
+      "glb": "/models/haier-hw90-dm14929ebkf.glb",
+      "thumb": "/photos/haier-hw90-dm14929ebkf/0.jpg",
+      "photos": [
+        "/photos/haier-hw90-dm14929ebkf/0.jpg",
+        "/photos/haier-hw90-dm14929ebkf/1.jpg",
+        "/photos/haier-hw90-dm14929ebkf/2.jpg",
+        "/photos/haier-hw90-dm14929ebkf/3.jpg"
+      ],
+      "placement": "floor",
+      "arLabel": "View in your home",
+      "orbit": "-26deg 76deg 118%",
+      "finishes": [
+        {
+          "name": "Black",
+          "swatchColor": "#232836",
+          "usdz": "/models/usdz/haier-hw90-dm14929ebkf-black.usdz",
+          "itemCode": "HW90-DM14929EBKF",
+          "code": "HW90-DM14929EBKF",
+          "altCodes": [
+            "HW90-DM14929ECBK"
+          ]
+        }
+      ],
+      "parts": [
+        {
+          "key": "drawer",
+          "label": "drawer",
+          "node": "Drawer",
+          "slide": [
+            0,
+            0,
+            0.22
+          ],
+          "zone": {
+            "closed": [
+              [
+                -0.295,
+                0.729,
+                -0.012
+              ],
+              [
+                -0.118,
+                0.85,
+                0.25
+              ]
+            ],
+            "open": [
+              [
+                -0.295,
+                0.729,
+                0.208
+              ],
+              [
+                -0.118,
+                0.85,
+                0.47
+              ]
+            ]
+          }
+        },
+        {
+          "key": "door",
+          "label": "door",
+          "node": "Door",
+          "axis": "y",
+          "angle": -115,
+          "hint": true,
+          "zone": {
+            "closed": [
+              [
+                -0.279,
+                0.19,
+                0.163
+              ],
+              [
+                0.279,
+                0.748,
+                0.278
+              ]
+            ],
+            "open": [
+              [
+                -0.497,
+                0.19,
+                0.249
+              ],
+              [
+                -0.198,
+                0.748,
+                0.763
+              ]
+            ]
+          }
+        }
+      ],
+      "size": {
+        "w": "59.5 cm",
+        "h": "85 cm",
+        "d": "50 cm"
+      },
+      "sizeNote": "About 53 cm deep with the door",
+      "specs": [
+        [
+          "Capacity",
+          "9 kg"
+        ],
+        [
+          "Type",
+          "Front-load washer, fully automatic"
+        ],
+        [
+          "Max spin",
+          "1400 rpm"
+        ],
+        [
+          "Motor",
+          "Direct Motion Motor"
+        ],
+        [
+          "Drum",
+          "525 mm Super Drum, pillow-shape drum, high-strength welding"
+        ],
+        [
+          "Controls",
+          "Programme knob, LED display"
+        ],
+        [
+          "Programmes",
+          "15: Cotton, Synthetics, Mix, Allergen, Baby Care, Daily, Delicate, Refresh, Quick 15', Sportswear, Jeans, Duvet, Self Clean, Shirts, Spin"
+        ],
+        [
+          "Features",
+          "Puri Steam, Dual Spray, Intense function, Anti-Bacterial Treatment on the gasket and the dispenser"
+        ],
+        [
+          "Energy",
+          "5 star, 0.0501 kWh per kg per cycle"
+        ],
+        [
+          "Water",
+          "6.63 litres per kg per cycle"
+        ],
+        [
+          "Supply",
+          "220 V, 50 Hz, 10 A, 1800 W"
+        ],
+        [
+          "Weight",
+          "62 kg"
+        ],
+        [
+          "Door",
+          "Hinged on the left, half-transparent glass with black"
+        ],
+        [
+          "Gasket",
+          "Dark grey"
+        ],
+        [
+          "Warranty",
+          "5 years comprehensive, 20 years on the motor"
+        ]
+      ],
+      "source": "https://web.archive.org/web/20240529000000*/https://www.haier.com/in/washing-machines/front-load-fully-automatic-hw90-dm14929ebkf.shtml",
+      "hotspots": [
+        {
+          "title": "Puri Steam",
+          "text": "Touch Steam to add steam to the Cotton, Synthetics, Mix, Baby Care, Allergen and Daily programmes.",
+          "pos": [
+            -0.0347,
+            0.784,
+            0.2425
+          ],
+          "normal": [
+            0,
+            0.5,
+            0.866
+          ],
+          "show": "always"
+        },
+        {
+          "title": "Direct Motion Motor",
+          "text": "Haier's direct motion motor, with a 20-year warranty on the motor.",
+          "pos": [
+            -0.237,
+            0.808,
+            0.2285
+          ],
+          "normal": [
+            0,
+            0.5,
+            0.866
+          ],
+          "show": "always"
+        },
+        {
+          "title": "15 programmes",
+          "text": "Turn the knob to pick one of 15 programmes, from Cotton and Baby Care to Quick 15' and Self Clean.",
+          "pos": [
+            0.247,
+            0.806,
+            0.2285
+          ],
+          "normal": [
+            0,
+            0.5,
+            0.866
+          ],
+          "show": "always"
+        },
+        {
+          "title": "525 mm Super Drum",
+          "text": "A 525 mm pillow-shape drum of high-strength welded steel.",
+          "pos": [
+            0.1,
+            0.52,
+            -0.16
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "show": "door"
+        }
+      ]
     }
   ]
 }
