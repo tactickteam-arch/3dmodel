@@ -63,7 +63,7 @@
         ["Cleaning", "Ice Wash technology, filter clean indicator"],
         ["Filter", "Anti-dust filter with anti-microbial coating"],
         ["Coils", "Gold fin evaporator, anti-corrosive gold fin condenser"],
-        ["Outdoor cooling", "Cools even at 52 degrees C"],
+        ["Outdoor cooling", "Cools even at 52 °C"],
         ["Warranty", "1 year product, 10 years compressor"]
       ],
       "sangeethaUrl": null,
@@ -97,8 +97,7 @@
           "normal": [1, 0, 0],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     }
   ]
 }
