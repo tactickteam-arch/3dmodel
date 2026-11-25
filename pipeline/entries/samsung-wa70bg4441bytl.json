@@ -20,7 +20,9 @@
         {
           "name": "Lavender Gray",
           "swatchColor": "#bcbec4",
-          "usdz": "/models/usdz/samsung-wa70bg4441bytl-lavender-gray.usdz"
+          "usdz": "/models/usdz/samsung-wa70bg4441bytl-lavender-gray.usdz",
+          "itemCode": "WA70BG4441BYTL",
+          "code": "WA70BG4441BYTL"
         }
       ],
       "parts": [
@@ -37,8 +39,8 @@
               [0.263, 0.927, 0.278]
             ],
             "open": [
-              [-0.263, 0.893, -0.203],
-              [0.263, 1.303, -0.064]
+              [-0.263, 0.916, -0.184],
+              [0.263, 1.326, -0.045]
             ]
           }
         },

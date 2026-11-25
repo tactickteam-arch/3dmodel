@@ -155,9 +155,12 @@ const drumDepth = 0.43;
 for (const sx of [-1, 1]) cab.add(box("HingeCover", 0.06, 0.03, 0.04, black, sx * 0.19, plateY(HINGE) + 0.015, xz(HINGE) - 0.02));
 
 // ── lid: hinged at its back edge, a black frame with a tinted window; the soft-close damper is the grey block at the hinge ──
-const lid = group("Lid", 0, (topY(HINGE) + plateY(HINGE) + 0.004) / 2, xz(HINGE));
+// It turns about its top back edge: the panel block's front stands flush with the lid's back, so a hinge any lower swung
+// the lid's top back edge into the panel (3 to 4 cm at 100 degrees, gate check parts-motion); from the top edge the lid
+// stands up in front of the panel, as a real lid stops against it. The closed lid is where it was.
+const lid = group("Lid", 0, topY(HINGE), xz(HINGE));
 {
-  const hy = lid.position.y;
+  const hy = lid.position.y, barrelY = (topY(HINGE) + plateY(HINGE) + 0.004) / 2 - hy;
   // the bevel grows the outline by BEV on every side, so the outline is drawn BEV inside the lid's real edges (BENCHMARK 2).
   // Samsung's side photo (Sangeetha photo 2) shows the lid about 25 mm thick with its front 7 mm behind the cabinet's front.
   // An 11 mm bevel on the outline had made it 49 mm thick, 11 mm too high and 14 mm in front of the cabinet
@@ -180,7 +183,7 @@ const lid = group("Lid", 0, (topY(HINGE) + plateY(HINGE) + 0.004) / 2, xz(HINGE)
   const fr = mesh("LidWindowEdge", new THREE.BoxGeometry(wx + 0.016, 0.0015, (wd + 0.016) / Math.cos(slope)), blackGloss, 0, topY(wxf) - hy + 0.0003, HINGE - wxf);
   fr.rotation.x = slope; lid.add(fr);
   // hinge barrels at the back corners and a finger notch at the front
-  for (const sx of [-1, 1]) lid.add(cyl("HingeBarrel", 0.011, 0.011, 0.045, steelM, sx * 0.19, 0, 0.0, 16).rotateZ(Math.PI / 2));
+  for (const sx of [-1, 1]) lid.add(cyl("HingeBarrel", 0.011, 0.011, 0.045, steelM, sx * 0.19, barrelY, 0.0, 16).rotateZ(Math.PI / 2));
   lid.add(box("LidDamper", 0.09, 0.012, 0.02, tubDark, 0, (plateY(HINGE) - hy) + 0.006, -0.005));
 }
 root.add(lid);
