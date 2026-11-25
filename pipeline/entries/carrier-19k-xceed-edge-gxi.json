@@ -20,7 +20,10 @@
         {
           "name": "White",
           "swatchColor": "#f3f4f6",
-          "usdz": "/models/usdz/carrier-19k-xceed-edge-gxi-white.usdz"
+          "usdz": "/models/usdz/carrier-19k-xceed-edge-gxi-white.usdz",
+          "code": "19KXCEED EDGEGXI",
+          "itemCode": "19KXCEED EDGEGXI ODU",
+          "altCodes": ["19KXCEED EDGEGXI IDU"]
         }
       ],
       "parts": [
