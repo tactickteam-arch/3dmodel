@@ -454,7 +454,7 @@ export async function partsMotion({ entry, glbFile, usdzFiles = [], own = {}, do
     const all = [...fails, ...(waived ? [] : motionBad)];
     const okLine = `matches ${clipsSeen ? "the GLB's clips" : "no clips"} and ${usdas.length} Apple file${usdas.length === 1 ? "" : "s"}; tap zones hold it; ${kind || "?"}: ${dir}; ${inside}`;
     results.push({
-      part: p.key, kind, ok: !all.length, waived: !!waived,
+      part: p.key, kind, ok: !fails.length && !motionBad.length, waived: !!waived,
       detail: `${head}: ${all.length ? all.join(" | ") : okLine}${waived ? ` (waived: ${motionBad.join("; ")}: ${wv.reason} [${wv.source}])` : ""}${notes.length ? ` (${notes.join("; ")})` : ""}`,
       numbers: { kind, dir, frac: worstFrac, deep: worstDeep, n: worstN, pts: pts.length, glbBad: glbBad.length, usdBad: usdBad.length, zoneBad: zoneBad.length },
     });
