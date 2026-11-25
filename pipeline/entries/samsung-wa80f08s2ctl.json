@@ -21,7 +21,9 @@
         {
           "name": "Deep Charcoal",
           "swatchColor": "#323235",
-          "usdz": "/models/usdz/samsung-wa80f08s2ctl-deep-charcoal.usdz"
+          "usdz": "/models/usdz/samsung-wa80f08s2ctl-deep-charcoal.usdz",
+          "itemCode": "WA80F08S2CTL",
+          "code": "WA80F08S2CTL"
         }
       ],
       "parts": [

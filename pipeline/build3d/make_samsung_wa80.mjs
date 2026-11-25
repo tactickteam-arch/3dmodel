@@ -212,7 +212,11 @@ for (const sx of [-1, 1]) {
   cab.add(mesh("TubKnob", kn, detBlack, 0.212, floorY + 0.001, xz(0.37)));
   // the detergent box's housing: a shelf over the back of the opening and a hood the drawer slides under
   cab.add(box("DetShelf", 0.196, 0.002, 0.075, detBlack, 0, floorY + 0.0005, xz(0.3675)));
-  cab.add(box("DetHood", 0.196, 0.0515, 0.045, detBlack, 0, floorY + 0.004 + 0.02575, xz(0.3825)));
+  // the hood is a shell, its top and its two sides, open at the front and back: the drawer's cups and impellers slide out
+  // of it (a solid block had them cutting through its front face as the drawer opened, gate check parts-motion). From
+  // outside it looks as the block did; the drawer's sloped face covers its open front when shut.
+  cab.add(box("DetHood", 0.196, 0.003, 0.045, detBlack, 0, floorY + 0.004 + 0.0515 - 0.0015, xz(0.3825)));
+  for (const sx of [-1, 1]) cab.add(box("DetHood", 0.003, 0.0515, 0.045, detBlack, sx * (0.098 - 0.0015), floorY + 0.004 + 0.02575, xz(0.3825)));
 }
 
 // ── lid: hinged at its back edge, a black frame round a large tinted glass window; it sits 2 mm over the top cover ──
