@@ -18599,7 +18599,7 @@
           "label": "flaps",
           "node": "FlapUpper",
           "axis": "x",
-          "angle": -40,
+          "angle": 40,
           "also": [
             {
               "node": "FlapLower",
