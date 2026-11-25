@@ -113,7 +113,7 @@ for (const id of ids) {
   const top0 = await b.evalJS("document.querySelector('aside').scrollTop");
   await key("ArrowDown", "ArrowDown", 40);
   await key("ArrowDown", "ArrowDown", 40);
-  await b.waitFor(`document.querySelector('aside').scrollTop > ${top0}`, 5000); // it scrolls smoothly
+  await b.waitFor(`document.querySelector('aside').scrollTop > ${top0}`, 20000); // it scrolls smoothly; on a busy Mac the first frames can lag several seconds
   c = await cam();
   const top1 = await b.evalJS("document.querySelector('aside').scrollTop");
   check(near(c.phi, home.phi, 0.5) && top1 > top0, `after a click in the side panel, arrows scroll it (${top0} -> ${top1} px) and the model stays`);

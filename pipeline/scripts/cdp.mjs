@@ -5,7 +5,19 @@ import fs from "node:fs";
 const BIN = "/Users/apple/Library/Caches/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-mac-arm64/chrome-headless-shell";
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// is something already serving DevTools on this port (on 127.0.0.1 or ::1)? A second browser on a busy port binds the
+// other address and the test then drives the first browser's page, so two tests end up fighting over one page
+const answers = async (port) => {
+  for (const host of ["127.0.0.1", "[::1]"]) {
+    try { const r = await fetch(`http://${host}:${port}/json/version`, { signal: AbortSignal.timeout(1500) }); if (r.ok) return host; } catch {}
+  }
+  return null;
+};
+
 export async function launch({ port = 9444, profile, flags = [] } = {}) {
+  for (let i = 0; i < 60 && (await answers(port)); i++) await sleep(1000);
+  const busy = await answers(port);
+  if (busy) throw new Error(`port ${port} is already in use by another browser (${busy}); pick another PORT`);
   const proc = spawn(BIN, [`--remote-debugging-port=${port}`, "--enable-unsafe-swiftshader", "--use-angle=swiftshader", "--hide-scrollbars", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=${profile}`, ...flags, "about:blank"], { stdio: "ignore" });
   // a test stopped by its time limit, the gate's timeout or a crash must take its browser with it: left running,
   // they piled up for days and slowed every later run
@@ -24,7 +36,7 @@ export async function launch({ port = 9444, profile, flags = [] } = {}) {
   ws.onmessage = (e) => {
     const m = JSON.parse(e.data);
     if (m.method && listeners[m.method]) listeners[m.method].forEach((fn) => fn(m.params));
-    if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+    if (m.id && pending.has(m.id)) { pending.get(m.id).ok(m); pending.delete(m.id); }
     if (m.method === "Runtime.consoleAPICalled") logs.push(`[${m.params.type}] ` + m.params.args.map((a) => a.value ?? a.description).join(" "));
     if (m.method === "Runtime.exceptionThrown") logs.push("EXCEPTION " + (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text));
     // /prices.json is on Sangeetha's server only, and absent until the prices arrive (prices.js shows the placeholder):
@@ -33,12 +45,15 @@ export async function launch({ port = 9444, profile, flags = [] } = {}) {
     if (m.method === "Log.entryAdded" && m.params.entry.level === "error") logs.push("LOG " + m.params.entry.text + " " + (m.params.entry.url || ""));
   };
   await new Promise((r) => (ws.onopen = r));
+  // the browser went away (killed, crashed, or the Mac slept and dropped it): fail every waiting call with a clear
+  // message, instead of the test quietly exiting with code 13 and no result
+  ws.onclose = () => { for (const [i, p] of pending) { pending.delete(i); p.fail(new Error("the browser closed its connection (killed, crashed or the Mac slept)")); } };
   // a reply that never comes (a screenshot on a Mac swapping hard) fails the test after 5 minutes instead of hanging the gate
   const send = (method, params = {}) => new Promise((r, j) => {
     const i = ++id;
     const t = setTimeout(() => { pending.delete(i); j(new Error(`${method} got no reply in 300 s`)); }, 300000);
     t.unref?.();
-    pending.set(i, (m) => { clearTimeout(t); r(m); });
+    pending.set(i, { ok: (m) => { clearTimeout(t); r(m); }, fail: (e) => { clearTimeout(t); j(e); } });
     ws.send(JSON.stringify({ id: i, method, params }));
   });
   await send("Runtime.enable");
