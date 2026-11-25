@@ -1497,7 +1497,7 @@
         ],
         [
           "Warranty",
-          "1 year product, 10 years compressor"
+          "1 year on the product, 10 years on the compressor"
         ]
       ],
       "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-240l-frost-free-double-door-refrigerator-or-flat-door-or-marine-carnation-or-2-star-or-hrf-2902icmc-p-hrf-2902icmc-p/20637",
@@ -2086,7 +2086,7 @@
         ],
         [
           "Extras",
-          "Twist Ice Maker, Deodorizer, top LED light"
+          "Twist Ice Maker, top LED light"
         ],
         [
           "Controls",
@@ -3659,6 +3659,10 @@
         [
           "Weight",
           "65 kg"
+        ],
+        [
+          "Warranty",
+          "1 year on the product, 10 years on the compressor"
         ]
       ],
       "source": "https://www.haier.com/in/refrigerators/haier-325l-2-star-nickel-steel-finish-bottom-mounted-frost-free-refrigerator-hrb-3752bnsa-p.shtml",
@@ -4293,7 +4297,7 @@
         ],
         [
           "Vegetable tray",
-          "38 litres"
+          "38 L"
         ],
         [
           "Extras",
@@ -5527,7 +5531,7 @@
         ],
         [
           "Energy rating",
-          "2 star, 230 kWh energy consumption"
+          "2 star, 239 units a year (BEE's register; Godrej's page says 230)"
         ],
         [
           "Compressor",
@@ -5547,7 +5551,7 @@
         ],
         [
           "Vegetable tray",
-          "33 litres"
+          "33 L"
         ],
         [
           "Extras",
@@ -5567,7 +5571,7 @@
         ],
         [
           "Warranty",
-          "1 year comprehensive, 10 years compressor"
+          "1 year comprehensive, 10 years on the compressor"
         ]
       ],
       "source": "https://www.godrejenterprises.com/home-appliances/refrigerators/double-door-frost-free/p/rt-eonvibe-366-bn-rcit-mt-bk",
@@ -7422,7 +7426,7 @@
         ],
         [
           "Power cuts",
-          "Stabiliser Free Operation"
+          "Stabilizer Free Operation"
         ],
         [
           "Controls",
@@ -7735,7 +7739,7 @@
         ],
         [
           "Energy rating",
-          "2 star, 230 kWh energy consumption"
+          "2 star, 230 units a year"
         ],
         [
           "Compressor",
@@ -7755,7 +7759,7 @@
         ],
         [
           "Vegetable tray",
-          "27 litres"
+          "27 L"
         ],
         [
           "Extras",
@@ -7840,7 +7844,7 @@
       "brandLogo": "/logos/samsung.png",
       "category": "Refrigerator",
       "model": "RT40H28U2PHL",
-      "name": "Samsung 236 L double-door refrigerator with Convertible Freezer, Elegant Inox",
+      "name": "Samsung 236 L double-door refrigerator with Convertible Freezer",
       "shortName": "236 L Convertible Freezer refrigerator",
       "summary": "Pick one of its five colours, open the freezer and the fridge one at a time, look inside, then stand it in your kitchen at its real size.",
       "arTip": "Tap a door to open it",
@@ -10451,7 +10455,7 @@
         ],
         [
           "Energy rating",
-          "3 star, 532 units a year"
+          "3 star, 532 units a year (2023-26 label)"
         ],
         [
           "Compressor",
@@ -11040,7 +11044,7 @@
         ],
         [
           "Max spin",
-          "1400 RPM"
+          "1400 rpm (1400 / 1200 / 1000 / 800 / 400 / no spin)"
         ],
         [
           "Motor",
@@ -11048,7 +11052,7 @@
         ],
         [
           "Programmes",
-          "14, including TurboWash 39 and Steam+"
+          "14, including TurboWash 39 and Allergy Care"
         ],
         [
           "Smart features",
@@ -11545,6 +11549,10 @@
         [
           "Motor",
           "EcoSilence Drive (SilentPowerDrive)"
+        ],
+        [
+          "Energy rating",
+          "5 star (BEE's register)"
         ],
         [
           "Anti Stain",
@@ -12344,6 +12352,10 @@
           "EcoSilence Drive (SilentPowerDrive)"
         ],
         [
+          "Energy rating",
+          "5 star (BEE's register)"
+        ],
+        [
           "Anti Stain",
           "Anti Stain Plus, up to 16 kinds of stain"
         ],
@@ -12784,6 +12796,10 @@
         [
           "Weight",
           "65 kg"
+        ],
+        [
+          "Warranty",
+          "2 years on the product, 10 years on the motor"
         ],
         [
           "Made in",
@@ -14520,7 +14536,7 @@
         ],
         [
           "Outdoor cooling",
-          "Cools even at 52 degrees C"
+          "Cools even at 52 °C"
         ],
         [
           "Warranty",
@@ -14699,7 +14715,7 @@
         "h": "30.6 cm",
         "d": "22.3 cm"
       },
-      "sizeNote": "Indoor unit, the size of Haier's Kinouchi Ultra range. Outdoor unit 86 x 34.5 x 55 cm",
+      "sizeNote": "Indoor unit, the size of Haier's Kinouchi Ultra range. Outdoor unit 86 x 55 x 34.5 cm",
       "specs": [
         [
           "Capacity",
@@ -14731,7 +14747,7 @@
         ],
         [
           "Outdoor cooling",
-          "Works up to 60 degrees C outdoors"
+          "Works up to 60 °C outdoors"
         ],
         [
           "Coil",
@@ -14743,7 +14759,7 @@
         ]
       ],
       "sangeethaUrl": null,
-      "source": "https://www.haier.com/in/air-conditioners/",
+      "source": "https://www.haier.com/in/air-conditioners/haier-15-ton-3-star-kinouchi-ai-atomox-hexa-inverter-split-air-conditioner-gold.shtml",
       "hotspots": [
         {
           "title": "Supersonic Cooling",
@@ -15286,7 +15302,7 @@
         ],
         [
           "Vegetable box",
-          "1, 16 litres"
+          "1, 16 L"
         ],
         [
           "Freezer",
@@ -15615,7 +15631,7 @@
         ],
         [
           "Door",
-          "PET, Pocket Handle"
+          "PET, pocket handle"
         ],
         [
           "Light",
@@ -17607,6 +17623,10 @@
         [
           "Weight",
           "64 kg"
+        ],
+        [
+          "Warranty",
+          "2 years on the product, 10 years on the compressor"
         ]
       ],
       "source": "https://www.haier.com/in/refrigerators/265-litres-frost-free-bottom-mounted-refrigerator-hrb-3152pmg-p.shtml",
@@ -17886,7 +17906,7 @@
         ],
         [
           "Shelves",
-          "4 toughened glass shelves (fridge)"
+          "4 toughened glass (fridge)"
         ],
         [
           "Vegetable box",
@@ -17898,7 +17918,7 @@
         ],
         [
           "Ice maker",
-          "Manual, 2 lever 2 tray"
+          "Manual, 2 levers and 2 trays"
         ],
         [
           "Control",
@@ -18425,7 +18445,7 @@
         ],
         [
           "Outdoor cooling",
-          "Works up to 52 degrees C outdoors"
+          "Works up to 52 °C outdoors"
         ],
         [
           "Condenser",
@@ -18632,7 +18652,7 @@
         ],
         [
           "Power use",
-          "880.1 kWh a year"
+          "880.1 units a year"
         ],
         [
           "Compressor",
@@ -18875,7 +18895,7 @@
         ],
         [
           "Power use",
-          "769.55 kWh a year"
+          "769.55 units a year"
         ],
         [
           "Compressor",
@@ -19014,8 +19034,7 @@
           "itemCode": "GLS18I3ASCHC ODU",
           "sangeethaUrl": "https://www.sangeetha.com/product-details/lloyd-classic-series-inverter-split-ac-1-5-or-3-star-gls18i3aschc/20486",
           "altCodes": [
-            "GLS18I3ASCHC IDU",
-            "GLS18I3ASCHC ODU"
+            "GLS18I3ASCHC IDU"
           ]
         },
         {
@@ -19105,7 +19124,7 @@
         ],
         [
           "Operating temperature",
-          "16 to 54 degrees C"
+          "16 to 54 °C"
         ],
         [
           "Power supply",
@@ -19286,7 +19305,7 @@
         "h": "31 cm",
         "d": "21 cm"
       },
-      "sizeNote": "Indoor unit, Haier's size for HSU18C-TQB3BN-INV. Outdoor unit 86 x 55 x 35 cm",
+      "sizeNote": "Indoor unit, Haier's size for HSU18C-TQB3BN-INV. Outdoor unit 86 × 35 × 55 cm (W × D × H)",
       "specs": [
         [
           "Capacity",
@@ -19550,11 +19569,11 @@
         ],
         [
           "Energy",
-          "5 star, 0.0408 kWh per kg per cycle"
+          "5 star, 0.0408 kWh/kg/cycle"
         ],
         [
           "Water",
-          "6.45 litres per kg per cycle"
+          "6.45 L/kg/cycle"
         ],
         [
           "Noise",
@@ -19779,7 +19798,7 @@
         ],
         [
           "Heater",
-          "In-built, heats water up to 90°C"
+          "In-built, heats water up to 90 °C"
         ],
         [
           "Programmes",
@@ -20802,11 +20821,11 @@
         ],
         [
           "Energy",
-          "5 star, 0.0450 kWh per kg per cycle"
+          "5 star, 0.0450 kWh/kg/cycle"
         ],
         [
           "Water",
-          "7.43 litres per kg per cycle"
+          "7.43 L/kg/cycle"
         ],
         [
           "Noise",
@@ -21497,7 +21516,7 @@
         ],
         [
           "Programmes",
-          "Cotton, eCotton, Synthetics, Hygiene Steam, Rinse+Spin, Drum Clean, Mixed Load, Quick Wash 15', Bedding, Colors, Wool/Delicates, Towels"
+          "Cotton, eCotton, Synthetics, Hygiene Steam, Rinse+Spin, Drum Clean, Mixed Load, Quick Wash 15', Bedding, Colours, Wool/Delicates, Towels"
         ],
         [
           "Options",
@@ -22654,11 +22673,11 @@
         ],
         [
           "Energy",
-          "5 star, 0.0501 kWh per kg per cycle"
+          "5 star, 0.0501 kWh/kg/cycle"
         ],
         [
           "Water",
-          "6.63 litres per kg per cycle"
+          "6.63 L/kg/cycle"
         ],
         [
           "Supply",
@@ -23622,7 +23641,7 @@
         ],
         [
           "Heater",
-          "In-built, washes with water up to 60°C"
+          "In-built, washes with water up to 60 °C"
         ],
         [
           "Spin speed",
@@ -23925,7 +23944,7 @@
           "54 dB(A) washing"
         ],
         [
-          "Energy",
+          "Energy rating",
           "5 star (BEE's register)"
         ],
         [
@@ -24154,11 +24173,11 @@
         ],
         [
           "Energy",
-          "5 star, 0.0342 kWh per kg per cycle (BEE label HA XC 90 BD 5S/2025)"
+          "5 star, 0.0342 kWh/kg/cycle (BEE label HA XC 90 BD 5S/2025)"
         ],
         [
           "Water",
-          "9 litres per kg per cycle (BEE label)"
+          "9 L/kg/cycle (BEE label)"
         ],
         [
           "Supply",
@@ -24264,7 +24283,8 @@
           "swatchColor": "#3a3b3f",
           "usdz": "/models/usdz/haier-hwm110-h688bk-black.usdz",
           "itemCode": "HWM110-H688BK:NOIDA",
-          "code": "HWM110-H688BK"
+          "code": "HWM110-H688BK",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-11-kg-5-star-fully-automatic-top-load-washing-machine-in-built-butterfly-heater-black-hwm110-h688bk-noida/21229"
         }
       ],
       "parts": [
@@ -24425,7 +24445,8 @@
           ],
           "show": "lid"
         }
-      ]
+      ],
+      "sangeethaUrl": "https://www.sangeetha.com/product-details/haier-11-kg-5-star-fully-automatic-top-load-washing-machine-in-built-butterfly-heater-black-hwm110-h688bk-noida/21229"
     },
     {
       "id": "whirlpool-33015",
@@ -24571,11 +24592,11 @@
         ],
         [
           "Energy",
-          "5 star, 0.0376 kWh per kg per cycle (BEE label HA XC 80 BD 5S/2025)"
+          "5 star, 0.0376 kWh/kg/cycle (BEE label HA XC 80 BD 5S/2025)"
         ],
         [
           "Water",
-          "9 litres per kg per cycle (BEE label)"
+          "9 L/kg/cycle (BEE label)"
         ],
         [
           "Supply",
@@ -26183,7 +26204,7 @@
         ],
         [
           "Programmes",
-          "9: Mix/Daily, Cotton, Express 30', Delicates, Baby Wear, StainFighter, Bulky, Anti-Allergen and Tub Clean"
+          "9: Mix/Daily, Cotton, Express 30 min, Delicates, Baby Wear, StainFighter, Bulky, Anti-Allergen and Tub Clean"
         ],
         [
           "Features",
@@ -26322,7 +26343,8 @@
           "usdz": "/models/usdz/samsung-ww12dg5b24abtl-navy.usdz",
           "variant": "Navy",
           "itemCode": "WW12DG5B24ASTL",
-          "code": "WW12DG5B24ASTL"
+          "code": "WW12DG5B24ASTL",
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/ww12dg5b24astl/21221"
         },
         {
           "name": "Refined Inox",
@@ -26333,7 +26355,8 @@
           "code": "WW12DG5B24AXTL",
           "altCodes": [
             "WW12DG5B24AX"
-          ]
+          ],
+          "sangeethaUrl": "https://www.sangeetha.com/product-details/ww12dg5b24axtl/21824"
         }
       ],
       "size": {
@@ -26377,7 +26400,7 @@
         ],
         [
           "Programmes",
-          "Cotton, eCotton, Synthetics, Hygiene Steam, Rinse+Spin, Drum Clean+, Downloaded, Quick Wash 15', Super Speed, Less Microfiber, Intense Cold, Colors, Wool/Delicates, Bedding"
+          "Cotton, eCotton, Synthetics, Hygiene Steam, Rinse+Spin, Drum Clean+, Downloaded, Quick Wash 15', Super Speed, Less Microfiber, Intense Cold, Colours, Wool/Delicates, Bedding"
         ],
         [
           "Options",
@@ -26937,7 +26960,7 @@
         ],
         [
           "Heater",
-          "In-built, heats water up to 90°C"
+          "In-built, heats water up to 90 °C"
         ],
         [
           "Programmes",
@@ -27213,7 +27236,7 @@
         ],
         [
           "Warranty",
-          "4 years, 10 years on the motor, spare parts for 10 years"
+          "4 years on the machine, 10 years on the motor, 10 years spare parts support"
         ]
       ],
       "source": "https://www.ifbappliances.com/tl900nb2sid",
