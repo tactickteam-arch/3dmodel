@@ -1,5 +1,11 @@
 {
   "sticksOut": {
     "Door[A-Z]\\w*|Knob[A-Z]\\w*|Flap[A-Z]\\w*|Drawer(Face|Bar)|DisplayGlass|LockSlot": "Bosch's manual gives an appliance depth of 59.0 cm and 63.6 cm with the door closed (manual 9001946103, technical data). The door, the dial, the drawer face and its bar, the display glass, the lock slot and the pump-filter flap stand in front of the cabinet."
+  },
+  "motion": {
+    "door": {
+      "reason": "Bosch gives 104.9 cm deep with the door open at 90 degrees, which puts the door's hinge axis 33 mm behind the body front at the rim's left edge. So the back of the rim on the hinge side swings up to 3 cm behind the body front there (about 1 % of the door, at the hinge), hidden behind the rim and the side panel. The door's free edge comes forward all the way, and nothing else of it goes into the body.",
+      "source": "Bosch manual 9001946103 (technical data) and Bosch's WGA254ZPIN page: 59.0 cm deep, 63.6 cm with the door closed, 104.9 cm with the door open at 90 degrees"
+    }
   }
 }
