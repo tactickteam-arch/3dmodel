@@ -4,7 +4,7 @@
 // FAIL or WAIVED for each check, with the numbers) and REVIEW.md (the pictures to look at), and exits 1 on any FAIL.
 // usage: node pipeline/scripts/gate.mjs <id> [out dir, default .work/gate/<id>] [--fast] [--entry <entry file>]
 //   --fast skips the page tests and the renders (for quick rounds while building; a product passes only on a full run)
-//   --entry gates the entry in that file instead of the one in products.json (a product being rebuilt)
+//   --entry gates the entry in that file instead of the one in products.json (a product being rebuilt); GATE_ENTRY=<file> too
 //   GATE_PORT=<n> picks the ports (server n, browsers n+1 to n+12; default 8800), so several gates can run at once
 // Waivers and parts that really stick out past the published size: pipeline/entries/gate.json (each with its reason).
 import fs from "node:fs";
@@ -23,7 +23,9 @@ const { ALL_EXTENSIONS } = await import(req.resolve("@gltf-transform/extensions"
 
 const args = process.argv.slice(2);
 const fast = args.includes("--fast");
-const entryArg = args.includes("--entry") ? args[args.indexOf("--entry") + 1] : null;
+// GATE_ENTRY=<entry file> does the same as --entry, for runs through a wrapper (a product already on show being rebuilt:
+// its new entry is gated before promote.py puts it into products.json)
+const entryArg = args.includes("--entry") ? args[args.indexOf("--entry") + 1] : process.env.GATE_ENTRY || null;
 const [id, outArg] = args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--entry");
 if (!id) { console.error("usage: node pipeline/scripts/gate.mjs <id> [out dir] [--fast] [--entry pipeline/entries/<id>.json]"); process.exit(2); }
 const OUT = path.resolve(outArg || `${SITE}/.work/gate/${id}`);
@@ -206,6 +208,22 @@ for (const u of usdzFiles) {
   if (!fast && !/-free$/.test(name)) {
     for (const pose of ["closed", "open"]) run(`${SITE}/tools/bin/render_usdz`, [f, `${OUT}/apple-${name}-${pose}.png`, ...(pose === "open" ? ["open"] : [])], { timeout: 300000 });
     record("apple-render", ["closed", "open"].every((p) => fs.existsSync(`${OUT}/apple-${name}-${p}.png`)), `${name}: Apple renders apple-${name}-closed.png and -open.png (look at them)`);
+  }
+}
+
+// ── 3a. every moving part moves the same way in every viewer, and the way the real one does (parts_motion.mjs): the
+// entry's angle/slide against the GLB's clips, every Apple file's poses and the tap zones; the free edge's way at
+// 25/50/75/100 % open; nothing going into the body. One line per part. Only a part's direction and intrusion can be
+// excused, in pipeline/entries/<id>.gate.json "motion" with its reason and source; gate.json's waivers don't apply.
+if (doc) {
+  const { partsMotion } = await import(`${SCR}/parts_motion.mjs`);
+  let res;
+  try { res = await partsMotion({ entry, glbFile: file(entry.glb), usdzFiles: usdzFiles.map(file), own: cfgOwn, doc }); }
+  catch (e) { res = [{ part: "?", ok: false, detail: `the check failed to run: ${e.message}` }]; }
+  for (const r of res) {
+    const status = r.ok ? "PASS" : r.waived ? "WAIVED" : "FAIL";
+    results.push({ key: "parts-motion", status, detail: r.detail });
+    console.log(`${status.padEnd(6)} ${"parts-motion".padEnd(14)} ${r.detail}`);
   }
 }
 
