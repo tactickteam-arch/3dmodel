@@ -148,6 +148,9 @@ for (const id of ids) {
     }
     // move it: point at a floor spot the open parts don't stand in front of (a door open to 135-140 degrees, as on LG
     // front-loaders, covers the spot to the left; pointing through it would rightly close the door instead)
+    // a wall unit keeps its hanging height: its box, open parts and all, is where it was before the move (a louvre
+    // that swings out and down, or a panel that lifts, moves the open box's middle off 2.05 m; the closed one is checked above)
+    const hung = await still();
     let spot, hv;
     for (const s of [[-0.9, 0, -1.6], [0.9, 0, -1.6], [-1.5, 0, -0.9], [1.5, 0, -0.9]]) {
       spot = s;
@@ -161,7 +164,7 @@ for (const id of ids) {
     inf = await info();
     bx = await still();
     const yawTo = Math.atan2(-inf.holder[0], -inf.holder[2]); // its front towards your head (at x 0, z 0)
-    check(hv?.type === "floor" && Math.hypot(inf.holder[0] - spot[0], inf.holder[2] - spot[2]) < 0.05 && Math.abs(inf.holder[1] - bx.floorY) < 1e-6 && Math.abs(Math.sin(inf.yaw - yawTo)) < 0.05 && (wall ? Math.abs((bx.min[1] + bx.max[1]) / 2 - 2.05) < 0.01 : true),
+    check(hv?.type === "floor" && Math.hypot(inf.holder[0] - spot[0], inf.holder[2] - spot[2]) < 0.05 && Math.abs(inf.holder[1] - bx.floorY) < 1e-6 && Math.abs(Math.sin(inf.yaw - yawTo)) < 0.05 && (wall ? Math.abs((bx.min[1] + bx.max[1]) / 2 - (hung.min[1] + hung.max[1]) / 2) < 0.01 : true),
       `pointing at the floor and pulling the trigger moves it there, on the floor, facing you (${inf.holder.map((v) => v.toFixed(2))})`);
     if (!noShots) await b.shot(`${out}/3-ar-moved.png`);
     await aim("right", hand, await b.evalJS("window.__xrDebug.buttonWorld('exit:')"));
