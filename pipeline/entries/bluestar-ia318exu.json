@@ -61,7 +61,7 @@
         ["Filters", "PM2.5 filter with activated carbon, high density dust filter"],
         ["Airflow", "630 / 470 / 410 / 350 CFM"],
         ["Indoor noise", "54 / 48 / 44 / 40 dBA"],
-        ["Outdoor cooling", "Works up to 52 degrees C outdoors"],
+        ["Outdoor cooling", "Works up to 52 °C outdoors"],
         ["Condenser", "100% copper, R32 refrigerant"],
         ["Remote", "LCD remote with display, night glow buttons"],
         ["Indoor unit weight", "11 kg"]
@@ -97,8 +97,7 @@
           "normal": [1, 0, 0],
           "show": "always"
         }
-      ],
-      "hidden": true
+      ]
     }
   ]
 }
