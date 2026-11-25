@@ -20,7 +20,9 @@
         {
           "name": "Graphite",
           "swatchColor": "#363638",
-          "usdz": "/models/usdz/whirlpool-31688-graphite.usdz"
+          "usdz": "/models/usdz/whirlpool-31688-graphite.usdz",
+          "itemCode": "31688",
+          "code": "31688"
         }
       ],
       "parts": [
@@ -37,8 +39,8 @@
               [0.272, 0.962, 0.296]
             ],
             "open": [
-              [-0.272, 0.927, -0.27],
-              [0.272, 1.396, -0.08]
+              [-0.272, 0.962, -0.241],
+              [0.272, 1.431, -0.051]
             ]
           }
         }
