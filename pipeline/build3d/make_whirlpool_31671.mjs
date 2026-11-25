@@ -399,7 +399,10 @@ export function buildBloomwash(K) {
   // ── lid: hinged at its back edge; one tinted glass over the whole top, a grey frame under it, a chrome edge at the front ──
   // (the frame stands 0.9 mm off the top cover, just over the flicker gap: at 2 mm a grazing look ran along the slit under
   // the closed lid and out the far side)
-  const PIV = [seat(K.lid1), K.lid1];
+  // It turns about its top back edge: the panel housing stands flush with the lid's back, so a hinge at the seat swung the
+  // lid's top back edge 3 to 5 cm into the housing when open (gate check parts-motion); from the top edge it stands up in
+  // front of the panel. The closed lid is where it was.
+  const PIV = [lidTop(K.lid1), K.lid1];
   const lid = group("Lid", 0, PIV[0], xz(PIV[1]));
   {
     const off = (m) => { m.geometry.translate(0, -PIV[0], -xz(PIV[1])); return m; };

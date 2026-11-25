@@ -20,7 +20,9 @@
         {
           "name": "Midnight Grey",
           "swatchColor": "#464d56",
-          "usdz": "/models/usdz/whirlpool-31671-midnight-grey.usdz"
+          "usdz": "/models/usdz/whirlpool-31671-midnight-grey.usdz",
+          "itemCode": "31671",
+          "code": "31671"
         }
       ],
       "parts": [
@@ -37,8 +39,8 @@
               [0.257, 0.95, 0.283]
             ],
             "open": [
-              [-0.257, 0.924, -0.287],
-              [0.257, 1.392, -0.079]
+              [-0.257, 0.95, -0.265],
+              [0.257, 1.419, -0.058]
             ]
           }
         }
