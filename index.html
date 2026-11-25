@@ -157,6 +157,9 @@
   .empty { grid-column: 1 / -1; text-align: center; padding: 48px 16px; color: var(--slate); background: var(--card); border: 1px dashed var(--hair); border-radius: 20px; font-size: 16px; line-height: 1.5; }
   .empty b { color: var(--ink); }
   footer { border-top: 1px solid var(--hair); padding: 22px 0 36px; font-size: 13px; line-height: 1.6; color: var(--slate); }
+  footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; }
+  .built-by { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--slate); opacity: .75; white-space: nowrap; }
+  .built-by img { height: 13px; width: auto; display: block; }
   .embed header, .embed .hero { display: none; }
   .note { margin: 24px 0 0; padding: 14px 18px; border-radius: 14px; background: var(--orange-bg); font-size: 16px; line-height: 1.45; }
 
@@ -242,7 +245,7 @@
     <button class="clear" id="cclear" aria-label="Clear the comparison"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
 
-  <footer>3D models made for Sangeetha from each brand’s official photos and published dimensions. Demo prepared by Tanmay Agarwal.</footer>
+  <footer><span>3D models made for Sangeetha from each brand’s official photos and published dimensions. Demo prepared by Tanmay Agarwal.</span><span class="built-by">Built by <img src="/brand/tactick.svg" alt="Tactick" width="76" height="13"></span></footer>
 </div>
 
 <script type="module">
