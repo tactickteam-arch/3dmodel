@@ -175,3 +175,11 @@ Set from the reference products, with headroom:
 | Split AC | 1.2 MB | 1.5 MB | 40 | 70 |
 
 Going over a budget is a FAIL. Cut segment counts and texture sizes first, and never cut real detail.
+
+**What a budget Android phone (about 4 GB) holds in AR**, checked by `test_arphone.mjs` (gate check page-arphone) from the GLB itself (`glb_load.mjs`), for every product:
+
+| Textures once decoded (every colour, with mipmaps) | Largest image side | Triangles | Draw calls (stock shown) |
+|---|---|---|---|
+| 256 MB | 4096 px | 100,000 | 1,000 |
+
+The reasons and sources are written next to the numbers in `test_arphone.mjs`.

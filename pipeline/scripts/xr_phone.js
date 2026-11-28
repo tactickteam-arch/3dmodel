@@ -1,11 +1,17 @@
 // A stand-in for phone AR in Chrome on Android (WebXR "immersive-ar" with hit testing), for the browser
-// tests. The room is one flat floor 1.35 m below where the phone starts. The test aims the phone,
+// tests. The room is one flat floor 1.35 m below where the phone starts, and, when the test puts one there
+// (`state.wall` = its z), a flat wall facing the phone's first view, for units that hang on a wall. The test aims the phone,
 // decides when the floor has been "found", and touches the screen; hit tests answer from the floor.
 // It is not ARCore: real tracking, drift, shiny floors and camera images are not part of it.
+// Light estimation ("light-estimation", which model-viewer asks for with xr-environment) is off unless the test sets
+// `state.light` before AR starts: { sh: 27 numbers, dir: [x, y, z], intensity: [r, g, b] } is the room's light as
+// ARCore would estimate it, sent once `state.light.on` is true; `state.light.reflection` = [r, g, b] (0-255) is a plain
+// room-coloured reflection cube map, sent with a "reflectionchange" when the test calls __phone.reflect() (again after
+// a change of colour, for a room whose light changes).
 // Inject it before the page loads (Page.addScriptToEvaluateOnNewDocument), with an Android user agent.
 (() => {
   const FLOOR = -1.35, FOV_Y = 62 * Math.PI / 180, NEAR = 0.05, FAR = 100;
-  const phone = { pos: [0, 0, 0], q: [0, 0, 0, 1], floorFound: true, session: null, touch: null, frames: 0 };
+  const phone = { pos: [0, 0, 0], q: [0, 0, 0, 1], floorFound: true, wall: null, light: null, probe: null, session: null, touch: null, frames: 0 };
 
   const qRotate = ([x, y, z, w], [vx, vy, vz]) => {
     const ix = w * vx + y * vz - z * vy, iy = w * vy + z * vx - x * vz, iz = w * vz + x * vy - y * vx, iw = -x * vx - y * vy - z * vz;
@@ -31,12 +37,17 @@
     const t = Math.tan(FOV_Y / 2), d = [ax * t * aspect(), -ay * t, -1], l = Math.hypot(...d);
     return { o: phone.pos, d: qRotate(phone.q, d.map((v) => v / l)) };
   };
+  // the nearest surface along a ray: the floor (its pose's y axis points up), or the wall (its y axis points out of
+  // the wall, towards the room, as ARCore gives a wall's hit pose)
   const floorHit = ({ o, d }) => {
-    if (!phone.floorFound || d[1] >= -1e-6) return null;
-    const t = (FLOOR - o[1]) / d[1];
-    if (t <= 0 || t > 20) return null;
-    const p = [o[0] + d[0] * t, FLOOR, o[2] + d[2] * t];
-    return { getPose: () => ({ transform: rigid(p, [0, 0, 0, 1]), emulatedPosition: false }), point: p };
+    if (!phone.floorFound) return null;
+    const hits = [];
+    if (d[1] < -1e-6) hits.push([(FLOOR - o[1]) / d[1], [0, 0, 0, 1]]);
+    if (phone.wall != null && d[2] < -1e-6) hits.push([(phone.wall - o[2]) / d[2], [Math.SQRT1_2, 0, 0, Math.SQRT1_2]]);
+    const [t, q] = hits.filter(([t]) => t > 0 && t <= 20).sort((a, b) => a[0] - b[0])[0] || [];
+    if (t == null) return null;
+    const p = [o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t];
+    return { getPose: () => ({ transform: rigid(p, q), emulatedPosition: false }), point: p };
   };
 
   class Space extends EventTarget { constructor(type) { super(); this.type = type; } getOffsetReferenceSpace() { return this; } }
@@ -58,6 +69,11 @@
       const l = Math.hypot(...d), wo = qRotate(phone.q, o).map((v, i) => v + phone.pos[i]), wd = qRotate(phone.q, d.map((v) => v / l));
       const h = floorHit({ o: wo, d: wd });
       return h ? [h] : [];
+    }
+    getLightEstimate(probe) {
+      const l = phone.light;
+      if (!l?.on || probe !== phone.probe) return null;
+      return { sphericalHarmonicsCoefficients: new Float32Array(l.sh), primaryLightDirection: new DOMPointReadOnly(...l.dir, 0), primaryLightIntensity: new DOMPointReadOnly(...l.intensity, 1) };
     }
     getHitTestResultsForTransientInput(src) {
       if (src.cancelled || !phone.touch) return [];
@@ -94,6 +110,11 @@
         this.rootStyle = this.root.getAttribute("style");
         this.root.style.cssText += ";position:fixed;inset:0;width:100%;height:100%;";
         document.documentElement.classList.add("xr-overlay");
+      }
+      if (phone.light) {
+        this.enabledFeatures.push("light-estimation");
+        this.preferredReflectionFormat = "srgba8";
+        this.requestLightProbe = () => Promise.resolve((phone.probe = new EventTarget()));
       }
       this.cbs = new Map(); this.next = 0; this.ended = false;
       const tick = (t) => {
@@ -141,7 +162,25 @@
   });
   Object.defineProperty(navigator, "xr", { value: xr, configurable: true });
 
-  Object.assign(window, { XRSession: Session, XRWebGLLayer: Layer, XRRay, XRHitTestSource: HitSource });
+  // the room's reflections, as a cube map texture in the page's own WebGL context
+  class Binding {
+    constructor(session, gl) { this.gl = gl; this.cube = null; }
+    getReflectionCubeMap(probe) {
+      const c = phone.light?.reflection;
+      if (!c || !phone.light.sent || probe !== phone.probe) return null;
+      // a room that changes (a lamp switched on) sends a new map into the same texture, as ARCore does
+      if (this.cube && this.colour === String(c)) return this.cube;
+      const gl = this.gl, t = this.cube || gl.createTexture(), n = 16, px = new Uint8Array(n * n * 4);
+      this.colour = String(c);
+      for (let i = 0; i < n * n; i++) px.set([...c, 255], i * 4);
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, t);
+      for (let f = 0; f < 6; f++) gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + f, 0, gl.RGBA, n, n, 0, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+      return (this.cube = t);
+    }
+  }
+  Object.assign(window, { XRSession: Session, XRWebGLLayer: Layer, XRWebGLBinding: Binding, XRRay, XRHitTestSource: HitSource });
   for (const C of [window.WebGLRenderingContext, window.WebGL2RenderingContext]) if (C) C.prototype.makeXRCompatible = () => Promise.resolve();
 
   window.__phone = {
@@ -155,7 +194,7 @@
       phone.q = [cy * sx, sy * cx, -sy * sx, cy * cx];
     },
     floor: FLOOR,
-    // where the middle of the screen meets the floor
+    // where the middle of the screen meets the floor (or the wall)
     centreHit() { const h = floorHit(screenRay(0, 0)); return h && h.point; },
     // a world point on the screen, -1..1 across and down, or null behind the phone
     project(p) {
@@ -164,6 +203,8 @@
       const t = Math.tan(FOV_Y / 2);
       return [v[0] / -v[2] / (t * aspect()), -(v[1] / -v[2]) / t];
     },
+    // the room's reflection cube map arrives
+    reflect() { if (phone.light && phone.probe) { phone.light.sent = true; phone.probe.dispatchEvent(new Event("reflectionchange")); } },
     touchStart(ax, ay) {
       phone.touch = { handedness: "none", targetRayMode: "screen", profiles: ["generic-touchscreen"], gamepad: { axes: [ax, ay], buttons: [] }, targetRaySpace: new Space("touch") };
       if (phone.session) phone.session.inputSources = [phone.touch];
