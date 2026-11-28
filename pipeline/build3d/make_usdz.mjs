@@ -43,6 +43,7 @@ const tuple = (a) => `(${a.map(num).join(", ")})`;
 // mesh data at the precision it needs: 0.01 mm positions, 3-place normals, 4-place UVs
 const fixed = (places) => (a) => `(${a.map((v) => { const r = +v.toFixed(places); return r === 0 ? "0" : String(r); }).join(", ")})`;
 const P5 = fixed(5), N3 = fixed(3), U4 = fixed(4);
+const needsOf = (p) => [].concat(p.needs || []);
 const safe = (s) => (s || "Node").replace(/[^A-Za-z0-9_]/g, "_").replace(/^([0-9])/, "_$1");
 
 function quatAxisAngle(axis, deg) {
@@ -112,7 +113,8 @@ for (const finish of finishes) {
   const parts = product.parts || [];
   // a part can move more than one node (`also`: both freezer doors on one button, see lib.mjs stateClips). Each of
   // those is written like a part of its own (`of` names its part), and its part's taps and moves take it along.
-  const companions = parts.flatMap((p) => (p.also || []).map((a) => ({ key: p.key, of: p.key, node: a.node, axis: a.axis || p.axis, angle: a.angle, slide: a.slide })));
+  const companions = parts.flatMap((p) => (p.also || []).map((a) => ({ key: p.key, of: p.key, node: a.node, axis: a.axis || p.axis, angle: a.angle, slide: a.slide, needs: p.needs })));
+  let tapKeys = false; // some part is locked inside another (writeNode), so the unseen key material is written
   const partByNode = new Map([...parts, ...companions].map((p) => [p.node, p]));
   const partInfo = new Map(); // node name -> { closedPath, openPath, closedTargets, openTargets, poseClosed, poseOpen, poseAjar }
 
@@ -167,8 +169,11 @@ for (const finish of finishes) {
       const move = (k) => (part.slide ? t0.map((v, i) => v + part.slide[i] * k) : t0);
       const parked = s0.map((v) => v * PARK);
       const info = { part };
-      info.closedTargets = writeNode(child, p, childNames, { tappable: true, inPart: true });
+      // a part inside another (`needs`) is locked: its own copy takes no taps, a key does (below)
+      const locked = needsOf(part).length > 0;
+      info.closedTargets = writeNode(child, p, childNames, { tappable: !locked, inPart: true });
       info.closedPath = `${p}/${[...childNames].pop()}`;
+      if (locked) info.closedTargets = []; // a companion of a locked part moves with it, and is tapped through its key
       info.openTargets = writeNode(child, p, childNames, { name: `${child.getName()}_Open`, rotation: turn(0), translation: move(0), scale: parked, tappable: true, inPart: true });
       info.openPath = `${p}/${[...childNames].pop()}`;
       for (const [label, k, scale] of [["PoseClosed", 0, s0], ["PoseOpen", 1, s0], ["PoseAjar", 0.16, s0], ["PoseParked", 0, parked]]) {
@@ -182,6 +187,66 @@ for (const finish of finishes) {
         w.line('uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]');
         w.close();
         info[label[0].toLowerCase() + label.slice(1)] = `${p}/${n}`;
+      }
+      // The lock. RealityKit gives a collision shape to every tap target and to nothing else, so a tap on the side of
+      // a shut fridge passes through the cabinet and lands on the trays inside, which then slid out through the shut
+      // door. Quick Look has no "if", so the lock is built from scale: the part's tap target is an unseen box round it
+      // (the key), held inside one gate per part it needs. A gate is parked (scale 0.001, too small to tap) while its
+      // part is shut and set to full size once that part is fully open; the key parks itself while this part is out.
+      // So the key can be tapped only when everything it needs is open, and the part never moves inside a shut one.
+      if (locked && !part.of) {
+        const nb = new THREE.Box3(), v = new THREE.Vector3(), el = [];
+        const pieces = []; collect(child, new THREE.Matrix4().copy(world(node)).invert(), pieces);
+        for (const { prim, M } of pieces) { const a = prim.getAttribute("POSITION"); for (let i = 0; i < a.getCount(); i++) { a.getElement(i, el); nb.expandByPoint(v.set(el[0], el[1], el[2]).applyMatrix4(M)); } }
+        nb.expandByScalar(0.005); // a little larger than the part, so a tap meets the key first
+        info.gates = {};
+        let at = p;
+        const pose = (name, scale) => {
+          childNames.add(name);
+          w.open(`def Xform "${name}"`);
+          w.line(`double3 xformOp:scale = ${tuple(scale)}`);
+          w.line('uniform token[] xformOpOrder = ["xformOp:scale"]');
+          w.close();
+          return `${at}/${name}`;
+        };
+        const opened = [];
+        for (const k of needsOf(part)) {
+          const g = safe(`${child.getName()}_Gate_${k}`);
+          info.gates[k] = { path: `${at}/${g}`, on: pose(`${g}On`, [1, 1, 1]), off: pose(`${g}Off`, [PARK, PARK, PARK]) };
+          childNames.add(g);
+          w.open(`def Xform "${g}"`);
+          w.line(`double3 xformOp:scale = ${tuple([PARK, PARK, PARK])}`);
+          w.line('uniform token[] xformOpOrder = ["xformOp:scale"]');
+          opened.push(g);
+          at = `${at}/${g}`;
+        }
+        const key = safe(`${child.getName()}_Key`);
+        info.keyOn = pose(`${key}On`, [1, 1, 1]);
+        info.keyOff = pose(`${key}Off`, [PARK, PARK, PARK]);
+        info.keyPath = `${at}/${key}`;
+        w.open(`def Xform "${key}"`);
+        w.line(`double3 xformOp:scale = (1, 1, 1)`);
+        w.line('uniform token[] xformOpOrder = ["xformOp:scale"]');
+        w.open('def RealityKitComponent "InputTarget"');
+        w.line("bool allowsDirectInput = 1");
+        w.line("bool allowsIndirectInput = 1");
+        w.line('uniform token info:id = "RealityKit.InputTarget"');
+        w.close();
+        const [a, b] = [nb.min, nb.max];
+        const pts = [[a.x, a.y, a.z], [b.x, a.y, a.z], [b.x, b.y, a.z], [a.x, b.y, a.z], [a.x, a.y, b.z], [b.x, a.y, b.z], [b.x, b.y, b.z], [a.x, b.y, b.z]];
+        const quads = [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [3, 7, 6, 2], [0, 4, 7, 3], [1, 2, 6, 5]];
+        w.open('def Mesh "Geom_0"', ['prepend apiSchemas = ["MaterialBindingAPI"]']);
+        w.line(`float3[] extent = [${tuple([a.x, a.y, a.z])}, ${tuple([b.x, b.y, b.z])}]`);
+        w.line(`int[] faceVertexCounts = [${quads.flatMap(() => [3, 3]).join(",")}]`);
+        w.line(`int[] faceVertexIndices = [${quads.flatMap(([i, j, k, l]) => [i, j, k, i, k, l]).join(",")}]`);
+        w.line(`point3f[] points = [${pts.map(P5).join(", ")}]`);
+        w.line('uniform token subdivisionScheme = "none"');
+        w.line("rel material:binding = </Root/Materials/TapKey>");
+        w.close();
+        w.close(); // key
+        opened.forEach(() => w.close()); // gates
+        info.closedTargets = [info.keyPath];
+        tapKeys = true;
       }
       partInfo.set(part.node, info);
     }
@@ -333,39 +398,52 @@ for (const finish of finishes) {
     const swing = (from, pose) => (all.length === 1
       ? { name: "Swing", write: () => transform("Swing", from(info), pose(info), SWING) }
       : { name: "Swing", write: () => group("Swing", "parallel", all.map((i, j) => ({ name: `Swing${j}`, write: () => transform(`Swing${j}`, from(i), pose(i), SWING) }))) });
+    // the parts locked inside this one (the trays behind the fridge door): their gate opens once this part is fully
+    // open; the part's own key, if it is locked itself, parks while it is out and comes back when it is in again
+    const gatesOf = (keys) => [...partInfo.values()].filter((i) => i.gates).flatMap((i) => Object.entries(i.gates).filter(([k]) => keys.includes(k)).map(([, g]) => g));
+    const unlock = gatesOf([info.part.key]).map((g, k) => ({ name: `Unlock${k}`, write: () => transform(`Unlock${k}`, g.path, g.on, 0) }));
+    const key = (pose) => (info.keyPath ? [{ name: `Key${pose === info.keyOn ? "On" : "Off"}`, write: () => transform(`Key${pose === info.keyOn ? "On" : "Off"}`, info.keyPath, pose, 0) }] : []);
     behavior(`Open_${n}`, tap(all.flatMap((i) => i.closedTargets)), {
       name: "Open",
       write: () => group("Open", "serial", [
         swing((i) => i.closedPath, (i) => i.poseOpen),
-        { name: "Swap", write: () => group("Swap", "parallel", all.flatMap((i, j) => [
+        { name: "Swap", write: () => group("Swap", "parallel", [...all.flatMap((i, j) => [
           { name: `PlaceOpen${sx(j)}`, write: () => transform(`PlaceOpen${sx(j)}`, i.openPath, i.poseOpen, 0) },
           { name: `ParkClosed${sx(j)}`, write: () => transform(`ParkClosed${sx(j)}`, i.closedPath, i.poseParked, 0) },
-        ])) },
+        ]), ...key(info.keyOff), ...unlock]) },
       ]),
     });
-    // a part inside this one (the trays behind the fridge door, the ice tray behind the freezer's) goes back in at
-    // once before this one closes; both moves are absolute, so nothing happens if it is already in
-    const inner = [...partInfo.values()].filter((i) => [].concat(i.part.needs || []).includes(info.part.key));
-    const putBack = inner.length ? [{ name: "PutBack", write: () => group("PutBack", "parallel", inner.flatMap((i, k) => [
+    // every part inside this one (the trays behind the fridge door, the ice tray behind the freezer's), and any part
+    // inside those, goes back in at once before this one closes, and its gate shuts, so nothing can be opened inside a
+    // closing part; the moves are absolute, so nothing happens to a part that is already in
+    const within = new Set([info.part.key]);
+    for (let grew = true; grew;) { grew = false; for (const i of partInfo.values()) if (!within.has(i.part.key) && needsOf(i.part).some((k) => within.has(k))) { within.add(i.part.key); grew = true; } }
+    const inner = [...partInfo.values()].filter((i) => i.part.key !== info.part.key && within.has(i.part.key));
+    const lock = gatesOf([...within]);
+    const putBack = inner.length || lock.length ? [{ name: "PutBack", write: () => group("PutBack", "parallel", [...inner.flatMap((i, k) => [
       { name: `In${k}Place`, write: () => transform(`In${k}Place`, i.closedPath, i.poseClosed, 0) },
       { name: `In${k}Park`, write: () => transform(`In${k}Park`, i.openPath, i.poseParked, 0) },
-    ])) }] : [];
+      ...(i.keyPath ? [{ name: `In${k}Key`, write: () => transform(`In${k}Key`, i.keyPath, i.keyOn, 0) }] : []),
+    ]), ...lock.map((g, k) => ({ name: `Lock${k}`, write: () => transform(`Lock${k}`, g.path, g.off, 0) }))]) }] : [];
     behavior(`Close_${n}`, tap(all.flatMap((i) => i.openTargets)), {
       name: "Close",
       write: () => group("Close", "serial", [
         ...putBack,
         swing((i) => i.openPath, (i) => i.poseClosed),
-        { name: "Swap", write: () => group("Swap", "parallel", all.flatMap((i, j) => [
+        { name: "Swap", write: () => group("Swap", "parallel", [...all.flatMap((i, j) => [
           { name: `PlaceClosed${sx(j)}`, write: () => transform(`PlaceClosed${sx(j)}`, i.closedPath, i.poseClosed, 0) },
           { name: `ParkOpen${sx(j)}`, write: () => transform(`ParkOpen${sx(j)}`, i.openPath, i.poseParked, 0) },
-        ])) },
+        ]), ...key(info.keyOn)]) },
       ]),
     });
   }
 
   // on start: nudge the main part ajar once so people know it moves
   const own = [...partInfo.values()].filter((i) => !i.part.of);
-  const hint = own.find((i) => i.part.hint) || own[0];
+  // a hint part that sits inside another (a dishwasher's rack, a detergent box under the lid) would move inside
+  // its shut outer part, so the outermost part it needs is nudged instead
+  let hint = own.find((i) => i.part.hint) || own[0];
+  for (let guard = 0; hint && needsOf(hint.part).length && guard < 8; guard++) hint = own.find((i) => i.part.key === needsOf(hint.part)[0]) || hint;
   if (partInfo.size) {
     behavior("OnStart", ['token info:id = "SceneTransition"', 'token type = "enter"'], {
       name: "Start",
@@ -433,7 +511,12 @@ for (const finish of finishes) {
     else if (m.getAlphaMode() === "BLEND") w.line(`float inputs:opacity = ${num(a)}`);
     // cut the clear part away entirely: left in, RealityKit still puts a sheen on it, a faint box round the logo
     if (cutout) w.line(`float inputs:opacityThreshold = ${num(m.getAlphaMode() === "MASK" ? m.getAlphaCutoff() : 0.05)}`);
-    const e = m.getEmissiveFactor();
+    // glTF's emission is the factor times KHR_materials_emissive_strength. Written without the strength, a Samsung
+    // fridge's liner (0.55) glowed 1.8 times brighter in Quick Look than on the page, and a washer's dial lamp (0.6)
+    // 1.7 times. A colour can't pass 1 here, so a stronger light keeps its hue at full brightness.
+    const es = m.getExtension("KHR_materials_emissive_strength")?.getEmissiveStrength() ?? 1;
+    let e = m.getEmissiveFactor().map((v) => v * es);
+    if (Math.max(...e) > 1) e = e.map((v) => v / Math.max(...e));
     if (e.some((v) => v > 0)) w.line(`color3f inputs:emissiveColor = ${tuple(e)}`);
     w.line("int inputs:useSpecularWorkflow = 0");
     w.line("token outputs:surface");
@@ -477,6 +560,19 @@ for (const finish of finishes) {
       const f = m.getRoughnessFactor();
       texture("Roughness", rTex, m.getMetallicRoughnessTextureInfo(), "raw", [`float4 inputs:scale = ${tuple([f, f, f, 1])}`], "float outputs:g");
     }
+    w.close();
+  }
+  if (tapKeys) {
+    w.open('def Material "TapKey"');
+    w.line("token outputs:surface.connect = </Root/Materials/TapKey/Surface.outputs:surface>");
+    w.open('def Shader "Surface"');
+    w.line('uniform token info:id = "UsdPreviewSurface"');
+    w.line("color3f inputs:diffuseColor = (0, 0, 0)");
+    w.line("float inputs:opacity = 0");
+    w.line("float inputs:opacityThreshold = 0.5");
+    w.line("int inputs:useSpecularWorkflow = 0");
+    w.line("token outputs:surface");
+    w.close();
     w.close();
   }
   w.close(); // Materials

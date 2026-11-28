@@ -106,6 +106,7 @@ const parts = entry.parts || [];
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
 const doc = exists(entry.glb) ? await io.read(file(entry.glb)) : null;
 const glbHashes = new Set();
+const glbAll = [[1e9, 1e9, 1e9], [-1e9, -1e9, -1e9]]; // the whole model at rest, cord and hoses included (ql-size)
 if (doc) {
   const size = fs.statSync(file(entry.glb)).size;
   record("glb-size", size / 1048576 <= BUDGET.glb, `${MB(size)} MB (budget ${BUDGET.glb} MB)`);
@@ -135,6 +136,7 @@ if (doc) {
       const a = pr.getAttribute("POSITION"), v = [0, 0, 0];
       for (let i = 0; i < a.getCount(); i++) {
         a.getElement(i, v); const w = mul(m, v[0], v[1], v[2]);
+        for (let k = 0; k < 3; k++) { glbAll[0][k] = Math.min(glbAll[0][k], w[k]); glbAll[1][k] = Math.max(glbAll[1][k], w[k]); }
         let o = 0; for (let k = 0; k < 3; k++) o = Math.max(o, box[0][k] - w[k], w[k] - box[1][k]);
         if (o > 0.003) (food ? stockOut : over).set(name, Math.max((food ? stockOut : over).get(name) || 0, o));
         if (!ok) for (let k = 0; k < 3; k++) { body[0][k] = Math.min(body[0][k], w[k]); body[1][k] = Math.max(body[1][k], w[k]); }
@@ -183,6 +185,7 @@ if (doc) {
 }
 
 // ── 3. the Apple files: validation, RealityKit, meshes, grain, size, textures, renders ──
+fs.writeFileSync(`${OUT}/entry.json`, JSON.stringify({ products: [entry] })); // the entry being gated, for ql_check.py
 const usdzFiles = (entry.finishes || []).flatMap((f) => wall ? [f.usdz] : [f.usdz, f.usdz.replace(/\.usdz$/, "-free.usdz")]).filter(exists);
 for (const u of usdzFiles) {
   const name = path.basename(u, ".usdz"), f = file(u), size = fs.statSync(f).size;
@@ -198,6 +201,16 @@ for (const u of usdzFiles) {
     const foreign = Object.entries(st.textures).filter(([n, h]) => !glbHashes.has(h) && !/grain_/.test(n));
     record("textures", !foreign.length, foreign.length ? `${name}: ${foreign.length} textures not in its own GLB: ${foreign.slice(0, 4).map(([n]) => n).join(", ")}` : `${name}: all ${Object.keys(st.textures).length} textures match the GLB's`);
   }
+  // what Quick Look will do with the file (ql_check.py): the scene (metres, Y up, the floor anchor on a floor product's
+  // own file and none on a wall unit's or a -free copy), the textures (formats, sizes, memory), and tap to open played out
+  // through every order of taps (one copy of each part showing, nothing opening inside a shut part, nothing stuck)
+  const qc = run(`${SITE}/tools/usdenv/bin/python`, ["-I", `${SCR}/ql_check.py`, f, `${OUT}/entry.json`, id]);
+  let q = null; try { q = JSON.parse(qc.stdout.trim().split("\n").pop()); } catch {}
+  for (const k of ["scene", "textures", "taps"]) {
+    const what = { scene: "metres, Y up, one scene, the right anchor", textures: `${q?.info?.textures} JPEG/PNG textures, ${q?.info?.textureMB} MB decoded`, taps: `every part opens and shuts in every order of taps (${q?.info?.states} states), one copy showing, none inside a shut part` }[k];
+    record(`ql-${k}`, !!q && !q[k].length, q ? `${name}: ${q[k].length ? q[k].slice(0, 3).join("; ") : what}` : `${name}: ql_check failed: ${tail(qc.stderr)}`);
+  }
+  if (q?.warn?.length) record("ql-textures", false, `${name}: ${q.warn.join("; ")}`, true);
   const rm = run(`${SITE}/tools/bin/rk_materials`, [f]);
   const g = +(rm.stdout.match(/materials with grain: (\d+)/) || [])[1];
   const sz = rm.stdout.match(/W ([\d.]+) x H ([\d.]+) x D ([\d.]+) cm, lowest point y = (-?[\d.]+) cm/);
@@ -205,6 +218,14 @@ for (const u of usdzFiles) {
   record("rk-grain", g > 0, `${name}: RealityKit picks up the grain on ${g || 0} materials`);
   record("rk-size", !!sz && Math.abs(+sz[1] - S[0]) <= 0.35 && Math.abs(+sz[2] - S[1]) <= 0.35 && Math.abs(+sz[4]) <= 0.2,
     sz ? `${name}: RealityKit places W ${sz[1]} x H ${sz[2]} cm (published ${S[0]} x ${S[1]}), lowest point ${sz[4]} cm` : `${name}: no size from rk_materials`, false);
+  // the Apple file is the GLB at real size: its whole extent as USD reads it, and as RealityKit places it, equals the
+  // GLB's at rest (cord and hoses included) within 1 mm (1.5 mm for RealityKit, which prints 0.1 mm), in W, H and D;
+  // the GLB itself is held to the published size by dims
+  if (doc && q?.info?.size) {
+    const G = [0, 1, 2].map((k) => (glbAll[1][k] - glbAll[0][k]) * 1000), U = q.info.size, R = sz ? [1, 2, 3].map((k) => +sz[k] * 10) : null;
+    const off = [0, 1, 2].filter((k) => Math.abs(U[k] - G[k]) > 1 || Math.abs(q.info.min[k] - glbAll[0][k] * 1000) > 1 || (R && Math.abs(R[k] - G[k]) > 1.5));
+    record("ql-size", !off.length && !!R, `${name}: GLB ${G.map((x) => x.toFixed(1)).join(" x ")} mm, USD ${U.join(" x ")}, RealityKit ${R ? R.map((x) => x.toFixed(1)).join(" x ") : "?"}${off.length ? `; differ in ${off.map((k) => "WHD"[k]).join(", ")}` : ""}`);
+  }
   if (!fast && !/-free$/.test(name)) {
     for (const pose of ["closed", "open"]) run(`${SITE}/tools/bin/render_usdz`, [f, `${OUT}/apple-${name}-${pose}.png`, ...(pose === "open" ? ["open"] : [])], { timeout: 300000 });
     record("apple-render", ["closed", "open"].every((p) => fs.existsSync(`${OUT}/apple-${name}-${p}.png`)), `${name}: Apple renders apple-${name}-closed.png and -open.png (look at them)`);
@@ -266,6 +287,7 @@ if (!fast) {
   page("page-controls", "test_controls.mjs", [id]);
   page("page-arphone", "test_arphone.mjs", [id]);
   page("page-room", "test_room.mjs", []);
+  page("page-quicklook", "test_quicklook.mjs", [id]);
   { const o = `${OUT}/page-xr`; const r = run("node", [`${SCR}/test_xr.mjs`, base, o, `${SITE}/tools/iwer.min.js`, id], { env: { PORT: String(++p) }, timeout: 1200000 });
     fs.mkdirSync(o, { recursive: true }); fs.writeFileSync(`${o}/log.txt`, r.stdout + r.stderr);
     record("page-xr", r.status === 0, `${r.status === 0 ? tail(r.stdout, 1) : tail(r.stdout + r.stderr)} (page-xr/log.txt)`); }

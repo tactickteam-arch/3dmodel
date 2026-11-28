@@ -32,7 +32,7 @@ Task { @MainActor in
     print("materials with grain:", seen.count)
     // the size RealityKit itself places in the room (Quick Look's engine), closed, in centimetres
     let vb = root.visualBounds(relativeTo: nil)
-    print(String(format: "RealityKit size: W %.1f x H %.1f x D %.1f cm, lowest point y = %.1f cm", vb.extents.x * 100, vb.extents.y * 100, vb.extents.z * 100, vb.min.y * 100))
+    print(String(format: "RealityKit size: W %.2f x H %.2f x D %.2f cm, lowest point y = %.2f cm", vb.extents.x * 100, vb.extents.y * 100, vb.extents.z * 100, vb.min.y * 100))
 
     if args.count > 2 {
       let out = URL(fileURLWithPath: args[2])
