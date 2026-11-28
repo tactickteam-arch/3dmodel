@@ -2,7 +2,7 @@
 // product on their own phones and headsets from the preview link (/p/<id>?preview=1), fill the checklist and give
 // feedback with photos; an admin or manager then approves it (it goes on the catalogue at once, through live.js) or
 // declines it (it comes off). Every rule is enforced by the database (pipeline/admin/schema.sql), not this page.
-import { CATEGORIES, finishSlug } from "/site.js";
+import { CATEGORIES, finishSlug, androidFile, sceneViewerIntent } from "/site.js";
 import { siteOrigin, PUBLIC_ORIGIN } from "./config.js";
 import { esc, icon, badge, emptyState, errorBox, toast, formModal, copyText, qrSvg, fmtNum, fmtDateTime, fmtAgo } from "./ui.js";
 
@@ -122,12 +122,10 @@ function quickLookUrl(p, f, page) {
   const o = siteOrigin();
   return `${o}${model(f.usdz)}#allowsContentScaling=0&custom=${PUBLIC_ORIGIN}/banners/${p.id}&customHeight=small&canonicalWebPageURL=${encodeURIComponent(page)}`;
 }
-// Android without WebXR: Google's Scene Viewer, with the link model-viewer 4.0.0 (product.html's viewer) makes. It
-// always shows the model's own colour, the first one.
-function sceneViewerUrl(p, page) {
-  const params = new URLSearchParams({ v: "7", mode: "ar_preferred", disable_occlusion: "true", resizable: "false" });
-  if (p.placement === "wall") params.set("enable_vertical_placement", "true");
-  return `intent://arvr.google.com/scene-viewer/1.2?${params}&file=${encodeURIComponent(siteOrigin() + model(p.glb))}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(page)};end;`;
+// Android without WebXR: Google's Scene Viewer with that colour's own file, as product.html's openSceneViewer() opens it
+// (androidFile and sceneViewerIntent in site.js)
+function sceneViewerUrl(p, fi, page) {
+  return sceneViewerIntent(p, fi, { file: siteOrigin() + model(androidFile(p, fi)), page, fallback: `${page.split("#")[0]}#no-ar` });
 }
 
 async function productReview(ctx, id) {
@@ -230,8 +228,8 @@ async function productReview(ctx, id) {
       <ul class="rv-ar">
         <li><div><b>iPhone / iPad</b><span>Apple’s AR view of this colour. Tap it on the iPhone or iPad itself.</span></div>
           <div class="actions"><button class="btn sm" data-ql="${esc(quickLookUrl(p, f, page))}">${icon("cube")}Open</button><button class="btn sm icon" data-copy="${esc(quickLookUrl(p, f, page))}" aria-label="Copy the iPhone AR link">${icon("copy")}</button></div></li>
-        <li><div><b>Android (Scene Viewer)</b><span>Google’s AR view. It always shows the first colour${finishes.length > 1 ? ` (${esc(finishes[0].name)})` : ""}; for the others, open the preview link and press the AR button.</span></div>
-          <div class="actions"><a class="btn sm" id="svLink" href="${esc(sceneViewerUrl(p, page))}">${icon("cube")}Open</a><button class="btn sm icon" data-copy="${esc(sceneViewerUrl(p, page))}" aria-label="Copy the Android AR link">${icon("copy")}</button></div></li>
+        <li><div><b>Android (Scene Viewer)</b><span>Google’s AR view of this colour, at real size, closed. Tap it on the Android phone itself.</span></div>
+          <div class="actions"><a class="btn sm" id="svLink" href="${esc(sceneViewerUrl(p, fi, page))}">${icon("cube")}Open</a><button class="btn sm icon" data-copy="${esc(sceneViewerUrl(p, fi, page))}" aria-label="Copy the Android AR link">${icon("copy")}</button></div></li>
         <li><div><b>Meta Quest</b><span>Open the preview link in the headset’s browser, then press the AR button for passthrough.</span></div></li>
       </ul>`;
     $("linkColour")?.addEventListener("change", (e) => { fi = +e.target.value; renderView(); renderLinks(); });

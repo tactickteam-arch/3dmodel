@@ -18,6 +18,7 @@ import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { launch, sleep } from "./cdp.mjs";
+import { androidFile } from "../../site.js";
 import { SITE } from "../../site-config.js";
 
 const [base, out] = process.argv.slice(2);
@@ -222,7 +223,10 @@ check(await b.evalJS(`document.querySelector('[data-fi="2"]').getAttribute('aria
 await b.evalJS("window.__arLink = null; document.querySelector('[data-ql]').click()");
 check(await b.evalJS("window.__arLink?.rel === 'ar' && window.__arLink.img === true"), "Open (iPhone) opens Apple's AR view the way Safari needs it (rel=ar, one image)");
 const sv = await b.evalJS("document.getElementById('svLink').getAttribute('href')");
-check(sv.startsWith(`intent://arvr.google.com/scene-viewer/1.2?v=7&mode=ar_preferred&disable_occlusion=true&resizable=false&file=${encodeURIComponent(`${base}${w1.glb}?v=7`)}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=`), "the Android AR link is Google's Scene Viewer for the model");
+const svq = new URLSearchParams(sv.split("#")[0].split("?")[1] || "");
+check(sv.startsWith("intent://arvr.google.com/scene-viewer/1.2?") && sv.includes("#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=")
+  && svq.get("file") === `${base}${androidFile(w1, 2)}?v=7` && svq.get("mode") === "ar_preferred" && svq.get("resizable") === "false",
+  "the Android AR link is Google's Scene Viewer with that colour's own file, at real size");
 await b.evalJS("navigator.clipboard.writeText = async (t) => { window.__copied = t; }; document.querySelector('#testLinks .linkbox [data-copy]').click()");
 await sleep(100);
 check((await b.evalJS("window.__copied")) === (await b.evalJS("document.querySelector('#testLinks .linkbox code').textContent")), "Copy copies the preview link");
@@ -395,16 +399,8 @@ await b.waitFor("window.__demo.idle()", 15000);
 check(await b.evalJS(`!!window.__demo.state[${js(key)}]`), `the doors work (${key} opened)`);
 check(await noSideScroll(), "no sideways scroll at 1440 px");
 await b.shot(`${out}/preview-desktop.png`);
-// Google's AR link, as model-viewer itself makes it, against the admin's
-const mvIntent = await b.evalJS(`(async () => {
-  const mv = document.querySelector('model-viewer');
-  const sym = (o, n) => { for (; o; o = Object.getPrototypeOf(o)) { const s = Object.getOwnPropertySymbols(o).find((x) => x.description === n); if (s) return s; } };
-  const s = sym(mv, 'openSceneViewer');
-  if (!s) return 'model-viewer has no openSceneViewer';
-  window.__arLink = null;
-  await mv[s]();
-  return window.__arLink?.raw || 'nothing opened';
-})()`);
+// Google's AR link, as the page opens it on Android without WebXR (each colour's own file), against the admin's
+const mvIntent = await b.evalJS("window.__sceneViewerLink?.() || 'the page has no Scene Viewer link'");
 await b.go(`${base}/p/${hiddenP.id}?preview=1&embed`);
 await b.waitFor("document.querySelector('model-viewer')?.loaded === true", 60000);
 check(await b.evalJS("document.documentElement.classList.contains('preview') && getComputedStyle(document.querySelector('.preview-bar')).display === 'none'"), "embedded (as in the admin), the bar is hidden");
@@ -433,8 +429,9 @@ const adminQL = await b.evalJS("document.querySelector('[data-ql]').dataset.ql")
 const cut = (u) => new URL(u).href.split("&canonicalWebPageURL=")[0];
 check(pageQL && cut(adminQL) === cut(pageQL), "the admin's iPhone AR link is the one the product page opens");
 const adminSV = await b.evalJS("document.getElementById('svLink').getAttribute('href')");
-const fallback = (u) => u.split(";S.browser_fallback_url=")[0];
-check(mvIntent.startsWith("intent://") && fallback(adminSV) === fallback(mvIntent), `the admin's Android AR link is the one model-viewer makes${mvIntent.startsWith("intent://") ? "" : ` (${mvIntent})`}`);
+// the same file, mode, size lock, wall flag and title; the link back and the fallback are each page's own
+const svParams = (u) => { const q = new URLSearchParams(u.split("#")[0].split("?")[1] || ""); q.delete("link"); return q.toString(); };
+check(mvIntent.startsWith("intent://") && svParams(adminSV) === svParams(mvIntent), `the admin's Android AR link opens what the product page opens${mvIntent.startsWith("intent://") ? "" : ` (${mvIntent})`}`);
 check(errors().length === 0, `no console errors${errors().length ? `: ${errors().join(" | ")}` : ""}`);
 
 // ── 4. live.js with the decisions stubbed ──

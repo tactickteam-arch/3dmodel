@@ -2,8 +2,9 @@
 # Builds one product the standard way (STANDARD.md steps 4 and 5) into .work/build/<id>/, never over the site's files:
 # the GLB from its builder (run on a copy of the product's entry), then an Apple file for each colour, plus the -free
 # copy for a floor product, each packed, validated and loaded in RealityKit.
-# --install then copies the GLB and the Apple files into models/ and the entry (with the zones the builder measured) back
-# to pipeline/entries/<id>.json. It never touches products.json: an entry goes in only at promotion (STANDARD.md step 10).
+# --install then copies the GLB and the Apple files into models/, makes each colour's Android Scene Viewer file from that
+# GLB (models/android/<id>/, make_android.mjs), and copies the entry (with the zones the builder measured) back to
+# pipeline/entries/<id>.json. It never touches products.json: an entry goes in only at promotion (STANDARD.md step 10).
 # usage: pipeline/scripts/build_product.sh <id> <builder, e.g. make_lg_glt3426.mjs> [--install]
 set -euo pipefail
 ID=$1; MAKE=$2; INSTALL=${3:-}
@@ -33,4 +34,6 @@ if [ "$INSTALL" = --install ]; then
   cp "$STAGE/$ID.glb" "$SITE/models/$ID.glb"
   cp "$STAGE"/usdz/*.usdz "$SITE/models/usdz/"
   cp "$STAGE/entry.json" "$SITE/pipeline/entries/$ID.json"
+  # Android without WebXR: each colour's Scene Viewer file, made from the GLB just installed (it reads that file's bytes)
+  node "$SITE/pipeline/scripts/make_android.mjs" "$ID" --entry "$STAGE/entry.json"
 fi

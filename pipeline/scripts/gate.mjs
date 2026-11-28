@@ -248,6 +248,16 @@ if (doc) {
   }
 }
 
+// ── 3b. Android without WebXR AR (in-app browsers, Samsung Internet, phones without WebXR): Google's Scene Viewer opens
+// each colour's own file, made from this GLB by make_android.mjs; check_android.mjs holds each to the GLB, the Khronos
+// validator, Google's file requirements, the colour, real size and the link the page builds. One line per colour and check.
+if (doc) {
+  const { checkAndroid } = await import(`${SCR}/check_android.mjs`);
+  let res;
+  try { res = await checkAndroid({ entry, cfg }); } catch (e) { res = [{ key: "run", status: "FAIL", detail: `the check failed to run: ${e.message}` }]; }
+  for (const r of res) record("android-sceneviewer", r.status === "PASS", `${r.key}: ${r.detail}`, r.status === "WARN");
+}
+
 // ── 4. the page tests, on a staging catalogue with only this product on show ──
 let server = null;
 if (!fast) {
@@ -287,6 +297,7 @@ if (!fast) {
   page("page-controls", "test_controls.mjs", [id]);
   page("page-arphone", "test_arphone.mjs", [id]);
   page("page-room", "test_room.mjs", []);
+  page("page-android", "test_android_fallback.mjs", [id]);
   page("page-quicklook", "test_quicklook.mjs", [id]);
   { const o = `${OUT}/page-xr`; const r = run("node", [`${SCR}/test_xr.mjs`, base, o, `${SITE}/tools/iwer.min.js`, id], { env: { PORT: String(++p) }, timeout: 1200000 });
     fs.mkdirSync(o, { recursive: true }); fs.writeFileSync(`${o}/log.txt`, r.stdout + r.stderr);

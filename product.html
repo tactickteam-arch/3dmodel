@@ -321,6 +321,7 @@
   .sheet-foot { padding: 14px 26px calc(20px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hair); }
   .sheet-foot .go { width: 100%; height: 56px; border: 0; border-radius: 14px; background: var(--navy); color: var(--paper); font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
   .sheet-foot .go svg { width: 21px; height: 21px; color: var(--copper); }
+  .sheet-foot a.go { text-decoration: none; }
   .sheet-foot .alt { width: 100%; height: 48px; margin-top: 8px; border: 1px solid var(--hair); border-radius: 14px; background: #fff; font-size: 15px; font-weight: 600; }
   .sheet-foot label { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--slate); }
   .sheet-foot input { width: 16px; height: 16px; accent-color: var(--navy); }
@@ -590,7 +591,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { esc, cm, partAt, needsOf, hotspotShown, fitCheck, finishSlug, finishIndexOf, finishPath } from "/site.js";
+import { esc, cm, partAt, needsOf, hotspotShown, fitCheck, finishSlug, finishIndexOf, finishPath, androidFile, sceneViewerIntent, chromeIntent } from "/site.js";
 import { loadCatalogue } from "/live.js";
 import { initRoom } from "/room.js";
 import { initOrganise } from "/organise.js";
@@ -735,6 +736,10 @@ const isPhone = !isHeadset && !isVisionPro && (/Android|iPhone|iPad|iPod/i.test(
 const headsetAR = xrAR && !isPhone && !hasQuickLook; // Meta Quest and similar
 const headsetVR = xrVR && !isPhone;                  // Quest, Vision Pro, PC headsets
 const framed = window.self !== window.top;
+// Android in-app browsers (WhatsApp, Instagram, Facebook, a shop's own app) are WebViews: no WebXR, and most can't
+// hand Android the link that opens Google's AR view. Android marks a WebView "; wv)"; some apps add their name.
+const isAndroid = /Android/i.test(ua) && !isHeadset;
+const androidInApp = isAndroid && (/; wv\)/.test(ua) || /\b(FBAN|FBAV|FB_IAB|FB4A|Instagram|WhatsApp|Line|Snapchat|LinkedInApp|musical_ly|Twitter)\b/.test(ua));
 // ?embed shows the viewer alone, for a box on a retailer's product page. AR from inside another
 // site's frame is not dependable on every phone, so its button opens the full page in a new tab.
 if (new URLSearchParams(location.search).has("embed")) {
@@ -744,7 +749,8 @@ if (new URLSearchParams(location.search).has("embed")) {
 const platform = hasQuickLook ? (isVisionPro ? "visionos" : "ios")
   : headsetAR ? "quest"
   : isApple ? "ios-inapp"
-  : /Android/i.test(ua) ? "android"
+  : androidInApp ? "android-inapp"
+  : isAndroid ? "android"
   : "desktop";
 // usage counts for the admin (/track.js: fire and forget, off on localhost); staff testing a preview aren't counted
 const track = (kind, detail) => (PREVIEW ? undefined : window.s3dTrack?.(kind, product.id, detail));
@@ -1702,12 +1708,66 @@ async function openHeadset(mode) {
   }
 }
 function launchAR() {
-  const arKind = ["ios", "visionos", "quest"].includes(platform) ? platform : mv.canActivateAR ? "android" : null;
+  const arKind = ["ios", "visionos", "quest"].includes(platform) ? platform : platform === "android" && mv.canActivateAR ? "android" : null;
   if (arKind) track("AR", arKind);
   if (platform === "ios" || platform === "visionos") return openQuickLook();
   if (platform === "quest") return openHeadset("ar");
-  if (mv.canActivateAR) return mv.activateAR();
+  if (platform === "android" && mv.canActivateAR && !xrAR) return openSceneViewer();
+  if (platform === "android" && mv.canActivateAR) { hookSceneViewer(); return mv.activateAR(); }
   toast("AR isn’t available in this browser. Try Chrome on Android or Safari on iPhone.");
+}
+
+// ── Android without WebXR AR: Google's Scene Viewer ──
+// It gets one file address and nothing else: model-viewer would give it the product's GLB, in its first colour.
+// Each colour has its own file instead (androidFile, made by make_android.mjs, checked by the gate's
+// android-sceneviewer check), opened at real size and on the wall for a wall unit (sceneViewerIntent in site.js).
+// Doors can't open there; the product stands closed. When WebXR fails to start, model-viewer 4.0.0 falls back to
+// Scene Viewer through its own openSceneViewer, so that is pointed here too.
+const SV_FAILED = "#no-ar";
+function sceneViewerLink() {
+  const here = new URL(location.href);
+  here.hash = SV_FAILED;
+  const file = new URL(model(androidFile(product, finishIndex)), location.href).href;
+  return sceneViewerIntent(product, finishIndex, { file, page: shareUrl, fallback: here.href });
+}
+window.__sceneViewerLink = sceneViewerLink; // the admin's review page and its test compare their link with this
+function openSceneViewer() {
+  const a = document.createElement("a");
+  a.href = sceneViewerLink();
+  a.style.display = "none";
+  document.body.appendChild(a);
+  window.__sceneViewer = a.href; // what the browser tests read
+  a.click();
+  setTimeout(() => a.remove(), 1000);
+  // the Google app took it: this page goes to the background. Still in front after a few seconds: say what to do.
+  const shown = Date.now();
+  const gone = () => { if (document.hidden) clearTimeout(t); };
+  const t = setTimeout(() => {
+    document.removeEventListener("visibilitychange", gone);
+    if (!document.hidden && Date.now() - shown < 9000) toast("If AR didn’t open, update the Google app from the Play Store, or open this page in Chrome.");
+  }, 4000);
+  document.addEventListener("visibilitychange", gone);
+}
+// no Google app (or too old to take the link): Chrome opens the fallback, this page with #no-ar
+addEventListener("hashchange", () => {
+  if (location.hash !== SV_FAILED) return;
+  history.back();
+  toast("Android’s AR view isn’t on this phone. Install or update the Google app and Google Play Services for AR from the Play Store.");
+});
+function hookSceneViewer() {
+  const sym = symbolOf(mv, "openSceneViewer");
+  if (sym && mv[sym] !== openSceneViewer) mv[sym] = openSceneViewer;
+}
+// Android in-app browsers: open this page in Chrome, where AR works
+function openInChrome(e) {
+  const shown = Date.now();
+  const gone = () => { if (document.hidden) clearTimeout(t); };
+  const t = setTimeout(() => {
+    document.removeEventListener("visibilitychange", gone);
+    if (!document.hidden && Date.now() - shown < 9000) toast("Chrome didn’t open. Tap ⋮ at the top and choose Open in Chrome or Open in browser, or copy the link.");
+  }, 3000);
+  document.addEventListener("visibilitychange", gone);
+  window.__chromeIntent = e.currentTarget.href; // what the browser tests read
 }
 
 // ── Android: guidance inside AR ──
@@ -1887,7 +1947,22 @@ function guide() {
       groups: [["In passthrough", [parts.length && row(I.trigger, openTitle, "Point at it and pull the trigger, or pinch", true), row(I.move, "Move", onWall ? "Point at a wall or the floor and pull the trigger" : "Point at the floor and pull the trigger"), row(I.rotate, "Turn", "Hold grip and sweep, or push the thumbstick"), row(I.panel, "Finish and exit", "On the panel beside it")]]],
       go: "Open in your room", alt: headsetVR ? "See it alone in VR" : null,
     };
-    case "android": return mv.canActivateAR ? {
+    // Google's Scene Viewer (no WebXR here): it finds the floor or wall by itself, one finger moves it, two turn it,
+    // and the size is locked; no Place here button and no doors
+    case "android": return mv.canActivateAR && !xrAR ? {
+      title: "Place it at real size", sub: name,
+      steps: onWall ? [
+        step(1, "Point at the wall where it would hang", "Move the phone slowly until it appears on the wall"),
+        step(2, "It’s at real size", `${size}. Drag it with one finger to move it along the wall`),
+        step(3, "Walk up to it", "Look at it from every side"),
+      ] : [
+        step(1, "Point at the floor where it would stand", "Move the phone slowly until it appears"),
+        step(2, "It stands there at real size", `${size}. Drag it with one finger to move it, twist two fingers to turn it`),
+        step(3, "Walk around it", "Look at it from every side"),
+      ],
+      note: `${parts.length ? "In this view it stays closed: open the doors here on the page. " : ""}If it shows on a white background instead of your room, tap “View in your space”. If that button isn’t there, this phone needs Google Play Services for AR from the Play Store.`,
+      go: onWall ? "Open on your wall" : "Open in your room",
+    } : mv.canActivateAR ? {
       title: "Place it at real size", sub: name,
       steps: onWall ? [
         step(1, "Point at the wall where it would hang", "Move the phone slowly until it appears there"),
@@ -1903,7 +1978,12 @@ function guide() {
     } : {
       title: "AR isn’t available here", sub: "This browser or phone can’t open the camera view.",
       groups: [], note: "Open this page in Chrome on an Android phone with Google Play Services for AR, or in Safari on an iPhone.",
-      go: null, copy: true,
+      go: null, copy: true, chrome: true,
+    };
+    case "android-inapp": return {
+      title: "Open in Chrome to use AR", sub: "This app’s browser can’t open the camera view.",
+      groups: [], note: "If Chrome doesn’t open, tap ⋮ at the top and choose Open in Chrome or Open in browser, or copy the link and paste it into Chrome.",
+      go: null, copy: true, chrome: true,
     };
     // an app's own browser (Instagram, Facebook, a shop's app): Safari opens it. x-safari-https: hands the page to
     // Safari on iOS 17 and later in most apps; where an app ignores it, the note and the copied link still get there
@@ -1944,8 +2024,9 @@ function openGuide() {
   $("sheetFoot").innerHTML = `
     ${g.go ? `<button class="go" id="sheetGo">${I.ar}<span>${esc(g.go)}</span></button>` : ""}
     ${g.alt ? `<button class="alt" id="sheetAlt">${esc(g.alt)}</button>` : ""}
+    ${g.chrome ? `<a class="go" id="sheetChrome" href="${esc(chromeIntent(shareUrl))}">${I.ar}<span>Open in Chrome</span></a>` : ""}
     ${g.safari ? `<button class="go" id="sheetSafari">${I.ar}<span>Open in Safari</span></button>` : ""}
-    ${g.copy ? `<button class="${g.go || g.safari ? "alt" : "go"}" id="sheetCopy">${g.go || g.safari ? "" : I.link}<span>Copy link</span></button>` : ""}
+    ${g.copy ? `<button class="${g.go || g.chrome || g.safari ? "alt" : "go"}" id="sheetCopy">${g.go || g.chrome || g.safari ? "" : I.link}<span>Copy link</span></button>` : ""}
     ${g.go ? `<label><input type="checkbox" id="sheetSkip"> Don’t show this again on this device</label>` : ""}`;
   $("sheetClose").addEventListener("click", closeGuide);
   $("sheetGo")?.addEventListener("click", () => {
@@ -1956,9 +2037,10 @@ function openGuide() {
   $("sheetAlt")?.addEventListener("click", () => { openHeadset("vr"); closeGuide(); });
   $("sheetCopy")?.addEventListener("click", copyLink);
   $("sheetSafari")?.addEventListener("click", openInSafari);
+  $("sheetChrome")?.addEventListener("click", openInChrome);
   lastFocus = document.activeElement;
   for (const el of [$("scrim"), $("sheet")]) el.classList.remove("hide");
-  requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); ($("sheetGo") || $("sheetSafari") || $("sheetClose")).focus(); });
+  requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); ($("sheetGo") || $("sheetChrome") || $("sheetSafari") || $("sheetClose")).focus(); });
 }
 function closeGuide() {
   $("scrim").classList.remove("show");

@@ -39,7 +39,9 @@ export const androidFile = (product, i) => `/models/android/${product.id}/${fini
 // old sends Chrome to `fallback`.
 export function sceneViewerIntent(product, i, { file, page, fallback }) {
   const f = product.finishes[i];
-  const title = `${product.brand} ${product.shortName}${product.finishes.length > 1 ? `, ${f.name}` : ""}`;
+  // Scene Viewer cuts a title at 60 characters: a long name with its colour gives way to the model code, so the colour shows
+  let title = `${product.brand} ${product.shortName}${product.finishes.length > 1 ? `, ${f.name}` : ""}`;
+  if (title.length > 60 && product.finishes.length > 1) title = `${product.brand} ${product.model}, ${f.name}`;
   const q = new URLSearchParams({ file, mode: "ar_preferred", resizable: "false", disable_occlusion: "true", title: title.slice(0, 60) });
   if (product.placement === "wall") q.set("enable_vertical_placement", "true");
   if (page) q.set("link", page);
