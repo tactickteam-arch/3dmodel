@@ -163,10 +163,15 @@ const HELP = `window.__t = (() => {
       const nx = 10, ny = Math.max(10, Math.ceil((y1 - y0) / 2));
       for (let i = 0; i <= nx; i++) for (let j = 0; j <= ny; j++) spots.push([x0 + (x1 - x0) * i / nx, y0 + (y1 - y0) * j / ny]);
       spots.sort((a, c) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(c[0] - cx, c[1] - cy));
-      for (const [x, y] of spots) {
-        if (document.elementFromPoint(x, y) !== mv) continue; // a button or the status is over it
+      // judged at the whole pixel the tap lands on, with a fingertip's 4 px round it clear of every button: a spot judged
+      // before rounding sat 0.4 px outside the rounded corner of "Move to another spot" and the tap, rounded, landed on it
+      // (whirlpool-22461, 28 Nov: the fridge went back to the dot and the next tap stood it 5 m away)
+      const clear = (x, y) => [[0, 0], [4, 0], [-4, 0], [0, 4], [0, -4], [3, 3], [-3, 3], [3, -3], [-3, -3]].every(([dx, dy]) => document.elementFromPoint(x + dx, y + dy) === mv);
+      for (const [fx, fy] of spots) {
+        const x = Math.round(fx), y = Math.round(fy);
+        if (!clear(x, y)) continue; // a button or the status is over it, or right beside it
         const h = mv.positionAndNormalFromPoint(x, y);
-        if (h && partAt(product, st, h.position) === key) return [Math.round(x), Math.round(y)];
+        if (h && partAt(product, st, h.position) === key) return [x, y];
       }
       return null;
     },
