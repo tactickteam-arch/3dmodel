@@ -29,6 +29,27 @@ export function finishPath(product, i) {
   const code = String(f?.code || "").trim();
   return code ? `/p/${code}` : null;
 }
+// Android without WebXR AR (in-app browsers, Samsung Internet, phones without WebXR) opens Google's Scene Viewer, which
+// gets one file and nothing else. Each colour has its own file, in that colour and kept to Google's limits
+// (pipeline/scripts/make_android.mjs; the gate's android-sceneviewer check).
+export const androidFile = (product, i) => `/models/android/${product.id}/${finishSlug(product.finishes[i].name)}.gltf`;
+// The link that opens it (https://developers.google.com/ar/develop/scene-viewer): in AR first (ar_preferred; Google
+// says ar_only isn't for the Google app), at real size (resizable=false), on a wall for a wall unit, with the
+// product's name and a button back to this page. `file` and `fallback` are absolute; the Google app missing or too
+// old sends Chrome to `fallback`.
+export function sceneViewerIntent(product, i, { file, page, fallback }) {
+  const f = product.finishes[i];
+  const title = `${product.brand} ${product.shortName}${product.finishes.length > 1 ? `, ${f.name}` : ""}`;
+  const q = new URLSearchParams({ file, mode: "ar_preferred", resizable: "false", disable_occlusion: "true", title: title.slice(0, 60) });
+  if (product.placement === "wall") q.set("enable_vertical_placement", "true");
+  if (page) q.set("link", page);
+  return `intent://arvr.google.com/scene-viewer/1.2?${q}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(fallback)};end;`;
+}
+// Opens a web page in Chrome from an Android in-app browser that can't open Scene Viewer itself
+export const chromeIntent = (url) => {
+  const u = new URL(url);
+  return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${u.protocol.replace(":", "")};package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end;`;
+};
 // Sangeetha's Product ID at the end of a sangeetha.com address, or null
 export const productIdOf = (url) => String(url || "").match(/\/(\d+)\/?$/)?.[1] || null;
 
