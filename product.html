@@ -713,11 +713,17 @@ const model = (url) => `${url}?v=7`;
 
 // ── what this device can do ──
 const ua = navigator.userAgent;
-// In-app browsers (WhatsApp, Instagram…) are web views that can't open Apple's AR view;
-// Chrome, Edge, Firefox and Google on iPhone are web views that can.
+// Apple's AR view (Quick Look) opens from Safari, and from apps that show pages in Safari's own view. An app's own web
+// view (Instagram, Facebook, LinkedIn, a shop's app) can't open it (WebKit bug 240117), and since iOS 16 every web
+// view answers "no" when asked whether it supports rel="ar" (WebKit bug 239135), even Chrome, Edge, Firefox, DuckDuckGo
+// and the Google app, which open Quick Look themselves. So a web view is judged by which browser it is: by its user
+// agent, or by Chrome's or Firefox's own script object (Chrome and Edge on iPad can send a Mac user agent). Apps known
+// to keep links in their own web view never get Quick Look, whatever they report.
 const inWebView = !!(window.webkit && window.webkit.messageHandlers);
 const relAR = (() => { const a = document.createElement("a"); return !!a.relList?.supports?.("ar"); })();
-const hasQuickLook = inWebView ? relAR && /CriOS\/|EdgiOS\/|FxiOS\/|GSA\/|DuckDuckGo\//.test(ua) : relAR;
+const arBrowser = /CriOS\/|EdgiOS\/|FxiOS\/|GSA\/|DuckDuckGo\//.test(ua) || !!window.__gCrWeb || !!window.__firefox__;
+const iosInApp = /\b(FBAN|FBAV|FBIOS|FB_IAB|Instagram|LinkedInApp|Line|Snapchat|musical_ly|BytedanceWebview)\b/.test(ua);
+const hasQuickLook = !iosInApp && (inWebView ? arBrowser : relAR);
 const xrSupport = async (mode) => { try { return !!(await navigator.xr?.isSessionSupported(mode)); } catch { return false; } };
 const [xrAR, xrVR] = await Promise.all([xrSupport("immersive-ar"), xrSupport("immersive-vr")]);
 const isHeadset = /OculusBrowser|Quest|Pico|Wolvic/i.test(ua);
@@ -1646,14 +1652,22 @@ onLoad(() => {
 // ?ql=free opens the same product without the floor anchor (the -free file), to compare on an
 // iPhone which one stands where it is pointed; Quick Look's placement can't be set from the page.
 const qlFree = new URLSearchParams(location.search).get("ql") === "free" && !onWall;
+// The link Quick Look gets: this colour's file, at real size (no pinch to resize), the banner along the bottom (Apple
+// wants it over https: the public site's copy), and the page its Share button sends: this colour's public address,
+// never a test or Vercel one, with at most one query parameter (Safari cuts the rest, model-viewer issue 4570).
+function quickLookHref(i = finishIndex) {
+  const f = product.finishes[i];
+  const page = new URL(addressFor(i).pathname, PUBLIC_ORIGIN);
+  const q = addressFor(i).searchParams, keep = q.get("finish") ? "finish" : q.get("preview") ? "preview" : null;
+  if (keep) page.searchParams.set(keep, q.get(keep));
+  return `${model(qlFree ? f.usdz.replace(/\.usdz$/, "-free.usdz") : f.usdz)}#allowsContentScaling=0` +
+    `&custom=${PUBLIC_ORIGIN}/banners/${product.id}&customHeight=small` +
+    `&canonicalWebPageURL=${encodeURIComponent(page.href)}`;
+}
 function openQuickLook() {
-  const f = product.finishes[finishIndex];
-  const banner = `${location.origin}/banners/${product.id}`;
   const a = document.createElement("a");
   a.rel = "ar";
-  a.href = `${model(qlFree ? f.usdz.replace(/\.usdz$/, "-free.usdz") : f.usdz)}#allowsContentScaling=0` +
-    (location.protocol === "https:" ? `&custom=${banner}&customHeight=small` : "") +
-    `&canonicalWebPageURL=${encodeURIComponent(shareUrl)}`;
+  a.href = quickLookHref();
   a.appendChild(document.createElement("img"));
   a.style.display = "none";
   document.body.appendChild(a);
@@ -1891,10 +1905,12 @@ function guide() {
       groups: [], note: "Open this page in Chrome on an Android phone with Google Play Services for AR, or in Safari on an iPhone.",
       go: null, copy: true,
     };
+    // an app's own browser (Instagram, Facebook, a shop's app): Safari opens it. x-safari-https: hands the page to
+    // Safari on iOS 17 and later in most apps; where an app ignores it, the note and the copied link still get there
     case "ios-inapp": return {
-      title: "Open in Safari to use AR", sub: "This in-app browser can’t open Apple’s AR view.",
-      groups: [], note: "Tap ••• or the compass icon and choose Open in Safari, or copy the link and paste it into Safari.",
-      go: null, copy: true,
+      title: "Open in Safari to use AR", sub: "This app’s browser can’t open Apple’s AR view.",
+      groups: [], note: "If Safari doesn’t open, tap ••• or the compass icon and choose Open in Safari, or copy the link and paste it into Safari.",
+      go: null, copy: true, safari: true,
     };
     default: return {
       title: "Open it on your phone or headset", sub: `See the ${product.shortName} at real size in your room.`,
@@ -1903,6 +1919,16 @@ function guide() {
       go: null, copy: true,
     };
   }
+}
+// iPhone and iPad in-app browsers: hand the page to Safari, where AR works; still here after a moment, say how
+function openInSafari() {
+  const url = shareUrl.replace(/^https?:\/\//, "x-safari-https://");
+  window.__safariLink = url; // what the browser tests read
+  const shown = Date.now();
+  setTimeout(() => { if (!document.hidden && Date.now() - shown < 9000) toast("Safari didn’t open. Tap ••• and choose Open in Safari, or copy the link."); }, 3000);
+  const a = document.createElement("a");
+  a.href = url;
+  a.click();
 }
 let lastFocus = null;
 function openGuide() {
@@ -1918,7 +1944,8 @@ function openGuide() {
   $("sheetFoot").innerHTML = `
     ${g.go ? `<button class="go" id="sheetGo">${I.ar}<span>${esc(g.go)}</span></button>` : ""}
     ${g.alt ? `<button class="alt" id="sheetAlt">${esc(g.alt)}</button>` : ""}
-    ${g.copy ? `<button class="${g.go ? "alt" : "go"}" id="sheetCopy">${g.go ? "" : I.link}<span>Copy link</span></button>` : ""}
+    ${g.safari ? `<button class="go" id="sheetSafari">${I.ar}<span>Open in Safari</span></button>` : ""}
+    ${g.copy ? `<button class="${g.go || g.safari ? "alt" : "go"}" id="sheetCopy">${g.go || g.safari ? "" : I.link}<span>Copy link</span></button>` : ""}
     ${g.go ? `<label><input type="checkbox" id="sheetSkip"> Don’t show this again on this device</label>` : ""}`;
   $("sheetClose").addEventListener("click", closeGuide);
   $("sheetGo")?.addEventListener("click", () => {
@@ -1928,9 +1955,10 @@ function openGuide() {
   });
   $("sheetAlt")?.addEventListener("click", () => { openHeadset("vr"); closeGuide(); });
   $("sheetCopy")?.addEventListener("click", copyLink);
+  $("sheetSafari")?.addEventListener("click", openInSafari);
   lastFocus = document.activeElement;
   for (const el of [$("scrim"), $("sheet")]) el.classList.remove("hide");
-  requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); ($("sheetGo") || $("sheetClose")).focus(); });
+  requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); ($("sheetGo") || $("sheetSafari") || $("sheetClose")).focus(); });
 }
 function closeGuide() {
   $("scrim").classList.remove("show");
@@ -1980,7 +2008,7 @@ window.__demo = { product, state, togglePart, applyFinish, chooseFinish, openHea
   // nothing moving or waiting to move: no part, no chain of parts, no Fill or Empty, and the last clip has ended
   // mv.paused turns true only on a frame that drew the clip's last pose, so a busy machine that skips frames can't read early
   idle: () => !busy && !chaining && !pressing.size && !window.__organise?.openingDoors?.() && !window.__organise?.running?.() && mv.paused,
-  caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR } };
+  caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR }, quickLookHref };
 </script>
 </body>
 </html>

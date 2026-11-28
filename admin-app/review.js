@@ -3,7 +3,7 @@
 // feedback with photos; an admin or manager then approves it (it goes on the catalogue at once, through live.js) or
 // declines it (it comes off). Every rule is enforced by the database (pipeline/admin/schema.sql), not this page.
 import { CATEGORIES, finishSlug } from "/site.js";
-import { siteOrigin } from "./config.js";
+import { siteOrigin, PUBLIC_ORIGIN } from "./config.js";
 import { esc, icon, badge, emptyState, errorBox, toast, formModal, copyText, qrSvg, fmtNum, fmtDateTime, fmtAgo } from "./ui.js";
 
 export const DEVICE_LABEL = { iphone: "iPhone / iPad", android: "Android", headset: "Quest / headset", computer: "Computer" };
@@ -120,7 +120,7 @@ const model = (url) => `${url}?v=7`; // the cache key product.html puts on model
 // iPhone, iPad and Vision Pro: Apple's AR view of that colour's USDZ, as product.html's openQuickLook() opens it
 function quickLookUrl(p, f, page) {
   const o = siteOrigin();
-  return `${o}${model(f.usdz)}#allowsContentScaling=0${o.startsWith("https:") ? `&custom=${o}/banners/${p.id}&customHeight=small` : ""}&canonicalWebPageURL=${encodeURIComponent(page)}`;
+  return `${o}${model(f.usdz)}#allowsContentScaling=0&custom=${PUBLIC_ORIGIN}/banners/${p.id}&customHeight=small&canonicalWebPageURL=${encodeURIComponent(page)}`;
 }
 // Android without WebXR: Google's Scene Viewer, with the link model-viewer 4.0.0 (product.html's viewer) makes. It
 // always shows the model's own colour, the first one.

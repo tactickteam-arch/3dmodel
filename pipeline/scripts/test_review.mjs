@@ -18,6 +18,7 @@ import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { launch, sleep } from "./cdp.mjs";
+import { SITE } from "../../site-config.js";
 
 const [base, out] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
@@ -215,7 +216,7 @@ const c1 = JSON.parse(await b.evalJS(`JSON.stringify({ src: document.getElementB
   qr: document.querySelector('#testLinks .qr').innerHTML, link: document.querySelector('#testLinks .linkbox code').textContent,
   ql: document.querySelector('[data-ql]').dataset.ql, pressed: document.querySelector('[data-fi="1"]').getAttribute('aria-pressed') })`));
 check(c1.src !== head.src && c1.sel === "1" && c1.qr !== qr0 && c1.link !== head.link && c1.pressed === "true", "a colour chip changes the preview, the colour list, the QR code and the link");
-check(c1.ql.startsWith(`${base}${w1.finishes[1].usdz}?v=7#allowsContentScaling=0&canonicalWebPageURL=${encodeURIComponent(c1.link)}`), "the iPhone AR link is that colour's USDZ, as product.html opens it");
+check(c1.ql.startsWith(`${base}${w1.finishes[1].usdz}?v=7#allowsContentScaling=0&custom=${SITE.publicOrigin}/banners/${w1.id}&customHeight=small&canonicalWebPageURL=${encodeURIComponent(c1.link)}`), "the iPhone AR link is that colour's USDZ, as product.html opens it");
 await b.evalJS("(() => { const s = document.getElementById('linkColour'); s.value = '2'; s.dispatchEvent(new Event('change')); })()");
 check(await b.evalJS(`document.querySelector('[data-fi="2"]').getAttribute('aria-pressed') === 'true' && document.querySelector('[data-ql]').dataset.ql.includes(${js(w1.finishes[2].usdz)})`), "the colour list beside the QR code changes the colour too");
 await b.evalJS("window.__arLink = null; document.querySelector('[data-ql]').click()");
