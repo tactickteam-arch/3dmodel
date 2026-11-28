@@ -65,10 +65,23 @@ export async function studioLight(mv, { wall = false } = {}) {
   const castAll = () => scene.target.traverse((o) => { if (o.isMesh && o !== catcher && !o.userData.noHit) { o.castShadow = true; o.receiveShadow = false; } });
   castAll();
 
-  let home = mv.getCameraOrbit().theta, on = true;
+  let home = mv.getCameraOrbit().theta, on = true, arEnv = null;
   const place = () => {
-    const turn = on ? mv.getCameraOrbit().theta - home : 0;
+    let turn = on ? mv.getCameraOrbit().theta - home : 0;
     scene.environmentRotation.y = turn;
+    // In phone AR the product stands wherever the shopper puts it, turned any way. Until the phone sends its own
+    // estimate of the room's light (xr-environment), it is lit by the studio light, kept just as the 3D view keeps it:
+    // the same turntable, fixed to the viewer, so the side the phone sees gets the light the 3D view gives that side.
+    // Left fixed to the room, a product placed facing back the way the AR view started faced the studio's dark back
+    // and came out a third as bright, a fifth of it near black; turned with the product but not with the viewer, a
+    // black glass door seen straight on (the 3D view opens 20-30 degrees round) caught none of the studio's
+    // highlights and four fifths of it went near black (28 Nov). The room's own light, once it comes, stays where the
+    // room is.
+    if (!on && arEnv && scene.environment === arEnv) {
+      const q = scene.pivot.quaternion, yaw = 2 * Math.atan2(q.y, q.w), eye = scene.getCamera().position, at = scene.pivot.position;
+      turn = Math.atan2(eye.x - at.x, eye.z - at.z) - yaw - home;
+      scene.environmentRotation.y = yaw + turn;
+    }
     scene.environmentIntensity = 1 - BACK_DIM * (1 - Math.cos(turn)) / 2;
     // a wall unit's key light stays in front of the wall, however far round the view goes
     const az = (KEY_AZ * Math.PI) / 180 + turn, a = wall ? Math.max(-1.4, Math.min(1.4, az)) : az;
@@ -77,7 +90,7 @@ export async function studioLight(mv, { wall = false } = {}) {
     light.target.position.set(c.x, wall ? c.y : box.min.y, c.z);
     scene.queueRender();
   };
-  const setOn = (v) => { on = v; light.castShadow = v && shadow; catcher.visible = v && shadow; place(); };
+  const setOn = (v) => { arEnv = v ? null : on ? scene.environment : arEnv; on = v; light.castShadow = v && shadow; catcher.visible = v && shadow; place(); };
   mv.addEventListener("camera-change", place);
   // AR on Android lights the model with the real room
   mv.addEventListener("ar-status", (e) => setOn(e.detail.status === "not-presenting" || e.detail.status === "failed"));

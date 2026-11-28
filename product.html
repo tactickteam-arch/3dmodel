@@ -203,7 +203,8 @@
   .ar-status.gone { opacity: 0; }
   .ar-bottom { position: absolute; left: 0; right: 0; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
   .ar-bottom > * { pointer-events: auto; }
-  .ar-finishes { display: flex; gap: 8px; background: rgba(253,252,249,.94); padding: 6px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  /* many colours (a Samsung fridge has 11) wrap onto a second row instead of running off the screen */
+  .ar-finishes { display: flex; flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 24px); gap: 8px; background: rgba(253,252,249,.94); padding: 6px; border-radius: 26px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
   .ar-finishes button { width: 40px; height: 40px; border-radius: 50%; border: 2px solid transparent; padding: 0; background-size: cover; background-position: center; }
   .ar-finishes button[aria-pressed="true"] { border-color: var(--navy); box-shadow: inset 0 0 0 2px #fff; }
   .ar-parts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 12px; }
@@ -1790,10 +1791,13 @@ mv.addEventListener("ar-status", (e) => {
   renderParts();
   if (s === "session-started") {
     placedOnce = false;
+    roomLight();
+    if (onWall) wallHold();
     if (onWall || !startPin()) arStatus(onWall ? "Point at the wall and move your phone slowly" : "Point at the floor and move your phone slowly");
   }
   if (s === "object-placed" && pin.mode === "placed") arStatus(`It stays on this spot, at real size.${parts.length ? `\n${product.arTip}` : ""}`, 6500);
-  else if (s === "object-placed" && !placedOnce) { placedOnce = true; arStatus(parts.length ? `${product.arTip}\nDrag it to move · Twist two fingers to turn` : "Drag it to move · Twist two fingers to turn", 6500); }
+  // on a wall a finger slides it along the wall, and two fingers don't turn it (model-viewer keeps it square to the wall)
+  else if (s === "object-placed" && !placedOnce) { placedOnce = true; const how = onWall ? "Drag it along the wall to move it" : "Drag it to move · Twist two fingers to turn"; arStatus(parts.length ? `${product.arTip}\n${how}` : how, 6500); }
   if (s === "not-presenting" || s === "failed") stopPin();
   if (s === "failed") toast("AR couldn’t start on this phone. Try Chrome with Google Play Services for AR.");
 });
@@ -1822,6 +1826,41 @@ function hookAR() {
   R.moveToFloor = function (frame) { return pin.mode === "off" ? stockMove.call(this, frame) : aimFrame(frame); };
   R.processInput = function (frame) { if (pin.mode !== "off") this.isTranslating = this.isRotating = false; return stockInput.call(this, frame); };
   return (pin.R = R);
+}
+// The room's light (xr-environment). Phones with ARCore's light estimate send it in two parts: the light's strength,
+// colour and direction, and a picture of the room for reflections. model-viewer switches to the room's light at the
+// first part and lights the product with an empty (black) reflection map until the second comes, so steel doors went
+// dark grey and the trim black (a third as bright in the AR stand-in). The product keeps the 3D view's studio light
+// until the room's reflections have arrived, then takes the room's light whole.
+function roomLight() {
+  const R = hookAR(), xl = R?.xrLight, scene = R?.presentedScene, studio = scene?.environment;
+  if (!xl || !scene) return;
+  xl.addEventListener("estimationstart", () => {
+    const env = xl.environment;
+    if (!env || env.pmremVersion > 0 || R.presentedScene !== scene) return; // no reflections asked for, or already here
+    let d = null;
+    for (let o = Object.getPrototypeOf(env); o && !d; o = Object.getPrototypeOf(o)) d = Object.getOwnPropertyDescriptor(o, "needsPMREMUpdate");
+    if (!d?.set) return;
+    scene.remove(xl);
+    scene.environment = studio;
+    Object.defineProperty(env, "needsPMREMUpdate", { configurable: true, get: () => d.get?.call(env), set(v) {
+      d.set.call(env, v);
+      if (v && R.presentedScene === scene && xl === R.xrLight) { scene.add(xl); scene.environment = env; }
+    } });
+  });
+}
+// A unit on the wall keeps model-viewer's own placement, with two fixes. It hangs by the middle of its back where the
+// phone points, not by whatever spot the 3D view was zoomed in on (34 cm off for an AC zoomed onto its side). And a
+// touch doesn't move it: model-viewer adds its outline's 1 mm offset to the height at the end of every touch, so each
+// tap on a louvre dropped the unit 1 mm down the wall; and a touch starts a drag from the plane the finger meets, which
+// sat 1 mm behind the unit's back, so the first tap pulled it 1 mm off the wall. The plane now lies on its back.
+function wallHold() {
+  const R = hookAR(), scene = R?.presentedScene, box = R?.placementBox;
+  if (!scene?.model || !box) return;
+  const c = mv.getBoundingBoxCenter();
+  scene.setTarget(c.x, c.y, c.z);
+  Object.defineProperty(box, "offsetHeight", { get: () => 0, set() {}, configurable: true });
+  if (box.hitPlane) box.hitPlane.position.z = 0.001;
 }
 function startPin() {
   const R = hookAR(), scene = R?.presentedScene, session = R?.currentSession;
@@ -1869,7 +1908,9 @@ function placeHere() {
   if (pin.mode !== "aim" || !pin.ready || !scene) return;
   pin.spot = R.goalPosition.clone();
   scene.pivot.position.copy(pin.spot); // straight onto the spot, no glide
-  scene.yaw = R.goalYaw;
+  // the whole turn, not only its y angle: after a turn past 90 degrees three.js keeps the pivot's angles as
+  // (180, y, 180), so setting y alone stood it facing away and it then swung round in front of the shopper
+  scene.pivot.rotation.set(0, R.goalYaw, 0);
   R.placementBox.offsetHeight = 0;
   scene.setShadowOffset(0);
   R.placementBox.show = false;
