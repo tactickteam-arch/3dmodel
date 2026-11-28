@@ -107,6 +107,11 @@ if (spec.finishes) {
     if (!v) throw new Error(`${id}: no colour ${finish}`);
     list.addMapping(ext.createMapping().setMaterial(labelMat(`LabelBEE_${finish.replace(/\W+/g, "_")}`, file)).addVariant(v));
   }
+  // every other colour maps back to the main label: model-viewer keeps the material it has for a colour with no mapping,
+  // so picking Versailles Gray after Light Gray kept Light Gray's label (test_arphone, 28 Nov)
+  const listed = new Set(Object.keys(spec.finishes));
+  const rest = variants.filter((v) => !listed.has(v.getName()));
+  if (rest.length) { const m = ext.createMapping().setMaterial(prim.getMaterial()); rest.forEach((v) => m.addVariant(v)); list.addMapping(m); }
   prim.setExtension("KHR_materials_variants", list);
 }
 host.addChild(doc.createNode("BeeLabelDecal").setMesh(doc.createMesh("BeeLabelDecal").addPrimitive(prim)));
