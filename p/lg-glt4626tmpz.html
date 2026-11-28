@@ -753,6 +753,10 @@ const framed = window.self !== window.top;
 // hand Android the link that opens Google's AR view. Android marks a WebView "; wv)"; some apps add their name.
 const isAndroid = /Android/i.test(ua) && !isHeadset;
 const androidInApp = isAndroid && (/; wv\)/.test(ua) || /\b(FBAN|FBAV|FB_IAB|FB4A|Instagram|WhatsApp|Line|Snapchat|LinkedInApp|musical_ly|Twitter)\b/.test(ua));
+// Google's own Chrome, not a browser built on it (Samsung Internet, the default on Samsung phones, and Edge, Opera, Mi,
+// Vivo, Oppo...). Those can't run WebXR AR, so AR there is Google's Scene Viewer, where doors can't open; Chrome on the
+// same phone can, so they are offered Chrome first (guide below)
+const androidChrome = isAndroid && /Chrome\/\d/.test(ua) && !/SamsungBrowser|EdgA|OPR\/|YaBrowser|UCBrowser|MiuiBrowser|HeyTapBrowser|VivoBrowser|OppoBrowser|DuckDuckGo|Firefox|; wv\)/.test(ua);
 // ?embed shows the viewer alone, for a box on a retailer's product page. AR from inside another
 // site's frame is not dependable on every phone, so its button opens the full page in a new tab.
 if (new URLSearchParams(location.search).has("embed")) {
@@ -2000,9 +2004,21 @@ function guide() {
       groups: [["In passthrough", [parts.length && row(I.trigger, openTitle, "Point at it and pull the trigger, or pinch", true), row(I.move, "Move", onWall ? "Point at a wall or the floor and pull the trigger" : "Point at the floor and pull the trigger"), row(I.rotate, "Turn", "Hold grip and sweep, or push the thumbstick"), row(I.panel, "Finish and exit", "On the panel beside it")]]],
       go: "Open in your room", alt: headsetVR ? "See it alone in VR" : null,
     };
+    // Another Android browser (Samsung Internet, Edge, Opera...) without WebXR: Chrome on the same phone opens the doors in
+    // AR, Scene Viewer can't, so Chrome comes first and Scene Viewer is the quick view, saying its doors stay shut
+    case "android": return mv.canActivateAR && !xrAR && !androidChrome && parts.length ? {
+      title: "Open in Chrome to open the doors in AR", sub: name,
+      steps: [
+        step(1, "Tap Open in Chrome", "This page opens in Chrome on this phone"),
+        step(2, "Tap View in your room there", `It stands at real size in your room: ${size}`),
+        step(3, "Open it like the real one", product.arTip),
+      ],
+      note: "This browser can only show it closed. Quick view here places it at real size, but its doors and drawers stay shut: open them on this page instead.",
+      chrome: true, go: "Quick view here, doors shut", goAlt: true,
+    }
     // Google's Scene Viewer (no WebXR here): it finds the floor or wall by itself, one finger moves it, two turn it,
     // and the size is locked; no Place here button and no doors
-    case "android": return mv.canActivateAR && !xrAR ? {
+    : mv.canActivateAR && !xrAR ? {
       title: "Place it at real size", sub: name,
       steps: onWall ? [
         step(1, "Point at the wall where it would hang", "Move the phone slowly until it appears on the wall"),
@@ -2075,12 +2091,13 @@ function openGuide() {
     ${(g.groups || []).map(([label, rows]) => `<div class="g-label">${esc(label)}</div>${rows.filter(Boolean).join("")}`).join("")}
     ${g.note ? `<div class="g-note">${I.info}<div>${esc(g.note)}</div></div>` : ""}`;
   $("sheetFoot").innerHTML = `
-    ${g.go ? `<button class="go" id="sheetGo">${I.ar}<span>${esc(g.go)}</span></button>` : ""}
+    ${g.chrome && g.goAlt ? `<a class="go" id="sheetChrome" href="${esc(chromeIntent(shareUrl))}">${I.ar}<span>Open in Chrome</span></a>` : ""}
+    ${g.go ? `<button class="${g.goAlt ? "alt" : "go"}" id="sheetGo">${g.goAlt ? "" : I.ar}<span>${esc(g.go)}</span></button>` : ""}
     ${g.alt ? `<button class="alt" id="sheetAlt">${esc(g.alt)}</button>` : ""}
-    ${g.chrome ? `<a class="go" id="sheetChrome" href="${esc(chromeIntent(shareUrl))}">${I.ar}<span>Open in Chrome</span></a>` : ""}
+    ${g.chrome && !g.goAlt ? `<a class="go" id="sheetChrome" href="${esc(chromeIntent(shareUrl))}">${I.ar}<span>Open in Chrome</span></a>` : ""}
     ${g.safari ? `<button class="go" id="sheetSafari">${I.ar}<span>Open in Safari</span></button>` : ""}
     ${g.copy ? `<button class="${g.go || g.chrome || g.safari ? "alt" : "go"}" id="sheetCopy">${g.go || g.chrome || g.safari ? "" : I.link}<span>Copy link</span></button>` : ""}
-    ${g.go ? `<label><input type="checkbox" id="sheetSkip"> Don’t show this again on this device</label>` : ""}`;
+    ${g.go && !g.goAlt ? `<label><input type="checkbox" id="sheetSkip"> Don’t show this again on this device</label>` : ""}`;
   $("sheetClose").addEventListener("click", closeGuide);
   $("sheetGo")?.addEventListener("click", () => {
     if ($("sheetSkip")?.checked) { try { localStorage.setItem(GUIDE_KEY, "1"); } catch {} }
@@ -2093,7 +2110,7 @@ function openGuide() {
   $("sheetChrome")?.addEventListener("click", openInChrome);
   lastFocus = document.activeElement;
   for (const el of [$("scrim"), $("sheet")]) el.classList.remove("hide");
-  requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); ($("sheetGo") || $("sheetChrome") || $("sheetSafari") || $("sheetClose")).focus(); });
+  requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); ((g.goAlt && $("sheetChrome")) || $("sheetGo") || $("sheetChrome") || $("sheetSafari") || $("sheetClose")).focus(); });
 }
 function closeGuide() {
   $("scrim").classList.remove("show");
@@ -2106,7 +2123,8 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("shee
 
 $("btnAR").addEventListener("click", () => {
   if (framed) return void window.open(shareUrl, "_blank", "noopener");
-  const canLaunch = ["ios", "visionos", "quest"].includes(platform) || (platform === "android" && mv.canActivateAR);
+  // another Android browser always gets the guide, so Chrome (doors open in AR) is offered even after "Don't show again"
+  const canLaunch = ["ios", "visionos", "quest"].includes(platform) || (platform === "android" && mv.canActivateAR && (xrAR || androidChrome || !parts.length));
   if (canLaunch && skipGuide()) return launchAR();
   openGuide();
 });
@@ -2143,7 +2161,7 @@ window.__demo = { product, state, togglePart, applyFinish, chooseFinish, openHea
   // nothing moving or waiting to move: no part, no chain of parts, no Fill or Empty, and the last clip has ended
   // mv.paused turns true only on a frame that drew the clip's last pose, so a busy machine that skips frames can't read early
   idle: () => !busy && !chaining && !pressing.size && !window.__organise?.openingDoors?.() && !window.__organise?.running?.() && mv.paused,
-  caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR }, quickLookHref };
+  caps: { platform, isPhone, hasQuickLook, xrAR, xrVR, headsetAR, headsetVR, androidChrome }, quickLookHref };
 </script>
 </body>
 </html>

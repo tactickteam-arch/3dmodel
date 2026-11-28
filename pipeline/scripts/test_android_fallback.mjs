@@ -86,7 +86,9 @@ async function open(p, i) {
   return b.waitFor("!!window.__demo && document.querySelector('model-viewer')?.src && document.querySelector('model-viewer').canActivateAR !== undefined", 40000);
 }
 const sheetOf = () => b.evalJS(`({ title: document.getElementById("sheetTitle")?.textContent || "", go: !!document.getElementById("sheetGo"), chrome: document.getElementById("sheetChrome")?.href || null, copy: !!document.getElementById("sheetCopy"),
-  text: document.getElementById("sheetBody")?.textContent || "", note: document.querySelector(".g-note")?.textContent || "" })`);
+  text: document.getElementById("sheetBody")?.textContent || "", note: document.querySelector(".g-note")?.textContent || "",
+  goClass: document.getElementById("sheetGo")?.className || null,
+  chromeFirst: !!document.getElementById("sheetChrome") && !!document.getElementById("sheetGo") && !!(document.getElementById("sheetChrome").compareDocumentPosition(document.getElementById("sheetGo")) & Node.DOCUMENT_POSITION_FOLLOWING) })`);
 async function pressAR() {
   await b.evalJS("document.getElementById('btnAR').click()");
   await b.waitFor("!document.getElementById('sheet').classList.contains('hide')", 5000);
@@ -183,12 +185,22 @@ for (const [app, ua] of Object.entries(INAPP)) {
   errors(app);
 }
 {
+  // Samsung Internet (the default browser on Samsung phones) can't open the doors in AR, Chrome on the same phone can:
+  // Open in Chrome comes first, and Scene Viewer is the second button, saying the doors stay shut there
   await device(SAMSUNG, NO_XR);
   await open(X, xi);
   const st = await b.evalJS("window.__demo.caps.platform"), sheet = await pressAR();
+  const here = await b.evalJS("location.origin + location.pathname + location.search");
+  const okSheet = st === "android" && X.parts.length > 0 && /Chrome/.test(sheet.title) && sheet.chrome === chromeIntent(here) && sheet.chromeFirst && sheet.go && /\balt\b/.test(sheet.goClass || "") && /shut/.test(sheet.note) && !/Don’t show this again/.test(sheet.text + (await b.evalJS("document.getElementById('sheetFoot').textContent")));
+  check(okSheet, `Samsung Internet without WebXR: "${sheet.title}", Open in Chrome first (doors open in AR there), then the quick view that says the doors stay shut, and no "Don't show again"${okSheet ? "" : ` (platform ${st}, Chrome ${sheet.chrome}, first ${sheet.chromeFirst}, go ${sheet.goClass}, note "${sheet.note}")`}`);
+  await b.evalJS("document.getElementById('sheetChrome')?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))");
+  await sleep(200);
+  const [ci, chosen] = await Promise.all([b.evalJS("window.__intents"), b.evalJS("window.__chromeIntent || null")]);
+  check(ci.length === 1 && ci[0] === chromeIntent(here) && chosen === chromeIntent(here), `Samsung Internet: Open in Chrome opens ${new URL(here).pathname} in Chrome (${ci.join(" ")})`);
+  await b.evalJS("window.__intents.length = 0");
   await b.evalJS("document.getElementById('sheetGo')?.click()");
   await b.waitFor("window.__intents.length > 0", 3000);
-  check(st === "android" && sheet.go, `Samsung Internet without WebXR: "${sheet.title}" (${st})`);
+  check(st === "android" && sheet.go, `Samsung Internet without WebXR: the quick view opens Scene Viewer (${st})`);
   await checkIntent(X, xi, (await b.evalJS("window.__intents"))[0], await b.evalJS("location.origin + location.pathname + location.search"), "Samsung Internet");
   // no Google app: Chrome opens the fallback, this page with #no-ar; the page puts its address back and says what to install
   const before = await b.evalJS("location.pathname");
@@ -197,6 +209,12 @@ for (const [app, ua] of Object.entries(INAPP)) {
   const after = await b.evalJS("({ hash: location.hash, path: location.pathname, toast: document.getElementById('toast').textContent })");
   check(after.hash === "" && after.path === before && /Google app/.test(after.toast), `no Google app: the address is put back and the page says "${after.toast}"`);
   errors("Samsung Internet");
+  // "Don't show this again" ticked earlier (in Chrome, say) must not skip the offer of Chrome here
+  await open(X, xi);
+  await b.evalJS("localStorage.setItem('ar-guide-skip', '1')");
+  const again = await pressAR();
+  check(/Chrome/.test(again.title) && !!again.chrome, `Samsung Internet with "Don't show again" set: the guide still offers Chrome ("${again.title}")`);
+  await b.evalJS("localStorage.removeItem('ar-guide-skip')");
 }
 {
   await device(FIREFOX, NO_XR);
