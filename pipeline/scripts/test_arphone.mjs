@@ -143,8 +143,14 @@ const HELP = `window.__t = (() => {
       const s = S(), V = s.pivot.position.constructor;
       s.updateMatrixWorld(true);
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-      for (let i = 0; i < 8; i++) {
-        const v = s.target.localToWorld(new V(z[i & 1][0], z[(i >> 1) & 1][1], z[(i >> 2) & 1][2]));
+      // where to look: the part's tap zone and the part itself, as it stands now (a lifted filter's zone is only its top,
+      // which a phone level with it sees edge on; its front, a few cm below, is what a finger lands on)
+      const bb = new (s.boundingBox.constructor)();
+      for (const m of movers(p)) for (const { o } of nodes().get(m.node) || []) bb.expandByObject(o);
+      const corners = [];
+      for (let i = 0; i < 8; i++) corners.push(s.target.localToWorld(new V(z[i & 1][0], z[(i >> 1) & 1][1], z[(i >> 2) & 1][2])));
+      if (!bb.isEmpty()) for (let i = 0; i < 8; i++) corners.push(new V(i & 1 ? bb.max.x : bb.min.x, i & 2 ? bb.max.y : bb.min.y, i & 4 ? bb.max.z : bb.min.z));
+      for (const v of corners) {
         const sp = window.__phone.project([v.x, v.y, v.z]);
         if (!sp) continue;
         const X = (sp[0] + 1) / 2 * innerWidth, Y = (sp[1] + 1) / 2 * innerHeight;
@@ -153,7 +159,9 @@ const HELP = `window.__t = (() => {
       x0 = Math.max(x0, 6); y0 = Math.max(y0, 6); x1 = Math.min(x1, innerWidth - 6); y1 = Math.min(y1, innerHeight - 6);
       if (!(x1 > x0 && y1 > y0)) return null;
       const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, spots = [];
-      for (let i = 0; i <= 10; i++) for (let j = 0; j <= 10; j++) spots.push([x0 + (x1 - x0) * i / 10, y0 + (y1 - y0) * j / 10]);
+      // (every 2 px down: a lifted filter's top is a strip a few pixels high from in front)
+      const nx = 10, ny = Math.max(10, Math.ceil((y1 - y0) / 2));
+      for (let i = 0; i <= nx; i++) for (let j = 0; j <= ny; j++) spots.push([x0 + (x1 - x0) * i / nx, y0 + (y1 - y0) * j / ny]);
       spots.sort((a, c) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(c[0] - cx, c[1] - cy));
       for (const [x, y] of spots) {
         if (document.elementFromPoint(x, y) !== mv) continue; // a button or the status is over it
@@ -350,15 +358,25 @@ async function partsInAR(product) {
     await settledTo(parts, need, `button "${labelOf(p, true)}"`, `S${bits(parts, withP)}_${bits(parts, need)}`);
     // a tap on the part itself, from wherever a shopper standing in front can see it
     let found = false;
-    for (const [d, side, up] of [[2.4, 0, 0], [1.5, 0, 0.2], [1.6, 0.6, 0], [1.6, -0.6, 0], [1.2, 0, -0.5]]) {
+    const VIEWS = [[2.4, 0, 0], [1.5, 0, 0.2], [1.6, 0.6, 0], [1.6, -0.6, 0], [1.2, 0, -0.5]];
+    for (const [d, side, up] of VIEWS) {
       await lookAt(d, side, up);
-      const spot = await js(`window.__t.tapSpot(${JSON.stringify(p.key)}).then((s) => JSON.stringify(s))`);
+      const spot = JSON.parse(await b.evalJS(`window.__t.tapSpot(${JSON.stringify(p.key)}).then((s) => JSON.stringify(s))`));
       if (!spot) continue;
       found = true;
       await tap(...spot);
       await settledTo(parts, withP, `a tap on the ${p.label} at (${spot.join(", ")})`, `S${bits(parts, need)}_${bits(parts, withP)}`);
-      const back = await js(`window.__t.tapSpot(${JSON.stringify(p.key)}).then((s) => JSON.stringify(s))`);
-      if (!check(!!back, `the open ${p.label} can be tapped shut from the same place`)) break;
+      // the same place first; a part that opens out of sight from there (a filter lifted level with the phone shows only
+      // its edge) from wherever in front it shows. (No spot comes back as JSON null, which must count as none.)
+      const spotNow = async () => JSON.parse(await b.evalJS(`window.__t.tapSpot(${JSON.stringify(p.key)}).then((s) => JSON.stringify(s))`));
+      let back = await spotNow(), where = "from the same place";
+      for (const [d2, side2, up2] of VIEWS) {
+        if (back) break;
+        await lookAt(d2, side2, up2);
+        back = await spotNow();
+        where = `from ${d2} m off, ${side2} m to the side, ${up2} m up`;
+      }
+      if (!check(!!back, `the open ${p.label} can be tapped shut ${back ? where : "(no spot on the screen that the page reads as it, from 5 places in front)"}`)) break;
       await sleep(650);
       await tap(...back);
       await settledTo(parts, need, `a tap on the open ${p.label}`, `S${bits(parts, withP)}_${bits(parts, need)}`);
