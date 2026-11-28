@@ -302,6 +302,10 @@ def draw_panel(s_px, F):
 
 
 P = draw_panel(7.0, 1)
+# laid out at 7 px/mm (the builder counts panelV in those rows), saved at most 4096 px across: the most a budget phone's GPU
+# takes in one picture (STANDARD.md section 10); at 7 px/mm it was 4165 (28 Nov). Its UVs are fractions, so they hold.
+if P.shape[1] > 4096:
+    P = cv2.resize(P, (4096, round(P.shape[0] * 4096 / P.shape[1])), interpolation=cv2.INTER_AREA)
 save(P, "panel.jpg", 90)
 
 # ── the knob's top: dark, with the drawing's four-diamond mark in the middle (drawing centre 4060, 546) ──

@@ -13,7 +13,7 @@ usage: python3 tex_lg_t12.py <photos dir> <manual panel drawing> <logos dir> <ou
   logos:   the logos folder (LG's mark is drawn from pipeline/sources/logos/lg.svg by tex_lg_mark.py)
   writes <out dir>/lg_t12/*
 
-The control panel is drawn new at 7 px/mm: every word, number and icon is the manual's vector ink (the same layout as LG's
+The control panel is drawn new at 6.94 px/mm: every word, number and icon is the manual's vector ink (the same layout as LG's
 photo), placed by fitting the drawing to the photo; the callout discs, leader lines, the dotted group boxes and the printed
 button rings are removed (the rings are raised 3D parts in the model). The words and marks the drawing lacks (LG logo,
 Smart Diagnosis, the Smart Inverter badge) are set again from the photo. The seven-segment display is drawn as polygons.
@@ -64,7 +64,9 @@ def photo(name):
 # ───────────────────────── control panel ─────────────────────────
 # The panel face is the sloped front of the top cover, 23 degrees up toward the lid. Texture coordinates: x across (590 mm, the
 # machine's width, centred), s up the slope from the front edge (0 to 140 mm). Row 0 is the back (s = 140 mm).
-PXMM = HI or 7.0
+# 6.94 px/mm keeps the panel 4094 px across, inside the 4096 px a budget phone's GPU takes in one picture (STANDARD.md
+# section 10); at 7 it was 4130 (28 Nov). The print itself is laid on again at --hi density.
+PXMM = HI or 6.94
 XW, SMAX = 590.0, 140.0
 TW, TH = int(XW * PXMM), int(SMAX * PXMM)
 BG = np.array((12, 12, 13), np.float32)

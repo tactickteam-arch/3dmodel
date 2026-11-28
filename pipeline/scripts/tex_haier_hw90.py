@@ -383,7 +383,9 @@ lo_w, lo_slant = round(W_MM * LO), round(SLANT * LO)
 lo_h = lo_slant + round((LIP_TOP - PANEL_BOT) * LO)
 lo = np.concatenate([cv2.resize(P[:OUT_SLANT], (lo_w, lo_slant), interpolation=cv2.INTER_AREA),
                      cv2.resize(P[OUT_SLANT:], (lo_w, lo_h - lo_slant), interpolation=cv2.INTER_AREA)])
-save(lo, "panel.jpg", 90)
+# laid out at 7 px/mm (layout.json and the builder count in those rows), saved at most 4096 px across: the most a budget
+# phone's GPU takes in one picture (STANDARD.md section 10); at 7 px/mm it was 4165 (28 Nov). Its UVs are fractions, so they hold.
+save(lo if lo_w <= 4096 else cv2.resize(lo, (4096, round(lo_h * 4096 / lo_w)), interpolation=cv2.INTER_AREA), "panel.jpg", 90)
 
 # ════════ the knob's top: dark, the four-diamond mark in the middle (the picture: 29 x 24 px, 12.5 mm across) ════════
 KR = 27.3                         # ESTIMATED: the knob's dark disc reaches the cyan ring's inner edge in the picture
